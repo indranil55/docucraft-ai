@@ -130,20 +130,19 @@
       line-height: 1.5;
     }
 
+    /* Centered Filter Tabs Layout */
     .filter-wrapper {
       width: 100%;
-      overflow-x: auto;
       padding: 12px 16px;
-      scrollbar-width: none;
-      -webkit-overflow-scrolling: touch;
-    }
-
-    .filter-wrapper::-webkit-scrollbar {
-      display: none;
+      display: flex;
+      justify-content: center;
+      overflow-x: auto;
     }
 
     .filter-tabs {
-      display: inline-flex;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
       gap: 8px;
       white-space: nowrap;
     }
@@ -630,6 +629,7 @@
     <p>Advanced Photo KB Resizer, Passport Grid, Digital Signature Pad, QR Code Generator & PDF Utilities.</p>
   </section>
 
+  <!-- Centered Filter Tabs -->
   <div class="filter-wrapper">
     <div class="filter-tabs" id="tools">
       <button class="filter-btn active" onclick="filterCategory('all', this)">All</button>
