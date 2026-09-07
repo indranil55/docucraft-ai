@@ -425,6 +425,17 @@
       gap: 8px;
     }
 
+    .lang-select-box {
+      background: #1e293b;
+      border: 1px solid rgba(255,255,255,0.2);
+      color: #60a5fa;
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-size: 12px;
+      outline: none;
+      cursor: pointer;
+    }
+
     .voice-toggle-btn {
       background: #1e293b;
       border: 1px solid rgba(255,255,255,0.2);
@@ -846,7 +857,7 @@
           <i class="fa-solid fa-robot"></i>
         </div>
         <h3>AI Smart Assistant (Chat)</h3>
-        <p>Type here to get instructions or assistance with any tool.</p>
+        <p>Type here to get instructions or assistance with any tool in English or Hindi.</p>
         <span class="tool-meta">Open Chat Helpdesk &rarr;</span>
       </div>
 
@@ -859,6 +870,10 @@
       <div class="ai-chat-header">
         <h3><i class="fa-solid fa-robot" style="color: #60a5fa;"></i> DocuCraft AI Helpdesk</h3>
         <div style="display: flex; align-items: center; gap: 8px;">
+          <select id="chatLangSelect" class="lang-select-box" onchange="changeChatLanguage(this.value)">
+            <option value="en" selected>English</option>
+            <option value="hi">हिन्दी (Hindi)</option>
+          </select>
           <button id="voiceMuteToggle" class="voice-toggle-btn" onclick="toggleVoiceOutput()">
             <i class="fa-solid fa-volume-high"></i> Voice ON
           </button>
@@ -868,7 +883,7 @@
 
       <div class="ai-chat-messages" id="chatMessages">
         <div class="msg bot" id="welcomeMsg">
-          Hello! I am DocuCraft AI Assistant. You can ask any question or learn how to use our tools in English, Bengali, or Hindi.
+          Hello! I am DocuCraft AI Assistant. You can ask any question or learn how to use our tools in English or Hindi.
         </div>
       </div>
 
@@ -880,7 +895,7 @@
       </div>
 
       <div class="ai-chat-input-bar">
-        <input type="text" id="chatInput" placeholder="Type your question in English, Bengali or Hindi..." onkeypress="handleEnter(event)">
+        <input type="text" id="chatInput" placeholder="Type in English or Hindi..." onkeypress="handleEnter(event)">
         <button onclick="sendUserMessage()"><i class="fa-solid fa-paper-plane"></i></button>
       </div>
     </div>
@@ -942,6 +957,7 @@
 
     let activeTool = '';
     let selectedFiles = [];
+    let currentLang = 'en';
     let availableVoices = [];
     let isVoiceOutputEnabled = true;
     let sigCanvasInstance = null;
@@ -977,23 +993,31 @@
       utterance.rate = 1.0;
       utterance.pitch = 1.0;
 
-      const isBengali = /[\u0980-\u09FF]/.test(cleanText);
-      const isHindi = /[\u0900-\u097F]/.test(cleanText);
-
+      const isHindi = /[\u0900-\u097F]/.test(cleanText) || currentLang === 'hi';
       let matchedVoice = null;
-      if (isBengali) {
-        matchedVoice = availableVoices.find(v => v.lang.startsWith('bn'));
-        utterance.lang = 'bn-BD';
-      } else if (isHindi) {
-        matchedVoice = availableVoices.find(v => v.lang.startsWith('hi'));
+
+      if (isHindi) {
         utterance.lang = 'hi-IN';
+        matchedVoice = availableVoices.find(v => v.lang.startsWith('hi'));
       } else {
-        matchedVoice = availableVoices.find(v => v.lang.startsWith('en'));
         utterance.lang = 'en-US';
+        matchedVoice = availableVoices.find(v => v.lang.startsWith('en'));
       }
 
       if (matchedVoice) utterance.voice = matchedVoice;
       window.speechSynthesis.speak(utterance);
+    }
+
+    function changeChatLanguage(lang) {
+      currentLang = lang;
+      const welcome = document.getElementById('welcomeMsg');
+      if (lang === 'hi') {
+        welcome.innerHTML = "नमस्ते! मैं DocuCraft AI सहायक हूँ। आप यहाँ हिंदी में कोई भी प्रश्न पूछ सकते हैं या टूल इस्तेमाल करने का तरीका जान सकते हैं।";
+        speakText("नमस्ते! मैं DocuCraft AI सहायक हूँ।");
+      } else {
+        welcome.innerHTML = "Hello! I am DocuCraft AI Assistant. You can ask any question or learn how to use our tools in English or Hindi.";
+        speakText("Hello! I am DocuCraft AI Assistant.");
+      }
     }
 
     function openSmartAiChat() {
@@ -1024,13 +1048,12 @@
       input.value = '';
 
       setTimeout(() => {
-        const replyHtml = getSmartAnswer(text);
+        const replyHtml = getBilingualAnswer(text);
         appendChatMessage(replyHtml, 'bot');
 
         const tempDiv = document.createElement('div');
         tempDiv.innerHTML = replyHtml;
-        const links = tempDiv.querySelectorAll('a');
-        links.forEach(l => l.remove());
+        tempDiv.querySelectorAll('a').forEach(l => l.remove());
         speakText(tempDiv.innerText.trim());
       }, 300);
     }
@@ -1044,18 +1067,36 @@
       container.scrollTop = container.scrollHeight;
     }
 
-    function getSmartAnswer(query) {
+    function getBilingualAnswer(query) {
       const q = query.toLowerCase();
 
-      if (q.includes('signature') || q.includes('সিগনেচার') || q.includes('हस्ताक्षर')) {
+      if (currentLang === 'hi' || q.includes('फोटो') || q.includes('साइज') || q.includes('पासपोर्ट') || q.includes('हस्ताक्षर')) {
+        if (q.includes('फोटो') || q.includes('kb') || q.includes('साइज')) {
+          return `<b>Photo & Sign KB Resizer का उपयोग कैसे करें:</b><br>
+          1. <b>Photo & Sign KB Resizer</b> टूल खोलें।<br>
+          2. अपनी तस्वीर चुनें और वांछित KB साइज चुनें (10KB, 50KB, 100KB आदि)।<br>
+          3. Process बटन पर क्लिक करें और तुरंत डाउनलोड करें!<br>
+          <a href="javascript:void(0)" onclick="closeSmartAiChat(); launchTool('kbResizer');" class="action-link-btn">👉 Open KB Resizer Tool</a>`;
+        }
+        if (q.includes('पासपोर्ट')) {
+          return `<b>Passport Photo Grid का उपयोग कैसे करें:</b><br>
+          1. <b>Passport Photo Sheet</b> टूल खोलें और अपनी फोटो अपलोड करें।<br>
+          2. कॉपियों की संख्या चुनें (3, 4, 8, या 16) और PDF डाउनलोड करें!<br>
+          <a href="javascript:void(0)" onclick="closeSmartAiChat(); launchTool('passportGrid');" class="action-link-btn">👉 Open Passport Grid Tool</a>`;
+        }
+        return `नमस्ते! आप होमपेज पर किसी भी टूल (जैसे Merge, Split, Compress) का चयन करके अपना काम तुरंत कर सकते हैं।`;
+      }
+
+      // English Responses
+      if (q.includes('signature') || q.includes('sign')) {
         return `<b>How to use Digital Signature Maker:</b><br>
         1. Open the <b>Digital Signature Maker</b> tool.<br>
-        2. Draw your signature inside the box using your mouse or finger.<br>
+        2. Draw your signature in the box using your mouse or finger.<br>
         3. Click <b>Process & Download</b> to save your transparent PNG signature.<br>
         <a href="javascript:void(0)" onclick="closeSmartAiChat(); launchTool('sigPad');" class="action-link-btn">👉 Open Signature Pad</a>`;
       }
 
-      if (q.includes('qr') || q.includes('upi') || q.includes('কিউআর')) {
+      if (q.includes('qr') || q.includes('upi')) {
         return `<b>How to use QR Code Generator:</b><br>
         1. Open the <b>QR Code & UPI Generator</b> tool.<br>
         2. Enter your UPI ID, payment link, or website URL.<br>
@@ -1063,15 +1104,15 @@
         <a href="javascript:void(0)" onclick="closeSmartAiChat(); launchTool('qrGen');" class="action-link-btn">👉 Open QR Generator</a>`;
       }
 
-      if (q.includes('resize') || q.includes('kb') || q.includes('রিসাইজ')) {
+      if (q.includes('resize') || q.includes('kb')) {
         return `<b>How to use Photo & Sign KB Resizer:</b><br>
         1. Open the <b>Photo & Sign KB Resizer</b> tool.<br>
-        2. Select your image and choose the target KB size (10KB, 50KB, 100KB, etc.).<br>
+        2. Select your image and choose the target KB size.<br>
         3. Click process to download the resized photo instantly.<br>
         <a href="javascript:void(0)" onclick="closeSmartAiChat(); launchTool('kbResizer');" class="action-link-btn">👉 Open KB Resizer Tool</a>`;
       }
 
-      if (q.includes('passport') || q.includes('পাসপোর্ট')) {
+      if (q.includes('passport')) {
         return `<b>How to use Passport Photo Grid:</b><br>
         1. Open the <b>Passport Photo Sheet</b> tool and upload your photo.<br>
         2. Select the number of copies (3, 4, 8, or 16) and download your print-ready PDF.<br>
