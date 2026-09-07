@@ -115,6 +115,27 @@
       transform: scale(0.96);
     }
 
+    /* Compact Icon-only Auth Button */
+    .auth-icon-btn {
+      background: #10b981;
+      color: #ffffff;
+      border: none;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      box-shadow: 0 2px 8px rgba(16, 185, 129, 0.35);
+      transition: transform 0.15s ease;
+    }
+
+    .auth-icon-btn:active {
+      transform: scale(0.94);
+    }
+
     .hero {
       text-align: center;
       padding: 24px 16px 12px;
@@ -637,8 +658,8 @@
         <i class="fa-solid fa-wand-magic-sparkles" style="color: var(--primary);"></i> Docu<span>Craft</span> <span class="ai-tag">AI</span>
       </a>
       <div class="nav-actions">
-        <button class="ai-btn-top" onclick="openAuthModal()" style="background: #10b981;" id="authNavBtn">
-          <i class="fa-solid fa-user"></i> Login
+        <button class="auth-icon-btn" onclick="openAuthModal()" title="Login / Sign Up" id="authNavBtn">
+          <i class="fa-solid fa-user"></i>
         </button>
         <button class="ai-btn-top" onclick="openSmartAiChat()">
           <i class="fa-solid fa-comments"></i> AI Helpdesk
@@ -1003,9 +1024,10 @@
     window.addEventListener('DOMContentLoaded', () => {
       const loggedUser = localStorage.getItem('docuCraft_logged_in_user');
       if (loggedUser) {
-        document.getElementById('authNavBtn').innerHTML = `<i class="fa-solid fa-user-check"></i> ${loggedUser.split('@')[0]}`;
+        document.getElementById('authNavBtn').innerHTML = `<i class="fa-solid fa-user-check"></i>`;
         document.getElementById('authNavBtn').setAttribute('onclick', 'handleLogout()');
         document.getElementById('authNavBtn').style.background = '#64748b';
+        document.getElementById('authNavBtn').title = `Logged in as ${loggedUser} (Click to Logout)`;
       }
     });
 
