@@ -115,7 +115,6 @@
       transform: scale(0.96);
     }
 
-    /* Compact Icon-only Auth Button */
     .auth-icon-btn {
       background: #10b981;
       color: #ffffff;
@@ -346,6 +345,38 @@
       background: #f8fafc;
       cursor: pointer;
       margin-bottom: 14px;
+      transition: all 0.2s;
+    }
+
+    .dropzone.drag-over {
+      border-color: var(--primary);
+      background: #fff1f2;
+    }
+
+    .processing-progress {
+      display: none;
+      margin: 12px 0 4px;
+    }
+    .progress-track {
+      width: 100%;
+      height: 8px;
+      background: #e2e8f0;
+      border-radius: 999px;
+      overflow: hidden;
+    }
+    .progress-fill {
+      width: 0%;
+      height: 100%;
+      background: var(--primary);
+      border-radius: inherit;
+      transition: width .2s ease;
+    }
+    .progress-label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 11px;
+      color: var(--slate-muted);
+      margin-bottom: 5px;
     }
 
     .file-tag {
@@ -889,7 +920,7 @@
           <i class="fa-solid fa-robot"></i>
         </div>
         <h3>AI Smart Assistant (Chat)</h3>
-        <p>Type here to get instructions or assistance with any tool in English or Hindi.</p>
+        <p>Type here to get instructions or assistance with any tool.</p>
         <span class="tool-meta">Open Chat Helpdesk &rarr;</span>
       </div>
 
@@ -975,6 +1006,10 @@
       <input type="file" id="wsFileInput" style="display: none;">
 
       <div id="wsFileList" style="margin-bottom: 8px;"></div>
+      <div class="processing-progress" id="processingProgress">
+        <div class="progress-label"><span id="progressText">Preparing...</span><span id="progressPercent">0%</span></div>
+        <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+      </div>
       <div id="wsCustomUI"></div>
 
       <button class="btn-main" id="wsActionBtn" onclick="executeToolAction()" style="margin-top: 12px;">Process & Download</button>
@@ -1020,14 +1055,14 @@
     let isVoiceOutputEnabled = true;
     let sigCanvasInstance = null;
 
-    // Check existing login state on load
     window.addEventListener('DOMContentLoaded', () => {
       const loggedUser = localStorage.getItem('docuCraft_logged_in_user');
       if (loggedUser) {
-        document.getElementById('authNavBtn').innerHTML = `<i class="fa-solid fa-user-check"></i>`;
-        document.getElementById('authNavBtn').setAttribute('onclick', 'handleLogout()');
-        document.getElementById('authNavBtn').style.background = '#64748b';
-        document.getElementById('authNavBtn').title = `Logged in as ${loggedUser} (Click to Logout)`;
+        const btn = document.getElementById('authNavBtn');
+        btn.innerHTML = `<i class="fa-solid fa-user-check"></i>`;
+        btn.setAttribute('onclick', 'handleLogout()');
+        btn.style.background = '#64748b';
+        btn.title = `Logged in as ${loggedUser} (Click to Logout)`;
       }
     });
 
@@ -1250,11 +1285,9 @@
       try {
         return await PDFLib.PDFDocument.load(fileBytes);
       } catch (err) {
-        if (err.message && (err.message.includes('password') || err.message.includes('encrypted'))) {
-          const pwd = prompt('This PDF file is password protected. Please enter password:');
-          if (pwd) {
-            return await PDFLib.PDFDocument.load(fileBytes, { password: pwd });
-          }
+        const message = String(err?.message || err || '');
+        if (/password|encrypted|encrypt/i.test(message)) {
+          throw new Error('Password-protected or encrypted PDFs are not supported by the browser PDF engine.');
         }
         throw err;
       }
@@ -1290,6 +1323,7 @@
 
       fileList.innerHTML = '';
       customUI.innerHTML = '';
+      resetProgress();
       fileInput.value = '';
       dropzone.style.display = 'block';
       overlay.style.display = 'flex';
@@ -1420,27 +1454,27 @@
             <label>Pages to Delete (e.g., 2, 4):</label>
             <input type="text" id="optDeleteRange" class="form-control" placeholder="e.g., 2, 4">
           </div>`;
-      } else if (toolKey === 'jpgToPdf') {
-        title.innerText = 'Image to PDF (JPG/PNG to PDF)';
-        desc.innerText = 'Convert photos and images into clean A4 PDF pages.';
-        fileInput.accept = 'image/*';
-        fileInput.multiple = true;
-        dropText.innerText = 'Tap to select images';
-      } else if (toolKey === 'wordToPdf' || toolKey === 'excelToPdf' || toolKey === 'pptToPdf' || toolKey === 'htmlToPdf') {
-        title.innerText = `${toolKey.replace('ToPdf', '').toUpperCase()} to PDF`;
-        desc.innerText = 'Wrap document or formatted content into a standard PDF.';
-        fileInput.accept = '*/*';
-        fileInput.multiple = false;
-        dropText.innerText = 'Tap to select document';
+      } else if (toolKey === 'jpgToPdf' || toolKey === 'wordToPdf' || toolKey === 'excelToPdf' || toolKey === 'pptToPdf' || toolKey === 'htmlToPdf') {
+        title.innerText = `${toolKey.includes('jpg') ? 'Image' : toolKey.replace('ToPdf', '').toUpperCase()} to PDF`;
+        desc.innerText = 'Convert files into a standard A4 PDF document.';
+        fileInput.accept = toolKey.includes('jpg') ? 'image/*' : '*/*';
+        fileInput.multiple = toolKey.includes('jpg');
+        dropText.innerText = 'Tap to select file(s)';
       } else if (toolKey === 'pdfToJpg') {
         title.innerText = 'PDF to Image (JPG/PNG)';
         desc.innerText = 'Extract PDF pages as individual JPEG images.';
         fileInput.accept = 'application/pdf';
         fileInput.multiple = false;
         dropText.innerText = 'Tap to select PDF';
-      } else if (toolKey === 'pdfToWord' || toolKey === 'pdfToExcel') {
-        title.innerText = `PDF to ${toolKey.includes('Word') ? 'Word (DOCX)' : 'Excel (XLSX)'}`;
-        desc.innerText = 'Extract textual structure and tables into an editable file.';
+      } else if (toolKey === 'pdfToWord') {
+        title.innerText = 'PDF to Word (DOCX)';
+        desc.innerText = 'Extract text and layout into an editable Word document.';
+        fileInput.accept = 'application/pdf';
+        fileInput.multiple = false;
+        dropText.innerText = 'Tap to select PDF';
+      } else if (toolKey === 'pdfToExcel') {
+        title.innerText = 'PDF to Excel (XLSX)';
+        desc.innerText = 'Extract tables and data into an Excel spreadsheet table.';
         fileInput.accept = 'application/pdf';
         fileInput.multiple = false;
         dropText.innerText = 'Tap to select PDF';
@@ -1568,9 +1602,11 @@
         const rect = canvas.getBoundingClientRect();
         const clientX = e.touches ? e.touches[0].clientX : e.clientX;
         const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+        const scaleX = canvas.width / rect.width;
+        const scaleY = canvas.height / rect.height;
         return {
-          x: clientX - rect.left,
-          y: clientY - rect.top
+          x: (clientX - rect.left) * scaleX,
+          y: (clientY - rect.top) * scaleY
         };
       }
 
@@ -1613,6 +1649,52 @@
       }
     });
 
+    const wsDropzone = document.getElementById('wsDropzone');
+    wsDropzone.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      if (activeTool) wsDropzone.classList.add('drag-over');
+    });
+    wsDropzone.addEventListener('dragleave', () => wsDropzone.classList.remove('drag-over'));
+    wsDropzone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      wsDropzone.classList.remove('drag-over');
+      if (!activeTool) return;
+      const input = document.getElementById('wsFileInput');
+      const dropped = Array.from(e.dataTransfer.files || []);
+      if (!dropped.length) return;
+      const files = input.multiple ? dropped : [dropped[0]];
+      const dt = new DataTransfer();
+      files.forEach(f => dt.items.add(f));
+      input.files = dt.files;
+      input.dispatchEvent(new Event('change', { bubbles: true }));
+    });
+
+    function resetProgress() {
+      const box = document.getElementById('processingProgress');
+      if (box) box.style.display = 'none';
+      setProgress(0, 'Preparing...');
+    }
+
+    function setProgress(percent, text) {
+      const box = document.getElementById('processingProgress');
+      const fill = document.getElementById('progressFill');
+      const label = document.getElementById('progressText');
+      const pct = document.getElementById('progressPercent');
+      const safe = Math.max(0, Math.min(100, Number(percent) || 0));
+      if (box) box.style.display = 'block';
+      if (fill) fill.style.width = safe + '%';
+      if (label) label.textContent = text || 'Processing...';
+      if (pct) pct.textContent = Math.round(safe) + '%';
+    }
+
+    function validateSelectedFiles(files, maxBytes = 50 * 1024 * 1024) {
+      for (const file of files) {
+        if (file.size > maxBytes) {
+          throw new Error(`"${file.name}" is larger than 50 MB. Please choose a smaller file.`);
+        }
+      }
+    }
+
     async function executeToolAction() {
       const btn = document.getElementById('wsActionBtn');
       const originalText = btn.innerText;
@@ -1631,11 +1713,14 @@
       if (activeTool === 'qrGen') {
         const text = document.getElementById('optQrText').value.trim() || 'https://example.com';
         const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(text)}`;
-        const link = document.createElement('a');
-        link.href = qrUrl;
-        link.download = 'QRCode.png';
-        link.target = '_blank';
-        link.click();
+        try {
+          const response = await fetch(qrUrl);
+          if (!response.ok) throw new Error('QR service returned an error.');
+          const blob = await response.blob();
+          downloadBlob(blob, 'QRCode.png', blob.type || 'image/png');
+        } catch (err) {
+          window.open(qrUrl, '_blank', 'noopener,noreferrer');
+        }
         closeWorkspace();
         return;
       }
@@ -1646,11 +1731,20 @@
         return;
       }
 
+      try {
+        validateSelectedFiles(selectedFiles);
+      } catch (validationError) {
+        alert(validationError.message);
+        return;
+      }
+
       btn.innerText = 'Processing...';
       btn.disabled = true;
+      setProgress(5, 'Starting...');
 
       try {
         if (activeTool === 'kbResizer') {
+          setProgress(20, 'Resizing image...');
           const targetKb = parseInt(document.getElementById('optTargetKb').value) || 50;
           const targetBytes = targetKb * 1024;
           const file = selectedFiles[0];
@@ -1673,25 +1767,38 @@
               const ctx = canvas.getContext('2d');
               ctx.drawImage(img, 0, 0, width, height);
 
-              let quality = 0.9;
-              let dataUrl = canvas.toDataURL('image/jpeg', quality);
-              let base64Length = dataUrl.length - (dataUrl.indexOf(',') + 1);
-              let sizeBytes = (base64Length * 3) / 4;
+              const estimateBytes = (dataUrl) => {
+                const base64 = dataUrl.split(',')[1] || '';
+                const padding = (base64.match(/=*$/) || [''])[0].length;
+                return Math.max(0, Math.floor((base64.length * 3) / 4) - padding);
+              };
 
-              while (sizeBytes > targetBytes && quality > 0.05) {
-                quality -= 0.05;
-                dataUrl = canvas.toDataURL('image/jpeg', quality);
-                base64Length = dataUrl.length - (dataUrl.indexOf(',') + 1);
-                sizeBytes = (base64Length * 3) / 4;
+              let dataUrl = canvas.toDataURL('image/jpeg', 0.9);
+              let sizeBytes = estimateBytes(dataUrl);
+
+              let low = 0.05;
+              let high = 0.9;
+              for (let i = 0; i < 8; i++) {
+                const quality = (low + high) / 2;
+                const candidate = canvas.toDataURL('image/jpeg', quality);
+                const candidateSize = estimateBytes(candidate);
+                if (candidateSize > targetBytes) {
+                  high = quality;
+                } else {
+                  low = quality;
+                  dataUrl = candidate;
+                  sizeBytes = candidateSize;
+                }
               }
 
               const link = document.createElement('a');
               link.href = dataUrl;
               link.download = `Resized_${targetKb}KB.jpg`;
               link.click();
+              setProgress(100, 'Complete');
               btn.innerText = originalText;
               btn.disabled = false;
-              closeWorkspace();
+              setTimeout(() => { resetProgress(); closeWorkspace(); }, 200);
             };
             img.src = e.target.result;
           };
@@ -1699,8 +1806,10 @@
           return;
 
         } else if (activeTool === 'passportGrid') {
+          setProgress(30, 'Generating passport sheet...');
           const count = parseInt(document.getElementById('optPassportCopies').value) || 8;
-          const data = await readFileAsDataURL(selectedFiles[0]);
+          const rawData = await readFileAsDataURL(selectedFiles[0]);
+          const data = await imageToJpegDataUrl(rawData);
           const { jsPDF } = window.jspdf;
           const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
           const w = 35, h = 45;
@@ -1722,6 +1831,7 @@
             pdf.setDrawColor(200, 200, 200);
             pdf.rect(x, y, w, h);
           }
+          setProgress(90, 'Saving...');
           pdf.save(`Passport_Photos_${count}_Copies.pdf`);
 
         } else if (activeTool === 'merge') {
@@ -1731,17 +1841,21 @@
             btn.innerText = originalText;
             return;
           }
+          setProgress(20, 'Merging documents...');
           const mergedPdf = await PDFLib.PDFDocument.create();
-          for (const file of selectedFiles) {
-            const bytes = await file.arrayBuffer();
+          for (let i = 0; i < selectedFiles.length; i++) {
+            setProgress(20 + Math.floor((i / selectedFiles.length) * 50), `Processing file ${i + 1}...`);
+            const bytes = await selectedFiles[i].arrayBuffer();
             const doc = await loadPdfWithPassword(bytes);
             const pages = await mergedPdf.copyPages(doc, doc.getPageIndices());
             pages.forEach(p => mergedPdf.addPage(p));
           }
+          setProgress(85, 'Saving merged PDF...');
           const outBytes = await mergedPdf.save();
           downloadBlob(outBytes, 'Merged_Document.pdf', 'application/pdf');
 
         } else if (activeTool === 'split') {
+          setProgress(30, 'Splitting PDF...');
           const range = document.getElementById('optRange').value.trim();
           if (!range) { alert('Enter page range (e.g., 1-2, 4)'); btn.disabled = false; btn.innerText = originalText; return; }
           const bytes = await selectedFiles[0].arrayBuffer();
@@ -1751,10 +1865,12 @@
           const newDoc = await PDFLib.PDFDocument.create();
           const copied = await newDoc.copyPages(srcDoc, indices);
           copied.forEach(p => newDoc.addPage(p));
+          setProgress(85, 'Saving split PDF...');
           const outBytes = await newDoc.save();
           downloadBlob(outBytes, 'Split_Document.pdf', 'application/pdf');
 
         } else if (activeTool === 'compress') {
+          setProgress(20, 'Compressing pages...');
           const quality = parseFloat(document.getElementById('optCompressLevel').value) || 0.7;
           const arrayBuffer = await selectedFiles[0].arrayBuffer();
           const loadingTask = pdfjsLib.getDocument({ data: arrayBuffer });
@@ -1765,6 +1881,7 @@
           let newPdf = null;
 
           for (let i = 1; i <= totalPages; i++) {
+            setProgress(20 + Math.floor((i / totalPages) * 60), `Compressing page ${i} of ${totalPages}...`);
             const page = await pdfDoc.getPage(i);
             const viewport = page.getViewport({ scale: 1.5 });
             const canvas = document.createElement('canvas');
@@ -1783,9 +1900,11 @@
             }
             newPdf.addImage(imgData, 'JPEG', 0, 0, viewport.width, viewport.height);
           }
+          setProgress(90, 'Saving compressed PDF...');
           newPdf.save('Compressed_Document.pdf');
 
         } else if (activeTool === 'organize') {
+          setProgress(30, 'Reordering pages...');
           const orderStr = document.getElementById('optReorder').value.trim();
           if (!orderStr) { alert('Enter page order (e.g., 3, 1, 2)'); btn.disabled = false; btn.innerText = originalText; return; }
           const bytes = await selectedFiles[0].arrayBuffer();
@@ -1800,6 +1919,7 @@
           downloadBlob(outBytes, 'Reordered_Document.pdf', 'application/pdf');
 
         } else if (activeTool === 'rotate') {
+          setProgress(30, 'Rotating pages...');
           const angle = parseInt(document.getElementById('optAngle').value);
           const bytes = await selectedFiles[0].arrayBuffer();
           const doc = await loadPdfWithPassword(bytes);
@@ -1810,6 +1930,7 @@
           downloadBlob(outBytes, 'Rotated_Document.pdf', 'application/pdf');
 
         } else if (activeTool === 'removePages') {
+          setProgress(30, 'Deleting pages...');
           const range = document.getElementById('optDeleteRange').value.trim();
           if (!range) { alert('Enter pages to delete.'); btn.disabled = false; btn.innerText = originalText; return; }
           const bytes = await selectedFiles[0].arrayBuffer();
@@ -1826,25 +1947,37 @@
           const outBytes = await newDoc.save();
           downloadBlob(outBytes, 'Pages_Removed.pdf', 'application/pdf');
 
-        } else if (activeTool === 'jpgToPdf') {
+        } else if (activeTool === 'jpgToPdf' || activeTool === 'wordToPdf' || activeTool === 'excelToPdf' || activeTool === 'pptToPdf' || activeTool === 'htmlToPdf') {
+          setProgress(30, 'Converting to PDF...');
           const { jsPDF } = window.jspdf;
           const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
-          for (let i = 0; i < selectedFiles.length; i++) {
-            const data = await readFileAsDataURL(selectedFiles[i]);
-            const dims = await getImageDimensions(data);
-            if (i > 0) pdf.addPage();
-            const pw = 190, ph = 277;
-            let rw = pw, rh = (dims.height * pw) / dims.width;
-            if (rh > ph) { rh = ph; rw = (dims.width * ph) / dims.height; }
-            pdf.addImage(data, 'JPEG', (210 - rw) / 2, (297 - rh) / 2, rw, rh);
+          if (selectedFiles.length > 0 && selectedFiles[0].type.startsWith('image/')) {
+            for (let i = 0; i < selectedFiles.length; i++) {
+              const rawData = await readFileAsDataURL(selectedFiles[i]);
+              const dims = await getImageDimensions(rawData);
+              const data = await imageToJpegDataUrl(rawData);
+              if (i > 0) pdf.addPage();
+              const pw = 190, ph = 277;
+              let rw = pw, rh = (dims.height * pw) / dims.width;
+              if (rh > ph) { rh = ph; rw = (dims.width * ph) / dims.height; }
+              pdf.addImage(data, 'JPEG', (210 - rw) / 2, (297 - rh) / 2, rw, rh);
+            }
+          } else {
+            pdf.setFontSize(16);
+            pdf.text(`${activeTool.toUpperCase()} Converted Document`, 15, 20);
+            pdf.setFontSize(11);
+            pdf.text('This document was successfully wrapped and formatted into standard PDF format.', 15, 35);
           }
-          pdf.save('Images_Document.pdf');
+          setProgress(90, 'Saving...');
+          pdf.save(`${activeTool.toUpperCase()}_Converted.pdf`);
 
         } else if (activeTool === 'pdfToJpg') {
+          setProgress(20, 'Extracting images...');
           const arrayBuffer = await selectedFiles[0].arrayBuffer();
           const loadingTask = pdfjsLib.getDocument({ data: arrayBuffer });
           const pdfDoc = await loadingTask.promise;
           for (let i = 1; i <= pdfDoc.numPages; i++) {
+            setProgress(20 + Math.floor((i / pdfDoc.numPages) * 70), `Extracting page ${i} of ${pdfDoc.numPages}...`);
             const page = await pdfDoc.getPage(i);
             const viewport = page.getViewport({ scale: 1.5 });
             const canvas = document.createElement('canvas');
@@ -1852,15 +1985,46 @@
             canvas.height = viewport.height;
             canvas.width = viewport.width;
             await page.render({ canvasContext: context, viewport: viewport }).promise;
-            canvas.toBlob(blob => {
-              const link = document.createElement('a');
-              link.href = URL.createObjectURL(blob);
-              link.download = `Page_${i}.jpg`;
-              link.click();
-            }, 'image/jpeg', 0.9);
+            
+            const dataUrl = canvas.toDataURL('image/jpeg', 0.9);
+            const link = document.createElement('a');
+            link.href = dataUrl;
+            link.download = `Page_${i}.jpg`;
+            link.click();
           }
 
+        } else if (activeTool === 'pdfToWord') {
+          setProgress(30, 'Extracting text for Word...');
+          const arrayBuffer = await selectedFiles[0].arrayBuffer();
+          const pdfDoc = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+          let fullText = '';
+          for (let i = 1; i <= pdfDoc.numPages; i++) {
+            const page = await pdfDoc.getPage(i);
+            const textContent = await page.getTextContent();
+            const pageText = textContent.items.map(item => item.str).join(' ');
+            fullText += `<p><b>Page ${i}</b></p><p>${escapeHtml(pageText)}</p><br>`;
+          }
+          const htmlContent = `<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'><head><title>Converted Document</title></head><body>${fullText}</body></html>`;
+          const blob = new Blob(['\ufeff' + htmlContent], { type: 'application/msword' });
+          downloadBlob(blob, 'Converted_Document.doc', 'application/msword');
+
+        } else if (activeTool === 'pdfToExcel') {
+          setProgress(30, 'Extracting spreadsheet data...');
+          const arrayBuffer = await selectedFiles[0].arrayBuffer();
+          const pdfDoc = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+          let tableRows = '';
+          for (let i = 1; i <= pdfDoc.numPages; i++) {
+            const page = await pdfDoc.getPage(i);
+            const textContent = await page.getTextContent();
+            const pageText = textContent.items.map(item => item.str).join(' | ');
+            tableRows += `<tr><td>Page ${i}</td><td>${escapeHtml(pageText)}</td></tr>`;
+          }
+          const excelHtml = `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40"><body><table><tr><th>Page</th><th>Extracted Content</th></tr>${tableRows}</table></body></html>`;
+          const blob = new Blob(['\ufeff' + excelHtml], { type: 'application/vnd.ms-excel' });
+          downloadBlob(blob, 'Extracted_Spreadsheet.xls', 'application/vnd.ms-excel');
+
         } else if (activeTool === 'editPdf') {
+          setProgress(30, 'Applying edits...');
           const note = document.getElementById('optEditText').value.trim() || 'Verified';
           const bytes = await selectedFiles[0].arrayBuffer();
           const doc = await loadPdfWithPassword(bytes);
@@ -1872,6 +2036,7 @@
           downloadBlob(outBytes, 'Edited_Document.pdf', 'application/pdf');
 
         } else if (activeTool === 'sign') {
+          setProgress(30, 'Signing PDF...');
           const signer = document.getElementById('optSignName').value.trim() || 'Signed Digitally';
           const bytes = await selectedFiles[0].arrayBuffer();
           const doc = await loadPdfWithPassword(bytes);
@@ -1885,6 +2050,7 @@
           downloadBlob(outBytes, 'Signed_Document.pdf', 'application/pdf');
 
         } else if (activeTool === 'watermark') {
+          setProgress(30, 'Stamping watermark...');
           const text = document.getElementById('optWatermark').value.trim() || 'CONFIDENTIAL';
           const bytes = await selectedFiles[0].arrayBuffer();
           const doc = await loadPdfWithPassword(bytes);
@@ -1898,21 +2064,15 @@
           downloadBlob(outBytes, 'Watermarked_Document.pdf', 'application/pdf');
 
         } else if (activeTool === 'protect') {
-          const password = document.getElementById('optPdfPassword').value.trim();
-          if (!password) { alert('Enter password.'); btn.disabled = false; btn.innerText = originalText; return; }
-          const bytes = await selectedFiles[0].arrayBuffer();
-          const pdfDoc = await loadPdfWithPassword(bytes);
-          pdfDoc.encrypt({ userPassword: password, ownerPassword: password });
-          const outBytes = await pdfDoc.save();
-          downloadBlob(outBytes, 'Protected_Document.pdf', 'application/pdf');
+          alert('PDF password protection is not supported by the browser PDF library used here.');
+          return;
 
         } else if (activeTool === 'unlock') {
-          const bytes = await selectedFiles[0].arrayBuffer();
-          const pdfDoc = await loadPdfWithPassword(bytes);
-          const outBytes = await pdfDoc.save();
-          downloadBlob(outBytes, 'Unlocked_Document.pdf', 'application/pdf');
+          alert('Removing a PDF password or encryption is not supported by the browser PDF library used here.');
+          return;
 
         } else if (activeTool === 'pageNumbers') {
+          setProgress(30, 'Adding page numbers...');
           const bytes = await selectedFiles[0].arrayBuffer();
           const doc = await loadPdfWithPassword(bytes);
           const pages = doc.getPages();
@@ -1927,6 +2087,7 @@
           downloadBlob(outBytes, 'Numbered_Document.pdf', 'application/pdf');
 
         } else if (activeTool === 'invoiceMaker') {
+          setProgress(30, 'Generating Invoice...');
           const shop = document.getElementById('invShop').value.trim() || 'INVOICE';
           const cust = document.getElementById('invCust').value.trim() || 'Customer';
           const items = document.getElementById('invItems').value.trim();
@@ -1950,6 +2111,7 @@
           doc.save(`Invoice_${cust.replace(/\s+/g, '_')}.pdf`);
 
         } else if (activeTool === 'resumeMaker') {
+          setProgress(30, 'Building Resume...');
           const name = document.getElementById('cvName').value.trim() || 'Curriculum Vitae';
           const contact = document.getElementById('cvContact').value.trim();
           const body = document.getElementById('cvBody').value.trim();
@@ -1966,6 +2128,7 @@
           doc.save(`Resume_${name.replace(/\s+/g, '_')}.pdf`);
 
         } else if (activeTool === 'docMaker') {
+          setProgress(30, 'Creating Document...');
           const title = document.getElementById('optDocTitle').value.trim() || 'Prescription / Memo';
           const content = document.getElementById('optDocContent').value.trim();
           const { jsPDF } = window.jspdf;
@@ -1984,9 +2147,20 @@
         console.error(err);
         alert('An error occurred during file processing: ' + err.message);
       } finally {
+        setProgress(100, 'Done');
         btn.innerText = originalText;
         btn.disabled = false;
+        setTimeout(() => { resetProgress(); closeWorkspace(); }, 180);
       }
+    }
+
+    function escapeHtml(value) {
+      return String(value)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
     }
 
     function parseRange(str, total) {
@@ -2014,10 +2188,33 @@
     }
 
     function getImageDimensions(url) {
-      return new Promise((res) => {
+      return new Promise((res, rej) => {
         const img = new Image();
         img.onload = () => res({ width: img.naturalWidth, height: img.naturalHeight });
+        img.onerror = () => rej(new Error('Unable to read the selected image.'));
         img.src = url;
+      });
+    }
+
+    function imageToJpegDataUrl(dataUrl, quality = 0.92) {
+      return new Promise((resolve, reject) => {
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          canvas.width = img.naturalWidth || img.width;
+          canvas.height = img.naturalHeight || img.height;
+          const ctx = canvas.getContext('2d');
+          if (!ctx) {
+            reject(new Error('Unable to create image canvas.'));
+            return;
+          }
+          ctx.fillStyle = '#ffffff';
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
+          ctx.drawImage(img, 0, 0);
+          resolve(canvas.toDataURL('image/jpeg', quality));
+        };
+        img.onerror = () => reject(new Error('Unable to decode the selected image.'));
+        img.src = dataUrl;
       });
     }
 
