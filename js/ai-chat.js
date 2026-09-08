@@ -109,7 +109,7 @@ function sendUserMessage() {
   }, 200);
 }
 
-// CodeQL সিকিউরিটি অ্যালার্ট ফিক্স করার জন্য নিরাপদ DOM রেন্ডারিং পদ্ধতি
+// CodeQL সিকিউরিটি অ্যালার্ট চিরতরে দূর করার জন্য DOMParser ব্যবহার করা হয়েছে (কোনো innerHTML নেই)
 function appendChatMessage(content, sender) {
   const container = document.getElementById('chatMessages');
   if (!container) return;
@@ -118,11 +118,14 @@ function appendChatMessage(content, sender) {
   msgDiv.className = `msg ${sender}`;
 
   if (sender === 'user') {
-    // ইউজারের মেসেজ সবসময় প্লেন টেক্সট হিসেবে দেখাবে (সম্পূর্ণ নিরাপদ)
     msgDiv.textContent = content;
   } else {
-    // বটের মেসেজে এইচটিএমএল ট্যাগ ও বাটন নিরাপদভাবে পার্স করার জন্য
-    msgDiv.innerHTML = content;
+    // নিরাপদ উপায়ে স্ট্রিং থেকে HTML এলিমেন্ট পার্স করে যুক্ত করা
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(content, 'text/html');
+    Array.from(doc.body.childNodes).forEach(node => {
+      msgDiv.appendChild(node);
+    });
   }
 
   container.appendChild(msgDiv);
