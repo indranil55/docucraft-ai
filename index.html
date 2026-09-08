@@ -690,6 +690,24 @@
       color: #10b981;
     }
   </style>
+
+  <!-- Auto-Redirect from Social In-App Browsers to Chrome / External Browser -->
+  <script>
+    (function() {
+      const ua = navigator.userAgent || navigator.vendor || window.opera;
+      const isFacebook = /FBAN|FBAV|Instagram|WhatsApp|FB_IAB|FB4A/i.test(ua);
+      
+      if (isFacebook) {
+        // Android Intent redirection forcing Chrome/External Browser open
+        if (/android/i.test(ua)) {
+          const currentUrl = window.location.href;
+          const cleanUrl = currentUrl.replace(/^https?:\/\//i, '');
+          window.location.href = 'intent://' + cleanUrl + '#Intent;scheme=https;package=com.android.chrome;end;';
+        } 
+        // iOS Safari alternative fallback banner/prompt trigger if needed
+      }
+    })();
+  </script>
 </head>
 <body>
 
@@ -2274,7 +2292,6 @@
 
       const blobUrl = URL.createObjectURL(blob);
       
-      // Force popup modal for download in social media apps to bypass blocking
       const isSocialApp = /FBAN|FBAV|Instagram|Twitter|LinkedInApp|WhatsApp/i.test(navigator.userAgent);
 
       if (isSocialApp) {
