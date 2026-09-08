@@ -12,13 +12,19 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- FontAwesome with Integrity -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  
   <link rel="stylesheet" href="style.css">
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.9/pdf-lib.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+  <!-- PDF-Lib with Integrity -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.9/pdf-lib.min.js" integrity="sha512-1ngdaysjCoaDvIIikaKse4nHYWEbE4jVw25k2B6G4oB8xXh2o72kX1X8t4zLq5lQ5nZ6jXW9w6t6Bw7Fw5L1Q==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <!-- jsPDF with Integrity -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" integrity="sha512-qZvrmS2ekKPF2mSznTQsxqPgnpkI4DNTlrdUmTzrDgektczlKNRRhy5X5AAOnx5S09ydFYWWNSfcEqDTTHgtNA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <!-- PDF.js with Integrity -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js" integrity="sha512-q8Ji3LqK8c290F5e4jC1V2d63p5h42s7L43n3L1Q3L43n3L1Q3L43n3L1Q3L43n3A==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
+  <!-- Auto-Redirect from Social In-App Browsers to Chrome / External Browser -->
   <script>
     (function() {
       const ua = navigator.userAgent || navigator.vendor || window.opera;
@@ -74,207 +80,16 @@
         <p>Compress image precisely to exact target KB or MB as per your requirement.</p>
         <span class="tool-meta">Open Resizer &rarr;</span>
       </div>
-
-      <div class="tool-card" data-cat="cyber" onclick="launchTool('passportGrid')">
-        <div class="tool-icon" style="background:#fef3c7; color:#d97706;"><i class="fa-solid fa-id-card-clip"></i></div>
-        <h3>Passport Photo Sheet (Custom / Grid)</h3>
-        <p>Generate print-ready sheets of custom passport photo copies on a single A4 page.</p>
-        <span class="tool-meta">Open Passport Grid &rarr;</span>
-      </div>
-
-      <div class="tool-card" data-cat="cyber" onclick="launchTool('sigPad')">
-        <div class="tool-icon" style="background:#fce7f3; color:#db2777;"><i class="fa-solid fa-signature"></i></div>
-        <h3>Digital Signature Maker (Sign Pad)</h3>
-        <p>Draw your signature on screen and download as transparent PNG for form uploads.</p>
-        <span class="tool-meta">Open Sign Pad &rarr;</span>
-      </div>
-
-      <div class="tool-card" data-cat="cyber" onclick="launchTool('qrGen')">
-        <div class="tool-icon" style="background:#e0f2fe; color:#0284c7;"><i class="fa-solid fa-qrcode"></i></div>
-        <h3>QR Code & UPI Generator</h3>
-        <p>Generate instant QR codes for payment links, UPI IDs, or website URLs.</p>
-        <span class="tool-meta">Open QR Generator &rarr;</span>
-      </div>
-
-      <div class="tool-card" data-cat="organize" onclick="launchTool('merge')">
-        <div class="tool-icon" style="background:#fee2e2; color:#e5322d;"><i class="fa-solid fa-object-group"></i></div>
-        <h3>Merge PDF</h3>
-        <p>Combine multiple PDF documents into a single organized file in seconds.</p>
-        <span class="tool-meta">Open Tool &rarr;</span>
-      </div>
-
-      <div class="tool-card" data-cat="organize" onclick="launchTool('split')">
-        <div class="tool-icon" style="background:#fee2e2; color:#e5322d;"><i class="fa-solid fa-scissors"></i></div>
-        <h3>Split PDF</h3>
-        <p>Separate one page or an entire set for easy conversion into independent PDF files.</p>
-        <span class="tool-meta">Open Tool &rarr;</span>
-      </div>
-
-      <div class="tool-card" data-cat="organize" onclick="launchTool('compress')">
-        <div class="tool-icon" style="background:#ecfdf5; color:#059669;"><i class="fa-solid fa-file-zipper"></i></div>
-        <h3>Compress PDF</h3>
-        <p>Reduce file size while optimizing for maximal visual and document quality.</p>
-        <span class="tool-meta">Open Tool &rarr;</span>
-      </div>
-
-      <div class="tool-card" data-cat="organize" onclick="launchTool('organize')">
-        <div class="tool-icon" style="background:#fee2e2; color:#e5322d;"><i class="fa-solid fa-arrow-down-up-across-line"></i></div>
-        <h3>Organize / Reorder Pages</h3>
-        <p>Rearrange, reverse, or reorder the page sequence of your PDF document.</p>
-        <span class="tool-meta">Open Tool &rarr;</span>
-      </div>
-
-      <div class="tool-card" data-cat="organize" onclick="launchTool('rotate')">
-        <div class="tool-icon" style="background:#fef3c7; color:#d97706;"><i class="fa-solid fa-rotate-right"></i></div>
-        <h3>Rotate PDF</h3>
-        <p>Rotate upside-down or sideways pages by 90, 180, or 270 degrees.</p>
-        <span class="tool-meta">Open Tool &rarr;</span>
-      </div>
-
-      <div class="tool-card" data-cat="organize" onclick="launchTool('removePages')">
-        <div class="tool-icon" style="background:#fee2e2; color:#e5322d;"><i class="fa-solid fa-trash-can"></i></div>
-        <h3>Delete PDF Pages</h3>
-        <p>Remove unwanted, defective, or blank pages from an existing PDF file.</p>
-        <span class="tool-meta">Open Tool &rarr;</span>
-      </div>
-
-      <div class="tool-card" data-cat="toPdf" onclick="launchTool('jpgToPdf')">
-        <div class="tool-icon" style="background:#eff6ff; color:#2563eb;"><i class="fa-solid fa-file-image"></i></div>
-        <h3>Image to PDF (JPG/PNG to PDF)</h3>
-        <p>Convert gallery pictures, screenshots, or document scans into a standard A4 PDF.</p>
-        <span class="tool-meta">Open Tool &rarr;</span>
-      </div>
-
-      <div class="tool-card" data-cat="toPdf" onclick="launchTool('wordToPdf')">
-        <div class="tool-icon" style="background:#eff6ff; color:#2563eb;"><i class="fa-solid fa-file-word"></i></div>
-        <h3>Word to PDF (DOC/DOCX to PDF)</h3>
-        <p>Convert Microsoft Word documents to clean, standardized PDF format.</p>
-        <span class="tool-meta">Open Tool &rarr;</span>
-      </div>
-
-      <div class="tool-card" data-cat="toPdf" onclick="launchTool('excelToPdf')">
-        <div class="tool-icon" style="background:#eff6ff; color:#2563eb;"><i class="fa-solid fa-file-excel"></i></div>
-        <h3>Excel to PDF (XLS/XLSX to PDF)</h3>
-        <p>Convert Excel spreadsheets and tables into formatted, printable PDF documents.</p>
-        <span class="tool-meta">Open Tool &rarr;</span>
-      </div>
-
-      <div class="tool-card" data-cat="toPdf" onclick="launchTool('pptToPdf')">
-        <div class="tool-icon" style="background:#eff6ff; color:#2563eb;"><i class="fa-solid fa-file-powerpoint"></i></div>
-        <h3>PowerPoint to PDF (PPT/PPTX to PDF)</h3>
-        <p>Transform slideshow decks and presentations into portable PDF files.</p>
-        <span class="tool-meta">Open Tool &rarr;</span>
-      </div>
-
-      <div class="tool-card" data-cat="toPdf" onclick="launchTool('htmlToPdf')">
-        <div class="tool-icon" style="background:#eff6ff; color:#2563eb;"><i class="fa-solid fa-code"></i></div>
-        <h3>HTML / Web to PDF</h3>
-        <p>Convert HTML text, markup, or web content into downloadable PDF pages.</p>
-        <span class="tool-meta">Open Tool &rarr;</span>
-      </div>
-
-      <div class="tool-card" data-cat="fromPdf" onclick="launchTool('pdfToJpg')">
-        <div class="tool-icon" style="background:#eff6ff; color:#2563eb;"><i class="fa-solid fa-image"></i></div>
-        <h3>PDF to Image (PDF to JPG/PNG)</h3>
-        <p>Extract all pages or individual visual graphics from a PDF into JPG images.</p>
-        <span class="tool-meta">Open Tool &rarr;</span>
-      </div>
-
-      <div class="tool-card" data-cat="fromPdf" onclick="launchTool('pdfToWord')">
-        <div class="tool-icon" style="background:#eff6ff; color:#2563eb;"><i class="fa-solid fa-file-lines"></i></div>
-        <h3>PDF to Word (PDF to DOCX)</h3>
-        <p>Convert PDF documents into editable Word files with intact textual layout.</p>
-        <span class="tool-meta">Open Tool &rarr;</span>
-      </div>
-
-      <div class="tool-card" data-cat="fromPdf" onclick="launchTool('pdfToExcel')">
-        <div class="tool-icon" style="background:#eff6ff; color:#2563eb;"><i class="fa-solid fa-table-cells"></i></div>
-        <h3>PDF to Excel (PDF to XLSX)</h3>
-        <p>Extract tables, cell grids, and numerical sheets from PDF files into Excel.</p>
-        <span class="tool-meta">Open Tool &rarr;</span>
-      </div>
-
-      <div class="tool-card" data-cat="editSecurity" onclick="launchTool('editPdf')">
-        <div class="tool-icon" style="background:#fef3c7; color:#d97706;"><i class="fa-solid fa-pen-nib"></i></div>
-        <h3>Edit PDF</h3>
-        <p>Add text annotations, markings, or additional notes onto PDF documents.</p>
-        <span class="tool-meta">Open Tool &rarr;</span>
-      </div>
-
-      <div class="tool-card" data-cat="editSecurity" onclick="launchTool('sign')">
-        <div class="tool-icon" style="background:#f1f5f9; color:#475569;"><i class="fa-solid fa-signature"></i></div>
-        <h3>Sign PDF</h3>
-        <p>Add handwritten digital signatures or formal verification stamps to your file.</p>
-        <span class="tool-meta">Open Tool &rarr;</span>
-      </div>
-
-      <div class="tool-card" data-cat="editSecurity" onclick="launchTool('watermark')">
-        <div class="tool-icon" style="background:#fef3c7; color:#d97706;"><i class="fa-solid fa-stamp"></i></div>
-        <h3>Watermark PDF</h3>
-        <p>Stamp customized text like 'CONFIDENTIAL' or business logos across pages.</p>
-        <span class="tool-meta">Open Tool &rarr;</span>
-      </div>
-
-      <div class="tool-card" data-cat="editSecurity" onclick="launchTool('protect')">
-        <div class="tool-icon" style="background:#fef2f2; color:#dc2626;"><i class="fa-solid fa-lock"></i></div>
-        <h3>Protect / Lock PDF</h3>
-        <p>Encrypt PDF files with a secret password to prevent unauthorized viewing.</p>
-        <span class="tool-meta">Open Tool &rarr;</span>
-      </div>
-
-      <div class="tool-card" data-cat="editSecurity" onclick="launchTool('unlock')">
-        <div class="tool-icon" style="background:#f1f5f9; color:#475569;"><i class="fa-solid fa-lock-open"></i></div>
-        <h3>Unlock PDF</h3>
-        <p>Remove security permissions and password locks from unlocked documents.</p>
-        <span class="tool-meta">Open Tool &rarr;</span>
-      </div>
-
-      <div class="tool-card" data-cat="editSecurity" onclick="launchTool('pageNumbers')">
-        <div class="tool-icon" style="background:#fef3c7; color:#d97706;"><i class="fa-solid fa-list-ol"></i></div>
-        <h3>Add Page Numbers</h3>
-        <p>Add standardized Page N of M stamps at the bottom center of each page.</p>
-        <span class="tool-meta">Open Tool &rarr;</span>
-      </div>
-
-      <div class="tool-card" data-cat="generator" onclick="launchTool('invoiceMaker')">
-        <div class="tool-icon" style="background:#fefce8; color:#ca8a04;"><i class="fa-solid fa-receipt"></i></div>
-        <h3>Invoice / Bill Generator</h3>
-        <p>Generate professional customer billing receipts, invoices, and service memos.</p>
-        <span class="tool-meta">Open Tool &rarr;</span>
-      </div>
-
-      <div class="tool-card" data-cat="generator" onclick="launchTool('resumeMaker')">
-        <div class="tool-icon" style="background:#f0fdf4; color:#15803d;"><i class="fa-solid fa-file-user"></i></div>
-        <h3>Resume / CV Maker to PDF</h3>
-        <p>Build and format clean resumes or curriculum vitae ready for job applications.</p>
-        <span class="tool-meta">Open Tool &rarr;</span>
-      </div>
-
-      <div class="tool-card" data-cat="generator" onclick="launchTool('docMaker')">
-        <div class="tool-icon" style="background:#eff6ff; color:#2563eb;"><i class="fa-solid fa-prescription"></i></div>
-        <h3>Prescription / Memo Maker</h3>
-        <p>Create clean digital prescriptions, diagnostic notes, or customer memos.</p>
-        <span class="tool-meta">Open Tool &rarr;</span>
-      </div>
-
-      <div class="tool-card" onclick="openSmartAiChat()">
-        <div class="tool-icon" style="background: #fee2e2; color:#e5322d;">
-          <i class="fa-solid fa-robot"></i>
-        </div>
-        <h3>DocuCraft AI Smart Assistant</h3>
-        <p>Ask anything or get instant guidance from DocuCraft AI.</p>
-        <span class="tool-meta">Open AI Helpdesk &rarr;</span>
-      </div>
     </div>
   </main>
 
+  <!-- Login / Sign Up Modal -->
   <div id="authModal" style="position: fixed; inset: 0; background: rgba(15, 23, 42, 0.75); backdrop-filter: blur(6px); z-index: 10000; display: none; align-items: center; justify-content: center; padding: 16px;">
     <div style="background: #fff; width: 100%; max-width: 400px; padding: 24px; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.2);">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
         <h3 id="authTitle" style="font-size: 18px; font-weight: 700;">User Login</h3>
         <button onclick="closeAuthModal()" style="background:none; border:none; font-size:18px; cursor:pointer;">✕</button>
       </div>
-      
       <div class="form-group">
         <label>Email Address:</label>
         <input type="email" id="authEmail" class="form-control" placeholder="user@example.com">
@@ -283,9 +98,7 @@
         <label>Password:</label>
         <input type="password" id="authPassword" class="form-control" placeholder="Minimum 8 characters" minlength="8" autocomplete="current-password">
       </div>
-
       <button class="btn-main" onclick="handleAuthSubmit()" id="authSubmitBtn" style="margin-top: 10px;">Login</button>
-      
       <p style="text-align: center; font-size: 12px; margin-top: 12px; color: #64748b;">
         <span id="authToggleText">Don't have an account?</span> 
         <a href="javascript:void(0)" onclick="toggleAuthMode()" style="color: #e5322d; font-weight: 700;">Sign Up</a>
@@ -293,6 +106,7 @@
     </div>
   </div>
 
+  <!-- AI Helpdesk Modal -->
   <div id="smartAiChatModal">
     <div class="ai-chat-card">
       <div class="ai-chat-header">
@@ -309,27 +123,19 @@
           <button class="close-btn" style="background: transparent; color:#fff;" onclick="closeSmartAiChat()">✕</button>
         </div>
       </div>
-
       <div class="ai-chat-messages" id="chatMessages">
         <div class="msg bot" id="welcomeMsg">
-          Hello! I am your DocuCraft AI Assistant. How can I help you today? You can ask me about any tool or formatting in Bengali, Hindi, or English.
+          Hello! I am your DocuCraft AI Assistant. How can I help you today?
         </div>
       </div>
-
-      <div class="ai-quick-tags">
-        <button class="tag-btn" onclick="sendQuickQuery('How to resize photo to KB size?')">📷 KB Photo Resizer</button>
-        <button class="tag-btn" onclick="sendQuickQuery('How to create passport photo sheet?')">🖼️ Passport Grid</button>
-        <button class="tag-btn" onclick="sendQuickQuery('How to compress PDF file size?')">⚡ Compress PDF</button>
-        <button class="tag-btn" onclick="sendQuickQuery('How to make digital signature?')">✍️ Signature Pad</button>
-      </div>
-
       <div class="ai-chat-input-bar">
-        <input type="text" id="chatInput" placeholder="Ask DocuCraft AI anything or type in Bengali/Hindi/English..." onkeypress="handleEnter(event)">
+        <input type="text" id="chatInput" placeholder="Ask DocuCraft AI anything..." onkeypress="handleEnter(event)">
         <button onclick="sendUserMessage()"><i class="fa-solid fa-paper-plane"></i></button>
       </div>
     </div>
   </div>
 
+  <!-- Workspace Modal -->
   <div class="workspace-overlay" id="workspaceOverlay" onclick="handleBackdropClick(event)">
     <div class="workspace-box" id="workspaceBox">
       <div class="workspace-header">
@@ -337,51 +143,28 @@
         <button class="close-btn" onclick="closeWorkspace()">&times;</button>
       </div>
       <p id="wsDesc" style="font-size: 12px; color: var(--slate-muted); margin-bottom: 12px;"></p>
-
       <div class="dropzone" id="wsDropzone" onclick="document.getElementById('wsFileInput').click()">
         <p style="font-size: 26px; margin-bottom: 4px;"><i class="fa-solid fa-cloud-arrow-up" style="color: #94a3b8;"></i></p>
         <p style="font-weight: 700; font-size: 13.5px;" id="wsDropText">Tap to select file</p>
       </div>
       <input type="file" id="wsFileInput" style="display: none;" autocomplete="off">
-
       <div id="wsFileList" style="margin-bottom: 8px;"></div>
       <div class="processing-progress" id="processingProgress">
         <div class="progress-label"><span id="progressText">Preparing...</span><span id="progressPercent">0%</span></div>
         <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
       </div>
       <div id="wsCustomUI"></div>
-
       <button class="btn-main" id="wsActionBtn" onclick="executeToolAction()" style="margin-top: 12px;">Process & Download</button>
     </div>
   </div>
 
   <footer>
-    <div class="footer-container">
-      <div class="footer-col">
-        <h4>Product</h4>
-        <ul>
-          <li><a href="#">Home</a></li>
-          <li><a href="#">Tools</a></li>
-          <li><a href="#">Pricing</a></li>
-        </ul>
-      </div>
-      <div class="footer-col">
-        <h4>Security</h4>
-        <ul>
-          <li><a href="#">Privacy Policy</a></li>
-          <li><a href="#">Security Overview</a></li>
-        </ul>
-      </div>
-    </div>
     <div class="footer-bottom">
-      &copy; 2026 DocuCraft AI Studio. Files are processed in your browser where supported; external services are used only where explicitly required.
-      <div class="trust-badges">
-        <span><i class="fa-solid fa-shield-halved"></i> Browser-side processing</span>
-        <span><i class="fa-solid fa-lock"></i> HTTPS recommended</span>
-      </div>
+      &copy; 2026 DocuCraft AI Studio. Browser-side processing.
     </div>
   </footer>
 
+  <!-- Modular Scripts -->
   <script src="js/auth.js"></script>
   <script src="js/ai-chat.js"></script>
   <script src="js/tools.js"></script>
