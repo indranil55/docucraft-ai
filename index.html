@@ -2,7 +2,8 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <!-- Optimized viewport to fix mobile keyboard shifting and jumping layout bugs -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, interactive-widget=resizes-content">
   <title>DocuCraft AI - Smart All-in-One PDF & Document Studio</title>
 
   <!-- Browser Tab & Search Engine Favicon -->
@@ -276,7 +277,7 @@
       gap: 4px;
     }
 
-    /* Workspace Modal - Mobile Optimized */
+    /* Workspace Modal - Stable Fixed Positioning to prevent Facebook In-app jumping */
     .workspace-overlay {
       position: fixed;
       inset: 0;
@@ -287,6 +288,7 @@
       align-items: flex-end;
       justify-content: center;
       padding: 0;
+      overflow-y: auto;
     }
 
     @media (min-width: 640px) {
@@ -301,9 +303,10 @@
       width: 100%;
       max-width: 580px;
       border-radius: 20px 20px 0 0;
-      padding: 20px 16px 28px;
+      padding: 20px 16px 36px;
       box-shadow: 0 -10px 25px rgba(0, 0, 0, 0.1);
       max-height: 85vh;
+      max-height: 85dvh;
       overflow-y: auto;
       -webkit-overflow-scrolling: touch;
     }
@@ -1252,15 +1255,15 @@
       if (currentLang === 'bn' || q.includes('বাংলা') || q.includes('কিভাবে') || q.includes('সাইজ') || q.includes('ছবি') || q.includes('কেমন') || q.includes('কোথায়') || q.includes('কতো')) {
         if (q.includes('kb') || q.includes('resizer') || q.includes('সাইজ') || q.includes('photo')) {
           return `<b>Photo & Sign KB / MB Resizer ব্যবহারের নিয়ম:</b><br>
-          1. হোমপেজ থেকে <b>Photo & Sign KB / MB Resizer</b> টুলটি ওপেন করুন।<br>
+          1. হোমপেজ থেকে <b>Photo & Sign KB / MB Resizer</b> টুলটি ওপেন করুন。<br>
           2. আপনার ছবিটি সিলেক্ট বা ড্রপ করুন।<br>
-          3. ড্রপডাউন থেকে আপনার প্রয়োজনীয় সাইজ (যেমন 10, 20, 50, 100 KB বা MB) সিলেক্ট করুন এবং ফাইলের নাম দিয়ে প্রসেস করুন।<br>
+          3. ড্রপডাউন থেকে আপনার প্রয়োজনীয় সাইজ (যেমন 10, 20, 50, 100 KB বা MB) সিলেক্ট করুন এবং ফাইলের নাম দিয়ে প্রসেস করুন。<br>
           <a href="javascript:void(0)" onclick="closeSmartAiChat(); launchTool('kbResizer');" class="action-link-btn">👉 Open Resizer Tool</a>`;
         }
         if (q.includes('passport') || q.includes('পাসপোর্ট')) {
           return `<b>Passport Photo Sheet তৈরির নিয়ম:</b><br>
-          1. <b>Passport Photo Sheet</b> টুলটি ওপেন করুন।<br>
-          2. আপনার পাসপোর্ট সাইজ ছবি আপলোড করুন।<br>
+          1. <b>Passport Photo Sheet</b> টুলটি ওপেন করুন。<br>
+          2. আপনার পাসপোর্ট সাইজ ছবি আপলোড করুন。<br>
           3. কপির সংখ্যা লিখে আপনার পছন্দমতো ফাইলের নাম দিয়ে ডাউনলোড করুন!<br>
           <a href="javascript:void(0)" onclick="closeSmartAiChat(); launchTool('passportGrid');" class="action-link-btn">👉 Open Passport Grid</a>`;
         }
@@ -1772,7 +1775,6 @@
               let width = img.width;
               let height = img.height;
               
-              // Maintain higher resolution for crystal clear output
               const maxDim = 1600;
               if (width > maxDim || height > maxDim) {
                 if (width > height) {
@@ -2164,7 +2166,7 @@
           doc.text(title, 15, 22);
           doc.line(15, 26, 195, 26);
           doc.setFontSize(11);
-          const split = doc.splitTextToSize(content || 'Notes...', 180);
+          const split = doc.splitTestToSize(content || 'Notes...', 180);
           doc.text(split, 15, 34);
           doc.save(`${title.replace(/\s+/g, '_')}.pdf`);
         } else {
