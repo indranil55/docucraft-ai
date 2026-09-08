@@ -1027,6 +1027,19 @@
     </div>
   </div>
 
+  <!-- Direct Download Modal for Mobile / In-app browsers -->
+  <div id="downloadModal" style="position: fixed; inset: 0; background: rgba(15, 23, 42, 0.8); z-index: 10001; display: none; align-items: center; justify-content: center; padding: 20px;">
+    <div style="background: #fff; width: 100%; max-width: 420px; padding: 24px; border-radius: 20px; text-align: center; box-shadow: 0 15px 30px rgba(0,0,0,0.3);">
+      <div style="font-size: 40px; color: #10b981; margin-bottom: 10px;"><i class="fa-solid fa-circle-check"></i></div>
+      <h3 style="font-size: 18px; font-weight: 800; margin-bottom: 8px; color: #111827;">File Ready for Download!</h3>
+      <p style="font-size: 13px; color: #64748b; margin-bottom: 20px;" id="dlSubText">Your file has been successfully processed.</p>
+      <a id="directDlAnchor" href="#" target="_blank" class="btn-main" style="text-decoration: none; margin-bottom: 10px; background: #10b981; display: flex; align-items: center; justify-content: center; gap: 8px;">
+        <i class="fa-solid fa-download"></i> Click Here to Save File
+      </a>
+      <button onclick="document.getElementById('downloadModal').style.display='none';" style="background: #f1f5f9; border: none; padding: 10px; width: 100%; border-radius: 10px; font-weight: 700; color: #475569; cursor: pointer; margin-top: 5px;">Close</button>
+    </div>
+  </div>
+
   <footer>
     <div class="footer-container">
       <div class="footer-col">
@@ -2240,7 +2253,7 @@
       });
     }
 
-    /* Robust Download Handler for Facebook & Social Media In-app Browsers */
+    /* Universal Direct Download & Fallback Modal for Social Media In-app WebViews */
     function downloadBlob(content, name, type) {
       let blob;
       if (content instanceof Blob) {
@@ -2261,16 +2274,18 @@
 
       const blobUrl = URL.createObjectURL(blob);
       
-      // Check if running inside Facebook or other restricted in-app webviews
-      const isSocialApp = /FBAN|FBAV|Instagram|Twitter|LinkedInApp/i.test(navigator.userAgent);
+      // Force popup modal for download in social media apps to bypass blocking
+      const isSocialApp = /FBAN|FBAV|Instagram|Twitter|LinkedInApp|WhatsApp/i.test(navigator.userAgent);
 
       if (isSocialApp) {
-        // Force open in new tab/window for social media browsers where direct download is blocked
-        const newWindow = window.open(blobUrl, '_blank');
-        if (!newWindow) {
-          // If popup is blocked, fallback to location assignment
-          window.location.href = blobUrl;
-        }
+        const dlModal = document.getElementById('downloadModal');
+        const dlAnchor = document.getElementById('directDlAnchor');
+        const dlSubText = document.getElementById('dlSubText');
+        
+        dlAnchor.href = blobUrl;
+        dlAnchor.setAttribute('download', name);
+        dlSubText.innerText = `File: ${name} is ready. Tap below to save or view.`;
+        dlModal.style.display = 'flex';
       } else {
         const a = document.createElement('a');
         a.style.display = 'none';
