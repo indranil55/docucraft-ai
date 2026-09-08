@@ -17,13 +17,20 @@ function toggleVoiceOutput() {
   isVoiceOutputEnabled = !isVoiceOutputEnabled;
   const btn = document.getElementById('voiceMuteToggle');
   if (!btn) return;
-  if (isVoiceOutputEnabled) {
-    btn.innerHTML = '<i class="fa-solid fa-volume-high"></i> Voice ON';
-    btn.style.color = '#60a5fa';
-  } else {
-    btn.innerHTML = '<i class="fa-solid fa-volume-xmark"></i> Voice OFF';
-    btn.style.color = '#94a3b8';
-    if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+  
+  // innerHTML-এর বদলে নিরাপদ আইকন ও টেক্সট সেটিং
+  btn.innerHTML = '';
+  const icon = document.createElement('i');
+  icon.className = isVoiceOutputEnabled ? "fa-solid fa-volume-high" : "fa-solid fa-volume-xmark";
+  btn.appendChild(icon);
+  
+  const span = document.createElement('span');
+  span.textContent = isVoiceOutputEnabled ? " Voice ON" : " Voice OFF";
+  btn.appendChild(span);
+
+  btn.style.color = isVoiceOutputEnabled ? '#60a5fa' : '#94a3b8';
+  if (!isVoiceOutputEnabled && 'speechSynthesis' in window) {
+    window.speechSynthesis.cancel();
   }
 }
 
@@ -58,14 +65,16 @@ function changeChatLanguage(lang) {
   currentLang = lang;
   const welcome = document.getElementById('welcomeMsg');
   if (!welcome) return;
+  
+  // textContent ব্যবহার করা হয়েছে যাতে DOM XSS সিকিউরিটি অ্যালার্ট না আসে
   if (lang === 'bn') {
-    welcome.innerHTML = "নমস্কার! আমি আপনার DocuCraft AI অ্যাসিস্ট্যান্ট। আজ আপনাকে কীভাবে সাহায্য করতে পারি?";
+    welcome.textContent = "নমস্কার! আমি আপনার DocuCraft AI অ্যাসিস্ট্যান্ট। আজ আপনাকে কীভাবে সাহায্য করতে পারি?";
     speakText("নমস্কার! আমি আপনার ডকুক্রাফট এআই অ্যাসিস্ট্যান্ট।");
   } else if (lang === 'hi') {
-    welcome.innerHTML = "नमस्ते! मैं आपका DocuCraft AI सहायक हूँ। आज मैं आपकी कैसे मदद कर सकता हूँ?";
+    welcome.textContent = "नमस्ते! मैं आपका DocuCraft AI सहायक हूँ। आज मैं आपकी कैसे मदद कर सकता हूँ?";
     speakText("नमस्ते! मैं आपका DocuCraft AI सहायक हूँ।");
   } else {
-    welcome.innerHTML = "Hello! I am your DocuCraft AI Assistant. How can I help you today?";
+    welcome.textContent = "Hello! I am your DocuCraft AI Assistant. How can I help you today?";
     speakText("Hello! I am your DocuCraft AI Assistant.");
   }
 }
@@ -115,12 +124,19 @@ function sendUserMessage() {
   }, 200);
 }
 
-function appendChatMessage(html, sender) {
+function appendChatMessage(content, sender) {
   const container = document.getElementById('chatMessages');
   if (!container) return;
   const msgDiv = document.createElement('div');
   msgDiv.className = `msg ${sender}`;
-  msgDiv.innerHTML = html;
+
+  // ইউজারের মেসেজ প্লেন টেক্সট এবং বটের মেসেজ টেমপ্লেট অনুযায়ী নিরাপদভাবে রেন্ডার হবে
+  if (sender === 'user') {
+    msgDiv.textContent = content;
+  } else {
+    msgDiv.innerHTML = content;
+  }
+
   container.appendChild(msgDiv);
   container.scrollTop = container.scrollHeight;
 }
@@ -137,8 +153,8 @@ function getDocuCraftSmartAnswer(query) {
     }
     if (q.includes('passport') || q.includes('পাসপোর্ট')) {
       return `<b>Passport Photo Sheet (35 × 45 mm):</b><br>
-      1. <b>Passport Photo Sheet</b> টুল ওপেন করুন।<br>
-      2. ছবি আপলোড করে কপির সংখ্যা দিয়ে ডাউনলোড করুন।<br>
+      1. <b>Passport Photo Sheet</b> টুল ওপেন করুন。<br>
+      2. ছবি আপলোড করে কপির সংখ্যা দিয়ে ডাউনলোড করুন。<br>
       <a href="javascript:void(0)" onclick="closeSmartAiChat(); launchTool('passportGrid');" class="action-link-btn">👉 Open Passport Grid</a>`;
     }
     return `নমস্কার! আমি আপনার ডকুক্রাফট এআই অ্যাসিস্ট্যান্ট। KB Resizer, Passport Sheet (35x45 mm), Signature Pad কিংবা যেকোনো PDF টুল সম্পর্কে সরাসরি প্রশ্ন করতে পারেন।`;
