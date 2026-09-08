@@ -115,30 +115,18 @@ function sendUserMessage() {
     const replyHtml = getDocuCraftSmartAnswer(text);
     appendChatMessage(replyHtml, 'bot');
 
-    const tempDiv = document.createElement('div');
-    tempDiv.innerHTML = replyHtml;
-    tempDiv.querySelectorAll('a').forEach(l => l.remove());
-    speakText(tempDiv.innerText.trim());
+    speakText(replyHtml);
   }, 200);
 }
 
-// CodeQL সিকিউরিটি অ্যালার্ট সম্পূর্ণ দূর করার জন্য নিরাপদ DOM পার্সার ফাংশন
+// CodeQL সিকিউরিটি অ্যালার্ট সম্পূর্ণ দূর করার জন্য নিরাপদ ফাংশন
 function appendChatMessage(content, sender) {
   const container = document.getElementById('chatMessages');
   if (!container) return;
   const msgDiv = document.createElement('div');
   msgDiv.className = `msg ${sender}`;
 
-  if (sender === 'user') {
-    msgDiv.textContent = content;
-  } else {
-    // DOMPurify বা নিরাপদ উপায়ে এইচটিএমএল ট্যাগ রেন্ডার করার জন্য টেমপ্লেট পার্সিং
-    const parser = new DOMParser();
-    const doc = parser.parseFromString(content, 'text/html');
-    Array.from(doc.body.childNodes).forEach(node => {
-      msgDiv.appendChild(node);
-    });
-  }
+  msgDiv.textContent = content;
 
   container.appendChild(msgDiv);
   container.scrollTop = container.scrollHeight;
@@ -149,33 +137,20 @@ function getDocuCraftSmartAnswer(query) {
 
   if (currentLang === 'bn' || q.includes('বাংলা') || q.includes('কিভাবে') || q.includes('সাইজ') || q.includes('ছবি') || q.includes('পাসপোর্ট')) {
     if (q.includes('kb') || q.includes('resizer') || q.includes('সাইজ') || q.includes('photo')) {
-      return `<b>Photo & Sign KB / MB Resizer:</b><br>
-      1. <b>Photo & Sign KB / MB Resizer</b> টুলটি ওপেন করুন。<br>
-      2. ছবি সিলেক্ট করে পছন্দমতো KB বা MB সিলেক্ট করুন এবং প্রসেস করুন。<br>
-      <a href="javascript:void(0)" onclick="closeSmartAiChat(); launchTool('kbResizer');" class="action-link-btn">👉 Open Resizer Tool</a>`;
+      return "Photo & Sign KB / MB Resizer: 1. Photo & Sign KB / MB Resizer টুলটি ওপেন করুন। 2. ছবি সিলেক্ট করে পছন্দমতো KB বা MB সিলেক্ট করুন এবং প্রসেস করুন।";
     }
     if (q.includes('passport') || q.includes('পাসপোর্ট')) {
-      return `<b>Passport Photo Sheet (35 × 45 mm):</b><br>
-      1. <b>Passport Photo Sheet</b> টুল ওপেন করুন。<br>
-      2. ছবি আপলোড করে কপির সংখ্যা দিয়ে ডাউনলোড করুন。<br>
-      <a href="javascript:void(0)" onclick="closeSmartAiChat(); launchTool('passportGrid');" class="action-link-btn">👉 Open Passport Grid</a>`;
+      return "Passport Photo Sheet (35 × 45 mm): 1. Passport Photo Sheet টুল ওপেন করুন। 2. ছবি আপলোড করে কপির সংখ্যা দিয়ে ডাউনলোড করুন।";
     }
-    return `নমস্কার! আমি আপনার ডকুক্রাফট এআই অ্যাসিস্ট্যান্ট। KB Resizer, Passport Sheet (35x45 mm), Signature Pad কিংবা যেকোনো PDF টুল সম্পর্কে সরাসরি প্রশ্ন করতে পারেন।`;
+    return "নমস্কার! আমি আপনার ডকুক্রাফট এআই অ্যাসিস্ট্যান্ট। KB Resizer, Passport Sheet (35x45 mm), Signature Pad কিংবা যেকোনো PDF টুল সম্পর্কে সরাসরি প্রশ্ন করতে পারেন।";
   }
 
   if (q.includes('kb') || q.includes('resizer') || q.includes('resize')) {
-    return `<b>Photo & Sign KB / MB Resizer Guide:</b><br>
-    1. Open the <b>Photo & Sign KB / MB Resizer</b> card.<br>
-    2. Upload your image, select exact target KB/MB and download.<br>
-    <a href="javascript:void(0)" onclick="closeSmartAiChat(); launchTool('kbResizer');" class="action-link-btn">👉 Open Resizer Tool</a>`;
+    return "Photo & Sign KB / MB Resizer Guide: 1. Open the Photo & Sign KB / MB Resizer card. 2. Upload your image, select exact target KB/MB and download.";
   }
   if (q.includes('passport') || q.includes('grid')) {
-    return `<b>Passport Photo Sheet Guide (35 x 45 mm):</b><br>
-    1. Open the <b>Passport Photo Sheet</b> tool.<br>
-    2. Upload photo and generate print-ready A4 sheet.<br>
-    <a href="javascript:void(0)" onclick="closeSmartAiChat(); launchTool('passportGrid');" class="action-link-btn">👉 Open Passport Grid</a>`;
+    return "Passport Photo Sheet Guide (35 x 45 mm): 1. Open the Passport Photo Sheet tool. 2. Upload photo and generate print-ready A4 sheet.";
   }
 
-  return `<b>DocuCraft AI Smart Assistant:</b><br>
-  I am here to guide you through all our tools including Photo KB Resizer, Passport Sheet (35x45 mm), Signature Pad, and PDF Utilities.`;
+  return "DocuCraft AI Smart Assistant: I am here to guide you through all our tools including Photo KB Resizer, Passport Sheet (35x45 mm), Signature Pad, and PDF Utilities.";
 }
