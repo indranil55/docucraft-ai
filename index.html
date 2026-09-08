@@ -967,7 +967,7 @@
       </div>
       <div class="form-group">
         <label>Password:</label>
-        <input type="password" id="authPassword" class="form-control" placeholder="••••••••">
+        <input type="password" id="authPassword" class="form-control" placeholder="Minimum 8 characters" minlength="8" autocomplete="current-password">
       </div>
 
       <button class="btn-main" onclick="handleAuthSubmit()" id="authSubmitBtn" style="margin-top: 10px;">Login</button>
@@ -1030,7 +1030,7 @@
         <p style="font-size: 26px; margin-bottom: 4px;"><i class="fa-solid fa-cloud-arrow-up" style="color: #94a3b8;"></i></p>
         <p style="font-weight: 700; font-size: 13.5px;" id="wsDropText">Tap to select file</p>
       </div>
-      <input type="file" id="wsFileInput" style="display: none;">
+      <input type="file" id="wsFileInput" style="display: none;" autocomplete="off">
 
       <div id="wsFileList" style="margin-bottom: 8px;"></div>
       <div class="processing-progress" id="processingProgress">
@@ -1040,19 +1040,6 @@
       <div id="wsCustomUI"></div>
 
       <button class="btn-main" id="wsActionBtn" onclick="executeToolAction()" style="margin-top: 12px;">Process & Download</button>
-    </div>
-  </div>
-
-  <!-- Direct Download Modal for Mobile / In-app browsers -->
-  <div id="downloadModal" style="position: fixed; inset: 0; background: rgba(15, 23, 42, 0.8); z-index: 10001; display: none; align-items: center; justify-content: center; padding: 20px;">
-    <div style="background: #fff; width: 100%; max-width: 420px; padding: 24px; border-radius: 20px; text-align: center; box-shadow: 0 15px 30px rgba(0,0,0,0.3);">
-      <div style="font-size: 40px; color: #10b981; margin-bottom: 10px;"><i class="fa-solid fa-circle-check"></i></div>
-      <h3 style="font-size: 18px; font-weight: 800; margin-bottom: 8px; color: #111827;">File Ready for Download!</h3>
-      <p style="font-size: 13px; color: #64748b; margin-bottom: 20px;" id="dlSubText">Your file has been successfully processed.</p>
-      <a id="directDlAnchor" href="#" target="_blank" class="btn-main" style="text-decoration: none; margin-bottom: 10px; background: #10b981; display: flex; align-items: center; justify-content: center; gap: 8px;">
-        <i class="fa-solid fa-download"></i> Click Here to Save File
-      </a>
-      <button onclick="document.getElementById('downloadModal').style.display='none';" style="background: #f1f5f9; border: none; padding: 10px; width: 100%; border-radius: 10px; font-weight: 700; color: #475569; cursor: pointer; margin-top: 5px;">Close</button>
     </div>
   </div>
 
@@ -1075,10 +1062,10 @@
       </div>
     </div>
     <div class="footer-bottom">
-      &copy; 2026 DocuCraft AI Studio. All processing performed locally and securely in browser.
+      &copy; 2026 DocuCraft AI Studio. Files are processed in your browser where supported; external services are used only where explicitly required.
       <div class="trust-badges">
-        <span><i class="fa-solid fa-shield-halved"></i> ISO27001 Certified</span>
-        <span><i class="fa-solid fa-lock"></i> HTTPS Protected</span>
+        <span><i class="fa-solid fa-shield-halved"></i> Browser-side processing</span>
+        <span><i class="fa-solid fa-lock"></i> HTTPS recommended</span>
       </div>
     </div>
   </footer>
@@ -1096,7 +1083,7 @@
     let sigCanvasInstance = null;
 
     window.addEventListener('DOMContentLoaded', () => {
-      const loggedUser = localStorage.getItem('docuCraft_logged_in_user');
+      const loggedUser = sessionStorage.getItem('docuCraft_logged_in_user');
       if (loggedUser) {
         const btn = document.getElementById('authNavBtn');
         btn.innerHTML = `<i class="fa-solid fa-user-check"></i>`;
@@ -1123,40 +1110,98 @@
       document.getElementById('authToggleText').innerText = isSignUpMode ? 'Already have an account?' : "Don't have an account?";
     }
 
-    function handleAuthSubmit() {
-      const email = document.getElementById('authEmail').value.trim();
-      const pass = document.getElementById('authPassword').value.trim();
+    async function handleAuthSubmit() {
+      const emailInput = document.getElementById('authEmail');
+      const passInput = document.getElementById('authPassword');
+      const email = emailInput.value.trim().toLowerCase();
+      const pass = passInput.value;
 
       if (!email || !pass) {
         alert('Please enter both email and password.');
         return;
       }
+      if (!/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email)) {
+        alert('Please enter a valid email address.');
+        return;
+      }
+      if (pass.length < 8) {
+        alert('Password must be at least 8 characters.');
+        return;
+      }
 
+      // IMPORTANT: this is still a browser-only demo account system.
+      // Never treat client-side authentication as a security boundary.
       if (isSignUpMode) {
+        const salt = crypto.getRandomValues(new Uint8Array(16));
+        const hash = await derivePasswordHash(pass, salt);
         localStorage.setItem('docuCraft_user_email', email);
-        localStorage.setItem('docuCraft_user_pass', pass);
-        alert('Account created successfully! Please login now.');
+        localStorage.setItem('docuCraft_user_salt', bytesToBase64(salt));
+        localStorage.setItem('docuCraft_user_hash', bytesToBase64(hash));
+        alert('Account created on this device. For real account security, connect a server-side authentication system.');
         toggleAuthMode();
+        passInput.value = '';
       } else {
         const savedEmail = localStorage.getItem('docuCraft_user_email');
-        const savedPass = localStorage.getItem('docuCraft_user_pass');
+        const savedSalt = localStorage.getItem('docuCraft_user_salt');
+        const savedHash = localStorage.getItem('docuCraft_user_hash');
 
-        if (email === savedEmail && pass === savedPass) {
-          localStorage.setItem('docuCraft_logged_in_user', email);
+        if (!savedEmail || !savedSalt || !savedHash) {
+          alert('No local account found. Please Sign Up first.');
+          return;
+        }
+
+        const salt = base64ToBytes(savedSalt);
+        const hash = await derivePasswordHash(pass, salt);
+        const ok = email === savedEmail && timingSafeEqual(hash, base64ToBytes(savedHash));
+
+        if (ok) {
+          sessionStorage.setItem('docuCraft_logged_in_user', email);
           alert('Login successful! Welcome back.');
           closeAuthModal();
           location.reload();
-        } else if (!savedEmail) {
-          alert('No account found. Please Sign Up first.');
         } else {
           alert('Incorrect email or password.');
         }
       }
     }
 
+    async function derivePasswordHash(password, saltBytes) {
+      const material = await crypto.subtle.importKey(
+        'raw',
+        new TextEncoder().encode(password),
+        'PBKDF2',
+        false,
+        ['deriveBits']
+      );
+      const bits = await crypto.subtle.deriveBits(
+        { name: 'PBKDF2', salt: saltBytes, iterations: 120000, hash: 'SHA-256' },
+        material,
+        256
+      );
+      return new Uint8Array(bits);
+    }
+
+    function bytesToBase64(bytes) {
+      let binary = '';
+      bytes.forEach(b => binary += String.fromCharCode(b));
+      return btoa(binary);
+    }
+
+    function base64ToBytes(value) {
+      const binary = atob(value);
+      return Uint8Array.from(binary, ch => ch.charCodeAt(0));
+    }
+
+    function timingSafeEqual(a, b) {
+      if (a.length !== b.length) return false;
+      let diff = 0;
+      for (let i = 0; i < a.length; i++) diff |= a[i] ^ b[i];
+      return diff === 0;
+    }
+
     function handleLogout() {
       if (confirm('Are you sure you want to log out?')) {
-        localStorage.removeItem('docuCraft_logged_in_user');
+        sessionStorage.removeItem('docuCraft_logged_in_user');
         alert('Logged out successfully.');
         location.reload();
       }
@@ -1438,7 +1483,7 @@
         customUI.innerHTML = `
           <div class="form-group">
             <label>Number of Copies on A4 Sheet:</label>
-            <input type="number" id="optPassportCopies" class="form-control" value="8" min="1" max="50" placeholder="Enter number of copies">
+            <input type="number" id="optPassportCopies" class="form-control" value="8" min="1" max="50" step="1" inputmode="numeric" placeholder="Enter number of copies">
           </div>
           <div class="form-group">
             <label>Save File Name:</label>
@@ -1703,7 +1748,7 @@
       list.innerHTML = '';
       if (selectedFiles.length > 0) {
         selectedFiles.forEach((file) => {
-          list.innerHTML += `<div class="file-tag">📄 ${file.name}</div>`;
+          list.innerHTML += `<div class="file-tag">📄 ${escapeHtml(file.name)}</div>`;
         });
       }
     });
@@ -1747,9 +1792,20 @@
     }
 
     function validateSelectedFiles(files, maxBytes = 50 * 1024 * 1024) {
+      const allowedImage = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+      const allowedPdf = ['application/pdf'];
       for (const file of files) {
+        if (!file || !file.name) throw new Error('Invalid file selected.');
+        if (file.size <= 0) throw new Error(`"${file.name}" is empty.`);
         if (file.size > maxBytes) {
           throw new Error(`"${file.name}" is larger than 50 MB. Please choose a smaller file.`);
+        }
+        const ext = (file.name.split('.').pop() || '').toLowerCase();
+        const type = (file.type || '').toLowerCase();
+        const isImage = allowedImage.includes(type) || ['jpg','jpeg','png','webp','gif'].includes(ext);
+        const isPdf = allowedPdf.includes(type) || ext === 'pdf';
+        if (!isImage && !isPdf) {
+          throw new Error(`"${file.name}" is not a supported file type.`);
         }
       }
     }
@@ -2287,7 +2343,7 @@
       });
     }
 
-    /* Universal Direct Download & Fallback Modal for Social Media In-app WebViews */
+    /* Universal Direct Download for Mobile / Desktop */
     function downloadBlob(content, name, type) {
       let blob;
       if (content instanceof Blob) {
@@ -2307,30 +2363,16 @@
       }
 
       const blobUrl = URL.createObjectURL(blob);
-      
-      const isSocialApp = /FBAN|FBAV|Instagram|Twitter|LinkedInApp|WhatsApp/i.test(navigator.userAgent);
-
-      if (isSocialApp) {
-        const dlModal = document.getElementById('downloadModal');
-        const dlAnchor = document.getElementById('directDlAnchor');
-        const dlSubText = document.getElementById('dlSubText');
-        
-        dlAnchor.href = blobUrl;
-        dlAnchor.setAttribute('download', name);
-        dlSubText.innerText = `File: ${name} is ready. Tap below to save or view.`;
-        dlModal.style.display = 'flex';
-      } else {
-        const a = document.createElement('a');
-        a.style.display = 'none';
-        a.href = blobUrl;
-        a.download = name;
-        document.body.appendChild(a);
-        a.click();
-        setTimeout(() => {
-          document.body.removeChild(a);
-          URL.revokeObjectURL(blobUrl);
-        }, 1000);
-      }
+      const a = document.createElement('a');
+      a.style.display = 'none';
+      a.href = blobUrl;
+      a.download = name;
+      document.body.appendChild(a);
+      a.click();
+      setTimeout(() => {
+        document.body.removeChild(a);
+        URL.revokeObjectURL(blobUrl);
+      }, 1000);
     }
   </script>
 </body>
