@@ -2,11 +2,9 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <!-- Optimized viewport to fix mobile keyboard shifting and jumping layout bugs -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, interactive-widget=resizes-content">
   <title>DocuCraft AI - Smart All-in-One PDF & Document Studio</title>
 
-  <!-- Browser Tab & Search Engine Favicon -->
   <link rel="icon" type="image/png" sizes="32x32" href="logo.png">
   <link rel="apple-touch-icon" href="logo.png">
 
@@ -277,7 +275,6 @@
       gap: 4px;
     }
 
-    /* Workspace Modal - Stable Fixed Positioning to prevent Facebook In-app jumping */
     .workspace-overlay {
       position: fixed;
       inset: 0;
@@ -437,7 +434,6 @@
       outline: none;
     }
 
-    /* AI Helpdesk Chat Modal - Fully Mobile Optimized */
     #smartAiChatModal {
       position: fixed;
       inset: 0;
@@ -1256,7 +1252,7 @@
         if (q.includes('kb') || q.includes('resizer') || q.includes('সাইজ') || q.includes('photo')) {
           return `<b>Photo & Sign KB / MB Resizer ব্যবহারের নিয়ম:</b><br>
           1. হোমপেজ থেকে <b>Photo & Sign KB / MB Resizer</b> টুলটি ওপেন করুন。<br>
-          2. আপনার ছবিটি সিলেক্ট বা ড্রপ করুন।<br>
+          2. আপনার ছবিটি সিলেক্ট বা ড্রপ করুন。<br>
           3. ড্রপডাউন থেকে আপনার প্রয়োজনীয় সাইজ (যেমন 10, 20, 50, 100 KB বা MB) সিলেক্ট করুন এবং ফাইলের নাম দিয়ে প্রসেস করুন。<br>
           <a href="javascript:void(0)" onclick="closeSmartAiChat(); launchTool('kbResizer');" class="action-link-btn">👉 Open Resizer Tool</a>`;
         }
@@ -1718,10 +1714,7 @@
       if (activeTool === 'sigPad') {
         if (!sigCanvasInstance) return;
         const dataUrl = sigCanvasInstance.toDataURL('image/png');
-        const link = document.createElement('a');
-        link.href = dataUrl;
-        link.download = 'Digital_Signature.png';
-        link.click();
+        downloadBlob(dataUrl, 'Digital_Signature.png', 'image/png');
         closeWorkspace();
         return;
       }
@@ -1817,10 +1810,7 @@
                 }
               }
 
-              const link = document.createElement('a');
-              link.href = dataUrl;
-              link.download = `${customName}_${valInput}${unit}.jpg`;
-              link.click();
+              downloadBlob(dataUrl, `${customName}_${valInput}${unit}.jpg`, 'image/jpeg');
               setProgress(100, 'Complete');
               btn.innerText = originalText;
               btn.disabled = false;
@@ -1861,7 +1851,8 @@
             pdf.rect(x, y, w, h);
           }
           setProgress(90, 'Saving...');
-          pdf.save(`${customName}_${count}_Copies.pdf`);
+          const pdfOutput = pdf.output('blob');
+          downloadBlob(pdfOutput, `${customName}_${count}_Copies.pdf`, 'application/pdf');
 
         } else if (activeTool === 'merge') {
           if (selectedFiles.length < 2) {
@@ -1930,7 +1921,8 @@
             newPdf.addImage(imgData, 'JPEG', 0, 0, viewport.width, viewport.height);
           }
           setProgress(90, 'Saving compressed PDF...');
-          newPdf.save('Compressed_Document.pdf');
+          const compressedBlob = newPdf.output('blob');
+          downloadBlob(compressedBlob, 'Compressed_Document.pdf', 'application/pdf');
 
         } else if (activeTool === 'organize') {
           setProgress(30, 'Reordering pages...');
@@ -1998,7 +1990,8 @@
             pdf.text('This document was successfully wrapped and formatted into standard PDF format.', 15, 35);
           }
           setProgress(90, 'Saving...');
-          pdf.save(`${activeTool.toUpperCase()}_Converted.pdf`);
+          const pdfBlob = pdf.output('blob');
+          downloadBlob(pdfBlob, `${activeTool.toUpperCase()}_Converted.pdf`, 'application/pdf');
 
         } else if (activeTool === 'pdfToJpg') {
           setProgress(20, 'Extracting images...');
@@ -2016,10 +2009,7 @@
             await page.render({ canvasContext: context, viewport: viewport }).promise;
             
             const dataUrl = canvas.toDataURL('image/jpeg', 0.9);
-            const link = document.createElement('a');
-            link.href = dataUrl;
-            link.download = `Page_${i}.jpg`;
-            link.click();
+            downloadBlob(dataUrl, `Page_${i}.jpg`, 'image/jpeg');
           }
 
         } else if (activeTool === 'pdfToWord') {
@@ -2137,7 +2127,8 @@
           doc.line(10, 150, 138, 150);
           doc.setFontSize(12);
           doc.text(`Total: $ ${total}`, 85, 160);
-          doc.save(`Invoice_${cust.replace(/\s+/g, '_')}.pdf`);
+          const invoiceBlob = doc.output('blob');
+          downloadBlob(invoiceBlob, `Invoice_${cust.replace(/\s+/g, '_')}.pdf`, 'application/pdf');
 
         } else if (activeTool === 'resumeMaker') {
           setProgress(30, 'Building Resume...');
@@ -2154,7 +2145,8 @@
           doc.setFontSize(11);
           const split = doc.splitTextToSize(body || 'Professional Profile & Qualifications', 180);
           doc.text(split, 14, 42);
-          doc.save(`Resume_${name.replace(/\s+/g, '_')}.pdf`);
+          const resumeBlob = doc.output('blob');
+          downloadBlob(resumeBlob, `Resume_${name.replace(/\s+/g, '_')}.pdf`, 'application/pdf');
 
         } else if (activeTool === 'docMaker') {
           setProgress(30, 'Creating Document...');
@@ -2166,9 +2158,10 @@
           doc.text(title, 15, 22);
           doc.line(15, 26, 195, 26);
           doc.setFontSize(11);
-          const split = doc.splitTestToSize(content || 'Notes...', 180);
+          const split = doc.splitTextToSize(content || 'Notes...', 180);
           doc.text(split, 15, 34);
-          doc.save(`${title.replace(/\s+/g, '_')}.pdf`);
+          const docBlob = doc.output('blob');
+          downloadBlob(docBlob, `${title.replace(/\s+/g, '_')}.pdf`, 'application/pdf');
         } else {
           alert(`${activeTool.toUpperCase()} executed successfully.`);
         }
@@ -2247,13 +2240,44 @@
       });
     }
 
-    function downloadBlob(bytes, name, type) {
-      const blob = new Blob([bytes], { type });
+    /* Enhanced Mobile-friendly Download Handler that works inside In-app Browsers */
+    function downloadBlob(content, name, type) {
+      let blob;
+      if (content instanceof Blob) {
+        blob = content;
+      } else if (typeof content === 'string' && content.startsWith('data:')) {
+        // Handle Base64 Data URL conversion to Blob for mobile browsers
+        const arr = content.split(',');
+        const mime = arr[0].match(/:(.*?);/)[1];
+        const bstr = atob(arr[1]);
+        let n = bstr.length;
+        const u8arr = new Uint8Array(n);
+        while (n--) {
+          u8arr[n] = bstr.charCodeAt(n);
+        }
+        blob = new Blob([u8arr], { type: mime });
+      } else {
+        blob = new Blob([content], { type });
+      }
+
+      const blobUrl = URL.createObjectURL(blob);
       const a = document.createElement('a');
-      a.href = URL.createObjectURL(blob);
+      a.style.display = 'none';
+      a.href = blobUrl;
       a.download = name;
+      
+      // Fallback for mobile WebViews / Facebook browser where download attribute might be blocked
+      if (/FBAN|FBAV/i.test(navigator.userAgent)) {
+        a.target = '_blank';
+      }
+
+      document.body.appendChild(a);
       a.click();
-      URL.revokeObjectURL(a.href);
+      
+      setTimeout(() => {
+        document.body.removeChild(a);
+        URL.revokeObjectURL(blobUrl);
+      }, 1000);
     }
   </script>
 </body>
