@@ -457,8 +457,9 @@
       background: #ffffff;
       width: 100%;
       max-width: 540px;
-      height: 80vh;
-      height: 80dvh;
+      height: 75vh;
+      height: 75dvh;
+      max-height: 500px;
       border-radius: 24px 24px 0 0;
       display: flex;
       flex-direction: column;
@@ -733,15 +734,15 @@
       <!-- ================= PHOTO & CYBER TOOLS AT THE VERY TOP ================= -->
       <div class="tool-card" data-cat="cyber" onclick="launchTool('kbResizer')">
         <div class="tool-icon" style="background:#dbeafe; color:#2563eb;"><i class="fa-solid fa-compress"></i></div>
-        <h3>Photo & Sign KB Resizer</h3>
-        <p>Compress image precisely to 10KB, 50KB, 100KB, 200KB, 300KB, 400KB, or 500KB.</p>
-        <span class="tool-meta">Open KB Resizer &rarr;</span>
+        <h3>Photo & Sign KB / MB Resizer</h3>
+        <p>Compress image precisely to exact target KB or MB as per your requirement.</p>
+        <span class="tool-meta">Open Resizer &rarr;</span>
       </div>
 
       <div class="tool-card" data-cat="cyber" onclick="launchTool('passportGrid')">
         <div class="tool-icon" style="background:#fef3c7; color:#d97706;"><i class="fa-solid fa-id-card-clip"></i></div>
-        <h3>Passport Photo Sheet (3, 4, 8, 16)</h3>
-        <p>Generate print-ready sheets of 3, 4, 8, or 16 passport copies on a single A4 page.</p>
+        <h3>Passport Photo Sheet (Custom / Grid)</h3>
+        <p>Generate print-ready sheets of custom passport photo copies on a single A4 page.</p>
         <span class="tool-meta">Open Passport Grid &rarr;</span>
       </div>
 
@@ -929,9 +930,9 @@
         <div class="tool-icon" style="background: #fee2e2; color:#e5322d;">
           <i class="fa-solid fa-robot"></i>
         </div>
-        <h3>AI Smart Assistant (Chat)</h3>
-        <p>Type here to get instructions or assistance with any tool.</p>
-        <span class="tool-meta">Open Chat Helpdesk &rarr;</span>
+        <h3>DocuCraft AI Smart Assistant</h3>
+        <p>Ask anything or get instant guidance from DocuCraft AI.</p>
+        <span class="tool-meta">Open AI Helpdesk &rarr;</span>
       </div>
 
     </div>
@@ -963,15 +964,16 @@
     </div>
   </div>
 
-  <!-- AI Helpdesk Modal -->
+  <!-- AI Helpdesk Modal (DocuCraft Style) -->
   <div id="smartAiChatModal">
     <div class="ai-chat-card">
       <div class="ai-chat-header">
-        <h3><i class="fa-solid fa-robot" style="color: #60a5fa;"></i> DocuCraft AI Helpdesk</h3>
+        <h3><i class="fa-solid fa-sparkles" style="color: #60a5fa;"></i> DocuCraft AI Helpdesk</h3>
         <div style="display: flex; align-items: center; gap: 8px;">
           <select id="chatLangSelect" class="lang-select-box" onchange="changeChatLanguage(this.value)">
             <option value="en" selected>English</option>
             <option value="hi">हिन्दी (Hindi)</option>
+            <option value="bn">বাংলা (Bengali)</option>
           </select>
           <button id="voiceMuteToggle" class="voice-toggle-btn" onclick="toggleVoiceOutput()">
             <i class="fa-solid fa-volume-high"></i> Voice ON
@@ -982,7 +984,7 @@
 
       <div class="ai-chat-messages" id="chatMessages">
         <div class="msg bot" id="welcomeMsg">
-          Hello! I am DocuCraft AI Assistant. You can ask any question or learn how to use our tools in English or Hindi.
+          Hello! I am your DocuCraft AI Assistant. How can I help you today? You can ask me about any tool or formatting in Bengali, Hindi, or English.
         </div>
       </div>
 
@@ -994,7 +996,7 @@
       </div>
 
       <div class="ai-chat-input-bar">
-        <input type="text" id="chatInput" placeholder="Type in English or Hindi..." onkeypress="handleEnter(event)">
+        <input type="text" id="chatInput" placeholder="Ask DocuCraft AI anything or type in Bengali/Hindi/English..." onkeypress="handleEnter(event)">
         <button onclick="sendUserMessage()"><i class="fa-solid fa-paper-plane"></i></button>
       </div>
     </div>
@@ -1164,9 +1166,13 @@
       utterance.pitch = 1.0;
 
       const isHindi = /[\u0900-\u097F]/.test(cleanText) || currentLang === 'hi';
+      const isBengali = /[\u0980-\u09FF]/.test(cleanText) || currentLang === 'bn';
       let matchedVoice = null;
 
-      if (isHindi) {
+      if (isBengali) {
+        utterance.lang = 'bn-IN';
+        matchedVoice = availableVoices.find(v => v.lang.startsWith('bn'));
+      } else if (isHindi) {
         utterance.lang = 'hi-IN';
         matchedVoice = availableVoices.find(v => v.lang.startsWith('hi'));
       } else {
@@ -1181,12 +1187,15 @@
     function changeChatLanguage(lang) {
       currentLang = lang;
       const welcome = document.getElementById('welcomeMsg');
-      if (lang === 'hi') {
-        welcome.innerHTML = "नमस्ते! मैं DocuCraft AI सहायक हूँ। आप यहाँ हिंदी में कोई भी प्रश्न पूछ सकते हैं या टूल इस्तेमाल करने का तरीका जान सकते हैं।";
-        speakText("नमस्ते! मैं DocuCraft AI सहायक हूँ।");
+      if (lang === 'bn') {
+        welcome.innerHTML = "নমস্কার! আমি আপনার DocuCraft AI অ্যাসিস্ট্যান্ট। আজ আপনাকে কীভাবে সাহায্য করতে পারি? আপনি যেকোনো টুল বা ফরম্যাটিং সম্পর্কে বাংলায় প্রশ্ন করতে পারেন।";
+        speakText("নমস্কার! আমি আপনার ডকুক্রাফট এআই অ্যাসিস্ট্যান্ট।");
+      } else if (lang === 'hi') {
+        welcome.innerHTML = "नमस्ते! मैं आपका DocuCraft AI सहायक हूँ। आज मैं आपकी कैसे मदद कर सकता हूँ?";
+        speakText("नमस्ते! मैं आपका DocuCraft AI सहायक हूँ।");
       } else {
-        welcome.innerHTML = "Hello! I am DocuCraft AI Assistant. You can ask any question or learn how to use our tools in English or Hindi.";
-        speakText("Hello! I am DocuCraft AI Assistant.");
+        welcome.innerHTML = "Hello! I am your DocuCraft AI Assistant. How can I help you today? You can ask me about any tool or formatting.";
+        speakText("Hello! I am your DocuCraft AI Assistant.");
       }
     }
 
@@ -1218,14 +1227,14 @@
       input.value = '';
 
       setTimeout(() => {
-        const replyHtml = getBilingualAnswer(text);
+        const replyHtml = getDocuCraftSmartAnswer(text);
         appendChatMessage(replyHtml, 'bot');
 
         const tempDiv = document.createElement('div');
         tempDiv.innerHTML = replyHtml;
         tempDiv.querySelectorAll('a').forEach(l => l.remove());
         speakText(tempDiv.innerText.trim());
-      }, 300);
+      }, 400);
     }
 
     function appendChatMessage(html, sender) {
@@ -1237,58 +1246,40 @@
       container.scrollTop = container.scrollHeight;
     }
 
-    function getBilingualAnswer(query) {
+    function getDocuCraftSmartAnswer(query) {
       const q = query.toLowerCase();
 
-      if (currentLang === 'hi' || q.includes('फोटो') || q.includes('साइज') || q.includes('पासपोर्ट') || q.includes('हस्ताक्षर')) {
-        if (q.includes('फोटो') || q.includes('kb') || q.includes('साइज')) {
-          return `<b>Photo & Sign KB Resizer का उपयोग कैसे करें:</b><br>
-          1. <b>Photo & Sign KB Resizer</b> टूल खोलें।<br>
-          2. अपनी तस्वीर चुनें और वांछित KB साइज चुनें (10KB, 50KB, 100KB आदि)।<br>
-          3. Process बटन पर क्लिक करें और तुरंत डाउनलोड करें!<br>
-          <a href="javascript:void(0)" onclick="closeSmartAiChat(); launchTool('kbResizer');" class="action-link-btn">👉 Open KB Resizer Tool</a>`;
+      if (currentLang === 'bn' || q.includes('বাংলা') || q.includes('কিভাবে') || q.includes('সাইজ') || q.includes('ছবি') || q.includes('কেমন') || q.includes('কোথায়') || q.includes('কতো')) {
+        if (q.includes('kb') || q.includes('resizer') || q.includes('সাইজ') || q.includes('photo')) {
+          return `<b>Photo & Sign KB / MB Resizer ব্যবহারের নিয়ম:</b><br>
+          1. হোমপেজ থেকে <b>Photo & Sign KB / MB Resizer</b> টুলটি ওপেন করুন।<br>
+          2. আপনার ছবিটি সিলেক্ট বা ড্রপ করুন।<br>
+          3. ড্রপডাউন থেকে আপনার প্রয়োজনীয় সাইজ (যেমন 10, 20, 50, 100 KB বা MB) সিলেক্ট করুন এবং ফাইলের নাম দিয়ে প্রসেস করুন।<br>
+          <a href="javascript:void(0)" onclick="closeSmartAiChat(); launchTool('kbResizer');" class="action-link-btn">👉 Open Resizer Tool</a>`;
         }
-        if (q.includes('पासपोर्ट')) {
-          return `<b>Passport Photo Grid का उपयोग कैसे करें:</b><br>
-          1. <b>Passport Photo Sheet</b> टूल खोलें और अपनी फोटो अपलोड करें।<br>
-          2. कॉपियों की संख्या चुनें (3, 4, 8, या 16) और PDF डाउनलोड करें!<br>
-          <a href="javascript:void(0)" onclick="closeSmartAiChat(); launchTool('passportGrid');" class="action-link-btn">👉 Open Passport Grid Tool</a>`;
+        if (q.includes('passport') || q.includes('পাসপোর্ট')) {
+          return `<b>Passport Photo Sheet তৈরির নিয়ম:</b><br>
+          1. <b>Passport Photo Sheet</b> টুলটি ওপেন করুন।<br>
+          2. আপনার পাসপোর্ট সাইজ ছবি আপলোড করুন।<br>
+          3. কপির সংখ্যা লিখে আপনার পছন্দমতো ফাইলের নাম দিয়ে ডাউনলোড করুন!<br>
+          <a href="javascript:void(0)" onclick="closeSmartAiChat(); launchTool('passportGrid');" class="action-link-btn">👉 Open Passport Grid</a>`;
         }
-        return `नमस्ते! आप होमपेज पर किसी भी टूल (जैसे Merge, Split, Compress) का चयन करके अपना काम तुरंत कर सकते हैं।`;
+        return `আমি আপনার কথা বুঝতে পেরেছি। আপনি DocuCraft AI-এর যেকোনো টুল খুব সহজেই ব্যবহার করতে পারেন। কোনো বিশেষ টুলের সাহায্য চাইলে বলুন!`;
+      }
+
+      if (currentLang === 'hi' || q.includes('फोटो') || q.includes('साइज') || q.includes('पासपोर्ट') || q.includes('कैसी')) {
+        return `नमस्ते! आप DocuCraft AI के किसी भी टूल का उपयोग आसानी से कर सकते हैं। यदि आपको KB Resizer या Passport Sheet के बारे में जानना है, तो कृपया पूछें।`;
       }
 
       if (q.includes('signature') || q.includes('sign')) {
-        return `<b>How to use Digital Signature Maker:</b><br>
+        return `<b>Digital Signature Maker Guide:</b><br>
         1. Open the <b>Digital Signature Maker</b> tool.<br>
-        2. Draw your signature in the box using your mouse or finger.<br>
-        3. Click <b>Process & Download</b> to save your transparent PNG signature.<br>
+        2. Draw your signature cleanly on the canvas.<br>
+        3. Click process to download your transparent signature PNG.<br>
         <a href="javascript:void(0)" onclick="closeSmartAiChat(); launchTool('sigPad');" class="action-link-btn">👉 Open Signature Pad</a>`;
       }
 
-      if (q.includes('qr') || q.includes('upi')) {
-        return `<b>How to use QR Code Generator:</b><br>
-        1. Open the <b>QR Code & UPI Generator</b> tool.<br>
-        2. Enter your UPI ID, payment link, or website URL.<br>
-        3. Click process to download your instant QR code.<br>
-        <a href="javascript:void(0)" onclick="closeSmartAiChat(); launchTool('qrGen');" class="action-link-btn">👉 Open QR Generator</a>`;
-      }
-
-      if (q.includes('resize') || q.includes('kb')) {
-        return `<b>How to use Photo & Sign KB Resizer:</b><br>
-        1. Open the <b>Photo & Sign KB Resizer</b> tool.<br>
-        2. Select your image and choose the target KB size.<br>
-        3. Click process to download the resized photo instantly.<br>
-        <a href="javascript:void(0)" onclick="closeSmartAiChat(); launchTool('kbResizer');" class="action-link-btn">👉 Open KB Resizer Tool</a>`;
-      }
-
-      if (q.includes('passport')) {
-        return `<b>How to use Passport Photo Grid:</b><br>
-        1. Open the <b>Passport Photo Sheet</b> tool and upload your photo.<br>
-        2. Select the number of copies (3, 4, 8, or 16) and download your print-ready PDF.<br>
-        <a href="javascript:void(0)" onclick="closeSmartAiChat(); launchTool('passportGrid');" class="action-link-btn">👉 Open Passport Grid Tool</a>`;
-      }
-
-      return `To get started, simply tap on any tool on the homepage (such as KB Resizer, Passport Grid, Merge PDF, or Compress PDF) or ask assistance for a specific task.`;
+      return `DocuCraft AI Assistant: I am here to help you navigate DocuCraft AI tools smoothly. Feel free to ask any questions about photo resizing, PDF conversion, or document generation!`;
     }
 
     async function loadPdfWithPassword(fileBytes) {
@@ -1361,39 +1352,51 @@
             <input type="text" id="optQrText" class="form-control" placeholder="e.g. yourname@ybl or https://example.com" value="https://example.com">
           </div>`;
       } else if (toolKey === 'kbResizer') {
-        title.innerText = 'Photo & Sign KB Resizer';
-        desc.innerText = 'Compress image to exact target KB (10KB to 500KB).';
+        title.innerText = 'Photo & Sign KB / MB Resizer';
+        desc.innerText = 'Select preset size and file name.';
         fileInput.accept = 'image/*';
         fileInput.multiple = false;
         dropText.innerText = 'Tap to select photo/signature';
         customUI.innerHTML = `
           <div class="form-group">
-            <label>Target File Size:</label>
-            <select id="optTargetKb" class="form-control">
-              <option value="10">10 KB (For Signatures)</option>
-              <option value="50" selected>50 KB (Standard Form Photo)</option>
-              <option value="100">100 KB</option>
-              <option value="200">200 KB</option>
-              <option value="300">300 KB</option>
-              <option value="400">400 KB</option>
-              <option value="500">500 KB</option>
-            </select>
+            <label>Select Preset Size & Unit:</label>
+            <div style="display: flex; gap: 8px;">
+              <select id="optPresetSize" class="form-control" style="flex: 2;">
+                <option value="10">10</option>
+                <option value="20">20</option>
+                <option value="30">30</option>
+                <option value="40">40</option>
+                <option value="50" selected>50</option>
+                <option value="100">100</option>
+                <option value="200">200</option>
+                <option value="300">300</option>
+                <option value="400">400</option>
+                <option value="500">500</option>
+              </select>
+              <select id="optTargetUnit" class="form-control" style="flex: 1;">
+                <option value="KB" selected>KB</option>
+                <option value="MB">MB</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Save File Name:</label>
+            <input type="text" id="optCustomFileName" class="form-control" value="Resized_Photo" placeholder="Enter file name">
           </div>`;
       } else if (toolKey === 'passportGrid') {
-        title.innerText = 'Passport Photo Sheet (3, 4, 8, 16)';
-        desc.innerText = 'Generate print-ready passport sheets on A4 paper.';
+        title.innerText = 'Passport Photo Sheet (Custom Copies & Name)';
+        desc.innerText = 'Generate print-ready passport sheets on A4 paper with custom file name.';
         fileInput.accept = 'image/*';
         fileInput.multiple = false;
         dropText.innerText = 'Tap to select passport photo';
         customUI.innerHTML = `
           <div class="form-group">
             <label>Number of Copies on A4 Sheet:</label>
-            <select id="optPassportCopies" class="form-control">
-              <option value="3">3 Photos Layout</option>
-              <option value="4">4 Photos Grid (2x2)</option>
-              <option value="8" selected>8 Photos Grid (2x4)</option>
-              <option value="16">16 Photos Grid (4x4)</option>
-            </select>
+            <input type="number" id="optPassportCopies" class="form-control" value="8" min="1" max="50" placeholder="Enter number of copies">
+          </div>
+          <div class="form-group">
+            <label>Save File Name:</label>
+            <input type="text" id="optPassportFileName" class="form-control" value="Passport_Sheet" placeholder="Enter file name">
           </div>`;
       } else if (toolKey === 'merge') {
         title.innerText = 'Merge PDF';
@@ -1754,9 +1757,11 @@
 
       try {
         if (activeTool === 'kbResizer') {
-          setProgress(20, 'Resizing image...');
-          const targetKb = parseInt(document.getElementById('optTargetKb').value) || 50;
-          const targetBytes = targetKb * 1024;
+          setProgress(20, 'Resizing image with high clarity...');
+          const valInput = parseFloat(document.getElementById('optPresetSize').value) || 50;
+          const unit = document.getElementById('optTargetUnit').value;
+          const customName = document.getElementById('optCustomFileName').value.trim() || 'Resized_Photo';
+          const targetBytes = unit === 'MB' ? valInput * 1024 * 1024 : valInput * 1024;
           const file = selectedFiles[0];
           
           const reader = new FileReader();
@@ -1767,14 +1772,23 @@
               let width = img.width;
               let height = img.height;
               
-              if (width > 1000) {
-                height = Math.round((height * 1000) / width);
-                width = 1000;
+              // Maintain higher resolution for crystal clear output
+              const maxDim = 1600;
+              if (width > maxDim || height > maxDim) {
+                if (width > height) {
+                  height = Math.round((height * maxDim) / width);
+                  width = maxDim;
+                } else {
+                  width = Math.round((width * maxDim) / height);
+                  height = maxDim;
+                }
               }
 
               canvas.width = width;
               canvas.height = height;
               const ctx = canvas.getContext('2d');
+              ctx.imageSmoothingEnabled = true;
+              ctx.imageSmoothingQuality = 'high';
               ctx.drawImage(img, 0, 0, width, height);
 
               const estimateBytes = (dataUrl) => {
@@ -1783,12 +1797,12 @@
                 return Math.max(0, Math.floor((base64.length * 3) / 4) - padding);
               };
 
-              let dataUrl = canvas.toDataURL('image/jpeg', 0.9);
+              let dataUrl = canvas.toDataURL('image/jpeg', 0.95);
               let sizeBytes = estimateBytes(dataUrl);
 
-              let low = 0.05;
-              let high = 0.9;
-              for (let i = 0; i < 8; i++) {
+              let low = 0.1;
+              let high = 0.98;
+              for (let i = 0; i < 10; i++) {
                 const quality = (low + high) / 2;
                 const candidate = canvas.toDataURL('image/jpeg', quality);
                 const candidateSize = estimateBytes(candidate);
@@ -1803,7 +1817,7 @@
 
               const link = document.createElement('a');
               link.href = dataUrl;
-              link.download = `Resized_${targetKb}KB.jpg`;
+              link.download = `${customName}_${valInput}${unit}.jpg`;
               link.click();
               setProgress(100, 'Complete');
               btn.innerText = originalText;
@@ -1818,31 +1832,34 @@
         } else if (activeTool === 'passportGrid') {
           setProgress(30, 'Generating passport sheet...');
           const count = parseInt(document.getElementById('optPassportCopies').value) || 8;
+          const customName = document.getElementById('optPassportFileName').value.trim() || 'Passport_Sheet';
           const rawData = await readFileAsDataURL(selectedFiles[0]);
           const data = await imageToJpegDataUrl(rawData);
           const { jsPDF } = window.jspdf;
           const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
           const w = 35, h = 45;
           let cols = 4;
-          if (count === 3 || count === 4) cols = 2;
+          if (count <= 4) cols = 2;
           
-          const startX = cols === 2 ? (210 - (cols * w + (cols - 1) * 10)) / 2 : 20;
-          const startY = 25;
-          const gapX = 10;
-          const gapY = 12;
+          const startX = cols === 2 ? (210 - (cols * w + (cols - 1) * 10)) / 2 : 15;
+          const startY = 20;
+          const gapX = 8;
+          const gapY = 10;
 
           for (let i = 0; i < count; i++) {
             const row = Math.floor(i / cols);
             const col = i % cols;
             const x = startX + col * (w + gapX);
             const y = startY + row * (h + gapY);
-            if (y + h > 280) break;
+            if (y + h > 285) {
+              pdf.addPage();
+            }
             pdf.addImage(data, 'JPEG', x, y, w, h);
             pdf.setDrawColor(200, 200, 200);
             pdf.rect(x, y, w, h);
           }
           setProgress(90, 'Saving...');
-          pdf.save(`Passport_Photos_${count}_Copies.pdf`);
+          pdf.save(`${customName}_${count}_Copies.pdf`);
 
         } else if (activeTool === 'merge') {
           if (selectedFiles.length < 2) {
