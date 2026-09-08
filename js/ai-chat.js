@@ -55,21 +55,23 @@ function speakText(cleanText) {
 function changeChatLanguage(lang) {
   currentLang = lang;
   const welcome = document.getElementById('welcomeMsg');
+  if (!welcome) return;
+  
   if (lang === 'bn') {
-    welcome.innerHTML = "নমস্কার! আমি আপনার DocuCraft AI অ্যাসিস্ট্যান্ট। আজ আপনাকে কীভাবে সাহায্য করতে পারি? আপনি ফটো রিসাইজার, পাসপোর্ট গ্রিড (35x45 mm), সিগনেচার প্যাড কিংবা পিডিএফ টুলস সম্পর্কে বাংলায় যেকোনো প্রশ্ন করতে পারেন।";
+    welcome.textContent = "নমস্কার! আমি আপনার DocuCraft AI অ্যাসিস্ট্যান্ট। আজ আপনাকে কীভাবে সাহায্য করতে পারি? আপনি ফটো রিসাইজার, পাসপোর্ট গ্রিড (35x45 mm), সিগনেচার প্যাড কিংবা পিডিএফ টুলস সম্পর্কে বাংলায় যেকোনো প্রশ্ন করতে পারেন।";
     speakText("নমস্কার! আমি আপনার ডকুক্রাফট এআই অ্যাসিস্ট্যান্ট।");
   } else if (lang === 'hi') {
-    welcome.innerHTML = "नमस्ते! मैं आपका DocuCraft AI सहायक हूँ। आज मैं आपकी कैसे मदद कर सकता हूँ?";
+    welcome.textContent = "नमस्ते! मैं आपका DocuCraft AI सहायक हूँ। आज मैं आपकी कैसे मदद कर सकता हूँ?";
     speakText("नमस्ते! मैं आपका DocuCraft AI सहायक हूँ।");
   } else {
-    welcome.innerHTML = "Hello! I am your DocuCraft AI Assistant. How can I help you today? You can ask me about any tool or formatting.";
+    welcome.textContent = "Hello! I am your DocuCraft AI Assistant. How can I help you today? You can ask me about any tool or formatting.";
     speakText("Hello! I am your DocuCraft AI Assistant.");
   }
 }
 
 function openSmartAiChat() {
   document.getElementById('smartAiChatModal').style.display = 'flex';
-  setTimeout(() => document.getElementById('chatInput').focus(), 300);
+  setTimeout(() => document.getElementById('chatInput')?.focus(), 300);
 }
 
 function closeSmartAiChat() {
@@ -82,12 +84,14 @@ function handleEnter(e) {
 }
 
 function sendQuickQuery(text) {
-  document.getElementById('chatInput').value = text;
+  const input = document.getElementById('chatInput');
+  if (input) input.value = text;
   sendUserMessage();
 }
 
 function sendUserMessage() {
   const input = document.getElementById('chatInput');
+  if (!input) return;
   const text = input.value.trim();
   if (!text) return;
 
@@ -105,11 +109,22 @@ function sendUserMessage() {
   }, 200);
 }
 
-function appendChatMessage(html, sender) {
+// CodeQL সিকিউরিটি অ্যালার্ট ফিক্স করার জন্য নিরাপদ DOM রেন্ডারিং পদ্ধতি
+function appendChatMessage(content, sender) {
   const container = document.getElementById('chatMessages');
+  if (!container) return;
+  
   const msgDiv = document.createElement('div');
   msgDiv.className = `msg ${sender}`;
-  msgDiv.innerHTML = html;
+
+  if (sender === 'user') {
+    // ইউজারের মেসেজ সবসময় প্লেন টেক্সট হিসেবে দেখাবে (সম্পূর্ণ নিরাপদ)
+    msgDiv.textContent = content;
+  } else {
+    // বটের মেসেজে এইচটিএমএল ট্যাগ ও বাটন নিরাপদভাবে পার্স করার জন্য
+    msgDiv.innerHTML = content;
+  }
+
   container.appendChild(msgDiv);
   container.scrollTop = container.scrollHeight;
 }
