@@ -1,47 +1,24 @@
-window.addEventListener('DOMContentLoaded', () => {
-  const loggedUser = sessionStorage.getItem('docuCraft_logged_in_user');
-  if (loggedUser) {
-    const btn = document.getElementById('authNavBtn');
-    if (btn) {
-      btn.innerHTML = `<i class="fa-solid fa-user-check"></i>`;
-      btn.setAttribute('onclick', 'handleLogout()');
-      btn.style.background = '#64748b';
-      btn.title = `Logged in as ${loggedUser} (Click to Logout)`;
-    }
-  }
-});
+let isSignUpMode = false;
 
 function openAuthModal() {
-  const modal = document.getElementById('authModal');
-  if (modal) modal.style.display = 'flex';
-  setTimeout(() => {
-    const emailInput = document.getElementById('authEmail');
-    if (emailInput) emailInput.focus();
-  }, 200);
+  document.getElementById('authModal').style.display = 'flex';
+  setTimeout(() => document.getElementById('authEmail').focus(), 200);
 }
 
 function closeAuthModal() {
-  const modal = document.getElementById('authModal');
-  if (modal) modal.style.display = 'none';
+  document.getElementById('authModal').style.display = 'none';
 }
 
-let isSignUpMode = false;
 function toggleAuthMode() {
   isSignUpMode = !isSignUpMode;
-  const title = document.getElementById('authTitle');
-  const submitBtn = document.getElementById('authSubmitBtn');
-  const toggleText = document.getElementById('authToggleText');
-  
-  if (title) title.innerText = isSignUpMode ? 'Create Account (Sign Up)' : 'User Login';
-  if (submitBtn) submitBtn.innerText = isSignUpMode ? 'Register' : 'Login';
-  if (toggleText) toggleText.innerText = isSignUpMode ? 'Already have an account?' : "Don't have an account?";
+  document.getElementById('authTitle').innerText = isSignUpMode ? 'Create Account (Sign Up)' : 'User Login';
+  document.getElementById('authSubmitBtn').innerText = isSignUpMode ? 'Register' : 'Login';
+  document.getElementById('authToggleText').innerText = isSignUpMode ? 'Already have an account?' : "Don't have an account?";
 }
 
 async function handleAuthSubmit() {
   const emailInput = document.getElementById('authEmail');
   const passInput = document.getElementById('authPassword');
-  if (!emailInput || !passInput) return;
-
   const email = emailInput.value.trim().toLowerCase();
   const pass = passInput.value;
 
@@ -49,7 +26,7 @@ async function handleAuthSubmit() {
     alert('Please enter both email and password.');
     return;
   }
-  if (!/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email)) {
+  if (!/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/.test(email)) {
     alert('Please enter a valid email address.');
     return;
   }
