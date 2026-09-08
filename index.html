@@ -1216,7 +1216,7 @@
       currentLang = lang;
       const welcome = document.getElementById('welcomeMsg');
       if (lang === 'bn') {
-        welcome.innerHTML = "নমস্কার! আমি আপনার DocuCraft AI অ্যাসিস্ট্যান্ট। আজ আপনাকে কীভাবে সাহায্য করতে পারি? আপনি ফটো রিসাইজার, পাসপোর্ট গ্রিড, সিগনেচার প্যাড কিংবা পিডিএফ টুলস সম্পর্কে বাংলায় যেকোনো প্রশ্ন করতে পারেন।";
+        welcome.innerHTML = "নমস্কার! আমি আপনার DocuCraft AI অ্যাসিস্ট্যান্ট। আজ আপনাকে কীভাবে সাহায্য করতে পারি? আপনি ফটো রিসাইজার, পাসপোর্ট গ্রিড (35x45 mm), সিগনেচার প্যাড কিংবা পিডিএফ টুলস সম্পর্কে বাংলায় যেকোনো প্রশ্ন করতে পারেন।";
         speakText("নমস্কার! আমি আপনার ডকুক্রাফট এআই অ্যাসিস্ট্যান্ট।");
       } else if (lang === 'hi') {
         welcome.innerHTML = "नमस्ते! मैं आपका DocuCraft AI सहायक हूँ। आज मैं आपकी कैसे मदद कर सकता हूँ?";
@@ -1274,72 +1274,58 @@
       container.scrollTop = container.scrollHeight;
     }
 
-    /* Optimized Helpdesk Answer Handler */
+    /* Optimized Helpdesk Answer Handler with Standard Passport Guidelines */
     function getDocuCraftSmartAnswer(query) {
       const q = query.toLowerCase();
 
       if (currentLang === 'bn' || q.includes('বাংলা') || q.includes('কিভাবে') || q.includes('সাইজ') || q.includes('ছবি') || q.includes('কেমন') || q.includes('কোথায়') || q.includes('কতো') || q.includes('পাসপোর্ট')) {
         if (q.includes('kb') || q.includes('resizer') || q.includes('সাইজ') || q.includes('photo')) {
           return `<b>Photo & Sign KB / MB Resizer ব্যবহারের নিয়ম:</b><br>
-          1. হোমপেজ থেকে <b>Photo & Sign KB / MB Resizer</b> টুলটি ওপেন করুন。<br>
-          2. আপনার ছবিটি সিলেক্ট বা ড্রপ করুন。<br>
-          3. ড্রপডাউন থেকে আপনার প্রয়োজনীয় সাইজ (যেমন 10, 20, 50, 100 KB বা MB) সিলেক্ট করুন এবং ফাইলের নাম দিয়ে প্রসেস করুন。<br>
+          সাধারণত ভারতীয় অনলাইন ফর্মে ছবি 20–50 KB এবং সিগনেচার 10–20 KB চাওয়া হয়।<br>
+          1. <b>Photo & Sign KB / MB Resizer</b> টুলটি ওপেন করুন。<br>
+          2. ছবি সিলেক্ট করে পছন্দমতো KB বা MB সিলেক্ট করুন এবং প্রসেস করুন。<br>
           <a href="javascript:void(0)" onclick="closeSmartAiChat(); launchTool('kbResizer');" class="action-link-btn">👉 Open Resizer Tool</a>`;
         }
         if (q.includes('passport') || q.includes('পাসপোর্ট')) {
-          return `<b>Passport Photo Sheet তৈরির নিয়ম:</b><br>
-          1. <b>Passport Photo Sheet</b> টুলটি ওপেন করুন。<br>
-          2. আপনার পাসপোর্ট সাইজ ছবি আপলোড করুন。<br>
-          3. কপির সংখ্যা লিখে আপনার পছন্দমতো ফাইলের নাম দিয়ে ডাউনলোড করুন!<br>
+          return `<b>Passport Photo Sheet নির্দেশিকা:</b><br>
+          📏 স্ট্যান্ডার্ড মাপ: <b>35 × 45 mm</b> (1.38 × 1.77 inch, প্রায় 413 × 531 pixels @ 300 DPI)।<br>
+          1. <b>Passport Photo Sheet</b> টুল ওপেন করুন।<br>
+          2. ছবি আপলোড করে কপির সংখ্যা (যেমন 8) দিন ও ডাউনলোড করুন।<br>
           <a href="javascript:void(0)" onclick="closeSmartAiChat(); launchTool('passportGrid');" class="action-link-btn">👉 Open Passport Grid</a>`;
         }
-        if (q.includes('merge') || q.includes('pdf')) {
-          return `<b>PDF Tools ব্যবহারের নিয়ম:</b><br>
-          আপনার পছন্দের পিডিএফ টুল সিলেক্ট করুন, ফাইল আপলোড করে 'Process & Download' বাটনে ক্লিক করুন।<br>
-          <a href="javascript:void(0)" onclick="closeSmartAiChat(); launchTool('merge');" class="action-link-btn">👉 Open Merge Tool</a>`;
-        }
-        return `নমস্কার! আমি আপনার ডকুক্রাফট এআই অ্যাসিস্ট্যান্ট। আপনি KB Resizer, Passport Sheet, Signature Pad কিংবা যেকোনো PDF টুল সম্পর্কে সরাসরি প্রশ্ন করতে পারেন।`;
+        return `নমস্কার! আমি আপনার ডকুক্রাফট এআই অ্যাসিস্ট্যান্ট। আপনি KB Resizer, Passport Sheet (35x45 mm), Signature Pad কিংবা যেকোনো PDF টুল সম্পর্কে সরাসরি প্রশ্ন করতে পারেন।`;
       }
 
       if (currentLang === 'hi' || q.includes('फोटो') || q.includes('साइज') || q.includes('पासपोर्ट') || q.includes('कैसी')) {
         if (q.includes('kb') || q.includes('resizer') || q.includes('photo')) {
-          return `<b>Photo & Sign KB / MB Resizer का उपयोग कैसे करें:</b><br>
-          1. होमपेज से <b>KB Resizer</b> टूल खोलें।<br>
-          2. अपनी फोटो अपलोड करें।<br>
-          3. आवश्यक KB/MB चुनें और प्रोसेस करें।<br>
+          return `<b>Photo & Sign KB / MB Resizer:</b><br>
+          फॉर्म के अनुसार फोटो 20-50 KB और हस्ताक्षर 10-20 KB में सेट करें।<br>
           <a href="javascript:void(0)" onclick="closeSmartAiChat(); launchTool('kbResizer');" class="action-link-btn">👉 Open Resizer Tool</a>`;
         }
-        return `नमस्ते! आप DocuCraft AI के किसी भी टूल (जैसे Passport Sheet, Signature Maker, PDF Compress) का उपयोग आसानी से कर सकते हैं।`;
+        return `नमस्ते! पासपोर्ट साइज फोटो का मानक आकार आमतौर पर 35×45 mm होता है। आप हमारे <b>Passport Grid</b> टूल से इसे आसानी से बना सकते हैं।`;
       }
 
       if (q.includes('kb') || q.includes('resizer') || q.includes('resize')) {
         return `<b>Photo & Sign KB / MB Resizer Guide:</b><br>
-        1. Open the <b>Photo & Sign KB / MB Resizer</b> card from the top.<br>
-        2. Upload your image or signature file.<br>
-        3. Choose your target size and click Process & Download.<br>
+        1. Open the <b>Photo & Sign KB / MB Resizer</b> card.<br>
+        2. Upload your image, select exact target KB/MB (e.g. 20KB, 50KB) and download.<br>
         <a href="javascript:void(0)" onclick="closeSmartAiChat(); launchTool('kbResizer');" class="action-link-btn">👉 Open Resizer Tool</a>`;
       }
       if (q.includes('passport') || q.includes('grid')) {
-        return `<b>Passport Photo Sheet Guide:</b><br>
+        return `<b>Passport Photo Sheet Guide (35 x 45 mm):</b><br>
         1. Open the <b>Passport Photo Sheet</b> tool.<br>
-        2. Upload your passport photo and enter number of copies.<br>
+        2. Upload your photo, enter copy count, and generate print-ready A4 sheet.<br>
         <a href="javascript:void(0)" onclick="closeSmartAiChat(); launchTool('passportGrid');" class="action-link-btn">👉 Open Passport Grid</a>`;
       }
       if (q.includes('signature') || q.includes('sign')) {
         return `<b>Digital Signature Maker Guide:</b><br>
         1. Open the <b>Digital Signature Maker</b> tool.<br>
-        2. Draw your signature cleanly on the canvas and download.<br>
+        2. Draw your signature cleanly on the canvas and download transparent PNG.<br>
         <a href="javascript:void(0)" onclick="closeSmartAiChat(); launchTool('sigPad');" class="action-link-btn">👉 Open Signature Pad</a>`;
-      }
-      if (q.includes('compress') || q.includes('pdf size')) {
-        return `<b>Compress PDF Guide:</b><br>
-        1. Open the <b>Compress PDF</b> tool.<br>
-        2. Select your large PDF file and download optimized version.<br>
-        <a href="javascript:void(0)" onclick="closeSmartAiChat(); launchTool('compress');" class="action-link-btn">👉 Open Compress Tool</a>`;
       }
 
       return `<b>DocuCraft AI Smart Assistant:</b><br>
-      I am here to guide you through all our tools including Photo KB Resizer, Passport Sheet, Signature Pad, and PDF Utilities. Ask me how to use any tool!`;
+      I am here to guide you through all our tools including Photo KB Resizer, Passport Sheet (35x45 mm), Signature Pad, and PDF Utilities. Ask me how to use any tool!`;
     }
 
     async function loadPdfWithPassword(fileBytes) {
@@ -1413,7 +1399,7 @@
           </div>`;
       } else if (toolKey === 'kbResizer') {
         title.innerText = 'Photo & Sign KB / MB Resizer';
-        desc.innerText = 'Select preset size and file name.';
+        desc.innerText = 'Select preset size and file name. (Recommended Indian Form Size: 20-50 KB for Photo)';
         fileInput.accept = 'image/*';
         fileInput.multiple = false;
         dropText.innerText = 'Tap to select photo/signature';
@@ -1444,8 +1430,8 @@
             <input type="text" id="optCustomFileName" class="form-control" value="Resized_Photo" placeholder="Enter file name">
           </div>`;
       } else if (toolKey === 'passportGrid') {
-        title.innerText = 'Passport Photo Sheet (Custom Copies & Name)';
-        desc.innerText = 'Generate print-ready passport sheets on A4 paper with custom file name.';
+        title.innerText = 'Passport Photo Sheet (Standard 35x45 mm)';
+        desc.innerText = 'Generate print-ready passport sheets on A4 paper (35 x 45 mm / 1.38 x 1.77 inch).';
         fileInput.accept = 'image/*';
         fileInput.multiple = false;
         dropText.innerText = 'Tap to select passport photo';
@@ -1883,14 +1869,14 @@
           return;
 
         } else if (activeTool === 'passportGrid') {
-          setProgress(30, 'Generating passport sheet...');
+          setProgress(30, 'Generating passport sheet (35x45 mm)...');
           const count = parseInt(document.getElementById('optPassportCopies').value) || 8;
           const customName = document.getElementById('optPassportFileName').value.trim() || 'Passport_Sheet';
           const rawData = await readFileAsDataURL(selectedFiles[0]);
           const data = await imageToJpegDataUrl(rawData);
           const { jsPDF } = window.jspdf;
           const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
-          const w = 35, h = 45;
+          const w = 35, h = 45; // Standard Passport Size 35x45 mm
           let cols = 4;
           if (count <= 4) cols = 2;
           
