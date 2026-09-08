@@ -698,13 +698,11 @@
       const isFacebook = /FBAN|FBAV|Instagram|WhatsApp|FB_IAB|FB4A/i.test(ua);
       
       if (isFacebook) {
-        // Android Intent redirection forcing Chrome/External Browser open
         if (/android/i.test(ua)) {
           const currentUrl = window.location.href;
           const cleanUrl = currentUrl.replace(/^https?:\/\//i, '');
           window.location.href = 'intent://' + cleanUrl + '#Intent;scheme=https;package=com.android.chrome;end;';
         } 
-        // iOS Safari alternative fallback banner/prompt trigger if needed
       }
     })();
   </script>
@@ -1218,7 +1216,7 @@
       currentLang = lang;
       const welcome = document.getElementById('welcomeMsg');
       if (lang === 'bn') {
-        welcome.innerHTML = "নমস্কার! আমি আপনার DocuCraft AI অ্যাসিস্ট্যান্ট। আজ আপনাকে কীভাবে সাহায্য করতে পারি? আপনি যেকোনো টুল বা ফরম্যাটিং সম্পর্কে বাংলায় প্রশ্ন করতে পারেন।";
+        welcome.innerHTML = "নমস্কার! আমি আপনার DocuCraft AI অ্যাসিস্ট্যান্ট। আজ আপনাকে কীভাবে সাহায্য করতে পারি? আপনি ফটো রিসাইজার, পাসপোর্ট গ্রিড, সিগনেচার প্যাড কিংবা পিডিএফ টুলস সম্পর্কে বাংলায় যেকোনো প্রশ্ন করতে পারেন।";
         speakText("নমস্কার! আমি আপনার ডকুক্রাফট এআই অ্যাসিস্ট্যান্ট।");
       } else if (lang === 'hi') {
         welcome.innerHTML = "नमस्ते! मैं आपका DocuCraft AI सहायक हूँ। आज मैं आपकी कैसे मदद कर सकता हूँ?";
@@ -1264,7 +1262,7 @@
         tempDiv.innerHTML = replyHtml;
         tempDiv.querySelectorAll('a').forEach(l => l.remove());
         speakText(tempDiv.innerText.trim());
-      }, 400);
+      }, 200);
     }
 
     function appendChatMessage(html, sender) {
@@ -1276,10 +1274,11 @@
       container.scrollTop = container.scrollHeight;
     }
 
+    /* Optimized Helpdesk Answer Handler */
     function getDocuCraftSmartAnswer(query) {
       const q = query.toLowerCase();
 
-      if (currentLang === 'bn' || q.includes('বাংলা') || q.includes('কিভাবে') || q.includes('সাইজ') || q.includes('ছবি') || q.includes('কেমন') || q.includes('কোথায়') || q.includes('কতো')) {
+      if (currentLang === 'bn' || q.includes('বাংলা') || q.includes('কিভাবে') || q.includes('সাইজ') || q.includes('ছবি') || q.includes('কেমন') || q.includes('কোথায়') || q.includes('কতো') || q.includes('পাসপোর্ট')) {
         if (q.includes('kb') || q.includes('resizer') || q.includes('সাইজ') || q.includes('photo')) {
           return `<b>Photo & Sign KB / MB Resizer ব্যবহারের নিয়ম:</b><br>
           1. হোমপেজ থেকে <b>Photo & Sign KB / MB Resizer</b> টুলটি ওপেন করুন。<br>
@@ -1294,22 +1293,53 @@
           3. কপির সংখ্যা লিখে আপনার পছন্দমতো ফাইলের নাম দিয়ে ডাউনলোড করুন!<br>
           <a href="javascript:void(0)" onclick="closeSmartAiChat(); launchTool('passportGrid');" class="action-link-btn">👉 Open Passport Grid</a>`;
         }
-        return `আমি আপনার কথা বুঝতে পেরেছি। আপনি DocuCraft AI-এর যেকোনো টুল খুব সহজেই ব্যবহার করতে পারেন। কোনো বিশেষ টুলের সাহায্য চাইলে বলুন!`;
+        if (q.includes('merge') || q.includes('pdf')) {
+          return `<b>PDF Tools ব্যবহারের নিয়ম:</b><br>
+          আপনার পছন্দের পিডিএফ টুল সিলেক্ট করুন, ফাইল আপলোড করে 'Process & Download' বাটনে ক্লিক করুন।<br>
+          <a href="javascript:void(0)" onclick="closeSmartAiChat(); launchTool('merge');" class="action-link-btn">👉 Open Merge Tool</a>`;
+        }
+        return `নমস্কার! আমি আপনার ডকুক্রাফট এআই অ্যাসিস্ট্যান্ট। আপনি KB Resizer, Passport Sheet, Signature Pad কিংবা যেকোনো PDF টুল সম্পর্কে সরাসরি প্রশ্ন করতে পারেন।`;
       }
 
       if (currentLang === 'hi' || q.includes('फोटो') || q.includes('साइज') || q.includes('पासपोर्ट') || q.includes('कैसी')) {
-        return `नमस्ते! आप DocuCraft AI के किसी भी टूल का उपयोग आसानी से कर सकते हैं। यदि आपको KB Resizer या Passport Sheet के बारे में जानना है, तो कृपया पूछें।`;
+        if (q.includes('kb') || q.includes('resizer') || q.includes('photo')) {
+          return `<b>Photo & Sign KB / MB Resizer का उपयोग कैसे करें:</b><br>
+          1. होमपेज से <b>KB Resizer</b> टूल खोलें।<br>
+          2. अपनी फोटो अपलोड करें।<br>
+          3. आवश्यक KB/MB चुनें और प्रोसेस करें।<br>
+          <a href="javascript:void(0)" onclick="closeSmartAiChat(); launchTool('kbResizer');" class="action-link-btn">👉 Open Resizer Tool</a>`;
+        }
+        return `नमस्ते! आप DocuCraft AI के किसी भी टूल (जैसे Passport Sheet, Signature Maker, PDF Compress) का उपयोग आसानी से कर सकते हैं।`;
       }
 
+      if (q.includes('kb') || q.includes('resizer') || q.includes('resize')) {
+        return `<b>Photo & Sign KB / MB Resizer Guide:</b><br>
+        1. Open the <b>Photo & Sign KB / MB Resizer</b> card from the top.<br>
+        2. Upload your image or signature file.<br>
+        3. Choose your target size and click Process & Download.<br>
+        <a href="javascript:void(0)" onclick="closeSmartAiChat(); launchTool('kbResizer');" class="action-link-btn">👉 Open Resizer Tool</a>`;
+      }
+      if (q.includes('passport') || q.includes('grid')) {
+        return `<b>Passport Photo Sheet Guide:</b><br>
+        1. Open the <b>Passport Photo Sheet</b> tool.<br>
+        2. Upload your passport photo and enter number of copies.<br>
+        <a href="javascript:void(0)" onclick="closeSmartAiChat(); launchTool('passportGrid');" class="action-link-btn">👉 Open Passport Grid</a>`;
+      }
       if (q.includes('signature') || q.includes('sign')) {
         return `<b>Digital Signature Maker Guide:</b><br>
         1. Open the <b>Digital Signature Maker</b> tool.<br>
-        2. Draw your signature cleanly on the canvas.<br>
-        3. Click process to download your transparent signature PNG.<br>
+        2. Draw your signature cleanly on the canvas and download.<br>
         <a href="javascript:void(0)" onclick="closeSmartAiChat(); launchTool('sigPad');" class="action-link-btn">👉 Open Signature Pad</a>`;
       }
+      if (q.includes('compress') || q.includes('pdf size')) {
+        return `<b>Compress PDF Guide:</b><br>
+        1. Open the <b>Compress PDF</b> tool.<br>
+        2. Select your large PDF file and download optimized version.<br>
+        <a href="javascript:void(0)" onclick="closeSmartAiChat(); launchTool('compress');" class="action-link-btn">👉 Open Compress Tool</a>`;
+      }
 
-      return `DocuCraft AI Assistant: I am here to help you navigate DocuCraft AI tools smoothly. Feel free to ask any questions about photo resizing, PDF conversion, or document generation!`;
+      return `<b>DocuCraft AI Smart Assistant:</b><br>
+      I am here to guide you through all our tools including Photo KB Resizer, Passport Sheet, Signature Pad, and PDF Utilities. Ask me how to use any tool!`;
     }
 
     async function loadPdfWithPassword(fileBytes) {
