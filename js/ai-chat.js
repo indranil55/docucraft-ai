@@ -2,7 +2,7 @@
 
 // আপনার জেমিনি এআই এপিআই কী (Gemini API Key) এখানে বসাবেন। 
 // ফ্রি এপিআই কী পেতে Google AI Studio (aistudio.google.com) থেকে জেনারেট করে নিতে পারেন।
-const GEMINI_API_KEY = "YOUR_GEMINI_API_KEY_HERE"; 
+const GEMINI_API_KEY = "AQ.Ab8RN6Kr7kvyVuwEZSZrjiUZ8R3BGXNnuGdoJLowVG8jNPX32A"; 
 
 const aiKnowledge = {
   en: {
