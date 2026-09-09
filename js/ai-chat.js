@@ -45,9 +45,13 @@ document.addEventListener('DOMContentLoaded', () => {
           <option value="hi">हिंदी</option>
           <option value="en">English</option>
         </select>
-        <button onclick="handleUserAuth()" id="authActionBtn" style="background: #2563eb; color: #fff; border: none; padding: 4px 8px; border-radius: 6px; font-size: 11px; cursor: pointer; font-weight: 600;">Sign Out</button>
         <button onclick="toggleAiHelpdesk()" style="background:none; border:none; color:#fff; font-size:18px; cursor:pointer; line-height: 1; margin-left: 2px;">&times;</button>
       </div>
+    </div>
+
+    <!-- ভয়েস শোনার লাইভ স্ট্যাটাস বার -->
+    <div id="voiceStatusBar" style="display: none; background: #e0f2fe; color: #0369a1; padding: 6px 12px; font-size: 12px; font-weight: 600; text-align: center; border-bottom: 1px solid #bae6fd;">
+      🎙️ শুনছি... কথা বলুন স্পষ্ট করে
     </div>
 
     <div id="aiChatBody" style="padding: 12px; height: 260px; overflow-y: auto; background: #f8fafc; font-size: 13px;">
@@ -83,16 +87,6 @@ function toggleAiHelpdesk() {
   }
 }
 
-function handleUserAuth() {
-  if (typeof logoutUser === 'function') {
-    logoutUser();
-  } else {
-    localStorage.removeItem('userLoggedIn');
-    alert('Logged out successfully!');
-    location.reload();
-  }
-}
-
 function changeAiLanguage(lang) {
   currentLang = lang;
   const welcomeText = aiKnowledge[lang].welcome;
@@ -103,7 +97,7 @@ function changeAiLanguage(lang) {
   speakText(welcomeText);
 }
 
-// ভয়েস আউটপুট (কথা শেষ হওয়া পর্যন্ত ওয়েট করার সুবিধা সহ)
+// ভয়েস আউটপুট 
 function speakText(text) {
   if (!isVoiceActive || !('speechSynthesis' in window)) return;
   window.speechSynthesis.cancel();
@@ -129,7 +123,6 @@ async function sendUserMessage(customText = '') {
   appendUserMessage(query);
   if (input) input.value = '';
 
-  // লোডিং ইন্ডিকেটর দেখানো
   const loadingId = 'loading_' + Date.now();
   appendAiMessage("...", loadingId);
 
@@ -174,7 +167,7 @@ async function fetchGeminiAiResponse(prompt) {
   }
 }
 
-// লোকাল ফলব্যাক রেসপন্স (যদি এপিআই কী সেট করা না থাকে)
+// লোকাল ফলব্যাক রেসপন্স
 function generateLocalAiResponse(query) {
   const q = query.toLowerCase();
 
@@ -217,6 +210,7 @@ function removeAiMessage(id) {
   if (el) el.remove();
 }
 
+// ভয়েস ইনপুট ও লাইভ স্ট্যাটাস বার হ্যান্ডলার
 function startVoiceInput() {
   const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
   if (!SpeechRecognition) {
@@ -228,14 +222,30 @@ function startVoiceInput() {
   recognition.lang = currentLang === 'bn' ? 'bn-IN' : (currentLang === 'hi' ? 'hi-IN' : 'en-US');
   recognition.interimResults = false;
   recognition.maxAlternatives = 1;
-  recognition.start();
+
+  const statusBar = document.getElementById('voiceStatusBar');
+
+  recognition.onstart = function() {
+    if (statusBar) statusBar.style.display = 'block';
+  };
 
   recognition.onresult = function(event) {
     const speechText = event.results[0][0].transcript;
     const input = document.getElementById('aiChatInput');
     if (input) input.value = speechText;
+    if (statusBar) statusBar.style.display = 'none';
     sendUserMessage(speechText);
   };
+
+  recognition.onerror = function() {
+    if (statusBar) statusBar.style.display = 'none';
+  };
+
+  recognition.onend = function() {
+    if (statusBar) statusBar.style.display = 'none';
+  };
+
+  recognition.start();
 }
 
 function escapeHtml(value) {
