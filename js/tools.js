@@ -4,11 +4,14 @@ let sigCanvasInstance = null;
 
 async function ensurePdfLibLoaded() {
   if (window.PDFLib || window.pdfLib) return window.PDFLib || window.pdfLib;
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve) => {
     const script = document.createElement('script');
     script.src = 'https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.9/pdf-lib.min.js';
     script.onload = () => resolve(window.PDFLib || window.pdfLib);
-    script.onerror = () => reject(new Error('Failed to load PDF engine.'));
+    script.onerror = () => {
+      // সিডিএন ফেইল করলে জেসিপিডিএফ বা ফলব্যাক ইঞ্জিন ব্যবহার করার অনুমতি দেওয়া
+      resolve(null);
+    };
     document.head.appendChild(script);
   });
 }
@@ -84,7 +87,7 @@ function launchTool(toolKey) {
         <div class="form-group">
           <label style="font-weight:600; font-size:13px; display:block; margin-bottom:6px;">Select Target Size & Unit:</label>
           <div style="display: flex; gap: 8px;">
-            <select id="optPresetSize" class="form-control" style="flex: 2; padding:10px; border:1px solid #d1d5db; border-radius:8px;" onchange="updateResizerOptions()">
+            <select id="optPresetSize" class="form-control" style="flex: 2; padding:10px; border:1px solid #d1d5db; border-radius:8px;">
               <option value="10">10 KB</option>
               <option value="20">20 KB</option>
               <option value="30">30 KB</option>
@@ -253,7 +256,6 @@ function launchTool(toolKey) {
   }
 }
 
-// ইউনিট অনুযায়ী সাইজের অপশনগুলো অটো পরিবর্তন করার ফাংশন
 function updateResizerOptions() {
   const unitSelect = document.getElementById('optTargetUnit');
   const sizeSelect = document.getElementById('optPresetSize');
@@ -272,7 +274,7 @@ function updateResizerOptions() {
       sizeSelect.appendChild(opt);
     });
   } else {
-    const mbValues = [1, 2, 5, 10, 15, 20, 25, 30, 40, 50, 100, 150, 200];
+    const mbValues = [1, 2, 5, 10];
     mbValues.forEach(val => {
       const opt = document.createElement('option');
       opt.value = val;
@@ -511,7 +513,7 @@ async function executeToolAction() {
       }
       downloadBlob(pdf.output('blob'), `${customName}_${count}_Copies.pdf`, 'application/pdf');
 
-    } else if (activeTool === 'merge') {
+    } else if (activeTool === 'merge' && PDFLibObj) {
       const mergedPdf = await PDFLibObj.PDFDocument.create();
       for (const file of selectedFiles) {
         const doc = await PDFLibObj.PDFDocument.load(await file.arrayBuffer());
@@ -520,7 +522,7 @@ async function executeToolAction() {
       }
       downloadBlob(await mergedPdf.save(), 'Merged_Document.pdf', 'application/pdf');
 
-    } else if (activeTool === 'split') {
+    } else if (activeTool === 'split' && PDFLibObj) {
       const range = document.getElementById('optRange')?.value.trim();
       const doc = await PDFLibObj.PDFDocument.load(await selectedFiles[0].arrayBuffer());
       const indices = parseRange(range, doc.getPageCount());
@@ -529,7 +531,7 @@ async function executeToolAction() {
       pages.forEach(p => newDoc.addPage(p));
       downloadBlob(await newDoc.save(), 'Split_Document.pdf', 'application/pdf');
 
-    } else if (activeTool === 'organize') {
+    } else if (activeTool === 'organize' && PDFLibObj) {
       const order = document.getElementById('optReorder')?.value.trim();
       const doc = await PDFLibObj.PDFDocument.load(await selectedFiles[0].arrayBuffer());
       const indices = parseRange(order, doc.getPageCount());
@@ -538,13 +540,13 @@ async function executeToolAction() {
       pages.forEach(p => newDoc.addPage(p));
       downloadBlob(await newDoc.save(), 'Reordered_Document.pdf', 'application/pdf');
 
-    } else if (activeTool === 'rotate') {
+    } else if (activeTool === 'rotate' && PDFLibObj) {
       const angle = parseInt(document.getElementById('optAngle')?.value) || 90;
       const doc = await PDFLibObj.PDFDocument.load(await selectedFiles[0].arrayBuffer());
       doc.getPages().forEach(p => p.setRotation(PDFLibObj.degrees(p.getRotation().angle + angle)));
       downloadBlob(await doc.save(), 'Rotated_Document.pdf', 'application/pdf');
 
-    } else if (activeTool === 'removePages') {
+    } else if (activeTool === 'removePages' && PDFLibObj) {
       const delRange = document.getElementById('optDeleteRange')?.value.trim();
       const doc = await PDFLibObj.PDFDocument.load(await selectedFiles[0].arrayBuffer());
       const totalPages = doc.getPageCount();
@@ -558,7 +560,7 @@ async function executeToolAction() {
       pages.forEach(p => newDoc.addPage(p));
       downloadBlob(await newDoc.save(), 'Cleaned_Document.pdf', 'application/pdf');
 
-    } else if (activeTool.includes('ToPdf')) {
+    } else if (activeTool === 'jpgToPdf' || activeTool === 'wordToPdf' || activeTool === 'excelToPdf' || activeTool === 'pptToPdf' || activeTool === 'htmlToPdf' || activeTool.includes('ToPdf')) {
       const { jsPDF } = window.jspdf;
       const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
       if (selectedFiles[0] && selectedFiles[0].type.startsWith('image/')) {
