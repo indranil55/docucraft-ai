@@ -8,10 +8,7 @@ async function ensurePdfLibLoaded() {
     const script = document.createElement('script');
     script.src = 'https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.9/pdf-lib.min.js';
     script.onload = () => resolve(window.PDFLib || window.pdfLib);
-    script.onerror = () => {
-      // সিডিএন ফেইল করলে জেসিপিডিএফ বা ফলব্যাক ইঞ্জিন ব্যবহার করার অনুমতি দেওয়া
-      resolve(null);
-    };
+    script.onerror = () => { resolve(null); };
     document.head.appendChild(script);
   });
 }
@@ -79,7 +76,7 @@ function launchTool(toolKey) {
     }
   } else if (toolKey === 'kbResizer') {
     if (title) title.innerText = 'Photo & Sign KB / MB Resizer';
-    if (desc) desc.innerText = 'Compress image precisely to exact target KB or MB.';
+    if (desc) desc.innerText = 'Compress image precisely to exact target KB or MB (up to 500 MB).';
     if (fileInput) { fileInput.accept = 'image/*'; fileInput.multiple = false; }
     if (dropText) dropText.innerText = 'Tap to select photo/signature';
     if (customUI) {
@@ -274,7 +271,8 @@ function updateResizerOptions() {
       sizeSelect.appendChild(opt);
     });
   } else {
-    const mbValues = [1, 2, 5, 10];
+    // MB অপশন বাড়িয়ে সর্বোচ্চ 500 MB অব্দি করা হলো
+    const mbValues = [1, 2, 5, 10, 20, 50, 100, 200, 300, 400, 500];
     mbValues.forEach(val => {
       const opt = document.createElement('option');
       opt.value = val;
@@ -378,7 +376,7 @@ async function executeToolAction() {
     if (!sigCanvasInstance) return;
     sigCanvasInstance.toBlob((blob) => {
       downloadBlob(blob, 'Digital_Signature.png', 'image/png');
-      closeWorkspace();
+      showSuccessPopup('Digital Signature Downloaded Successfully!');
     }, 'image/png');
     return;
   }
@@ -391,6 +389,7 @@ async function executeToolAction() {
       if (!response.ok) throw new Error('QR service error.');
       const blob = await response.blob();
       downloadBlob(blob, 'QRCode.png', blob.type || 'image/png');
+      showSuccessPopup('QR Code Generated Successfully!');
     } catch {
       window.open(qrUrl, '_blank', 'noopener,noreferrer');
     }
@@ -415,6 +414,7 @@ async function executeToolAction() {
     doc.line(10, 150, 138, 150);
     doc.text(`Total: $ ${total}`, 85, 160);
     downloadBlob(doc.output('blob'), `Invoice_${cust}.pdf`, 'application/pdf');
+    showSuccessPopup('Invoice Generated Successfully!');
     closeWorkspace();
     return;
   }
@@ -430,6 +430,7 @@ async function executeToolAction() {
     doc.line(15, 33, 195, 33);
     doc.text(doc.splitTextToSize(body, 180), 15, 42);
     downloadBlob(doc.output('blob'), `Resume_${name.replace(/\s+/g, '_')}.pdf`, 'application/pdf');
+    showSuccessPopup('Resume Generated Successfully!');
     closeWorkspace();
     return;
   }
@@ -443,6 +444,7 @@ async function executeToolAction() {
     doc.line(15, 25, 195, 25);
     doc.text(doc.splitTextToSize(content, 180), 15, 35);
     downloadBlob(doc.output('blob'), 'Document.pdf', 'application/pdf');
+    showSuccessPopup('Prescription/Memo Generated Successfully!');
     closeWorkspace();
     return;
   }
@@ -474,7 +476,7 @@ async function executeToolAction() {
 
       const canvas = document.createElement('canvas');
       let width = img.width, height = img.height;
-      const maxDim = targetBytes <= 25000 ? 500 : (targetBytes <= 55000 ? 700 : 2000);
+      const maxDim = targetBytes <= 25000 ? 500 : (targetBytes <= 55000 ? 700 : 2500);
       if (width > maxDim || height > maxDim) {
         if (width > height) { height = Math.round((height * maxDim) / width); width = maxDim; }
         else { width = Math.round((width * maxDim) / height); height = maxDim; }
@@ -494,6 +496,7 @@ async function executeToolAction() {
       if (!bestBlob) bestBlob = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', 0.1));
 
       downloadBlob(bestBlob, `${customName}_${valInput}${unit}.jpg`, 'image/jpeg');
+      showSuccessPopup(`Photo Resized Successfully (${valInput} ${unit})!`);
 
     } else if (activeTool === 'passportGrid') {
       const count = parseInt(document.getElementById('optPassportCopies')?.value) || 8;
@@ -512,6 +515,7 @@ async function executeToolAction() {
         pdf.setDrawColor(200, 200, 200); pdf.rect(x, y, w, h);
       }
       downloadBlob(pdf.output('blob'), `${customName}_${count}_Copies.pdf`, 'application/pdf');
+      showSuccessPopup('Passport Photo Sheet Generated Successfully!');
 
     } else if (activeTool === 'merge' && PDFLibObj) {
       const mergedPdf = await PDFLibObj.PDFDocument.create();
@@ -521,6 +525,7 @@ async function executeToolAction() {
         pages.forEach(p => mergedPdf.addPage(p));
       }
       downloadBlob(await mergedPdf.save(), 'Merged_Document.pdf', 'application/pdf');
+      showSuccessPopup('PDFs Merged Successfully!');
 
     } else if (activeTool === 'split' && PDFLibObj) {
       const range = document.getElementById('optRange')?.value.trim();
@@ -530,6 +535,7 @@ async function executeToolAction() {
       const pages = await newDoc.copyPages(doc, indices);
       pages.forEach(p => newDoc.addPage(p));
       downloadBlob(await newDoc.save(), 'Split_Document.pdf', 'application/pdf');
+      showSuccessPopup('PDF Split Successfully!');
 
     } else if (activeTool === 'organize' && PDFLibObj) {
       const order = document.getElementById('optReorder')?.value.trim();
@@ -539,12 +545,14 @@ async function executeToolAction() {
       const pages = await newDoc.copyPages(doc, indices);
       pages.forEach(p => newDoc.addPage(p));
       downloadBlob(await newDoc.save(), 'Reordered_Document.pdf', 'application/pdf');
+      showSuccessPopup('PDF Pages Reordered Successfully!');
 
     } else if (activeTool === 'rotate' && PDFLibObj) {
       const angle = parseInt(document.getElementById('optAngle')?.value) || 90;
       const doc = await PDFLibObj.PDFDocument.load(await selectedFiles[0].arrayBuffer());
       doc.getPages().forEach(p => p.setRotation(PDFLibObj.degrees(p.getRotation().angle + angle)));
       downloadBlob(await doc.save(), 'Rotated_Document.pdf', 'application/pdf');
+      showSuccessPopup('PDF Rotated Successfully!');
 
     } else if (activeTool === 'removePages' && PDFLibObj) {
       const delRange = document.getElementById('optDeleteRange')?.value.trim();
@@ -559,6 +567,7 @@ async function executeToolAction() {
       const pages = await newDoc.copyPages(doc, keepIndices);
       pages.forEach(p => newDoc.addPage(p));
       downloadBlob(await newDoc.save(), 'Cleaned_Document.pdf', 'application/pdf');
+      showSuccessPopup('Selected Pages Deleted Successfully!');
 
     } else if (activeTool === 'jpgToPdf' || activeTool === 'wordToPdf' || activeTool === 'excelToPdf' || activeTool === 'pptToPdf' || activeTool === 'htmlToPdf' || activeTool.includes('ToPdf')) {
       const { jsPDF } = window.jspdf;
@@ -577,6 +586,7 @@ async function executeToolAction() {
         pdf.text('This document was successfully converted into standard A4 PDF format.', 15, 35);
       }
       downloadBlob(pdf.output('blob'), `${activeTool.toUpperCase()}_Converted.pdf`, 'application/pdf');
+      showSuccessPopup('File Converted to PDF Successfully!');
 
     } else {
       const { jsPDF } = window.jspdf;
@@ -586,6 +596,7 @@ async function executeToolAction() {
       pdf.setFontSize(10);
       pdf.text(`Tool ${activeTool.toUpperCase()} executed successfully.`, 15, 35);
       downloadBlob(pdf.output('blob'), `Processed_${activeTool}.pdf`, 'application/pdf');
+      showSuccessPopup('Document Processed Successfully!');
     }
 
     closeWorkspace();
@@ -596,6 +607,15 @@ async function executeToolAction() {
     setProgress(100, 'Done');
     if (btn) { btn.innerText = originalText; btn.disabled = false; }
     setTimeout(() => resetProgress(), 180);
+  }
+}
+
+// স্ক্রিনে সাকসেস পপআপ দেখানোর জন্য ফাংশন
+function showSuccessPopup(msg) {
+  if (window.Swal) {
+    Swal.fire({ icon: 'success', title: 'Downloaded!', text: msg, timer: 2000, showConfirmButton: false });
+  } else {
+    alert(msg);
   }
 }
 
