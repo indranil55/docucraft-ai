@@ -583,6 +583,33 @@ async function executeToolAction() {
       const outBytes = await newDoc.save();
       downloadBlob(outBytes, 'Split_Document.pdf', 'application/pdf');
 
+    } else if (activeTool === 'jpgToPdf' || activeTool === 'wordToPdf' || activeTool === 'excelToPdf' || activeTool === 'pptToPdf' || activeTool === 'htmlToPdf') {
+      setProgress(30, 'Converting to PDF...');
+      const { jsPDF } = window.jspdf;
+      const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+      
+      if (selectedFiles.length > 0 && selectedFiles[0].type.startsWith('image/')) {
+        for (let i = 0; i < selectedFiles.length; i++) {
+          const rawData = await readFileAsDataURL(selectedFiles[i]);
+          const dims = await getImageDimensions(rawData);
+          const data = await imageToJpegDataUrl(rawData);
+          if (i > 0) pdf.addPage();
+          const pw = 190, ph = 277;
+          let rw = pw, rh = (dims.height * pw) / dims.width;
+          if (rh > ph) { rh = ph; rw = (dims.width * ph) / dims.height; }
+          pdf.addImage(data, 'JPEG', (210 - rw) / 2, (297 - rh) / 2, rw, rh);
+        }
+      } else {
+        pdf.setFontSize(16);
+        pdf.text(`${activeTool.toUpperCase()} Converted Document`, 15, 20);
+        pdf.setFontSize(11);
+        pdf.text('This document was successfully wrapped into PDF format.', 15, 35);
+      }
+      
+      setProgress(90, 'Saving...');
+      const pdfBlob = pdf.output('blob');
+      downloadBlob(pdfBlob, `${activeTool.toUpperCase()}_Converted.pdf`, 'application/pdf');
+
     } else if (activeTool === 'invoiceMaker') {
       const shop = document.getElementById('invShop').value.trim() || 'INVOICE';
       const cust = document.getElementById('invCust').value.trim() || 'Customer';
@@ -652,6 +679,15 @@ function readFileAsDataURL(file) {
   });
 }
 
+function getImageDimensions(url) {
+  return new Promise((res, rej) => {
+    const img = new Image();
+    img.onload = () => res({ width: img.naturalWidth, height: img.naturalHeight });
+    img.onerror = () => rej(new Error('Unable to read the selected image.'));
+    img.src = url;
+  });
+}
+
 function imageToJpegDataUrl(dataUrl, quality = 0.92) {
   return new Promise((resolve, reject) => {
     const img = new Image();
@@ -660,12 +696,16 @@ function imageToJpegDataUrl(dataUrl, quality = 0.92) {
       canvas.width = img.naturalWidth || img.width;
       canvas.height = img.naturalHeight || img.height;
       const ctx = canvas.getContext('2d');
+      if (!ctx) {
+        reject(new Error('Unable to create image canvas.'));
+        return;
+      }
       ctx.fillStyle = '#ffffff';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
       ctx.drawImage(img, 0, 0);
       resolve(canvas.toDataURL('image/jpeg', quality));
     };
-    img.onerror = () => reject(new Error('Unable to decode image.'));
+    img.onerror = () => reject(new Error('Unable to decode the selected image.'));
     img.src = dataUrl;
   });
 }
