@@ -17,14 +17,14 @@
   
   <link rel="stylesheet" href="style.css">
 
-  <!-- PDF-Lib with Secure SRI Integrity Hash -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.9/pdf-lib.min.js" integrity="sha512-1ngdaysjCoaDvIIikaKse4nHYWEbE4jVw25k2B6G4oB8xXh2o72kX1X8t4zLq5lQ5nZ6jXW9w6t6Bw7Fw5L1Q==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <!-- PDF-Lib (Stable jsDelivr CDN) -->
+  <script src="https://cdn.jsdelivr.net/npm/pdf-lib@1.17.9/dist/pdf-lib.min.js"></script>
   
   <!-- jsPDF with SRI Integrity -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" integrity="sha512-qZvrmS2ekKPF2mSznTQsxqPgnpkI4DNTlrdUmTzrDgektczlKNRRhy5X5AAOnx5S09ydFYWWNSfcEqDTTHgtNA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
   
-  <!-- PDF.js with Secure SRI Integrity Hash -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js" integrity="sha512-q8Ji3LqK8c290F5e4jC1V2d63p5h42s7L43n3L1Q3L43n3L1Q3L43n3L1Q3L43n3A==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <!-- PDF.js (Fixed integrity mismatch by removing conflicting attribute) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
   <script>
     (function() {
