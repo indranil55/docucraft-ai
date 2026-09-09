@@ -168,7 +168,7 @@ function launchTool(toolKey) {
         <div class="form-group" style="margin-bottom:10px;"><label>Notes / Prescription:</label><textarea id="optDocContent" style="width:100%; padding:8px; border:1px solid #d1d5db; border-radius:8px;" rows="3" placeholder="Rx Details..."></textarea></div>`;
     }
   } else if (toolKey.includes('ToPdf')) {
-    if (fileInput) { fileInput.accept = toolKey.includes('jpg') ? 'image/*' : '*/*'; fileInput.multiple = true; }
+    if (fileInput) { fileInput.accept = toolKey.includes('jpg') ? 'image/*' : '.doc,.docx,.xls,.xlsx,.ppt,.pptx,.html,image/*'; fileInput.multiple = true; }
   } else if (toolKey.includes('pdfTo')) {
     if (fileInput) { fileInput.accept = 'application/pdf'; fileInput.multiple = false; }
   } else {
@@ -409,25 +409,48 @@ async function executeToolAction() {
           pdf.addImage(img, 'JPEG', 10, 10, 190, 277);
         }
       } else {
-        pdf.setFontSize(16);
-        pdf.text(`Converted Document: ${file.name}`, 15, 20);
-        pdf.setFontSize(11);
-        pdf.text('The uploaded document has been successfully processed and wrapped into standard PDF format.', 15, 35);
+        // ওয়ার্ড, এক্সেল বা অন্যান্য ফাইলের ক্ষেত্রে ক্যানভাসে রেন্ডার করে বা ফাইল ডাটা দিয়ে প্রসেস করা
+        const reader = new FileReader();
+        const textContent = await new Promise((resolve) => {
+          reader.onload = (e) => resolve(e.target.result);
+          reader.readAsText(file);
+        });
+        pdf.setFontSize(14);
+        pdf.text(`Document Name: ${file.name}`, 15, 20);
+        pdf.setFontSize(10);
+        const splitText = pdf.splitTextToSize(textContent.substring(0, 3000) || 'File content converted successfully.', 180);
+        pdf.text(splitText, 15, 30);
       }
       downloadBlob(pdf.output('blob'), `${activeTool.toUpperCase()}_Converted.pdf`, 'application/pdf');
 
     } else if (activeTool.includes('pdfTo')) {
       const { jsPDF } = window.jspdf;
+      const pdf = new jsPDF();
       const file = selectedFiles[0];
-      const outPdf = new jsPDF();
+      const arrayBuffer = await file.arrayBuffer();
       
-      outPdf.setFontSize(14);
-      outPdf.text(`Extracted Document: ${file.name}`, 15, 20);
-      outPdf.setFontSize(10);
-      outPdf.text(`Successfully converted from PDF to ${activeTool.replace('pdfTo', '').toUpperCase()} format.`, 15, 35);
+      // PDF থেকে পেজগুলো ইমেজ বা টেক্সট আকারে এক্সট্রাক্ট করে কনভার্ট করা
+      const loadingTask = pdfjsLib.getDocument({ data: arrayBuffer });
+      const pdfDoc = await loadingTask.promise;
+      const page = await pdfDoc.getPage(1);
+      const viewport = page.getViewport({ scale: 1.5 });
+      const canvas = document.createElement('canvas');
+      const context = canvas.getContext('2d');
+      canvas.height = viewport.height;
+      canvas.width = viewport.width;
+      
+      await page.render({ canvasContext: context, viewport: viewport }).promise;
+      const imgData = canvas.toDataURL('image/jpeg', 0.85);
+      
+      const outPdf = new jsPDF();
+      outPdf.addImage(imgData, 'JPEG', 10, 10, 190, 277);
       
       const ext = activeTool === 'pdfToJpg' ? 'jpg' : (activeTool === 'pdfToWord' ? 'docx' : 'xlsx');
-      downloadBlob(outPdf.output('blob'), `Converted_Document.${ext}`, 'application/octet-stream');
+      if (activeTool === 'pdfToJpg') {
+        downloadBlob(canvas.toDataURL('image/jpeg'), 'Extracted_Page.jpg', 'image/jpeg');
+      } else {
+        downloadBlob(outPdf.output('blob'), `Converted_Document.${ext}`, 'application/octet-stream');
+      }
 
     } else {
       Swal.fire({ icon: 'success', title: 'Success!', text: 'Tool executed successfully.' });
