@@ -2,6 +2,18 @@ let activeTool = '';
 let selectedFiles = [];
 let sigCanvasInstance = null;
 
+// গ্লোবাল পিডিএফ-লিব লোডার (CDN ফেইল করলে অটো রিকভার করবে)
+async function ensurePdfLibLoaded() {
+  if (window.PDFLib || window.pdfLib) return window.PDFLib || window.pdfLib;
+  return new Promise((resolve, reject) => {
+    const script = document.createElement('script');
+    script.src = 'https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.9/pdf-lib.min.js';
+    script.onload = () => resolve(window.PDFLib || window.pdfLib);
+    script.onerror = () => reject(new Error('Failed to load PDF processing engine. Please check internet connection.'));
+    document.head.appendChild(script);
+  });
+}
+
 function filterCategory(cat, btn) {
   if (btn) {
     document.querySelectorAll('.ilove-filter-btn, .filter-btn').forEach(b => b.classList.remove('active'));
@@ -39,7 +51,6 @@ function launchTool(toolKey) {
   if (overlay) overlay.style.display = 'flex';
   if (title) title.innerText = toolKey.toUpperCase();
 
-  // বিভিন্ন টুলের জন্য কাস্টম ইউআই এবং ফাইল ইনপুট কনফিগারেশন
   if (toolKey === 'sigPad') {
     if (dropzone) dropzone.style.display = 'none';
     if (customUI) {
@@ -326,11 +337,10 @@ async function executeToolAction() {
   setProgress(10, 'Initializing Engine...');
 
   try {
-    const PDFLibObj = window.PDFLib || window.pdfLib;
+    const PDFLibObj = await ensurePdfLibLoaded();
 
     if (activeTool === 'merge') {
       if (selectedFiles.length < 2) throw new Error('Select at least 2 PDF files to merge.');
-      if (!PDFLibObj) throw new Error('PDFLib not loaded.');
       const mergedPdf = await PDFLibObj.PDFDocument.create();
       for (const file of selectedFiles) {
         const doc = await PDFLibObj.PDFDocument.load(await file.arrayBuffer());
@@ -340,7 +350,6 @@ async function executeToolAction() {
       downloadBlob(await mergedPdf.save(), 'Merged_Document.pdf', 'application/pdf');
 
     } else if (activeTool === 'split') {
-      if (!PDFLibObj) throw new Error('PDFLib not loaded.');
       const range = document.getElementById('optRange')?.value.trim();
       const doc = await PDFLibObj.PDFDocument.load(await selectedFiles[0].arrayBuffer());
       const indices = parseRange(range, doc.getPageCount());
@@ -350,7 +359,6 @@ async function executeToolAction() {
       downloadBlob(await newDoc.save(), 'Split_Document.pdf', 'application/pdf');
 
     } else if (activeTool === 'organize') {
-      if (!PDFLibObj) throw new Error('PDFLib not loaded.');
       const order = document.getElementById('optReorder')?.value.trim();
       const doc = await PDFLibObj.PDFDocument.load(await selectedFiles[0].arrayBuffer());
       const indices = parseRange(order, doc.getPageCount());
@@ -360,14 +368,12 @@ async function executeToolAction() {
       downloadBlob(await newDoc.save(), 'Reordered_Document.pdf', 'application/pdf');
 
     } else if (activeTool === 'rotate') {
-      if (!PDFLibObj) throw new Error('PDFLib not loaded.');
       const angle = parseInt(document.getElementById('optAngle')?.value) || 90;
       const doc = await PDFLibObj.PDFDocument.load(await selectedFiles[0].arrayBuffer());
       doc.getPages().forEach(p => p.setRotation(PDFLibObj.degrees(p.getRotation().angle + angle)));
       downloadBlob(await doc.save(), 'Rotated_Document.pdf', 'application/pdf');
 
     } else if (activeTool === 'watermark') {
-      if (!PDFLibObj) throw new Error('PDFLib not loaded.');
       const text = document.getElementById('optWatermark')?.value.trim() || 'CONFIDENTIAL';
       const doc = await PDFLibObj.PDFDocument.load(await selectedFiles[0].arrayBuffer());
       doc.getPages().forEach(p => {
