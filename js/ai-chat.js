@@ -1,4 +1,4 @@
-// DocuCraft AI Helpdesk - Multi-Language Selector Box & Voice Support
+// DocuCraft AI Helpdesk - Fixed Voice Output (Complete Speech & Wait Handling)
 
 const aiKnowledge = {
   en: {
@@ -20,7 +20,7 @@ const aiKnowledge = {
     default: "मैं KB/MB Resizer, पासपोर्ट फोटो, डिजिटल सिग्नेचर और PDF टूल्स के बारे में आपकी मदद कर सकता हूँ। आप क्या जानना चाहते हैं?"
   },
   bn: {
-    welcome: "নমস্কার! আমি আপনার DocuCraft AI অ্যাসিস্ট্যান্ট। যেকোনো টুল, সাইজ বা ফরম্যাট সম্পর্কে আমাকে জিজ্ঞেস করতে পারেন।",
+    welcome: "নমস্কার! আমি আপনার DocuCraft AI অ্যাসিস্ট্যান্ট। যেকোনো টুল বা সাইজ সম্পর্কে আমাকে জিজ্ঞেস করতে পারেন।",
     kbResizer: "Photo & Sign KB/MB Resizer: এটি দিয়ে ছবি বা সিগনেচারকে ১০KB থেকে শুরু করে ৫০০MB পর্যন্ত নিখুঁত মাপে রিসাইজ করতে পারবেন।",
     passportGrid: "Passport Photo Sheet: একটি মাত্র A4 পেজে স্ট্যান্ডার্ড ৩৫x৪৫ মিমি মাপের একাধিক পাসপোর্ট ছবি প্রিন্ট করার উপযোগী শিট তৈরি করে।",
     sigPad: "Digital Signature Maker: স্ক্রিনে আপনার আঙুল দিয়ে স্বাক্ষর এঁকে ফর্ম আপলোডের জন্য ক্লিয়ার পিএনজি ফাইল ডাউনলোড করুন।",
@@ -31,9 +31,8 @@ const aiKnowledge = {
 };
 
 let isVoiceActive = true;
-let currentLang = 'bn'; // ডিফল্ট ভাষা বাংলা
+let currentLang = 'bn';
 
-// পেজ লোড হওয়ার সাথে সাথে এআই উইন্ডো তৈরি করা (ডান কোণায় ভাষা পরিবর্তনের বক্স সহ)
 document.addEventListener('DOMContentLoaded', () => {
   if (document.getElementById('autoAiModal')) return;
 
@@ -51,12 +50,13 @@ document.addEventListener('DOMContentLoaded', () => {
       <span style="font-weight: 600; font-size: 13px;">🤖 AI Helpdesk</span>
       
       <div style="display: flex; align-items: center; gap: 6px;">
-        <select id="aiLangSelect" onchange="changeAiLanguage(this.value)" style="background: #0f172a; color: #fff; border: 1px solid #475569; padding: 3px 6px; border-radius: 4px; font-size: 11px; cursor: pointer;">
+        <select id="aiLangSelect" onchange="changeAiLanguage(this.value)" style="background: #0f172a; color: #fff; border: 1px solid #475569; padding: 4px 6px; border-radius: 6px; font-size: 11px; cursor: pointer;">
           <option value="bn" selected>বাংলা</option>
           <option value="hi">हिंदी</option>
           <option value="en">English</option>
         </select>
-        <button onclick="toggleAiHelpdesk()" style="background:none; border:none; color:#fff; font-size:18px; cursor:pointer; line-height: 1;">&times;</button>
+        <button onclick="handleUserAuth()" id="authActionBtn" style="background: #2563eb; color: #fff; border: none; padding: 4px 8px; border-radius: 6px; font-size: 11px; cursor: pointer; font-weight: 600;">Sign Out</button>
+        <button onclick="toggleAiHelpdesk()" style="background:none; border:none; color:#fff; font-size:18px; cursor:pointer; line-height: 1; margin-left: 2px;">&times;</button>
       </div>
     </div>
 
@@ -77,6 +77,15 @@ document.addEventListener('DOMContentLoaded', () => {
   document.body.appendChild(modal);
 });
 
+function openSmartAiChat() {
+  toggleAiHelpdesk();
+}
+
+function closeSmartAiChat() {
+  const modal = document.getElementById('autoAiModal');
+  if (modal) modal.style.display = 'none';
+}
+
 function toggleAiHelpdesk() {
   const modal = document.getElementById('autoAiModal');
   if (modal) {
@@ -84,7 +93,16 @@ function toggleAiHelpdesk() {
   }
 }
 
-// ভাষা পরিবর্তনের ফাংশন (ডান কোণার ড্রপডাউন থেকে সিলেক্ট করলে কাজ করবে)
+function handleUserAuth() {
+  if (typeof logoutUser === 'function') {
+    logoutUser();
+  } else {
+    localStorage.removeItem('userLoggedIn');
+    alert('Logged out successfully!');
+    location.reload();
+  }
+}
+
 function changeAiLanguage(lang) {
   currentLang = lang;
   const welcomeText = aiKnowledge[lang].welcome;
@@ -95,17 +113,34 @@ function changeAiLanguage(lang) {
   speakText(welcomeText);
 }
 
+// ভয়েস কথা শেষ হওয়া পর্যন্ত অপেক্ষা করার জন্য নিরাপদ স্পিচ ফাংশন
 function speakText(text) {
   if (!isVoiceActive || !('speechSynthesis' in window)) return;
-  window.speechSynthesis.cancel();
-  const utterance = new SpeechSynthesisUtterance(text);
   
-  if (currentLang === 'bn') utterance.lang = 'bn-IN';
-  else if (currentLang === 'hi') utterance.lang = 'hi-IN';
-  else utterance.lang = 'en-US';
+  // আগের কথা সম্পূর্ণ বন্ধ করে নতুন কথা শুরু করা
+  window.speechSynthesis.cancel();
 
-  utterance.rate = 1.0;
-  window.speechSynthesis.speak(utterance);
+  setTimeout(() => {
+    const utterance = new SpeechSynthesisUtterance(text);
+    
+    if (currentLang === 'bn') utterance.lang = 'bn-IN';
+    else if (currentLang === 'hi') utterance.lang = 'hi-IN';
+    else utterance.lang = 'en-US';
+
+    utterance.rate = 0.95; // একটু ধীরস্থির গতি যাতে কথা কেটে না যায়
+    utterance.pitch = 1.0;
+
+    // কথা শেষ হওয়া পর্যন্ত ওয়েট বা হ্যান্ডেল করার ইভেন্ট
+    utterance.onend = function() {
+      console.log('Voice speech completed successfully.');
+    };
+    
+    utterance.onerror = function(e) {
+      console.error('Speech synthesis error:', e);
+    };
+
+    window.speechSynthesis.speak(utterance);
+  }, 250);
 }
 
 function sendUserMessage(customText = '') {
@@ -133,7 +168,7 @@ function generateAiResponse(query) {
     return dict.passportGrid;
   } else if (q.includes('sign') || q.includes('signature') || q.includes('স্বাক্ষর') || q.includes('साइन')) {
     return dict.sigPad;
-  } else if (q.includes('qr') || q.includes('upi') || q.includes('payment') || q.includes('पেমেন্ট')) {
+  } else if (q.includes('qr') || q.includes('upi') || q.includes('payment') || q.includes('পেমেন্ট')) {
     return dict.qrGen;
   } else if (q.includes('pdf') || q.includes('merge') || q.includes('split') || q.includes('compress') || q.includes('কম্প্রেস')) {
     return dict.pdfTools;
@@ -165,6 +200,8 @@ function startVoiceInput() {
 
   const recognition = new SpeechRecognition();
   recognition.lang = currentLang === 'bn' ? 'bn-IN' : (currentLang === 'hi' ? 'hi-IN' : 'en-US');
+  recognition.interimResults = false;
+  recognition.maxAlternatives = 1;
   recognition.start();
 
   recognition.onresult = function(event) {
@@ -172,6 +209,10 @@ function startVoiceInput() {
     const input = document.getElementById('aiChatInput');
     if (input) input.value = speechText;
     sendUserMessage(speechText);
+  };
+
+  recognition.onerror = function(event) {
+    console.error('Voice input error:', event.error);
   };
 }
 
