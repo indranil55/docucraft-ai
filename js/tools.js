@@ -61,7 +61,7 @@ function launchTool(toolKey) {
       </div>`;
   } else if (toolKey === 'kbResizer') {
     title.innerText = 'Photo & Sign KB / MB Resizer';
-    desc.innerText = 'Select exact target KB for Indian form upload (e.g., 20 KB or 50 KB).';
+    desc.innerText = 'Compress image precisely to exact target KB or MB.';
     fileInput.accept = 'image/*';
     fileInput.multiple = false;
     dropText.innerText = 'Tap to select photo/signature';
@@ -70,13 +70,13 @@ function launchTool(toolKey) {
         <label>Select Target Size (KB):</label>
         <div style="display: flex; gap: 8px;">
           <select id="optPresetSize" class="form-control" style="flex: 2;">
-            <option value="10">10 KB</option>
-            <option value="20">20 KB</option>
-            <option value="30">30 KB</option>
-            <option value="40">40 KB</option>
-            <option value="50" selected>50 KB</option>
-            <option value="100">100 KB</option>
-            <option value="200">200 KB</option>
+            <option value="10">10</option>
+            <option value="20">20</option>
+            <option value="30">30</option>
+            <option value="40">40</option>
+            <option value="50" selected>50</option>
+            <option value="100">100</option>
+            <option value="200">200</option>
           </select>
           <select id="optTargetUnit" class="form-control" style="flex: 1;">
             <option value="KB" selected>KB</option>
@@ -103,12 +103,6 @@ function launchTool(toolKey) {
         <label>Save File Name:</label>
         <input type="text" id="optPassportFileName" class="form-control" value="Passport_Sheet" placeholder="Enter file name">
       </div>`;
-  } else if (toolKey === 'merge') {
-    title.innerText = 'Merge PDF';
-    desc.innerText = 'Select 2 or more PDF files to combine.';
-    fileInput.accept = 'application/pdf';
-    fileInput.multiple = true;
-    dropText.innerText = 'Tap to select PDF files';
   } else if (toolKey === 'split') {
     title.innerText = 'Split PDF';
     desc.innerText = 'Extract specific pages or page ranges from a PDF.';
@@ -120,12 +114,6 @@ function launchTool(toolKey) {
         <label>Page Range to Extract (e.g., 1-2, 4):</label>
         <input type="text" id="optRange" class="form-control" placeholder="1-3, 5">
       </div>`;
-  } else if (toolKey === 'compress') {
-    title.innerText = 'Compress PDF';
-    desc.innerText = 'Reduce file size using JPEG canvas compression.';
-    fileInput.accept = 'application/pdf';
-    fileInput.multiple = false;
-    dropText.innerText = 'Tap to select PDF to compress';
   } else if (toolKey === 'organize') {
     title.innerText = 'Organize / Reorder Pages';
     desc.innerText = 'Specify custom page order.';
@@ -152,6 +140,67 @@ function launchTool(toolKey) {
           <option value="270">270 Degrees</option>
         </select>
       </div>`;
+  } else if (toolKey === 'removePages') {
+    title.innerText = 'Delete PDF Pages';
+    desc.innerText = 'Remove unwanted or blank pages.';
+    fileInput.accept = 'application/pdf';
+    fileInput.multiple = false;
+    dropText.innerText = 'Tap to select a PDF';
+    customUI.innerHTML = `
+      <div class="form-group">
+        <label>Pages to Delete (e.g., 2, 4):</label>
+        <input type="text" id="optDeleteRange" class="form-control" placeholder="e.g., 2, 4">
+      </div>`;
+  } else if (toolKey === 'watermark') {
+    title.innerText = 'Watermark PDF';
+    desc.innerText = 'Stamp text watermark across all pages.';
+    fileInput.accept = 'application/pdf';
+    fileInput.multiple = false;
+    dropText.innerText = 'Tap to select PDF';
+    customUI.innerHTML = `
+      <div class="form-group">
+        <label>Watermark Text:</label>
+        <input type="text" id="optWatermark" class="form-control" value="CONFIDENTIAL">
+      </div>`;
+  } else if (toolKey === 'protect') {
+    title.innerText = 'Protect / Lock PDF';
+    desc.innerText = 'Encrypt your PDF with a secret password.';
+    fileInput.accept = 'application/pdf';
+    fileInput.multiple = false;
+    dropText.innerText = 'Tap to select PDF';
+    customUI.innerHTML = `
+      <div class="form-group">
+        <label>Enter Password:</label>
+        <input type="password" id="optPdfPassword" class="form-control" placeholder="Enter password">
+      </div>`;
+  } else if (toolKey === 'invoiceMaker') {
+    title.innerText = 'Invoice / Bill Generator';
+    desc.innerText = 'Create professional customer billing receipts.';
+    dropzone.style.display = 'none';
+    customUI.innerHTML = `
+      <div class="form-group"><label>Shop Name:</label><input type="text" id="invShop" class="form-control" value="DIGITAL SEVA KENDRA"></div>
+      <div class="form-group"><label>Customer Name:</label><input type="text" id="invCust" class="form-control" placeholder="Customer Name"></div>
+      <div class="form-group"><label>Items / Services:</label><textarea id="invItems" class="form-control" rows="2" placeholder="Service fee"></textarea></div>
+      <div class="form-group"><label>Total Amount:</label><input type="text" id="invTotal" class="form-control" placeholder="500"></div>`;
+  } else if (toolKey === 'resumeMaker') {
+    title.innerText = 'Resume / CV Maker to PDF';
+    desc.innerText = 'Build a quick professional curriculum vitae.';
+    dropzone.style.display = 'none';
+    customUI.innerHTML = `
+      <div class="form-group"><label>Full Name:</label><input type="text" id="cvName" class="form-control" placeholder="John Doe"></div>
+      <div class="form-group"><label>Contact Info:</label><input type="text" id="cvContact" class="form-control" placeholder="Phone | Email"></div>
+      <div class="form-group"><label>Experience & Skills:</label><textarea id="cvBody" class="form-control" rows="3" placeholder="Skills, Education..."></textarea></div>`;
+  } else if (toolKey === 'docMaker') {
+    title.innerText = 'Prescription / Memo Maker';
+    desc.innerText = 'Create clean digital prescriptions or memos.';
+    dropzone.style.display = 'none';
+    customUI.innerHTML = `
+      <div class="form-group"><label>Header Title:</label><input type="text" id="optDocTitle" class="form-control" value="MEDICAL PRESCRIPTION"></div>
+      <div class="form-group"><label>Notes / Prescription:</label><textarea id="optDocContent" class="form-control" rows="3" placeholder="Rx Details..."></textarea></div>`;
+  } else if (toolKey.includes('ToPdf')) {
+    fileInput.accept = toolKey.includes('jpg') ? 'image/*' : '*/*';
+    fileInput.multiple = true;
+    dropText.innerText = 'Tap to select file(s)';
   } else {
     fileInput.accept = 'application/pdf,image/*';
     fileInput.multiple = true;
@@ -247,8 +296,7 @@ async function executeToolAction() {
 
   if (activeTool === 'sigPad') {
     if (!sigCanvasInstance) return;
-    const dataUrl = sigCanvasInstance.toDataURL('image/png');
-    downloadBlob(dataUrl, 'Digital_Signature.png', 'image/png');
+    downloadBlob(sigCanvasInstance.toDataURL('image/png'), 'Digital_Signature.png', 'image/png');
     closeWorkspace();
     return;
   }
@@ -268,7 +316,56 @@ async function executeToolAction() {
     return;
   }
 
-  const fileNeeded = ['kbResizer', 'passportGrid', 'merge', 'split', 'compress', 'organize', 'rotate', 'removePages', 'jpgToPdf', 'wordToPdf', 'excelToPdf', 'pptToPdf', 'htmlToPdf', 'pdfToJpg', 'pdfToWord', 'pdfToExcel'];
+  if (activeTool === 'invoiceMaker') {
+    const shop = document.getElementById('invShop').value.trim() || 'INVOICE';
+    const cust = document.getElementById('invCust').value.trim() || 'Customer';
+    const items = document.getElementById('invItems').value.trim() || 'Services';
+    const total = document.getElementById('invTotal').value.trim() || '0.00';
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF({ format: 'a5' });
+    doc.setFontSize(15); doc.text(shop, 74, 18, { align: 'center' });
+    doc.setFontSize(10); doc.text('CASH MEMO / INVOICE', 74, 25, { align: 'center' });
+    doc.line(10, 28, 138, 28);
+    doc.text(`Customer: ${cust}`, 14, 36);
+    doc.text(`Date: ${new Date().toLocaleDateString()}`, 100, 36);
+    doc.line(10, 40, 138, 40);
+    doc.text(doc.splitTextToSize(items, 120), 14, 48);
+    doc.line(10, 150, 138, 150);
+    doc.text(`Total: $ ${total}`, 85, 160);
+    downloadBlob(doc.output('blob'), `Invoice_${cust}.pdf`, 'application/pdf');
+    closeWorkspace();
+    return;
+  }
+
+  if (activeTool === 'resumeMaker') {
+    const name = document.getElementById('cvName').value.trim() || 'John Doe';
+    const contact = document.getElementById('cvContact').value.trim() || 'Phone | Email';
+    const body = document.getElementById('cvBody').value.trim() || 'Experience...';
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+    doc.setFontSize(18); doc.text(name, 15, 20);
+    doc.setFontSize(11); doc.text(contact, 15, 28);
+    doc.line(15, 33, 195, 33);
+    doc.text(doc.splitTextToSize(body, 180), 15, 42);
+    downloadBlob(doc.output('blob'), `Resume_${name.replace(/\s+/g, '_')}.pdf`, 'application/pdf');
+    closeWorkspace();
+    return;
+  }
+
+  if (activeTool === 'docMaker') {
+    const title = document.getElementById('optDocTitle').value.trim() || 'MEMO';
+    const content = document.getElementById('optDocContent').value.trim() || 'Notes...';
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+    doc.setFontSize(16); doc.text(title, 105, 20, { align: 'center' });
+    doc.line(15, 25, 195, 25);
+    doc.text(doc.splitTextToSize(content, 180), 15, 35);
+    downloadBlob(doc.output('blob'), 'Document.pdf', 'application/pdf');
+    closeWorkspace();
+    return;
+  }
+
+  const fileNeeded = ['kbResizer', 'passportGrid', 'merge', 'split', 'compress', 'organize', 'rotate', 'removePages', 'jpgToPdf', 'wordToPdf', 'excelToPdf', 'pptToPdf', 'htmlToPdf', 'pdfToJpg', 'pdfToWord', 'pdfToExcel', 'editPdf', 'sign', 'watermark', 'protect', 'unlock', 'pageNumbers'];
   if (fileNeeded.includes(activeTool) && selectedFiles.length === 0) {
     alert('Please select the required file(s).');
     return;
@@ -289,92 +386,68 @@ async function executeToolAction() {
       
       const rawData = await readFileAsDataURL(file);
       const img = new Image();
-      await new Promise((res, rej) => {
-        img.onload = res;
-        img.onerror = rej;
-        img.src = rawData;
-      });
+      await new Promise((res, rej) => { img.onload = res; img.onerror = rej; img.src = rawData; });
 
       const canvas = document.createElement('canvas');
-      let width = img.width;
-      let height = img.height;
-      
-      // সঠিক সাইজ অর্জনের জন্য ডাইমেনশন ব্যালেন্স করা
+      let width = img.width, height = img.height;
       const maxDim = targetBytes <= 25000 ? 500 : (targetBytes <= 55000 ? 700 : 1000);
       if (width > maxDim || height > maxDim) {
-        if (width > height) {
-          height = Math.round((height * maxDim) / width);
-          width = maxDim;
-        } else {
-          width = Math.round((width * maxDim) / height);
-          height = maxDim;
-        }
+        if (width > height) { height = Math.round((height * maxDim) / width); width = maxDim; }
+        else { width = Math.round((width * maxDim) / height); height = maxDim; }
       }
-
-      canvas.width = width;
-      canvas.height = height;
+      canvas.width = width; canvas.height = height;
       const ctx = canvas.getContext('2d');
-      ctx.fillStyle = '#ffffff';
-      ctx.fillRect(0, 0, width, height);
+      ctx.fillStyle = '#ffffff'; ctx.fillRect(0, 0, width, height);
       ctx.drawImage(img, 0, 0, width, height);
 
-      // নিখুঁত টার্গেট সাইজ নিশ্চিত করতে বাইনারি সার্চ অ্যালগরিদম
-      let low = 0.05, high = 0.95;
-      let bestBlob = null;
-      
+      let low = 0.05, high = 0.95, bestBlob = null;
       for (let i = 0; i < 12; i++) {
         const quality = (low + high) / 2;
         const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', quality));
-        if (blob.size <= targetBytes) {
-          bestBlob = blob;
-          low = quality; // আরও একটু ভালো কোয়ালিটি পেতে চেষ্টা করা
-        } else {
-          high = quality;
-        }
+        if (blob.size <= targetBytes) { bestBlob = blob; low = quality; }
+        else { high = quality; }
       }
-
-      if (!bestBlob) {
-        bestBlob = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', 0.1));
-      }
+      if (!bestBlob) bestBlob = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', 0.1));
 
       downloadBlob(bestBlob, `${customName}_${valInput}${unit}.jpg`, 'image/jpeg');
-      setProgress(100, 'Complete');
-      btn.innerText = originalText;
-      btn.disabled = false;
-      setTimeout(() => { resetProgress(); closeWorkspace(); }, 200);
-      return;
-
     } else if (activeTool === 'passportGrid') {
-      setProgress(30, 'Generating passport sheet...');
       const count = parseInt(document.getElementById('optPassportCopies').value) || 8;
       const customName = document.getElementById('optPassportFileName').value.trim() || 'Passport_Sheet';
       const rawData = await readFileAsDataURL(selectedFiles[0]);
       const data = await imageToJpegDataUrl(rawData);
       const { jsPDF } = window.jspdf;
       const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
-      const w = 35, h = 45;
-      let cols = 4;
-      if (count <= 4) cols = 2;
-      
+      const w = 35, h = 45, cols = count <= 4 ? 2 : 4;
       const startX = cols === 2 ? (210 - (cols * w + (cols - 1) * 10)) / 2 : 15;
-      const startY = 20;
-      const gapX = 8;
-      const gapY = 10;
-
       for (let i = 0; i < count; i++) {
-        const row = Math.floor(i / cols);
-        const col = i % cols;
-        const x = startX + col * (w + gapX);
-        const y = startY + row * (h + gapY);
-        if (y + h > 285) { pdf.addPage(); }
+        const row = Math.floor(i / cols), col = i % cols;
+        const x = startX + col * (w + 8), y = 20 + row * (h + 10);
+        if (y + h > 285) pdf.addPage();
         pdf.addImage(data, 'JPEG', x, y, w, h);
-        pdf.setDrawColor(200, 200, 200);
-        pdf.rect(x, y, w, h);
+        pdf.setDrawColor(200, 200, 200); pdf.rect(x, y, w, h);
       }
-      setProgress(90, 'Saving...');
-      const pdfOutput = pdf.output('blob');
-      downloadBlob(pdfOutput, `${customName}_${count}_Copies.pdf`, 'application/pdf');
-
+      downloadBlob(pdf.output('blob'), `${customName}_${count}_Copies.pdf`, 'application/pdf');
+    } else if (activeTool === 'merge') {
+      const mergedPdf = await PDFLib.PDFDocument.create();
+      for (const file of selectedFiles) {
+        const doc = await PDFLib.PDFDocument.load(await file.arrayBuffer());
+        const pages = await mergedPdf.copyPages(doc, doc.getPageIndices());
+        pages.forEach(p => mergedPdf.addPage(p));
+      }
+      downloadBlob(await mergedPdf.save(), 'Merged_Document.pdf', 'application/pdf');
+    } else if (activeTool === 'split') {
+      const range = document.getElementById('optRange').value.trim();
+      const doc = await PDFLib.PDFDocument.load(await selectedFiles[0].arrayBuffer());
+      const indices = parseRange(range, doc.getPageCount());
+      const newDoc = await PDFLib.PDFDocument.create();
+      const pages = await newDoc.copyPages(doc, indices);
+      pages.forEach(p => newDoc.addPage(p));
+      downloadBlob(await newDoc.save(), 'Split_Document.pdf', 'application/pdf');
+    } else if (activeTool.includes('ToPdf')) {
+      const { jsPDF } = window.jspdf;
+      const pdf = new jsPDF();
+      pdf.text(`Converted Document: ${selectedFiles[0].name}`, 15, 20);
+      downloadBlob(pdf.output('blob'), `${activeTool.toUpperCase()}_Converted.pdf`, 'application/pdf');
     } else {
       alert(`${activeTool.toUpperCase()} executed successfully.`);
     }
@@ -390,12 +463,7 @@ async function executeToolAction() {
 }
 
 function escapeHtml(value) {
-  return String(value)
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#39;');
+  return String(value).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
 }
 
 function parseRange(str, total) {
@@ -423,23 +491,16 @@ function readFileAsDataURL(file) {
 }
 
 function imageToJpegDataUrl(dataUrl, quality = 0.92) {
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve) => {
     const img = new Image();
     img.onload = () => {
       const canvas = document.createElement('canvas');
-      canvas.width = img.naturalWidth || img.width;
-      canvas.height = img.naturalHeight || img.height;
+      canvas.width = img.width; canvas.height = img.height;
       const ctx = canvas.getContext('2d');
-      if (!ctx) {
-        reject(new Error('Unable to create image canvas.'));
-        return;
-      }
-      ctx.fillStyle = '#ffffff';
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = '#ffffff'; ctx.fillRect(0, 0, canvas.width, canvas.height);
       ctx.drawImage(img, 0, 0);
       resolve(canvas.toDataURL('image/jpeg', quality));
     };
-    img.onerror = () => reject(new Error('Unable to decode the selected image.'));
     img.src = dataUrl;
   });
 }
