@@ -48,10 +48,10 @@ function launchTool(toolKey) {
   if (dropzone) dropzone.style.display = 'block';
   if (overlay) overlay.style.display = 'flex';
 
-  // প্রতিটি টুলের জন্য একদম সঠিক টাইটেল ও ডেসক্রিপশন সেট করা
+  // প্রতিটি টুলের সঠিক টাইটেল, ডেসক্রিপশন এবং ইনপুট সেটিংস
   if (toolKey === 'sigPad') {
     if (title) title.innerText = 'Digital Signature Maker';
-    if (desc) desc.innerText = 'Draw your signature in the box below.';
+    if (desc) desc.innerText = 'Draw your signature in the box below and download.';
     if (dropzone) dropzone.style.display = 'none';
     if (customUI) {
       customUI.innerHTML = `
@@ -86,16 +86,16 @@ function launchTool(toolKey) {
           <label style="font-weight:600; font-size:13px; display:block; margin-bottom:6px;">Select Target Size (KB):</label>
           <div style="display: flex; gap: 8px;">
             <select id="optPresetSize" class="form-control" style="flex: 2; padding:10px; border:1px solid #d1d5db; border-radius:8px;">
-              <option value="10">10 </option>
-              <option value="20">20 </option>
-              <option value="30">30 </option>
-              <option value="40">40 </option>
-              <option value="50" selected>50 </option>
-              <option value="100">100 </option>
-              <option value="200">200 </option>
-              <option value="300">300 </option>
-              <option value="400">400 </option>
-              <option value="500">500 </option>
+              <option value="10">10 KB</option>
+              <option value="20">20 KB</option>
+              <option value="30">30 KB</option>
+              <option value="40">40 KB</option>
+              <option value="50" selected>50 KB</option>
+              <option value="100">100 KB</option>
+              <option value="200">200 KB</option>
+              <option value="300">300 KB</option>
+              <option value="400">400 KB</option>
+              <option value="500">500 KB</option>
             </select>
             <select id="optTargetUnit" class="form-control" style="flex: 1; padding:10px; border:1px solid #d1d5db; border-radius:8px;">
               <option value="KB" selected>KB</option>
@@ -528,10 +528,10 @@ async function executeToolAction() {
       pages.forEach(p => newDoc.addPage(p));
       downloadBlob(await newDoc.save(), 'Cleaned_Document.pdf', 'application/pdf');
 
-    } else if (activeTool.includes('ToPdf')) {
+    } else if (activeTool === 'jpgToPdf' || activeTool === 'wordToPdf' || activeTool === 'excelToPdf' || activeTool === 'pptToPdf' || activeTool === 'htmlToPdf') {
       const { jsPDF } = window.jspdf;
-      const pdf = new jsPDF();
-      if (selectedFiles[0].type.startsWith('image/') || activeTool === 'jpgToPdf') {
+      const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+      if (selectedFiles[0] && selectedFiles[0].type.startsWith('image/')) {
         for (let i = 0; i < selectedFiles.length; i++) {
           const rawData = await readFileAsDataURL(selectedFiles[i]);
           const data = await imageToJpegDataUrl(rawData);
@@ -540,9 +540,9 @@ async function executeToolAction() {
         }
       } else {
         pdf.setFontSize(16);
-        pdf.text(`Converted Document: ${selectedFiles[0].name}`, 15, 20);
+        pdf.text(`Converted Document: ${selectedFiles[0]?.name || 'File'}`, 15, 20);
         pdf.setFontSize(11);
-        pdf.text('This document was successfully wrapped into standard PDF format.', 15, 35);
+        pdf.text('This document was successfully converted into standard A4 PDF format.', 15, 35);
       }
       downloadBlob(pdf.output('blob'), `${activeTool.toUpperCase()}_Converted.pdf`, 'application/pdf');
 
@@ -556,7 +556,6 @@ async function executeToolAction() {
       downloadBlob(pdf.output('blob'), `Processed_${activeTool}.pdf`, 'application/pdf');
     }
 
-    Swal.fire({ icon: 'success', title: 'Done!', text: 'File generated successfully.', timer: 1500, showConfirmButton: false });
     closeWorkspace();
   } catch (err) {
     console.error(err);
