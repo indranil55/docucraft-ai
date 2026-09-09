@@ -86,16 +86,16 @@ function launchTool(toolKey) {
           <label style="font-weight:600; font-size:13px; display:block; margin-bottom:6px;">Select Target Size (KB):</label>
           <div style="display: flex; gap: 8px;">
             <select id="optPresetSize" class="form-control" style="flex: 2; padding:10px; border:1px solid #d1d5db; border-radius:8px;">
-              <option value="10">10 KB</option>
-              <option value="20">20 KB</option>
-              <option value="30">30 KB</option>
-              <option value="40">40 KB</option>
-              <option value="50" selected>50 KB</option>
-              <option value="100">100 KB</option>
-              <option value="200">200 KB</option>
-              <option value="300">300 KB</option>
-              <option value="400">400 KB</option>
-              <option value="500">500 KB</option>
+              <option value="10">10 </option>
+              <option value="20">20 </option>
+              <option value="30">30 </option>
+              <option value="40">40 </option>
+              <option value="50" selected>50 </option>
+              <option value="100">100 </option>
+              <option value="200">200 </option>
+              <option value="300">300 </option>
+              <option value="400">400 </option>
+              <option value="500">500 </option>
             </select>
             <select id="optTargetUnit" class="form-control" style="flex: 1; padding:10px; border:1px solid #d1d5db; border-radius:8px;">
               <option value="KB" selected>KB</option>
