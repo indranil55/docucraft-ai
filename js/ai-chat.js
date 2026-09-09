@@ -1,21 +1,26 @@
 // DocuCraft AI - Real AI Powered Assistant (Google Gemini AI Integration + Voice & Multi-language)
 
 // আপনার জেমিনি এআই এপিআই কী (Gemini API Key) এখানে বসাবেন। 
-// ফ্রি এপিআই কী পেতে Google AI Studio (aistudio.google.com) থেকে জেনারেট করে নিতে পারেন।
 const GEMINI_API_KEY = "AQ.Ab8RN6Kr7kvyVuwEZSZrjiUZ8R3BGXNnuGdoJLowVG8jNPX32A"; 
 
 const aiKnowledge = {
   en: {
     welcome: "Hello! I am DocuCraft AI. Ask me anything about our tools, sizing, PDFs, or any general questions.",
-    default: "I am DocuCraft AI, your smart assistant! I can help you with KB Resizer, Passport Photos, Digital Signatures, QR codes, PDF tools, or answer any general questions."
+    default: "I am DocuCraft AI, your smart assistant! I can help you with KB Resizer, Passport Photos, Digital Signatures, QR codes, PDF tools, or answer any general questions.",
+    listening: "🎙️ Listening... Please speak clearly",
+    placeholder: "Type your question here..."
   },
   hi: {
     welcome: "नमस्ते! मैं DocuCraft AI हूँ। आप मुझसे हमारे टूल्स, साइज़, PDF या किसी भी विषय के बारे में पूछ सकते हैं।",
-    default: "मैं DocuCraft AI हूँ, आपका स्मार्ट सहायक! मैं KB Resizer, Passport Photos, Digital Signatures और सभी PDF टूल्स में आपकी मदद कर सकता हूँ।"
+    default: "मैं DocuCraft AI हूँ, आपका स्मार्ट सहायक! मैं KB Resizer, Passport Photos, Digital Signatures और सभी PDF टूल्स में आपकी मदद कर सकता हूँ।",
+    listening: "🎙️ सुन रहा हूँ... कृपया स्पष्ट रूप से बोलें",
+    placeholder: "यहाँ अपना प्रश्न लिखें..."
   },
   bn: {
     welcome: "নমস্কার! আমি DocuCraft AI। আমাদের টুলস, সাইজ, পিডিএফ বা যেকোনো বিষয়ে আমাকে প্রশ্ন করতে পারেন।",
-    default: "আমি DocuCraft AI, আপনার স্মার্ট অ্যাসিস্ট্যান্ট! KB/MB Photo Resizer, Passport Photo Sheet, Digital Signature, PDF Tools কিংবা যেকোনো সাধারণ প্রশ্ন বা তথ্যের উত্তর আমি দিতে পারি।"
+    default: "আমি DocuCraft AI, আপনার স্মার্ট অ্যাসিস্ট্যান্ট! KB/MB Photo Resizer, Passport Photo Sheet, Digital Signature, PDF Tools কিংবা যেকোনো সাধারণ প্রশ্ন বা তথ্যের উত্তর আমি দিতে পারি।",
+    listening: "🎙️ শুনছি... কথা বলুন স্পষ্ট করে",
+    placeholder: "এখানে আপনার প্রশ্ন লিখুন..."
   }
 };
 
@@ -49,21 +54,21 @@ document.addEventListener('DOMContentLoaded', () => {
       </div>
     </div>
 
-    <!-- ভয়েস শোনার লাইভ স্ট্যাটাস বার -->
+    <!-- ডায়নামিক ভয়েস স্ট্যাটাস বার -->
     <div id="voiceStatusBar" style="display: none; background: #e0f2fe; color: #0369a1; padding: 6px 12px; font-size: 12px; font-weight: 600; text-align: center; border-bottom: 1px solid #bae6fd;">
-      🎙️ শুনছি... কথা বলুন স্পষ্ট করে
+      ${aiKnowledge.bn.listening}
     </div>
 
     <div id="aiChatBody" style="padding: 12px; height: 260px; overflow-y: auto; background: #f8fafc; font-size: 13px;">
       <div style="margin: 8px 0; text-align: left;">
         <span id="aiWelcomeMsg" style="background: #f1f5f9; color: #1e293b; padding: 8px 12px; border-radius: 12px 12px 12px 0; display: inline-block; border: 1px solid #e2e8f0;">
-          নমস্কার! আমি DocuCraft AI। আমাদের টুলস বা যেকোনো বিষয় নিয়ে আমার সাথে কথা বলতে পারেন।
+          ${aiKnowledge.bn.welcome}
         </span>
       </div>
     </div>
 
     <div style="padding: 10px; background: #fff; border-top: 1px solid #e2e8f0; display: flex; gap: 6px; align-items: center;">
-      <input type="text" id="aiChatInput" placeholder="এখানে আপনার প্রশ্ন লিখুন..." style="flex: 1; padding: 8px 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 13px;" onkeypress="if(event.key==='Enter') sendUserMessage()">
+      <input type="text" id="aiChatInput" placeholder="${aiKnowledge.bn.placeholder}" style="flex: 1; padding: 8px 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 13px;" onkeypress="if(event.key==='Enter') sendUserMessage()">
       <button onclick="startVoiceInput()" style="background: #0284c7; color: #fff; border: none; padding: 8px 10px; border-radius: 6px; cursor: pointer;" title="Voice Input">🎤</button>
       <button onclick="sendUserMessage()" style="background: #2563eb; color: #fff; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer;">➤</button>
     </div>
@@ -87,14 +92,21 @@ function toggleAiHelpdesk() {
   }
 }
 
+// ভাষা পরিবর্তনের ফাংশন যা সব টেক্সট আপডেট করবে
 function changeAiLanguage(lang) {
   currentLang = lang;
-  const welcomeText = aiKnowledge[lang].welcome;
+  const langData = aiKnowledge[lang] || aiKnowledge.bn;
+  
   const welcomeEl = document.getElementById('aiWelcomeMsg');
-  if (welcomeEl) {
-    welcomeEl.innerText = welcomeText;
-  }
-  speakText(welcomeText);
+  if (welcomeEl) welcomeEl.innerText = langData.welcome;
+
+  const statusBar = document.getElementById('voiceStatusBar');
+  if (statusBar) statusBar.innerText = langData.listening;
+
+  const inputEl = document.getElementById('aiChatInput');
+  if (inputEl) inputEl.placeholder = langData.placeholder;
+
+  speakText(langData.welcome);
 }
 
 // ভয়েস আউটপুট 
@@ -139,7 +151,7 @@ async function sendUserMessage(customText = '') {
   }
 }
 
-// আসল রিয়েল জেমিনি এআই এপিআই কল করার ফাংশন
+// জেমিনি এআই এপিআই কল করার ফাংশন (সঠিক মডেলসহ)
 async function fetchGeminiAiResponse(prompt) {
   if (!GEMINI_API_KEY || GEMINI_API_KEY === "YOUR_GEMINI_API_KEY_HERE") {
     return generateLocalAiResponse(prompt);
@@ -147,7 +159,10 @@ async function fetchGeminiAiResponse(prompt) {
 
   const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`;
   
-  const systemInstruction = `You are DocuCraft AI, an advanced smart assistant for a web-based document platform (DocuCraft AI) featuring KB/MB Photo Resizers, Passport Photo Grids, Digital Signatures, QR/UPI generators, and PDF tools (Merge, Split, Compress, etc.). Respond in the user's language (Bengali, Hindi, or English) naturally and accurately.`;
+  const langNames = { bn: "Bengali", hi: "Hindi", en: "English" };
+  const targetLangName = langNames[currentLang] || "Bengali";
+
+  const systemInstruction = `You are DocuCraft AI, an advanced smart assistant for a web-based document platform (DocuCraft AI) featuring KB/MB Photo Resizers, Passport Photo Grids, Digital Signatures, QR/UPI generators, and PDF tools. You must reply strictly in ${targetLangName} language based on the user's question.`;
 
   const response = await fetch(url, {
     method: 'POST',
@@ -170,24 +185,14 @@ async function fetchGeminiAiResponse(prompt) {
 // লোকাল ফলব্যাক রেসপন্স
 function generateLocalAiResponse(query) {
   const q = query.toLowerCase();
+  const dict = aiKnowledge[currentLang] || aiKnowledge.bn;
 
-  if (q.includes('কেমন আছেন') || q.includes('how are you') || q.includes('कैसी हो')) {
+  if (q.includes('কেমন আছেন') || q.includes('how are you') || q.includes('कैसी हो') || q.includes('कैसे हो')) {
     if (currentLang === 'hi') return 'मैं बिल्कुल ठीक हूँ! बताइए, DocuCraft AI में आज मैं आपकी क्या सहायता कर सकता हूँ?';
     if (currentLang === 'en') return 'I am doing great! How can DocuCraft AI assist you today?';
     return 'আমি একদম ভালো আছি, ধন্যবাদ! DocuCraft AI-তে আজ আপনাকে কীভাবে সাহায্য করতে পারি বলুন?';
   }
 
-  if (q.includes('kb') || q.includes('mb') || q.includes('resizer') || q.includes('রিসাইজ') || q.includes('সাইজ')) {
-    return 'Photo & Sign KB/MB Resizer: এটি ব্যবহার করে আপনি যেকোনো ছবি বা সিগনেচারকে ১০KB থেকে শুরু করে ৫০০MB পর্যন্ত একদম নিখুঁত মাপে রিসাইজ বা কম্প্রেস করতে পারবেন।';
-  } else if (q.includes('passport') || q.includes('grid') || q.includes('পাসপোর্ট')) {
-    return 'Passport Photo Sheet: একটি মাত্র A4 পেজে স্ট্যান্ডার্ড ৩৫x৪৫ মিমি মাপের একাধিক পাসপোর্ট ছবি প্রিন্ট করার উপযোগী শিট তৈরি করে দেয়।';
-  } else if (q.includes('sign') || q.includes('signature') || q.includes('স্বাক্ষর')) {
-    return 'Digital Signature Maker: স্ক্রিনে আপনার আঙুল দিয়ে স্বাক্ষর এঁকে ফর্ম আপলোডের জন্য ক্লিয়ার পিএনজি ফাইল ডাউনলোড করতে পারেন।';
-  } else if (q.includes('pdf') || q.includes('merge') || q.includes('split') || q.includes('compress')) {
-    return 'PDF Tools: একাধিক পিডিএফ একসাথে যুক্ত করা (Merge), পেজ আলাদা করা (Split), ফাইলের সাইজ ছোট করা (Compress) বা রিঅর্ডার করার সমস্ত টুল এখানে পেয়ে যাবেন।';
-  }
-
-  const dict = aiKnowledge[currentLang] || aiKnowledge.bn;
   return dict.default;
 }
 
@@ -224,9 +229,13 @@ function startVoiceInput() {
   recognition.maxAlternatives = 1;
 
   const statusBar = document.getElementById('voiceStatusBar');
+  const langData = aiKnowledge[currentLang] || aiKnowledge.bn;
 
   recognition.onstart = function() {
-    if (statusBar) statusBar.style.display = 'block';
+    if (statusBar) {
+      statusBar.innerText = langData.listening;
+      statusBar.style.display = 'block';
+    }
   };
 
   recognition.onresult = function(event) {
