@@ -48,7 +48,6 @@ function launchTool(toolKey) {
   if (dropzone) dropzone.style.display = 'block';
   if (overlay) overlay.style.display = 'flex';
 
-  // প্রতিটি টুলের সঠিক টাইটেল, ডেসক্রিপশন এবং ইনপুট সেটিংস
   if (toolKey === 'sigPad') {
     if (title) title.innerText = 'Digital Signature Maker';
     if (desc) desc.innerText = 'Draw your signature in the box below and download.';
@@ -77,15 +76,15 @@ function launchTool(toolKey) {
     }
   } else if (toolKey === 'kbResizer') {
     if (title) title.innerText = 'Photo & Sign KB / MB Resizer';
-    if (desc) desc.innerText = 'Compress image precisely to exact target KB or MB (up to 500 KB).';
+    if (desc) desc.innerText = 'Compress image precisely to exact target KB or MB.';
     if (fileInput) { fileInput.accept = 'image/*'; fileInput.multiple = false; }
     if (dropText) dropText.innerText = 'Tap to select photo/signature';
     if (customUI) {
       customUI.innerHTML = `
         <div class="form-group">
-          <label style="font-weight:600; font-size:13px; display:block; margin-bottom:6px;">Select Target Size (KB):</label>
+          <label style="font-weight:600; font-size:13px; display:block; margin-bottom:6px;">Select Target Size & Unit:</label>
           <div style="display: flex; gap: 8px;">
-            <select id="optPresetSize" class="form-control" style="flex: 2; padding:10px; border:1px solid #d1d5db; border-radius:8px;">
+            <select id="optPresetSize" class="form-control" style="flex: 2; padding:10px; border:1px solid #d1d5db; border-radius:8px;" onchange="updateResizerOptions()">
               <option value="10">10 KB</option>
               <option value="20">20 KB</option>
               <option value="30">30 KB</option>
@@ -97,7 +96,7 @@ function launchTool(toolKey) {
               <option value="400">400 KB</option>
               <option value="500">500 KB</option>
             </select>
-            <select id="optTargetUnit" class="form-control" style="flex: 1; padding:10px; border:1px solid #d1d5db; border-radius:8px;">
+            <select id="optTargetUnit" class="form-control" style="flex: 1; padding:10px; border:1px solid #d1d5db; border-radius:8px;" onchange="updateResizerOptions()">
               <option value="KB" selected>KB</option>
               <option value="MB">MB</option>
             </select>
@@ -251,6 +250,36 @@ function launchTool(toolKey) {
     if (desc) desc.innerText = 'Process your document instantly.';
     if (fileInput) { fileInput.accept = 'application/pdf,image/*'; fileInput.multiple = true; }
     if (dropText) dropText.innerText = 'Tap to select file(s)';
+  }
+}
+
+// ইউনিট অনুযায়ী সাইজের অপশনগুলো অটো পরিবর্তন করার ফাংশন
+function updateResizerOptions() {
+  const unitSelect = document.getElementById('optTargetUnit');
+  const sizeSelect = document.getElementById('optPresetSize');
+  if (!unitSelect || !sizeSelect) return;
+
+  const unit = unitSelect.value;
+  sizeSelect.innerHTML = '';
+
+  if (unit === 'KB') {
+    const kbValues = [10, 20, 30, 40, 50, 100, 200, 300, 400, 500];
+    kbValues.forEach(val => {
+      const opt = document.createElement('option');
+      opt.value = val;
+      opt.text = val + ' KB';
+      if (val === 50) opt.selected = true;
+      sizeSelect.appendChild(opt);
+    });
+  } else {
+    const mbValues = [1, 2, 5, 10, 15, 20, 25, 30, 40, 50, 100, 150, 200];
+    mbValues.forEach(val => {
+      const opt = document.createElement('option');
+      opt.value = val;
+      opt.text = val + ' MB';
+      if (val === 1) opt.selected = true;
+      sizeSelect.appendChild(opt);
+    });
   }
 }
 
@@ -433,6 +462,7 @@ async function executeToolAction() {
       const valInput = parseFloat(document.getElementById('optPresetSize')?.value) || 50;
       const unit = document.getElementById('optTargetUnit')?.value || 'KB';
       const customName = document.getElementById('optCustomFileName')?.value?.trim() || 'Resized_Photo';
+      
       const targetBytes = unit === 'MB' ? valInput * 1024 * 1024 : valInput * 1024;
       const file = selectedFiles[0];
       
@@ -442,7 +472,7 @@ async function executeToolAction() {
 
       const canvas = document.createElement('canvas');
       let width = img.width, height = img.height;
-      const maxDim = targetBytes <= 25000 ? 500 : (targetBytes <= 55000 ? 700 : 1200);
+      const maxDim = targetBytes <= 25000 ? 500 : (targetBytes <= 55000 ? 700 : 2000);
       if (width > maxDim || height > maxDim) {
         if (width > height) { height = Math.round((height * maxDim) / width); width = maxDim; }
         else { width = Math.round((width * maxDim) / height); height = maxDim; }
@@ -528,7 +558,7 @@ async function executeToolAction() {
       pages.forEach(p => newDoc.addPage(p));
       downloadBlob(await newDoc.save(), 'Cleaned_Document.pdf', 'application/pdf');
 
-    } else if (activeTool === 'jpgToPdf' || activeTool === 'wordToPdf' || activeTool === 'excelToPdf' || activeTool === 'pptToPdf' || activeTool === 'htmlToPdf') {
+    } else if (activeTool.includes('ToPdf')) {
       const { jsPDF } = window.jspdf;
       const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
       if (selectedFiles[0] && selectedFiles[0].type.startsWith('image/')) {
