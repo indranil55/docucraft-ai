@@ -1,7 +1,7 @@
 // DocuCraft AI - Real AI Powered Assistant (Google Gemini AI Integration + Voice & Multi-language)
 
-// আপনার জেমিনি এআই এপিআই কী (Gemini API Key) এখানে বসাবেন। 
-const GEMINI_API_KEY = "AQ.Ab8RN6Kr7kvyVuwEZSZrjiUZ8R3BGXNnuGdoJLowVG8jNPX32A"; 
+// আপনার জেমিনি এআই এপিআই কী (Gemini API Key) এখানে নিরাপদভাবে বসাবেন বা পরবর্তীতে ইনপুট নেবেন।
+const GEMINI_API_KEY = "YOUR_GEMINI_API_KEY_HERE"; 
 
 const aiKnowledge = {
   en: {
@@ -151,7 +151,7 @@ async function sendUserMessage(customText = '') {
   }
 }
 
-// জেমিনি এআই এপিআই কল করার ফাংশন (সঠিক মডেলসহ)
+// জেমিনি এআই এপিআই কল করার ফাংশন
 async function fetchGeminiAiResponse(prompt) {
   if (!GEMINI_API_KEY || GEMINI_API_KEY === "YOUR_GEMINI_API_KEY_HERE") {
     return generateLocalAiResponse(prompt);
@@ -174,12 +174,16 @@ async function fetchGeminiAiResponse(prompt) {
     })
   });
 
-  const data = await response.json();
+  const data = andSafeJson(response);
   if (data && data.candidates && data.candidates[0].content.parts[0].text) {
     return data.candidates[0].content.parts[0].text.trim();
   } else {
     throw new Error('Invalid API response');
   }
+}
+
+async function andSafeJson(response) {
+  return await response.json();
 }
 
 // লোকাল ফলব্যাক রেসপন্স
