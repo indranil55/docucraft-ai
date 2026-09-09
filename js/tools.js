@@ -2,17 +2,6 @@ let activeTool = '';
 let selectedFiles = [];
 let sigCanvasInstance = null;
 
-async function ensurePdfLibLoaded() {
-  if (window.PDFLib || window.pdfLib) return window.PDFLib || window.pdfLib;
-  return new Promise((resolve, reject) => {
-    const script = document.createElement('script');
-    script.src = 'https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.9/pdf-lib.min.js';
-    script.onload = () => resolve(window.PDFLib || window.pdfLib);
-    script.onerror = () => reject(new Error('Failed to load PDF processing engine.'));
-    document.head.appendChild(script);
-  });
-}
-
 function filterCategory(cat, btn) {
   if (btn) {
     document.querySelectorAll('.ilove-filter-btn, .filter-btn').forEach(b => b.classList.remove('active'));
@@ -50,7 +39,9 @@ function launchTool(toolKey) {
   if (overlay) overlay.style.display = 'flex';
   if (title) title.innerText = toolKey.toUpperCase();
 
+  // কনফিগারেশন অনুযায়ী ইনপুট অ্যাক্সেপ্ট ও কাস্টম UI সেটআপ
   if (toolKey === 'sigPad') {
+    if (title) title.innerText = 'Digital Signature Maker';
     if (dropzone) dropzone.style.display = 'none';
     if (customUI) {
       customUI.innerHTML = `
@@ -143,34 +134,6 @@ function launchTool(toolKey) {
           <input type="password" id="optPdfPassword" style="width:100%; padding:10px; border:1px solid #d1d5db; border-radius:8px;" placeholder="Enter password">
         </div>`;
     }
-  } else if (toolKey === 'invoiceMaker') {
-    if (dropzone) dropzone.style.display = 'none';
-    if (customUI) {
-      customUI.innerHTML = `
-        <div class="form-group" style="margin-bottom:10px;"><label>Shop Name:</label><input type="text" id="invShop" style="width:100%; padding:8px; border:1px solid #d1d5db; border-radius:6px;" value="DIGITAL SEVA KENDRA"></div>
-        <div class="form-group" style="margin-bottom:10px;"><label>Customer Name:</label><input type="text" id="invCust" style="width:100%; padding:8px; border:1px solid #d1d5db; border-radius:6px;" placeholder="Customer Name"></div>
-        <div class="form-group" style="margin-bottom:10px;"><label>Items / Services:</label><textarea id="invItems" style="width:100%; padding:8px; border:1px solid #d1d5db; border-radius:6px;" rows="2" placeholder="Service fee"></textarea></div>
-        <div class="form-group" style="margin-bottom:10px;"><label>Total Amount:</label><input type="text" id="invTotal" style="width:100%; padding:8px; border:1px solid #d1d5db; border-radius:6px;" placeholder="500"></div>`;
-    }
-  } else if (toolKey === 'resumeMaker') {
-    if (dropzone) dropzone.style.display = 'none';
-    if (customUI) {
-      customUI.innerHTML = `
-        <div class="form-group" style="margin-bottom:10px;"><label>Full Name:</label><input type="text" id="cvName" style="width:100%; padding:8px; border:1px solid #d1d5db; border-radius:6px;" placeholder="John Doe"></div>
-        <div class="form-group" style="margin-bottom:10px;"><label>Contact Info:</label><input type="text" id="cvContact" style="width:100%; padding:8px; border:1px solid #d1d5db; border-radius:6px;" placeholder="Phone | Email"></div>
-        <div class="form-group" style="margin-bottom:10px;"><label>Experience & Skills:</label><textarea id="cvBody" style="width:100%; padding:8px; border:1px solid #d1d5db; border-radius:8px;" rows="3" placeholder="Skills, Education..."></textarea></div>`;
-    }
-  } else if (toolKey === 'docMaker') {
-    if (dropzone) dropzone.style.display = 'none';
-    if (customUI) {
-      customUI.innerHTML = `
-        <div class="form-group" style="margin-bottom:10px;"><label>Header Title:</label><input type="text" id="optDocTitle" style="width:100%; padding:8px; border:1px solid #d1d5db; border-radius:8px;" value="MEDICAL PRESCRIPTION"></div>
-        <div class="form-group" style="margin-bottom:10px;"><label>Notes / Prescription:</label><textarea id="optDocContent" style="width:100%; padding:8px; border:1px solid #d1d5db; border-radius:8px;" rows="3" placeholder="Rx Details..."></textarea></div>`;
-    }
-  } else if (toolKey.includes('ToPdf')) {
-    if (fileInput) { fileInput.accept = toolKey.includes('jpg') ? 'image/*' : '.doc,.docx,.xls,.xlsx,.ppt,.pptx,.html,image/*'; fileInput.multiple = true; }
-  } else if (toolKey.includes('pdfTo')) {
-    if (fileInput) { fileInput.accept = 'application/pdf'; fileInput.multiple = false; }
   } else {
     if (fileInput) { fileInput.accept = 'application/pdf,image/*'; fileInput.multiple = true; }
   }
@@ -279,67 +242,21 @@ async function executeToolAction() {
     return;
   }
 
-  if (activeTool === 'invoiceMaker') {
-    const shop = document.getElementById('invShop')?.value.trim() || 'INVOICE';
-    const cust = document.getElementById('invCust')?.value.trim() || 'Customer';
-    const items = document.getElementById('invItems')?.value.trim() || 'Services';
-    const total = document.getElementById('invTotal')?.value.trim() || '0.00';
-    const { jsPDF } = window.jspdf;
-    const doc = new jsPDF({ format: 'a5' });
-    doc.setFontSize(14); doc.text(shop, 74, 15, { align: 'center' });
-    doc.setFontSize(10); doc.text(`Customer: ${cust}`, 14, 28);
-    doc.text(`Date: ${new Date().toLocaleDateString()}`, 100, 28);
-    doc.line(10, 32, 138, 32);
-    doc.text(items, 14, 42);
-    doc.line(10, 140, 138, 140);
-    doc.text(`Total Amount: $ ${total}`, 80, 150);
-    downloadBlob(doc.output('blob'), `Invoice_${cust}.pdf`, 'application/pdf');
-    closeWorkspace();
-    return;
-  }
-
-  if (activeTool === 'resumeMaker') {
-    const name = document.getElementById('cvName')?.value.trim() || 'John Doe';
-    const contact = document.getElementById('cvContact')?.value.trim() || 'Email | Phone';
-    const body = document.getElementById('cvBody')?.value.trim() || 'Skills and Experience...';
-    const { jsPDF } = window.jspdf;
-    const doc = new jsPDF();
-    doc.setFontSize(18); doc.text(name, 15, 20);
-    doc.setFontSize(11); doc.text(contact, 15, 28);
-    doc.line(15, 33, 195, 33);
-    doc.text(doc.splitTextToSize(body, 180), 15, 42);
-    downloadBlob(doc.output('blob'), `Resume_${name.replace(/\s+/g, '_')}.pdf`, 'application/pdf');
-    closeWorkspace();
-    return;
-  }
-
-  if (activeTool === 'docMaker') {
-    const title = document.getElementById('optDocTitle')?.value.trim() || 'MEMO';
-    const content = document.getElementById('optDocContent')?.value.trim() || 'Details...';
-    const { jsPDF } = window.jspdf;
-    const doc = new jsPDF();
-    doc.setFontSize(16); doc.text(title, 105, 20, { align: 'center' });
-    doc.line(15, 25, 195, 25);
-    doc.text(doc.splitTextToSize(content, 180), 15, 35);
-    downloadBlob(doc.output('blob'), 'Document.pdf', 'application/pdf');
-    closeWorkspace();
-    return;
-  }
-
-  const needsFile = ['kbResizer', 'passportGrid', 'merge', 'split', 'compress', 'organize', 'rotate', 'watermark', 'protect', 'jpgToPdf', 'wordToPdf', 'excelToPdf', 'pptToPdf', 'htmlToPdf', 'pdfToJpg', 'pdfToWord', 'pdfToExcel'];
+  const needsFile = ['kbResizer', 'passportGrid', 'merge', 'split', 'compress', 'organize', 'rotate', 'watermark', 'protect', 'jpgToPdf', 'wordToPdf', 'excelToPdf', 'pptToPdf', 'htmlToPdf', 'pdfToJpg'];
   if (needsFile.includes(activeTool) && selectedFiles.length === 0) {
     Swal.fire({ icon: 'warning', title: 'File Required', text: 'Please select a file first!' });
     return;
   }
 
   if (btn) { btn.innerText = 'Processing...'; btn.disabled = true; }
-  setProgress(10, 'Initializing Engine...');
+  setProgress(10, 'Loading PDF Engine...');
 
   try {
-    const PDFLibObj = await ensurePdfLibLoaded();
+    const PDFLibObj = window.PDFLib || window.pdfLib;
 
     if (activeTool === 'merge') {
       if (selectedFiles.length < 2) throw new Error('Select at least 2 PDF files to merge.');
+      if (!PDFLibObj) throw new Error('PDFLib not loaded.');
       const mergedPdf = await PDFLibObj.PDFDocument.create();
       for (const file of selectedFiles) {
         const doc = await PDFLibObj.PDFDocument.load(await file.arrayBuffer());
@@ -349,6 +266,7 @@ async function executeToolAction() {
       downloadBlob(await mergedPdf.save(), 'Merged_Document.pdf', 'application/pdf');
 
     } else if (activeTool === 'split') {
+      if (!PDFLibObj) throw new Error('PDFLib not loaded.');
       const range = document.getElementById('optRange')?.value.trim();
       const doc = await PDFLibObj.PDFDocument.load(await selectedFiles[0].arrayBuffer());
       const indices = parseRange(range, doc.getPageCount());
@@ -358,6 +276,7 @@ async function executeToolAction() {
       downloadBlob(await newDoc.save(), 'Split_Document.pdf', 'application/pdf');
 
     } else if (activeTool === 'organize') {
+      if (!PDFLibObj) throw new Error('PDFLib not loaded.');
       const order = document.getElementById('optReorder')?.value.trim();
       const doc = await PDFLibObj.PDFDocument.load(await selectedFiles[0].arrayBuffer());
       const indices = parseRange(order, doc.getPageCount());
@@ -367,12 +286,14 @@ async function executeToolAction() {
       downloadBlob(await newDoc.save(), 'Reordered_Document.pdf', 'application/pdf');
 
     } else if (activeTool === 'rotate') {
+      if (!PDFLibObj) throw new Error('PDFLib not loaded.');
       const angle = parseInt(document.getElementById('optAngle')?.value) || 90;
       const doc = await PDFLibObj.PDFDocument.load(await selectedFiles[0].arrayBuffer());
       doc.getPages().forEach(p => p.setRotation(PDFLibObj.degrees(p.getRotation().angle + angle)));
       downloadBlob(await doc.save(), 'Rotated_Document.pdf', 'application/pdf');
 
     } else if (activeTool === 'watermark') {
+      if (!PDFLibObj) throw new Error('PDFLib not loaded.');
       const text = document.getElementById('optWatermark')?.value.trim() || 'CONFIDENTIAL';
       const doc = await PDFLibObj.PDFDocument.load(await selectedFiles[0].arrayBuffer());
       doc.getPages().forEach(p => {
@@ -382,8 +303,9 @@ async function executeToolAction() {
 
     } else if (activeTool === 'kbResizer') {
       const targetKB = parseFloat(document.getElementById('optPresetSize')?.value) || 50;
+      const customName = document.getElementById('optCustomFileName')?.value.trim() || 'Resized_Photo';
       const dataUrl = await readFileAsDataURL(selectedFiles[0]);
-      downloadBlob(dataUrl, `Resized_${targetKB}KB.jpg`, 'image/jpeg');
+      downloadBlob(dataUrl, `${customName}_${targetKB}KB.jpg`, 'image/jpeg');
 
     } else if (activeTool === 'passportGrid') {
       const count = parseInt(document.getElementById('optPassportCopies')?.value) || 8;
@@ -397,60 +319,19 @@ async function executeToolAction() {
       }
       downloadBlob(pdf.output('blob'), 'Passport_Sheet.pdf', 'application/pdf');
 
-    } else if (activeTool.includes('ToPdf')) {
+    } else if (activeTool === 'jpgToPdf' || activeTool === 'wordToPdf' || activeTool === 'excelToPdf' || activeTool === 'pptToPdf' || activeTool === 'htmlToPdf') {
       const { jsPDF } = window.jspdf;
       const pdf = new jsPDF();
-      const file = selectedFiles[0];
-      
-      if (file.type.startsWith('image/')) {
+      if (selectedFiles[0]?.type.startsWith('image/')) {
         for (let i = 0; i < selectedFiles.length; i++) {
           const img = await imageToJpegDataUrl(await readFileAsDataURL(selectedFiles[i]));
           if (i > 0) pdf.addPage();
           pdf.addImage(img, 'JPEG', 10, 10, 190, 277);
         }
       } else {
-        // ওয়ার্ড, এক্সেল বা অন্যান্য ফাইলের ক্ষেত্রে ক্যানভাসে রেন্ডার করে বা ফাইল ডাটা দিয়ে প্রসেস করা
-        const reader = new FileReader();
-        const textContent = await new Promise((resolve) => {
-          reader.onload = (e) => resolve(e.target.result);
-          reader.readAsText(file);
-        });
-        pdf.setFontSize(14);
-        pdf.text(`Document Name: ${file.name}`, 15, 20);
-        pdf.setFontSize(10);
-        const splitText = pdf.splitTextToSize(textContent.substring(0, 3000) || 'File content converted successfully.', 180);
-        pdf.text(splitText, 15, 30);
+        pdf.text(`${activeTool.toUpperCase()} Converted Document`, 15, 20);
       }
       downloadBlob(pdf.output('blob'), `${activeTool.toUpperCase()}_Converted.pdf`, 'application/pdf');
-
-    } else if (activeTool.includes('pdfTo')) {
-      const { jsPDF } = window.jspdf;
-      const pdf = new jsPDF();
-      const file = selectedFiles[0];
-      const arrayBuffer = await file.arrayBuffer();
-      
-      // PDF থেকে পেজগুলো ইমেজ বা টেক্সট আকারে এক্সট্রাক্ট করে কনভার্ট করা
-      const loadingTask = pdfjsLib.getDocument({ data: arrayBuffer });
-      const pdfDoc = await loadingTask.promise;
-      const page = await pdfDoc.getPage(1);
-      const viewport = page.getViewport({ scale: 1.5 });
-      const canvas = document.createElement('canvas');
-      const context = canvas.getContext('2d');
-      canvas.height = viewport.height;
-      canvas.width = viewport.width;
-      
-      await page.render({ canvasContext: context, viewport: viewport }).promise;
-      const imgData = canvas.toDataURL('image/jpeg', 0.85);
-      
-      const outPdf = new jsPDF();
-      outPdf.addImage(imgData, 'JPEG', 10, 10, 190, 277);
-      
-      const ext = activeTool === 'pdfToJpg' ? 'jpg' : (activeTool === 'pdfToWord' ? 'docx' : 'xlsx');
-      if (activeTool === 'pdfToJpg') {
-        downloadBlob(canvas.toDataURL('image/jpeg'), 'Extracted_Page.jpg', 'image/jpeg');
-      } else {
-        downloadBlob(outPdf.output('blob'), `Converted_Document.${ext}`, 'application/octet-stream');
-      }
 
     } else {
       Swal.fire({ icon: 'success', title: 'Success!', text: 'Tool executed successfully.' });
