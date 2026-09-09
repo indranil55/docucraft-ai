@@ -1,6 +1,6 @@
 // DocuCraft AI - Real AI Powered Assistant (Google Gemini AI Integration + Voice & Multi-language)
 
-// আপনার জেমিনি এআই এপিআই কী (Gemini API Key) এখানে নিরাপদভাবে বসাবেন বা পরবর্তীতে ইনপুট নেবেন।
+// কখনোই কোডের ভেতর সরাসরি রিয়েল এপিআই কি রাখবেন না। নিরাপদ রাখতে "YOUR_GEMINI_API_KEY_HERE" রাখুন।
 const GEMINI_API_KEY = "YOUR_GEMINI_API_KEY_HERE"; 
 
 const aiKnowledge = {
@@ -17,7 +17,7 @@ const aiKnowledge = {
     placeholder: "यहाँ अपना प्रश्न लिखें..."
   },
   bn: {
-    welcome: "নমস্কার! আমি DocuCraft AI। আমাদের টুলস, সাইজ, পিডিএফ বা যেকোনো বিষয়ে আমাকে প্রশ্ন করতে পারেন।",
+    welcome: "নমস্কার! আমি DocuCraft AI। আমাদের টুলস, সাইজ, পিডিএফ বা যেকোনো বিষয়ে আমাকে প্রশ্ন করতে পারেন।",
     default: "আমি DocuCraft AI, আপনার স্মার্ট অ্যাসিস্ট্যান্ট! KB/MB Photo Resizer, Passport Photo Sheet, Digital Signature, PDF Tools কিংবা যেকোনো সাধারণ প্রশ্ন বা তথ্যের উত্তর আমি দিতে পারি।",
     listening: "🎙️ শুনছি... কথা বলুন স্পষ্ট করে",
     placeholder: "এখানে আপনার প্রশ্ন লিখুন..."
@@ -27,7 +27,7 @@ const aiKnowledge = {
 let isVoiceActive = true;
 let currentLang = 'bn';
 
-// পেজ লোড হওয়ার সাথে সাথে চ্যাট উইন্ডো তৈরি করা
+// পেজ লোড হওয়ার সাথে সাথে চ্যাট উইন্ডো তৈরি করা
 document.addEventListener('DOMContentLoaded', () => {
   if (document.getElementById('autoAiModal')) return;
 
@@ -54,7 +54,7 @@ document.addEventListener('DOMContentLoaded', () => {
       </div>
     </div>
 
-    <!-- ডায়নামিক ভয়েস স্ট্যাটাস বার -->
+    <!-- ডায়নামিক ভয়েস স্ট্যাটাস বার -->
     <div id="voiceStatusBar" style="display: none; background: #e0f2fe; color: #0369a1; padding: 6px 12px; font-size: 12px; font-weight: 600; text-align: center; border-bottom: 1px solid #bae6fd;">
       ${aiKnowledge.bn.listening}
     </div>
@@ -109,7 +109,7 @@ function changeAiLanguage(lang) {
   speakText(langData.welcome);
 }
 
-// ভয়েস আউটপুট 
+// ভয়েস আউটপুট 
 function speakText(text) {
   if (!isVoiceActive || !('speechSynthesis' in window)) return;
   window.speechSynthesis.cancel();
@@ -174,16 +174,12 @@ async function fetchGeminiAiResponse(prompt) {
     })
   });
 
-  const data = andSafeJson(response);
+  const data = await response.json();
   if (data && data.candidates && data.candidates[0].content.parts[0].text) {
     return data.candidates[0].content.parts[0].text.trim();
   } else {
     throw new Error('Invalid API response');
   }
-}
-
-async function andSafeJson(response) {
-  return await response.json();
 }
 
 // লোকাল ফলব্যাক রেসপন্স
@@ -219,7 +215,7 @@ function removeAiMessage(id) {
   if (el) el.remove();
 }
 
-// ভয়েস ইনপুট ও লাইভ স্ট্যাটাস বার হ্যান্ডলার
+// ভয়েস ইনপুট ও লাইভ স্ট্যাটাস বার হ্যান্ডলার
 function startVoiceInput() {
   const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
   if (!SpeechRecognition) {
