@@ -185,10 +185,18 @@ async function handleAuthSubmit() {
   }
 }
 
-// হোমপেজের টুলগুলোতে ক্লিক করার সময় লগইন চেক এবং টুলের নাম মনে রাখার ফাংশন
+// হোমপেজের টুলগুলোতে ক্লিক করার সময় অটো-লগইন চেক এবং টুলের নাম মনে রাখার ফাংশন
 function checkUserAccess(toolName, event) {
   const loggedUser = sessionStorage.getItem('docuCraft_logged_in_user');
-  if (!loggedUser) {
+  const savedEmail = localStorage.getItem('docuCraft_user_email');
+
+  // যদি সেশন খালি থাকে কিন্তু লোকাল স্টোরেজে একাউন্ট থাকে, তবে অটোমেটিক লগইন বজায় রাখা হবে
+  if (!loggedUser && savedEmail) {
+    sessionStorage.setItem('docuCraft_logged_in_user', savedEmail);
+  }
+
+  const activeUser = sessionStorage.getItem('docuCraft_logged_in_user');
+  if (!activeUser) {
     if (event) {
       event.preventDefault();
       event.stopPropagation();
