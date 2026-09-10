@@ -5,12 +5,19 @@ let isResetMode = false;
 const GOOGLE_SHEET_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbw7ypSy3VkabsXyc0aiDStAC7xCsEW5Xks-OPGa9SUmpDIlgaXidHT7jC56cQlw-LpXsw/exec";
 
 function openAuthModal() {
-  document.getElementById('authModal').style.display = 'flex';
-  setTimeout(() => document.getElementById('authEmail').focus(), 200);
+  const modal = document.getElementById('authModal');
+  if (modal) modal.style.display = 'flex';
+  document.body.classList.add('modal-open'); // পপআপ খুললে পেছনের ব্যাকগ্রাউন্ড লক
+  setTimeout(() => {
+    const emailInput = document.getElementById('authEmail');
+    if (emailInput) emailInput.focus();
+  }, 200);
 }
 
 function closeAuthModal() {
-  document.getElementById('authModal').style.display = 'none';
+  const modal = document.getElementById('authModal');
+  if (modal) modal.style.display = 'none';
+  document.body.classList.remove('modal-open'); // পপআপ বন্ধ করলে স্ক্রোল চালু
   resetAuthFormState();
 }
 
@@ -192,7 +199,10 @@ async function handleAuthSubmit() {
   }
 }
 
-// গেট চেক করার ফাস্ট ফাংশন (localStorage ব্যবহার করায় আর বারবার পাসওয়ার্ড লাগবে না)
+// -----------------------------------------------------------------
+// মূল পরিবর্তন: ইউজার হোমপেজ ও সব টুলস দেখতে পাবে, কিন্তু যেকোনো টুলে 
+// ক্লিক করলেই গেট বা লগইন পপআপ আটকে ধরবে।
+// -----------------------------------------------------------------
 function checkUserAccess(toolName, event) {
   const loggedUser = localStorage.getItem('docuCraft_logged_in_user');
   if (!loggedUser) {
@@ -201,7 +211,7 @@ function checkUserAccess(toolName, event) {
       event.stopPropagation();
     }
     sessionStorage.setItem('pending_tool', toolName);
-    openAuthModal();
+    openAuthModal(); // এখানে ইউজার যখনই টুলে হাত দিবে তখনই গেট আটকাবে
     return false;
   }
   return true;
