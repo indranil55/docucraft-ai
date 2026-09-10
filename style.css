@@ -28,6 +28,14 @@ body {
   -webkit-overflow-scrolling: touch;
 }
 
+/* পপআপ বা গেট খোলার সময় পেছনের ব্যাকগ্রাউন্ড ও সুড়ঙ্গ পুরোপুরি লক করার জন্য */
+body.modal-open {
+  overflow: hidden !important;
+  position: fixed !important;
+  width: 100% !important;
+  height: 100% !important;
+}
+
 header {
   background: var(--bg-surface);
   border-bottom: 1px solid var(--border-subtle);
@@ -77,26 +85,6 @@ header {
   display: flex;
   align-items: center;
   gap: 8px;
-}
-
-.ai-btn-top {
-  background: linear-gradient(135deg, #1d4ed8, #7c3aed, #e11d48);
-  color: #ffffff;
-  border: none;
-  padding: 7px 14px;
-  border-radius: 9999px;
-  font-weight: 700;
-  font-size: 12px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 7px;
-  box-shadow: 0 2px 10px rgba(124, 58, 237, 0.35);
-  transition: transform 0.15s ease;
-}
-
-.ai-btn-top:active {
-  transform: scale(0.96);
 }
 
 .auth-icon-btn {
@@ -259,7 +247,7 @@ header {
   inset: 0;
   background: rgba(15, 23, 42, 0.65);
   backdrop-filter: blur(4px);
-  z-index: 1000;
+  z-index: 5000;
   display: none;
   align-items: flex-end;
   justify-content: center;
@@ -413,12 +401,23 @@ header {
   outline: none;
 }
 
+/* লগইন পপআপ বা গেট যেন সবসময় সবার ওপরে একদম ফিক্সড থাকে */
+#authModal {
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: 999999 !important;
+  overflow-y: auto !important;
+  background: rgba(15, 23, 42, 0.85) !important;
+  backdrop-filter: blur(6px) !important;
+}
+
+/* AI চ্যাট মডাল যেন লগইন পপআপের নিচে থাকে */
 #smartAiChatModal {
   position: fixed;
   inset: 0;
   background: rgba(15, 23, 42, 0.75);
   backdrop-filter: blur(6px);
-  z-index: 9999;
+  z-index: 9999 !important;
   display: none;
   align-items: flex-end;
   justify-content: center;
