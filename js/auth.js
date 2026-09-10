@@ -1,7 +1,7 @@
 let isSignUpMode = false;
 
 // আপনার গুগল শিটের সাথে সংযুক্ত সঠিক Web App URL এখানে বসানো হয়েছে
-const GOOGLE_SHEET_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbz.../exec"; // আপনার তৈরি করা ডিপ্লয়মেন্ট ইউআরএল এখানে থাকবে
+const GOOGLE_SHEET_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbw7ypSy3VkabsXyc0aiDStAC7xCsEW5Xks-OPGa9SUmpDIlgaXidHT7jC56cQlw-LpXsw/exec";
 
 function openAuthModal() {
   document.getElementById('authModal').style.display = 'flex';
@@ -17,6 +17,26 @@ function toggleAuthMode() {
   document.getElementById('authTitle').innerText = isSignUpMode ? 'Create Account (Sign Up)' : 'User Login';
   document.getElementById('authSubmitBtn').innerText = isSignUpMode ? 'Register' : 'Login';
   document.getElementById('authToggleText').innerText = isSignUpMode ? 'Already have an account?' : "Don't have an account?";
+}
+
+// পাসওয়ার্ড দেখতে পাওয়ার জন্য টগল ফাংশন
+function togglePasswordVisibility() {
+  const passInput = document.getElementById('authPassword');
+  const eyeIcon = document.getElementById('eyeIcon');
+  if (!passInput) return;
+  if (passInput.type === 'password') {
+    passInput.type = 'text';
+    if (eyeIcon) {
+      eyeIcon.classList.remove('fa-eye');
+      eyeIcon.classList.add('fa-eye-slash');
+    }
+  } else {
+    passInput.type = 'password';
+    if (eyeIcon) {
+      eyeIcon.classList.remove('fa-eye-slash');
+      eyeIcon.classList.add('fa-eye');
+    }
+  }
 }
 
 async function handleAuthSubmit() {
