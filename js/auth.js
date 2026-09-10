@@ -175,7 +175,7 @@ async function handleAuthSubmit() {
     const ok = timingSafeEqual(hash, base64ToBytes(savedHash));
 
     if (ok) {
-      // লোকাল স্টোরেজে স্থায়ীভাবে গেট আনলক করে রাখা (যাতে পরবর্তীতে আসলে আর বারবার গেট খুলতে না হয়)
+      // লোকাল স্টোরেজে স্থায়ীভাবে গেট আনলক করে রাখা
       localStorage.setItem('docuCraft_logged_in_user', email);
       await sendDataToGoogleSheet(email, 'Login');
 
