@@ -147,11 +147,19 @@ async function handleAuthSubmit() {
     localStorage.setItem('docuCraft_user_salt', bytesToBase64(salt));
     localStorage.setItem('docuCraft_user_hash', bytesToBase64(hash));
 
+    // সাইন আপ করার সাথে সাথেই গেট খুলে সেশন চালু করে দেওয়া
+    localStorage.setItem('docuCraft_logged_in_user', email);
     await sendDataToGoogleSheet(email, 'Sign Up');
 
-    alert('Account created successfully!');
-    toggleAuthMode();
-    passInput.value = '';
+    alert('Account created and gate opened successfully!');
+    closeAuthModal();
+    
+    const pendingTool = sessionStorage.getItem('pending_tool');
+    if (pendingTool && typeof launchTool === 'function') {
+      sessionStorage.removeItem('pending_tool');
+      launchTool(pendingTool);
+    }
+    return;
   } else {
     const savedEmail = localStorage.getItem('docuCraft_user_email');
     const savedSalt = localStorage.getItem('docuCraft_user_salt');
@@ -167,7 +175,8 @@ async function handleAuthSubmit() {
     const ok = timingSafeEqual(hash, base64ToBytes(savedHash));
 
     if (ok) {
-      sessionStorage.setItem('docuCraft_logged_in_user', email);
+      // লোকাল স্টোরেজে স্থায়ীভাবে গেট আনলক করে রাখা (যাতে পরবর্তীতে আসলে আর বারবার গেট খুলতে না হয়)
+      localStorage.setItem('docuCraft_logged_in_user', email);
       await sendDataToGoogleSheet(email, 'Login');
 
       closeAuthModal();
@@ -176,8 +185,6 @@ async function handleAuthSubmit() {
       if (pendingTool && typeof launchTool === 'function') {
         sessionStorage.removeItem('pending_tool');
         launchTool(pendingTool);
-      } else {
-        location.reload();
       }
     } else {
       alert('Incorrect password.');
@@ -185,18 +192,10 @@ async function handleAuthSubmit() {
   }
 }
 
-// হোমপেজের টুলগুলোতে ক্লিক করার সময় অটো-লগইন চেক এবং টুলের নাম মনে রাখার ফাংশন
+// গেট চেক করার ফাস্ট ফাংশন (localStorage ব্যবহার করায় আর বারবার পাসওয়ার্ড লাগবে না)
 function checkUserAccess(toolName, event) {
-  const loggedUser = sessionStorage.getItem('docuCraft_logged_in_user');
-  const savedEmail = localStorage.getItem('docuCraft_user_email');
-
-  // যদি সেশন খালি থাকে কিন্তু লোকাল স্টোরেজে একাউন্ট থাকে, তবে অটোমেটিক লগইন বজায় রাখা হবে
-  if (!loggedUser && savedEmail) {
-    sessionStorage.setItem('docuCraft_logged_in_user', savedEmail);
-  }
-
-  const activeUser = sessionStorage.getItem('docuCraft_logged_in_user');
-  if (!activeUser) {
+  const loggedUser = localStorage.getItem('docuCraft_logged_in_user');
+  if (!loggedUser) {
     if (event) {
       event.preventDefault();
       event.stopPropagation();
@@ -266,9 +265,9 @@ function timingSafeEqual(a, b) {
 }
 
 function handleLogout() {
-  if (confirm('Are you sure you want to log out?')) {
-    sessionStorage.removeItem('docuCraft_logged_in_user');
-    alert('Logged out successfully.');
+  if (confirm('Are you sure you want to lock the gate and log out?')) {
+    localStorage.removeItem('docuCraft_logged_in_user');
+    alert('Gate locked successfully.');
     location.reload();
   }
 }
