@@ -88,23 +88,35 @@ async function handleAuthSubmit() {
     if (ok) {
       sessionStorage.setItem('docuCraft_logged_in_user', email);
       
-      // গুগল শিটে ডেটা পাঠিয়ে দ্রুত পেজ রিলোড নিশ্চিত করা
+      // গুগল শিটে ডেটা পাঠানো
       await sendDataToGoogleSheet(email, 'Login');
 
       closeAuthModal();
-      location.reload();
+      
+      // ইউজার লগইন করার আগে যে টুলে ক্লিক করেছিল, লগইন হওয়ার সাথে সাথে সেটি অটোমেটিক ওপেন হয়ে যাবে
+      const pendingTool = sessionStorage.getItem('pending_tool');
+      if (pendingTool && typeof launchTool === 'function') {
+        sessionStorage.removeItem('pending_tool');
+        launchTool(pendingTool);
+      } else {
+        location.reload();
+      }
     } else {
       alert('Incorrect email or password.');
     }
   }
 }
 
-// হোমপেজের টুলগুলোতে ক্লিক করার সময় লগইন চেক করার ফাংশন
-function checkUserAccess(event) {
+// হোমপেজের টুলগুলোতে ক্লিক করার সময় লগইন চেক এবং টুলের নাম মনে রাখার ফাংশন
+function checkUserAccess(toolName, event) {
   const loggedUser = sessionStorage.getItem('docuCraft_logged_in_user');
   if (!loggedUser) {
-    if (event) event.preventDefault();
-    alert('Please login or register first to use the tools.');
+    if (event) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
+    // ইউজার যে টুলে ঢুকতে চেয়েছিল তা সেভ করে রাখা হলো
+    sessionStorage.setItem('pending_tool', toolName);
     openAuthModal();
     return false;
   }
