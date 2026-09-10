@@ -28,7 +28,7 @@ body {
   -webkit-overflow-scrolling: touch;
 }
 
-/* পপআপ বা গেট খোলার সময় পেছনের ব্যাকগ্রাউন্ড ও সুড়ঙ্গ পুরোপুরি লক করার জন্য */
+/* পপআপ বা গেট খোলার সময় পেছনের ব্যাকগ্রাউন্ড লক করার জন্য */
 body.modal-open {
   overflow: hidden !important;
   position: fixed !important;
@@ -411,7 +411,7 @@ header {
   backdrop-filter: blur(6px) !important;
 }
 
-/* AI চ্যাট মডাল যেন লগইন পপআপের নিচে থাকে এবং মোবাইলে কিবোর্ডের সাথে ফিক্সড থাকে */
+/* AI চ্যাট মডাল এবং চ্যাট কার্ড (টাইপ করার সময় স্বাভাবিক অবস্থায় থাকার জন্য) */
 #smartAiChatModal {
   position: fixed;
   inset: 0;
@@ -431,13 +431,14 @@ header {
 }
 
 .ai-chat-card {
-  position: fixed !important;
-  bottom: 0 !important;
-  left: 50% !important;
-  transform: translateX(-50%) !important;
+  position: relative !important;
+  bottom: auto !important;
+  left: auto !important;
+  transform: none !important;
   background: #ffffff;
   width: 100%;
   max-width: 540px;
+  height: 75vh;
   height: 75dvh;
   max-height: 500px;
   border-radius: 24px 24px 0 0;
@@ -450,9 +451,6 @@ header {
 
 @media (min-width: 640px) {
   .ai-chat-card {
-    position: relative !important;
-    transform: none !important;
-    left: auto !important;
     border-radius: 20px;
     height: 600px;
   }
