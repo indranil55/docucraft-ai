@@ -18,48 +18,36 @@
   <link rel="stylesheet" href="style.css">
 
   <style>
-    /* হেডার এবং সার্চ বক্স ডিজাইন */
+    /* হেডার এবং লোগো স্টাইল */
     .nav-container {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      flex-wrap: wrap;
-      gap: 12px;
+      padding: 12px 20px;
     }
     .brand-logo-svg {
       display: flex;
       align-items: center;
       text-decoration: none;
     }
-    .header-search-box {
+    /* ডানপাশের ইউজার অ্যাকাউন্ট বাটন */
+    .auth-icon-btn {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      background: #10B981;
+      border: none;
       display: flex;
       align-items: center;
-      background: #f1f5f9;
-      border: 1.5px solid #cbd5e1;
-      border-radius: 24px;
-      padding: 6px 14px;
-      width: 100%;
-      max-width: 280px;
-      transition: all 0.3s ease;
+      justify-content: center;
+      color: #ffffff;
+      font-size: 16px;
+      cursor: pointer;
+      box-shadow: 0 2px 6px rgba(16, 185, 129, 0.3);
+      transition: transform 0.2s ease;
     }
-    .header-search-box:focus-within {
-      border-color: #DC2626;
-      background: #fff;
-      box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.15);
-    }
-    .header-search-box input {
-      border: none;
-      background: transparent;
-      outline: none;
-      width: 100%;
-      font-size: 13.5px;
-      font-family: 'Plus Jakarta Sans', sans-serif;
-      color: #0f172a;
-      margin-left: 8px;
-    }
-    .header-search-box i {
-      color: #64748b;
-      font-size: 14px;
+    .auth-icon-btn:hover {
+      transform: scale(1.05);
     }
   </style>
 
@@ -80,20 +68,20 @@
   <header>
     <div class="nav-container">
       <a href="#" class="brand-logo-svg">
-        <!-- প্রিমিয়াম লোগো -->
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 250 50" width="185" height="40" style="vertical-align: middle;">
+        <!-- প্রিমিয়াম লোগো (ম্যাজিক ওয়ান্ড + Docu Craft + AI ব্যাজ) -->
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 225 45" width="175" height="38" style="vertical-align: middle;">
           <g transform="translate(0, 2)">
-            <path d="M8 38L34 12" stroke="#DC2626" stroke-width="6" stroke-linecap="round"/>
-            <path d="M4 14C4 14 6.5 9 9 9C11.5 9 14 14 14 14C14 14 11.5 19 9 19C6.5 19 4 14 4 14Z" fill="#DC2626"/>
-            <path d="M28 34C28 34 30.5 29 33 29C35.5 29 38 34 38 34C38 34 35.5 39 33 39C30.5 39 28 34 28 34Z" fill="#DC2626"/>
-            <circle cx="16" cy="6" r="2" fill="#DC2626"/>
-            <circle cx="36" cy="23" r="2" fill="#DC2626"/>
+            <path d="M6 34L28 12" stroke="#DC2626" stroke-width="5.5" stroke-linecap="round"/>
+            <path d="M3 13C3 13 5 9 7 9C9 9 11 13 11 13C11 13 9 17 7 17C5 17 3 13 3 13Z" fill="#DC2626"/>
+            <path d="M23 27C23 27 25 23 27 23C29 23 31 27 31 27C31 27 29 31 27 31C25 31 23 27 23 27Z" fill="#DC2626"/>
+            <circle cx="13" cy="6" r="1.5" fill="#DC2626"/>
+            <circle cx="25" cy="19" r="1.5" fill="#DC2626"/>
           </g>
-          <text x="46" y="34" font-family="Plus Jakarta Sans, sans-serif" font-weight="800" font-size="24" fill="#0F172A">Docu</text>
-          <text x="108" y="34" font-family="Plus Jakarta Sans, sans-serif" font-weight="800" font-size="24" fill="#DC2626">Craft</text>
-          <g transform="translate(182, 10)">
-            <rect width="36" height="26" rx="8" fill="url(#aiGradientLogo)"/>
-            <text x="18" y="17.5" font-family="Plus Jakarta Sans, sans-serif" font-weight="700" font-size="13" fill="#FFFFFF" text-anchor="middle">AI</text>
+          <text x="38" y="31" font-family="Plus Jakarta Sans, sans-serif" font-weight="800" font-size="22" fill="#0F172A">Docu</text>
+          <text x="94" y="31" font-family="Plus Jakarta Sans, sans-serif" font-weight="800" font-size="22" fill="#DC2626">Craft</text>
+          <g transform="translate(158, 9)">
+            <rect width="32" height="23" rx="7" fill="url(#aiGradientLogo)"/>
+            <text x="16" y="15.5" font-family="Plus Jakarta Sans, sans-serif" font-weight="700" font-size="12" fill="#FFFFFF" text-anchor="middle">AI</text>
           </g>
           <defs>
             <linearGradient id="aiGradientLogo" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -104,13 +92,7 @@
         </svg>
       </a>
 
-      <!-- সার্চ বক্স (ম্যাগনিফাইং গ্লাস আইকনসহ) -->
-      <div class="header-search-box">
-        <i class="fa-solid fa-magnifying-glass"></i>
-        <input type="text" id="toolSearchInput" placeholder="Search tools (e.g., Merge, Resize)..." onkeyup="filterToolsBySearch()">
-      </div>
-
-      <!-- ইউজার লগইন বাটন (মানুষের আইকন) -->
+      <!-- ডানপাশে ইউজার অ্যাকাউন্ট বাটন (মানুষের আইকন) -->
       <div class="nav-actions">
         <button class="auth-icon-btn" onclick="openAuthModal()" title="Login / Sign Up" id="authNavBtn">
           <i class="fa-solid fa-user"></i>
@@ -460,23 +442,6 @@
       </div>
     </div>
   </footer>
-
-  <!-- লাইভ সার্চ ফিল্টার স্ক্রিপ্ট -->
-  <script>
-    function filterToolsBySearch() {
-      const query = document.getElementById('toolSearchInput').value.toLowerCase();
-      const cards = document.querySelectorAll('.tools-grid .tool-card');
-      cards.forEach(card => {
-        const title = card.querySelector('h3').innerText.toLowerCase();
-        const desc = card.querySelector('p').innerText.toLowerCase();
-        if (title.includes(query) || desc.includes(query)) {
-          card.style.display = 'flex';
-        } else {
-          card.style.display = 'none';
-        }
-      });
-    }
-  </script>
 
   <script src="js/auth.js"></script>
   <script src="js/ai-chat.js"></script>
