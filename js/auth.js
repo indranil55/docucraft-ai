@@ -1,6 +1,6 @@
 let isSignUpMode = false;
 
-// আপনার গুগল শিটের সাথে সংযুক্ত সঠিক Web App URL এখানে বসানো হয়েছে
+// আপনার গুগল শিটের সঠিক Web App URL
 const GOOGLE_SHEET_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbw7ypSy3VkabsXyc0aiDStAC7xCsEW5Xks-OPGa9SUmpDIlgaXidHT7jC56cQlw-LpXsw/exec";
 
 function openAuthModal() {
@@ -65,10 +65,10 @@ async function handleAuthSubmit() {
     localStorage.setItem('docuCraft_user_salt', bytesToBase64(salt));
     localStorage.setItem('docuCraft_user_hash', bytesToBase64(hash));
 
-    // গুগল শিটে ডেটা পাঠানোর ফাংশন কল করা হলো
-    sendDataToGoogleSheet(email, 'Sign Up');
+    // গুগল শিটে ডেটা পাঠানো
+    await sendDataToGoogleSheet(email, 'Sign Up');
 
-    alert('Account created on this device.');
+    alert('Account created successfully!');
     toggleAuthMode();
     passInput.value = '';
   } else {
@@ -88,10 +88,9 @@ async function handleAuthSubmit() {
     if (ok) {
       sessionStorage.setItem('docuCraft_logged_in_user', email);
       
-      // লগইন করার সময়ও গুগল শিটে ডেটা পাঠানো হচ্ছে
-      sendDataToGoogleSheet(email, 'Login');
+      // গুগল শিটে ডেটা পাঠিয়ে দ্রুত পেজ রিলোড নিশ্চিত করা
+      await sendDataToGoogleSheet(email, 'Login');
 
-      alert('Login successful! Welcome back.');
       closeAuthModal();
       location.reload();
     } else {
@@ -100,25 +99,39 @@ async function handleAuthSubmit() {
   }
 }
 
-// গুগল শিটে ডেটা পাঠানোর ব্যাকগ্রাউন্ড ফাংশন
-function sendDataToGoogleSheet(email, actionType) {
+// হোমপেজের টুলগুলোতে ক্লিক করার সময় লগইন চেক করার ফাংশন
+function checkUserAccess(event) {
+  const loggedUser = sessionStorage.getItem('docuCraft_logged_in_user');
+  if (!loggedUser) {
+    if (event) event.preventDefault();
+    alert('Please login or register first to use the tools.');
+    openAuthModal();
+    return false;
+  }
+  return true;
+}
+
+// গুগল শিটে ডেটা পাঠানোর ফাংশন (ফাস্ট ও সিকিউরড)
+async function sendDataToGoogleSheet(email, actionType) {
   if (!GOOGLE_SHEET_WEB_APP_URL || GOOGLE_SHEET_WEB_APP_URL.includes("YOUR_URL")) {
     return;
   }
 
-  fetch(GOOGLE_SHEET_WEB_APP_URL, {
-    method: 'POST',
-    mode: 'no-cors',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      email: email,
-      action: actionType
-    })
-  }).catch(err => {
+  try {
+    await fetch(GOOGLE_SHEET_WEB_APP_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        email: email,
+        action: actionType
+      })
+    });
+  } catch (err) {
     console.error('Google Sheet Error:', err);
-  });
+  }
 }
 
 async function derivePasswordHash(password, saltBytes) {
