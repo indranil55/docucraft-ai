@@ -1,5 +1,8 @@
 let isSignUpMode = false;
 
+// আপনার গুগল শিটের সাথে সংযুক্ত সঠিক Web App URL এখানে বসানো হয়েছে
+const GOOGLE_SHEET_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbz.../exec"; // আপনার তৈরি করা ডিপ্লয়মেন্ট ইউআরএল এখানে থাকবে
+
 function openAuthModal() {
   document.getElementById('authModal').style.display = 'flex';
   setTimeout(() => document.getElementById('authEmail').focus(), 200);
@@ -41,6 +44,10 @@ async function handleAuthSubmit() {
     localStorage.setItem('docuCraft_user_email', email);
     localStorage.setItem('docuCraft_user_salt', bytesToBase64(salt));
     localStorage.setItem('docuCraft_user_hash', bytesToBase64(hash));
+
+    // গুগল শিটে ডেটা পাঠানোর ফাংশন কল করা হলো
+    sendDataToGoogleSheet(email, 'Sign Up');
+
     alert('Account created on this device.');
     toggleAuthMode();
     passInput.value = '';
@@ -60,6 +67,10 @@ async function handleAuthSubmit() {
 
     if (ok) {
       sessionStorage.setItem('docuCraft_logged_in_user', email);
+      
+      // লগইন করার সময়ও গুগল শিটে ডেটা পাঠানো হচ্ছে
+      sendDataToGoogleSheet(email, 'Login');
+
       alert('Login successful! Welcome back.');
       closeAuthModal();
       location.reload();
@@ -67,6 +78,27 @@ async function handleAuthSubmit() {
       alert('Incorrect email or password.');
     }
   }
+}
+
+// গুগল শিটে ডেটা পাঠানোর ব্যাকগ্রাউন্ড ফাংশন
+function sendDataToGoogleSheet(email, actionType) {
+  if (!GOOGLE_SHEET_WEB_APP_URL || GOOGLE_SHEET_WEB_APP_URL.includes("YOUR_URL")) {
+    return;
+  }
+
+  fetch(GOOGLE_SHEET_WEB_APP_URL, {
+    method: 'POST',
+    mode: 'no-cors',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      email: email,
+      action: actionType
+    })
+  }).catch(err => {
+    console.error('Google Sheet Error:', err);
+  });
 }
 
 async function derivePasswordHash(password, saltBytes) {
