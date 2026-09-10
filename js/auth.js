@@ -1,4 +1,5 @@
 let isSignUpMode = false;
+let isResetMode = false;
 
 // আপনার গুগল শিটের সঠিক Web App URL
 const GOOGLE_SHEET_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbw7ypSy3VkabsXyc0aiDStAC7xCsEW5Xks-OPGa9SUmpDIlgaXidHT7jC56cQlw-LpXsw/exec";
@@ -10,13 +11,63 @@ function openAuthModal() {
 
 function closeAuthModal() {
   document.getElementById('authModal').style.display = 'none';
+  resetAuthFormState();
 }
 
 function toggleAuthMode() {
   isSignUpMode = !isSignUpMode;
-  document.getElementById('authTitle').innerText = isSignUpMode ? 'Create Account (Sign Up)' : 'User Login';
-  document.getElementById('authSubmitBtn').innerText = isSignUpMode ? 'Register' : 'Login';
-  document.getElementById('authToggleText').innerText = isSignUpMode ? 'Already have an account?' : "Don't have an account?";
+  isResetMode = false;
+  updateAuthModalUI();
+}
+
+function toggleResetMode() {
+  isResetMode = !isResetMode;
+  isSignUpMode = false;
+  updateAuthModalUI();
+}
+
+function updateAuthModalUI() {
+  const title = document.getElementById('authTitle');
+  const submitBtn = document.getElementById('authSubmitBtn');
+  const passwordGroup = document.getElementById('passwordGroup');
+  const toggleContainer = document.getElementById('authToggleContainer');
+
+  if (isResetMode) {
+    title.innerText = 'Reset Password';
+    submitBtn.innerText = 'Reset Password';
+    if (passwordGroup) passwordGroup.style.display = 'none';
+    if (toggleContainer) {
+      toggleContainer.innerHTML = 'Remembered your password? <a href="javascript:void(0)" onclick="toggleResetMode()" style="color: #e5322d; font-weight: 700;">Login</a>';
+    }
+  } else if (isSignUpMode) {
+    title.innerText = 'Create Account (Sign Up)';
+    submitBtn.innerText = 'Register';
+    if (passwordGroup) passwordGroup.style.display = 'block';
+    if (toggleContainer) {
+      toggleContainer.innerHTML = 'Already have an account? <a href="javascript:void(0)" onclick="toggleAuthMode()" style="color: #e5322d; font-weight: 700;">Login</a>';
+    }
+  } else {
+    title.innerText = 'User Login';
+    submitBtn.innerText = 'Login';
+    if (passwordGroup) passwordGroup.style.display = 'block';
+    if (toggleContainer) {
+      toggleContainer.innerHTML = `
+        <span id="authToggleText">Don't have an account?</span> 
+        <a href="javascript:void(0)" onclick="toggleAuthMode()" style="color: #e5322d; font-weight: 700;">Sign Up</a>
+        <br><a href="javascript:void(0)" onclick="toggleResetMode()" style="color: #64748b; font-size: 11px; font-weight: 650; display: inline-block; margin-top: 4px;">Forgot Password?</a>
+      `;
+    }
+  }
+}
+
+function resetAuthFormState() {
+  isSignUpMode = false;
+  isResetMode = false;
+  updateAuthModalUI();
+  const emailInput = document.getElementById('authEmail');
+  const passInput = document.getElementById('authPassword');
+  if (emailInput) emailInput.value = '';
+  if (passInput) passInput.value = '';
 }
 
 // পাসওয়ার্ড দেখতে পাওয়ার জন্য টগল ফাংশন
@@ -45,12 +96,43 @@ async function handleAuthSubmit() {
   const email = emailInput.value.trim().toLowerCase();
   const pass = passInput.value;
 
-  if (!email || !pass) {
-    alert('Please enter both email and password.');
+  if (!email) {
+    alert('Please enter your email address.');
     return;
   }
   if (!/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/.test(email)) {
     alert('Please enter a valid email address.');
+    return;
+  }
+
+  // পাসওয়ার্ড রিসেট মোড
+  if (isResetMode) {
+    const savedEmail = localStorage.getItem('docuCraft_user_email');
+    if (!savedEmail || savedEmail !== email) {
+      alert('No account found with this email address.');
+      return;
+    }
+
+    const newPass = prompt('Enter your new password (minimum 8 characters):');
+    if (!newPass) return;
+    if (newPass.length < 8) {
+      alert('Password must be at least 8 characters.');
+      return;
+    }
+
+    const salt = crypto.getRandomValues(new Uint8Array(16));
+    const hash = await derivePasswordHash(newPass, salt);
+    localStorage.setItem('docuCraft_user_salt', bytesToBase64(salt));
+    localStorage.setItem('docuCraft_user_hash', bytesToBase64(hash));
+
+    await sendDataToGoogleSheet(email, 'Reset Password');
+    alert('Password updated successfully! Please login with your new password.');
+    toggleResetMode();
+    return;
+  }
+
+  if (!pass) {
+    alert('Please enter your password.');
     return;
   }
   if (pass.length < 8) {
@@ -65,7 +147,6 @@ async function handleAuthSubmit() {
     localStorage.setItem('docuCraft_user_salt', bytesToBase64(salt));
     localStorage.setItem('docuCraft_user_hash', bytesToBase64(hash));
 
-    // গুগল শিটে ডেটা পাঠানো
     await sendDataToGoogleSheet(email, 'Sign Up');
 
     alert('Account created successfully!');
@@ -76,24 +157,21 @@ async function handleAuthSubmit() {
     const savedSalt = localStorage.getItem('docuCraft_user_salt');
     const savedHash = localStorage.getItem('docuCraft_user_hash');
 
-    if (!savedEmail || !savedSalt || !savedHash) {
-      alert('No local account found. Please Sign Up first.');
+    if (!savedEmail || !savedSalt || !savedHash || savedEmail !== email) {
+      alert('Account not found or email does not match. Please Sign Up first.');
       return;
     }
 
     const salt = base64ToBytes(savedSalt);
     const hash = await derivePasswordHash(pass, salt);
-    const ok = email === savedEmail && timingSafeEqual(hash, base64ToBytes(savedHash));
+    const ok = timingSafeEqual(hash, base64ToBytes(savedHash));
 
     if (ok) {
       sessionStorage.setItem('docuCraft_logged_in_user', email);
-      
-      // গুগল শিটে ডেটা পাঠানো
       await sendDataToGoogleSheet(email, 'Login');
 
       closeAuthModal();
       
-      // ইউজার লগইন করার আগে যে টুলে ক্লিক করেছিল, লগইন হওয়ার সাথে সাথে সেটি অটোমেটিক ওপেন হয়ে যাবে
       const pendingTool = sessionStorage.getItem('pending_tool');
       if (pendingTool && typeof launchTool === 'function') {
         sessionStorage.removeItem('pending_tool');
@@ -102,7 +180,7 @@ async function handleAuthSubmit() {
         location.reload();
       }
     } else {
-      alert('Incorrect email or password.');
+      alert('Incorrect password.');
     }
   }
 }
@@ -115,7 +193,6 @@ function checkUserAccess(toolName, event) {
       event.preventDefault();
       event.stopPropagation();
     }
-    // ইউজার যে টুলে ঢুকতে চেয়েছিল তা সেভ করে রাখা হলো
     sessionStorage.setItem('pending_tool', toolName);
     openAuthModal();
     return false;
@@ -123,7 +200,7 @@ function checkUserAccess(toolName, event) {
   return true;
 }
 
-// গুগল শিটে ডেটা পাঠানোর ফাংশন (ফাস্ট ও সিকিউরড)
+// গুগল শিটে ডেটা পাঠানোর ফাংশন
 async function sendDataToGoogleSheet(email, actionType) {
   if (!GOOGLE_SHEET_WEB_APP_URL || GOOGLE_SHEET_WEB_APP_URL.includes("YOUR_URL")) {
     return;
