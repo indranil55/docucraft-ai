@@ -2,15 +2,39 @@ let activeTool = '';
 let selectedFiles = [];
 let sigCanvasInstance = null;
 
-async function ensurePdfLibLoaded() {
-  if (window.PDFLib || window.pdfLib) return window.PDFLib || window.pdfLib;
-  return new Promise((resolve) => {
+// Helper to load external scripts dynamically without blocking HTML head
+function loadScript(url) {
+  return new Promise((resolve, reject) => {
+    if (document.querySelector(`script[src="${url}"]`)) {
+      resolve();
+      return;
+    }
     const script = document.createElement('script');
-    script.src = 'https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.9/pdf-lib.min.js';
-    script.onload = () => resolve(window.PDFLib || window.pdfLib);
-    script.onerror = () => { resolve(null); };
+    script.src = url;
+    script.onload = resolve;
+    script.onerror = reject;
     document.head.appendChild(script);
   });
+}
+
+async function ensurePdfLibLoaded() {
+  if (window.PDFLib || window.pdfLib) return window.PDFLib || window.pdfLib;
+  try {
+    await loadScript('https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.9/pdf-lib.min.js');
+    return window.PDFLib || window.pdfLib;
+  } catch {
+    return null;
+  }
+}
+
+async function ensureJsPdfLoaded() {
+  if (window.jspdf) return window.jspdf;
+  try {
+    await loadScript('https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js');
+    return window.jspdf;
+  } catch {
+    return null;
+  }
 }
 
 function filterCategory(cat, btn) {
@@ -401,7 +425,8 @@ async function executeToolAction() {
     const cust = document.getElementById('invCust')?.value.trim() || 'Customer';
     const items = document.getElementById('invItems')?.value.trim() || 'Services';
     const total = document.getElementById('invTotal')?.value.trim() || '0.00';
-    const { jsPDF } = window.jspdf;
+    const jsPdfLib = await ensureJsPdfLoaded();
+    const { jsPDF } = jsPdfLib || window.jspdf;
     const doc = new jsPDF({ format: 'a5' });
     doc.setFontSize(15); doc.text(shop, 74, 18, { align: 'center' });
     doc.setFontSize(10); doc.text('CASH MEMO / INVOICE', 74, 25, { align: 'center' });
@@ -422,7 +447,8 @@ async function executeToolAction() {
     const name = document.getElementById('cvName')?.value.trim() || 'John Doe';
     const contact = document.getElementById('cvContact')?.value.trim() || 'Phone | Email';
     const body = document.getElementById('cvBody')?.value.trim() || 'Experience...';
-    const { jsPDF } = window.jspdf;
+    const jsPdfLib = await ensureJsPdfLoaded();
+    const { jsPDF } = jsPdfLib || window.jspdf;
     const doc = new jsPDF();
     doc.setFontSize(18); doc.text(name, 15, 20);
     doc.setFontSize(11); doc.text(contact, 15, 28);
@@ -437,7 +463,8 @@ async function executeToolAction() {
   if (activeTool === 'docMaker') {
     const title = document.getElementById('optDocTitle')?.value.trim() || 'MEMO';
     const content = document.getElementById('optDocContent')?.value.trim() || 'Notes...';
-    const { jsPDF } = window.jspdf;
+    const jsPdfLib = await ensureJsPdfLoaded();
+    const { jsPDF } = jsPdfLib || window.jspdf;
     const doc = new jsPDF();
     doc.setFontSize(16); doc.text(title, 105, 20, { align: 'center' });
     doc.line(15, 25, 195, 25);
@@ -502,7 +529,8 @@ async function executeToolAction() {
       const customName = document.getElementById('optPassportFileName')?.value?.trim() || 'Passport_Sheet';
       const rawData = await readFileAsDataURL(selectedFiles[0]);
       const data = await imageToJpegDataUrl(rawData);
-      const { jsPDF } = window.jspdf;
+      const jsPdfLib = await ensureJsPdfLoaded();
+      const { jsPDF } = jsPdfLib || window.jspdf;
       const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
       const w = 35, h = 45, cols = count <= 4 ? 2 : 4;
       const startX = cols === 2 ? (210 - (cols * w + (cols - 1) * 10)) / 2 : 15;
@@ -569,7 +597,8 @@ async function executeToolAction() {
       showSuccessPopup('Selected Pages Deleted Successfully!');
 
     } else if (activeTool === 'jpgToPdf' || activeTool === 'wordToPdf' || activeTool === 'excelToPdf' || activeTool === 'pptToPdf' || activeTool === 'htmlToPdf' || activeTool.includes('ToPdf')) {
-      const { jsPDF } = window.jspdf;
+      const jsPdfLib = await ensureJsPdfLoaded();
+      const { jsPDF } = jsPdfLib || window.jspdf;
       const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
       if (selectedFiles[0] && selectedFiles[0].type.startsWith('image/')) {
         for (let i = 0; i < selectedFiles.length; i++) {
@@ -588,7 +617,8 @@ async function executeToolAction() {
       showSuccessPopup('File Converted to PDF Successfully!');
 
     } else {
-      const { jsPDF } = window.jspdf;
+      const jsPdfLib = await ensureJsPdfLoaded();
+      const { jsPDF } = jsPdfLib || window.jspdf;
       const pdf = new jsPDF();
       pdf.setFontSize(14);
       pdf.text(`Processed Document: ${selectedFiles[0]?.name || 'File'}`, 15, 20);
