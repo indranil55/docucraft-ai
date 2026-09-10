@@ -5,17 +5,29 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, interactive-widget=resizes-content">
   <title>DocuCraft AI - Smart All-in-One PDF & Document Studio</title>
 
-  <link rel="icon" type="image/png" sizes="32x32" href="logo.png">
-  <link rel="apple-touch-icon" href="logo.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="1000043290.jpg">
+  <link rel="apple-touch-icon" href="1000043290.jpg">
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   
-  <!-- FontAwesome -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer">
   
   <link rel="stylesheet" href="style.css">
+
+  <style>
+    /* কভার ইমেজ স্টাইল ইন্টিগ্রেশন */
+    .brand-logo img.custom-cover-badge {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      object-fit: cover;
+      margin-right: 8px;
+      vertical-align: middle;
+      border: 2px solid var(--primary);
+    }
+  </style>
 
   <script>
     (function() {
@@ -34,7 +46,7 @@
   <header>
     <div class="nav-container">
       <a href="#" class="brand-logo">
-        <i class="fa-solid fa-wand-magic-sparkles" style="color: var(--primary);"></i> Docu<span>Craft</span> <span class="ai-tag">AI</span>
+        <img src="1000043290.jpg" alt="DocuCraft AI" class="custom-cover-badge"> Docu<span>Craft</span> <span class="ai-tag">AI</span>
       </a>
       <div class="nav-actions">
         <button class="auth-icon-btn" onclick="openAuthModal()" title="Login / Sign Up" id="authNavBtn">
@@ -275,8 +287,7 @@
         <input type="email" id="authEmail" class="form-control" placeholder="user@example.com">
       </div>
       
-      <!-- পাসওয়ার্ড ফিল্ড চোখের আইকনসহ -->
-      <div class="form-group" style="position: relative;">
+      <div class="form-group" id="passwordGroup" style="position: relative;">
         <label>Password:</label>
         <div style="display: flex; align-items: center; position: relative;">
           <input type="password" id="authPassword" class="form-control" placeholder="Minimum 8 characters" minlength="8" autocomplete="current-password" style="width: 100%; padding-right: 40px;">
@@ -288,10 +299,12 @@
 
       <button class="btn-main" onclick="handleAuthSubmit()" id="authSubmitBtn" style="margin-top: 10px;">Login</button>
       
-      <p style="text-align: center; font-size: 12px; margin-top: 12px; color: #64748b;">
+      <div id="authToggleContainer" style="text-align: center; font-size: 12px; margin-top: 12px; color: #64748b;">
         <span id="authToggleText">Don't have an account?</span> 
         <a href="javascript:void(0)" onclick="toggleAuthMode()" style="color: #e5322d; font-weight: 700;">Sign Up</a>
-      </p>
+        <br>
+        <a href="javascript:void(0)" onclick="toggleResetMode()" style="color: #64748b; font-size: 11px; font-weight: 650; display: inline-block; margin-top: 4px;">Forgot Password?</a>
+      </div>
     </div>
   </div>
 
