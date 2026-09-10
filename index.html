@@ -5,8 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, interactive-widget=resizes-content">
   <title>DocuCraft AI - Smart All-in-One PDF & Document Studio</title>
 
-  <!-- ব্রাউজারের ট্যাবের জন্য ফেভিকন (SVG Data URI) -->
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'><rect width='40' height='40' rx='10' fill='%23DC2626'/><path d='M12 20H28M20 12V28' stroke='%23FFFFFF' stroke-width='4' stroke-linecap='round'/></svg>">
+  <!-- ব্রাউজারের ট্যাবের জন্য ফেভিকন (বড় এবং স্পষ্ট ম্যাজিক ওয়ান্ড আইকন) -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 50 50'><rect width='50' height='50' rx='12' fill='%23DC2626'/><path d='M12 38L38 12' stroke='%23FFFFFF' stroke-width='6' stroke-linecap='round'/><circle cx='14' cy='14' r='3' fill='%23FFFFFF'/><circle cx='36' cy='36' r='3' fill='%23FFFFFF'/></svg>">
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -18,11 +18,48 @@
   <link rel="stylesheet" href="style.css">
 
   <style>
-    /* এসভিজি লোগো স্টাইল */
+    /* হেডার এবং সার্চ বক্স ডিজাইন */
+    .nav-container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
     .brand-logo-svg {
       display: flex;
       align-items: center;
       text-decoration: none;
+    }
+    .header-search-box {
+      display: flex;
+      align-items: center;
+      background: #f1f5f9;
+      border: 1.5px solid #cbd5e1;
+      border-radius: 24px;
+      padding: 6px 14px;
+      width: 100%;
+      max-width: 280px;
+      transition: all 0.3s ease;
+    }
+    .header-search-box:focus-within {
+      border-color: #DC2626;
+      background: #fff;
+      box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.15);
+    }
+    .header-search-box input {
+      border: none;
+      background: transparent;
+      outline: none;
+      width: 100%;
+      font-size: 13.5px;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      color: #0f172a;
+      margin-left: 8px;
+    }
+    .header-search-box i {
+      color: #DC2626;
+      font-size: 15px;
     }
   </style>
 
@@ -43,30 +80,31 @@
   <header>
     <div class="nav-container">
       <a href="#" class="brand-logo-svg">
-        <!-- আপনার কাঙ্ক্ষিত নিখুঁত এসভিজি লোগো -->
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 50" width="195" height="42" style="vertical-align: middle;">
-          <!-- ম্যাজিক ওয়ান্ড এবং স্পার্কল আইকন -->
-          <g transform="translate(0, 4)">
-            <path d="M10 34L28 16" stroke="#DC2626" stroke-width="4.5" stroke-linecap="round"/>
-            <path d="M6 14C6 14 7.5 11 9 11C10.5 11 12 14 12 14C12 14 10.5 17 9 17C7.5 17 6 14 6 14Z" fill="#DC2626"/>
-            <path d="M24 28C24 28 25.5 25 27 25C28.5 25 30 28 30 28C30 28 28.5 31 27 31C25.5 31 24 28 24 28Z" fill="#DC2626"/>
-            <circle cx="14" cy="8" r="1.5" fill="#DC2626"/>
-            <circle cx="28" cy="21" r="1.5" fill="#DC2626"/>
+        <!-- আরও স্পষ্ট, বড় ও আকর্ষণীয় ম্যাজিক ওয়ান্ড লোগো -->
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 250 50" width="185" height="40" style="vertical-align: middle;">
+          <!-- ম্যাজিক ওয়ান্ড রড এবং বড় স্পার্কলস -->
+          <g transform="translate(0, 2)">
+            <path d="M8 38L34 12" stroke="#DC2626" stroke-width="6" stroke-linecap="round"/>
+            <!-- বড় স্পার্কল ১ -->
+            <path d="M4 14C4 14 6.5 9 9 9C11.5 9 14 14 14 14C14 14 11.5 19 9 19C6.5 19 4 14 4 14Z" fill="#DC2626"/>
+            <!-- বড় স্পার্কল ২ -->
+            <path d="M28 34C28 34 30.5 29 33 29C35.5 29 38 34 38 34C38 34 35.5 39 33 39C30.5 39 28 34 28 34Z" fill="#DC2626"/>
+            <circle cx="16" cy="6" r="2" fill="#DC2626"/>
+            <circle cx="36" cy="23" r="2" fill="#DC2626"/>
           </g>
 
-          <!-- Docu টেক্সট (কালো) -->
-          <text x="42" y="34" font-family="Plus Jakarta Sans, sans-serif" font-weight="800" font-size="24" fill="#0F172A">Docu</text>
+          <!-- Docu টেক্সট -->
+          <text x="46" y="34" font-family="Plus Jakarta Sans, sans-serif" font-weight="800" font-size="24" fill="#0F172A">Docu</text>
 
-          <!-- Craft টেক্সট (লাল) -->
-          <text x="105" y="34" font-family="Plus Jakarta Sans, sans-serif" font-weight="800" font-size="24" fill="#DC2626">Craft</text>
+          <!-- Craft টেক্সট -->
+          <text x="108" y="34" font-family="Plus Jakarta Sans, sans-serif" font-weight="800" font-size="24" fill="#DC2626">Craft</text>
 
-          <!-- AI ব্যাজ (পার্পল গ্রেডিয়েন্ট) -->
-          <g transform="translate(178, 10)">
+          <!-- AI ব্যাজ -->
+          <g transform="translate(182, 10)">
             <rect width="36" height="26" rx="8" fill="url(#aiGradientLogo)"/>
             <text x="18" y="17.5" font-family="Plus Jakarta Sans, sans-serif" font-weight="700" font-size="13" fill="#FFFFFF" text-anchor="middle">AI</text>
           </g>
 
-          <!-- গ্রেডিয়েন্ট ডিফাইন -->
           <defs>
             <linearGradient id="aiGradientLogo" x1="0%" y1="0%" x2="100%" y2="100%">
               <stop offset="0%" stop-color="#3B82F6"/>
@@ -75,6 +113,13 @@
           </defs>
         </svg>
       </a>
+
+      <!-- ম্যাজিক লাঠি দিয়ে সার্চ করার সার্চ বক্স -->
+      <div class="header-search-box">
+        <i class="fa-solid fa-wand-magic-sparkles"></i>
+        <input type="text" id="toolSearchInput" placeholder="Search tools (e.g., Merge, Resize)..." onkeyup="filterToolsBySearch()">
+      </div>
+
       <div class="nav-actions">
         <button class="auth-icon-btn" onclick="openAuthModal()" title="Login / Sign Up" id="authNavBtn">
           <i class="fa-solid fa-user"></i>
@@ -424,6 +469,23 @@
       </div>
     </div>
   </footer>
+
+  <!-- লাইভ সার্চ ফিল্টার স্ক্রিপ্ট -->
+  <script>
+    function filterToolsBySearch() {
+      const query = document.getElementById('toolSearchInput').value.toLowerCase();
+      const cards = document.querySelectorAll('.tools-grid .tool-card');
+      cards.forEach(card => {
+        const title = card.querySelector('h3').innerText.toLowerCase();
+        const desc = card.querySelector('p').innerText.toLowerCase();
+        if (title.includes(query) || desc.includes(query)) {
+          card.style.display = 'flex';
+        } else {
+          card.style.display = 'none';
+        }
+      });
+    }
+  </script>
 
   <script src="js/auth.js"></script>
   <script src="js/ai-chat.js"></script>
