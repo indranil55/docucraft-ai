@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, interactive-widget=resizes-content">
   <title>DocuCraft AI - Smart All-in-One PDF & Document Studio</title>
 
-  <!-- ব্রাউজারের ট্যাবের জন্য ফেভিকন (বড় এবং স্পষ্ট ম্যাজিক ওয়ান্ড আইকন) -->
+  <!-- ব্রাউজারের ট্যাবের জন্য ফেভিকন -->
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 50 50'><rect width='50' height='50' rx='12' fill='%23DC2626'/><path d='M12 38L38 12' stroke='%23FFFFFF' stroke-width='6' stroke-linecap='round'/><circle cx='14' cy='14' r='3' fill='%23FFFFFF'/><circle cx='36' cy='36' r='3' fill='%23FFFFFF'/></svg>">
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -58,8 +58,8 @@
       margin-left: 8px;
     }
     .header-search-box i {
-      color: #DC2626;
-      font-size: 15px;
+      color: #64748b;
+      font-size: 14px;
     }
   </style>
 
@@ -80,31 +80,21 @@
   <header>
     <div class="nav-container">
       <a href="#" class="brand-logo-svg">
-        <!-- আরও স্পষ্ট, বড় ও আকর্ষণীয় ম্যাজিক ওয়ান্ড লোগো -->
+        <!-- প্রিমিয়াম লোগো -->
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 250 50" width="185" height="40" style="vertical-align: middle;">
-          <!-- ম্যাজিক ওয়ান্ড রড এবং বড় স্পার্কলস -->
           <g transform="translate(0, 2)">
             <path d="M8 38L34 12" stroke="#DC2626" stroke-width="6" stroke-linecap="round"/>
-            <!-- বড় স্পার্কল ১ -->
             <path d="M4 14C4 14 6.5 9 9 9C11.5 9 14 14 14 14C14 14 11.5 19 9 19C6.5 19 4 14 4 14Z" fill="#DC2626"/>
-            <!-- বড় স্পার্কল ২ -->
             <path d="M28 34C28 34 30.5 29 33 29C35.5 29 38 34 38 34C38 34 35.5 39 33 39C30.5 39 28 34 28 34Z" fill="#DC2626"/>
             <circle cx="16" cy="6" r="2" fill="#DC2626"/>
             <circle cx="36" cy="23" r="2" fill="#DC2626"/>
           </g>
-
-          <!-- Docu টেক্সট -->
           <text x="46" y="34" font-family="Plus Jakarta Sans, sans-serif" font-weight="800" font-size="24" fill="#0F172A">Docu</text>
-
-          <!-- Craft টেক্সট -->
           <text x="108" y="34" font-family="Plus Jakarta Sans, sans-serif" font-weight="800" font-size="24" fill="#DC2626">Craft</text>
-
-          <!-- AI ব্যাজ -->
           <g transform="translate(182, 10)">
             <rect width="36" height="26" rx="8" fill="url(#aiGradientLogo)"/>
             <text x="18" y="17.5" font-family="Plus Jakarta Sans, sans-serif" font-weight="700" font-size="13" fill="#FFFFFF" text-anchor="middle">AI</text>
           </g>
-
           <defs>
             <linearGradient id="aiGradientLogo" x1="0%" y1="0%" x2="100%" y2="100%">
               <stop offset="0%" stop-color="#3B82F6"/>
@@ -114,12 +104,13 @@
         </svg>
       </a>
 
-      <!-- ম্যাজিক লাঠি দিয়ে সার্চ করার সার্চ বক্স -->
+      <!-- সার্চ বক্স (ম্যাগনিফাইং গ্লাস আইকনসহ) -->
       <div class="header-search-box">
-        <i class="fa-solid fa-wand-magic-sparkles"></i>
+        <i class="fa-solid fa-magnifying-glass"></i>
         <input type="text" id="toolSearchInput" placeholder="Search tools (e.g., Merge, Resize)..." onkeyup="filterToolsBySearch()">
       </div>
 
+      <!-- ইউজার লগইন বাটন (মানুষের আইকন) -->
       <div class="nav-actions">
         <button class="auth-icon-btn" onclick="openAuthModal()" title="Login / Sign Up" id="authNavBtn">
           <i class="fa-solid fa-user"></i>
