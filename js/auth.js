@@ -12,7 +12,7 @@ document.addEventListener('DOMContentLoaded', () => {
 function openAuthModal() {
   const modal = document.getElementById('authModal');
   if (modal) modal.style.display = 'flex';
-  document.body.classList.add('modal-open'); // পপআপ খুললে পেছনের ব্যাকগ্রাউন্ড লক
+  document.body.classList.add('modal-open');
   setTimeout(() => {
     const emailInput = document.getElementById('authEmail');
     if (emailInput) emailInput.focus();
@@ -22,7 +22,7 @@ function openAuthModal() {
 function closeAuthModal() {
   const modal = document.getElementById('authModal');
   if (modal) modal.style.display = 'none';
-  document.body.classList.remove('modal-open'); // পপআপ বন্ধ করলে স্ক্রোল চালু
+  document.body.classList.remove('modal-open');
   resetAuthFormState();
 }
 
@@ -82,7 +82,6 @@ function resetAuthFormState() {
   if (passInput) passInput.value = '';
 }
 
-// পাসওয়ার্ড দেখতে পাওয়ার জন্য টগল ফাংশন
 function togglePasswordVisibility() {
   const passInput = document.getElementById('authPassword');
   const eyeIcon = document.getElementById('eyeIcon');
@@ -117,7 +116,6 @@ async function handleAuthSubmit() {
     return;
   }
 
-  // পাসওয়ার্ড রিসেট মোড
   if (isResetMode) {
     const savedEmail = localStorage.getItem('docuCraft_user_email');
     if (!savedEmail || savedEmail !== email) {
@@ -159,13 +157,12 @@ async function handleAuthSubmit() {
     localStorage.setItem('docuCraft_user_salt', bytesToBase64(salt));
     localStorage.setItem('docuCraft_user_hash', bytesToBase64(hash));
 
-    // সাইন আপ করার সাথে সাথেই গেট খুলে সেশন চালু করে দেওয়া
     localStorage.setItem('docuCraft_logged_in_user', email);
     await sendDataToGoogleSheet(email, 'Sign Up');
 
     alert('Account created and gate opened successfully!');
     closeAuthModal();
-    updateHeaderAuthUI(); // হেডার আপডেট করা
+    updateHeaderAuthUI();
     
     const pendingTool = sessionStorage.getItem('pending_tool');
     if (pendingTool && typeof launchTool === 'function') {
@@ -188,12 +185,11 @@ async function handleAuthSubmit() {
     const ok = timingSafeEqual(hash, base64ToBytes(savedHash));
 
     if (ok) {
-      // লোকাল স্টোরেজে স্থায়ীভাবে গেট আনলক করে রাখা
       localStorage.setItem('docuCraft_logged_in_user', email);
       await sendDataToGoogleSheet(email, 'Login');
 
       closeAuthModal();
-      updateHeaderAuthUI(); // হেডার আপডেট করা
+      updateHeaderAuthUI();
       
       const pendingTool = sessionStorage.getItem('pending_tool');
       if (pendingTool && typeof launchTool === 'function') {
@@ -206,7 +202,6 @@ async function handleAuthSubmit() {
   }
 }
 
-// ইউজার অ্যাক্সেস চেক: একবার লগইন করলে আর বারবার পপআপ আটকাবে না
 function checkUserAccess(toolName, event) {
   const loggedUser = localStorage.getItem('docuCraft_logged_in_user');
   if (!loggedUser) {
@@ -221,33 +216,38 @@ function checkUserAccess(toolName, event) {
   return true;
 }
 
-// হেডারের ডানপাশের ইউজার আইকন বা স্টータস আপডেট করার ফাংশন
+// নিখুঁত হেডার ইউজার স্টেট আপডেট ফাংশন (ডাবল আইকন সমস্যা সমাধান করা হয়েছে)
 function updateHeaderAuthUI() {
   const loggedUser = localStorage.getItem('docuCraft_logged_in_user');
-  const authBtnContainer = document.querySelector('.nav-actions');
+  const authBtn = document.querySelector('.auth-icon-btn');
   
-  if (authBtnContainer) {
-    let profileIndicator = document.getElementById('userProfileIndicator');
-    
+  if (authBtn) {
     if (loggedUser) {
-      if (!profileIndicator) {
-        profileIndicator = document.createElement('div');
-        profileIndicator.id = 'userProfileIndicator';
-        profileIndicator.style.cssText = 'display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 700; color: #10b981; background: #ecfdf5; padding: 6px 12px; border-radius: 99px; border: 1px solid #10b981; cursor: pointer;';
-        profileIndicator.title = 'Click to Logout';
-        profileIndicator.onclick = handleLogout;
-        profileIndicator.innerHTML = `<i class="fas fa-user-check"></i> <span>${loggedUser.split('@')[0]}</span>`;
-        authBtnContainer.prepend(profileIndicator);
-      }
+      // লগইন থাকলে মূল আইকনটির ভেতরে বা স্টাইলে ইউজারের নাম দেখাবে এবং ক্লিক করলে লগআউট হবে
+      authBtn.style.background = '#ecfdf5';
+      authBtn.style.color = '#10b981';
+      authBtn.style.border = '1px solid #10b981';
+      authBtn.style.width = 'auto';
+      authBtn.style.padding = '0 12px';
+      authBtn.style.borderRadius = '99px';
+      authBtn.title = 'Click to Logout';
+      authBtn.innerHTML = `<i class="fas fa-user-check" style="margin-right: 5px;"></i> <span style="font-size: 12px; font-weight: 700;">${loggedUser.split('@')[0]}</span>`;
+      authBtn.onclick = handleLogout;
     } else {
-      if (profileIndicator) {
-        profileIndicator.remove();
-      }
+      // লগইন না থাকলে স্বাভাবিক অবস্থায় ফিরিয়ে নেওয়া
+      authBtn.style.background = '#10b981';
+      authBtn.style.color = '#ffffff';
+      authBtn.style.border = 'none';
+      authBtn.style.width = '36px';
+      authBtn.style.padding = '0';
+      authBtn.style.borderRadius = '50%';
+      authBtn.title = 'Login / Sign Up';
+      authBtn.innerHTML = `<i class="fas fa-user"></i>`;
+      authBtn.onclick = openAuthModal;
     }
   }
 }
 
-// গুগল শিটে ডেটা পাঠানোর ফাংশন
 async function sendDataToGoogleSheet(email, actionType) {
   if (!GOOGLE_SHEET_WEB_APP_URL || GOOGLE_SHEET_WEB_APP_URL.includes("YOUR_URL")) {
     return;
