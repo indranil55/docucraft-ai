@@ -326,13 +326,14 @@ header {
   background: #fff1f2;
 }
 
+/* প্রোগ্রেস বার ছোট ও কম্প্যাক্ট করার জন্য ফিক্সড কোড */
 .processing-progress {
   display: none;
-  margin: 12px 0 4px;
+  margin: 8px 0 2px;
 }
 .progress-track {
   width: 100%;
-  height: 8px;
+  height: 5px;
   background: #e2e8f0;
   border-radius: 999px;
   overflow: hidden;
@@ -347,9 +348,9 @@ header {
 .progress-label {
   display: flex;
   justify-content: space-between;
-  font-size: 11px;
+  font-size: 10.5px;
   color: var(--slate-muted);
-  margin-bottom: 5px;
+  margin-bottom: 3px;
 }
 
 .file-tag {
@@ -411,7 +412,7 @@ header {
   backdrop-filter: blur(6px) !important;
 }
 
-/* AI চ্যাট মডাল এবং চ্যাট কার্ড (টাইপ করার সময় স্বাভাবিক অবস্থায় থাকার জন্য) */
+/* AI চ্যাট মডাল এবং চ্যাট কার্ড */
 #smartAiChatModal {
   position: fixed;
   inset: 0;
