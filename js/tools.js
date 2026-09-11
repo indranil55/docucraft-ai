@@ -820,17 +820,21 @@ function imageToJpegDataUrl(dataUrl, quality = 0.92) {
 
 function downloadBlob(content, name, type) {
   let blob = content instanceof Blob ? content : new Blob([content], { type });
-  const blobUrl = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.style.display = 'none';
-  a.href = blobUrl;
-  a.download = name;
-  document.body.appendChild(a);
-  setTimeout(() => {
-    a.click();
+  
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const a = document.createElement('a');
+    a.style.display = 'none';
+    a.href = e.target.result; // Base64 Data URL (সম্পূর্ণ নিরাপদ এবং অবজেক্ট ইউআরএল মুক্ত)
+    a.download = name;
+    document.body.appendChild(a);
+    
     setTimeout(() => {
-      document.body.removeChild(a);
-      URL.revokeObjectURL(blobUrl);
-    }, 1000);
-  }, 50);
+      a.click();
+      setTimeout(() => {
+        document.body.removeChild(a);
+      }, 500);
+    }, 50);
+  };
+  reader.readAsDataURL(blob);
 }
