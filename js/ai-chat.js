@@ -1,7 +1,4 @@
-// DocuCraft AI - Real AI Powered Assistant (Google Gemini AI Integration + Voice & Multi-language)
-
-// কখনোই কোডের ভেতর সরাসরি রিয়েল এপিআই কি রাখবেন না। নিরাপদ রাখতে "YOUR_GEMINI_API_KEY_HERE" রাখুন।
-const GEMINI_API_KEY = "YOUR_GEMINI_API_KEY_HERE"; 
+// DocuCraft AI - Smart Local AI Assistant with Speaker Toggle (100% Free & No API Key Needed)
 
 const aiKnowledge = {
   en: {
@@ -24,7 +21,7 @@ const aiKnowledge = {
   }
 };
 
-let isVoiceActive = true;
+let isVoiceActive = true; // স্পিকার অন বা অফ রাখার ভ্যারিয়েবল
 let currentLang = 'bn';
 
 // পেজ লোড হওয়ার সাথে সাথে চ্যাট উইন্ডো তৈরি করা
@@ -39,12 +36,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const modal = document.createElement('div');
   modal.id = 'autoAiModal';
-  modal.style.cssText = 'display: none; position: fixed; bottom: 80px; right: 20px; width: 360px; max-width: 90vw; background: #fff; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); z-index: 99999; flex-direction: column; overflow: hidden; border: 1px solid #cbd5e1;';
+  modal.style.cssText = 'display: none; position: fixed; bottom: 10px; right: 10px; width: 350px; max-width: calc(100vw - 20px); height: 450px; max-height: 80vh; background: #fff; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.25); z-index: 99999; flex-direction: column; overflow: hidden; border: 1px solid #cbd5e1;';
   modal.innerHTML = `
-    <div style="background: #1e293b; color: #fff; padding: 10px 14px; display: flex; justify-content: space-between; align-items: center;">
+    <div style="background: #1e293b; color: #fff; padding: 10px 14px; display: flex; justify-content: space-between; align-items: center; flex-shrink: 0;">
       <span style="font-weight: 600; font-size: 13px;">🤖 DocuCraft AI</span>
       
       <div style="display: flex; align-items: center; gap: 6px;">
+        <!-- স্পিকার অন/অফ বাটন -->
+        <button id="speakerToggleBtn" onclick="toggleVoiceOutput()" style="background: #0f172a; color: #60a5fa; border: 1px solid #475569; padding: 4px 8px; border-radius: 6px; font-size: 12px; cursor: pointer;" title="Toggle Speaker">🔊</button>
+        
         <select id="aiLangSelect" onchange="changeAiLanguage(this.value)" style="background: #0f172a; color: #fff; border: 1px solid #475569; padding: 4px 6px; border-radius: 6px; font-size: 11px; cursor: pointer;">
           <option value="bn" selected>বাংলা</option>
           <option value="hi">हिंदी</option>
@@ -55,11 +55,11 @@ document.addEventListener('DOMContentLoaded', () => {
     </div>
 
     <!-- ডায়নামিক ভয়েস স্ট্যাটাস বার -->
-    <div id="voiceStatusBar" style="display: none; background: #e0f2fe; color: #0369a1; padding: 6px 12px; font-size: 12px; font-weight: 600; text-align: center; border-bottom: 1px solid #bae6fd;">
+    <div id="voiceStatusBar" style="display: none; background: #e0f2fe; color: #0369a1; padding: 6px 12px; font-size: 12px; font-weight: 600; text-align: center; border-bottom: 1px solid #bae6fd; flex-shrink: 0;">
       ${aiKnowledge.bn.listening}
     </div>
 
-    <div id="aiChatBody" style="padding: 12px; height: 260px; overflow-y: auto; background: #f8fafc; font-size: 13px;">
+    <div id="aiChatBody" style="padding: 12px; flex: 1; overflow-y: auto; background: #f8fafc; font-size: 13px; -webkit-overflow-scrolling: touch;">
       <div style="margin: 8px 0; text-align: left;">
         <span id="aiWelcomeMsg" style="background: #f1f5f9; color: #1e293b; padding: 8px 12px; border-radius: 12px 12px 12px 0; display: inline-block; border: 1px solid #e2e8f0;">
           ${aiKnowledge.bn.welcome}
@@ -67,23 +67,14 @@ document.addEventListener('DOMContentLoaded', () => {
       </div>
     </div>
 
-    <div style="padding: 10px; background: #fff; border-top: 1px solid #e2e8f0; display: flex; gap: 6px; align-items: center;">
-      <input type="text" id="aiChatInput" placeholder="${aiKnowledge.bn.placeholder}" style="flex: 1; padding: 8px 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 13px;" onkeypress="if(event.key==='Enter') sendUserMessage()">
+    <div style="padding: 10px; background: #fff; border-top: 1px solid #e2e8f0; display: flex; gap: 6px; align-items: center; flex-shrink: 0;">
+      <input type="text" id="aiChatInput" placeholder="${aiKnowledge.bn.placeholder}" style="flex: 1; padding: 8px 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 13px; outline: none;" onkeypress="if(event.key==='Enter') sendUserMessage()">
       <button onclick="startVoiceInput()" style="background: #0284c7; color: #fff; border: none; padding: 8px 10px; border-radius: 6px; cursor: pointer;" title="Voice Input">🎤</button>
       <button onclick="sendUserMessage()" style="background: #2563eb; color: #fff; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer;">➤</button>
     </div>
   `;
   document.body.appendChild(modal);
 });
-
-function openSmartAiChat() {
-  toggleAiHelpdesk();
-}
-
-function closeSmartAiChat() {
-  const modal = document.getElementById('autoAiModal');
-  if (modal) modal.style.display = 'none';
-}
 
 function toggleAiHelpdesk() {
   const modal = document.getElementById('autoAiModal');
@@ -92,7 +83,23 @@ function toggleAiHelpdesk() {
   }
 }
 
-// ভাষা পরিবর্তনের ফাংশন যা সব টেক্সট আপডেট করবে
+// স্পিকার অন/অফ করার ফাংশন
+function toggleVoiceOutput() {
+  isVoiceActive = !isVoiceActive;
+  const speakerBtn = document.getElementById('speakerToggleBtn');
+  if (speakerBtn) {
+    if (isVoiceActive) {
+      speakerBtn.innerHTML = '🔊';
+      speakerBtn.style.color = '#60a5fa';
+      speakText('Speaker turned on.');
+    } else {
+      speakerBtn.innerHTML = '🔇';
+      speakerBtn.style.color = '#94a3b8';
+      window.speechSynthesis.cancel(); // কথা বলা বন্ধ করা
+    }
+  }
+}
+
 function changeAiLanguage(lang) {
   currentLang = lang;
   const langData = aiKnowledge[lang] || aiKnowledge.bn;
@@ -109,7 +116,6 @@ function changeAiLanguage(lang) {
   speakText(langData.welcome);
 }
 
-// ভয়েস আউটপুট 
 function speakText(text) {
   if (!isVoiceActive || !('speechSynthesis' in window)) return;
   window.speechSynthesis.cancel();
@@ -126,7 +132,6 @@ function speakText(text) {
   }, 250);
 }
 
-// ইউজার মেসেজ পাঠানোর প্রধান ফাংশন
 async function sendUserMessage(customText = '') {
   const input = document.getElementById('aiChatInput');
   const query = customText || (input ? input.value.trim() : '');
@@ -138,52 +143,15 @@ async function sendUserMessage(customText = '') {
   const loadingId = 'loading_' + Date.now();
   appendAiMessage("...", loadingId);
 
-  try {
-    const reply = await fetchGeminiAiResponse(query);
+  setTimeout(() => {
     removeAiMessage(loadingId);
+    const reply = generateSmartAiResponse(query);
     appendAiMessage(reply);
     speakText(reply);
-  } catch (error) {
-    removeAiMessage(loadingId);
-    const fallbackReply = generateLocalAiResponse(query);
-    appendAiMessage(fallbackReply);
-    speakText(fallbackReply);
-  }
+  }, 500);
 }
 
-// জেমিনি এআই এপিআই কল করার ফাংশন
-async function fetchGeminiAiResponse(prompt) {
-  if (!GEMINI_API_KEY || GEMINI_API_KEY === "YOUR_GEMINI_API_KEY_HERE") {
-    return generateLocalAiResponse(prompt);
-  }
-
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`;
-  
-  const langNames = { bn: "Bengali", hi: "Hindi", en: "English" };
-  const targetLangName = langNames[currentLang] || "Bengali";
-
-  const systemInstruction = `You are DocuCraft AI, an advanced smart assistant for a web-based document platform (DocuCraft AI) featuring KB/MB Photo Resizers, Passport Photo Grids, Digital Signatures, QR/UPI generators, and PDF tools. You must reply strictly in ${targetLangName} language based on the user's question.`;
-
-  const response = await fetch(url, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      contents: [
-        { role: "user", parts: [{ text: systemInstruction + "\n\nUser Question: " + prompt }] }
-      ]
-    })
-  });
-
-  const data = await response.json();
-  if (data && data.candidates && data.candidates[0].content.parts[0].text) {
-    return data.candidates[0].content.parts[0].text.trim();
-  } else {
-    throw new Error('Invalid API response');
-  }
-}
-
-// লোকাল ফলব্যাক রেসপন্স
-function generateLocalAiResponse(query) {
+function generateSmartAiResponse(query) {
   const q = query.toLowerCase();
   const dict = aiKnowledge[currentLang] || aiKnowledge.bn;
 
@@ -191,6 +159,34 @@ function generateLocalAiResponse(query) {
     if (currentLang === 'hi') return 'मैं बिल्कुल ठीक हूँ! बताइए, DocuCraft AI में आज मैं आपकी क्या सहायता कर सकता हूँ?';
     if (currentLang === 'en') return 'I am doing great! How can DocuCraft AI assist you today?';
     return 'আমি একদম ভালো আছি, ধন্যবাদ! DocuCraft AI-তে আজ আপনাকে কীভাবে সাহায্য করতে পারি বলুন?';
+  }
+
+  if (q.includes('photo') || q.includes('kb') || q.includes('mb') || q.includes('resizer') || q.includes('ছবি') || q.includes('সাইজ')) {
+    if (currentLang === 'hi') return 'आप हमारे "Photo & Sign KB/MB Resizer" टूल का उपयोग करके किसी भी फोटो या सिग्नेचर को अपनी आवश्यकतानुसार सटीक KB या MB में तुरंत resize कर सकते हैं।';
+    if (currentLang === 'en') return 'You can use our "Photo & Sign KB/MB Resizer" tool to precisely resize any photo or signature to your desired KB or MB instantly.';
+    return 'আপনি আমাদের "Photo & Sign KB/MB Resizer" টুলটি ব্যবহার করে যেকোনো ছবি বা সিগনেচারকে আপনার প্রয়োজনমতো নিখুঁত KB বা MB সাইজে ছোট বা বড় করতে পারেন।';
+  }
+
+  if (q.includes('passport') || q.includes('পাসপোর্ট')) {
+    if (currentLang === 'hi') return 'आप "Passport Photo Sheet" टूल की मदद से A4 पेज पर प्रिंट-रेडी पासपोर्ट फोटो शीट आसानी से तैयार कर सकते हैं।';
+    if (currentLang === 'en') return 'You can easily generate print-ready passport photo sheets on an A4 page using our "Passport Photo Sheet" tool.';
+    return 'আমাদের "Passport Photo Sheet" টুল ব্যবহার করে আপনি খুব সহজেই A4 পেজে প্রিন্ট-রেডি পাসপোর্ট ফটো শিট তৈরি করে নিতে পারেন।';
+  }
+
+  if (q.includes('signature') || q.includes('sign') || q.includes('স্বাক্ষর')) {
+    if (currentLang === 'hi') return 'आप "Digital Signature Maker" टूल का उपयोग करके स्क्रीन पर अपना हस्ताक्षर ड्रा कर सकते हैं और उसे ट्रांसपेरेंट PNG के रूप में डाउनलोड कर सकते हैं।';
+    if (currentLang === 'en') return 'You can draw your signature directly on the screen using the "Digital Signature Maker" and download it as a transparent PNG.';
+    return 'ডিজিটাল সিগনেচারের জন্য "Digital Signature Maker" টুল ব্যবহার করে স্ক্রিনেই স্বাক্ষর এঁকে তা ট্রান্সপারেন্ট PNG হিসেবে ডাউনলোড করতে পারেন।';
+  }
+
+  if (q.includes('pdf') || q.includes('merge') || q.includes('split') || q.includes('compress') || q.includes('পিডিএফ')) {
+    if (currentLang === 'hi') return 'हमारे पास सभी PDF टूल्स उपलब्ध हैं जैसे Merge PDF, Split PDF, और Compress PDF, जिनकी मदद से आप अपने PDF दस्तावेज़ों को प्रबंधित कर सकते हैं।';
+    if (currentLang === 'en') return 'We offer a complete suite of PDF tools including Merge, Split, and Compress PDF to easily manage your documents.';
+    return 'আমাদের প্ল্যাটফর্মে Merge PDF, Split PDF এবং Compress PDF-এর মতো চমৎকার সব টুল রয়েছে, যা দিয়ে আপনি যেকোনো পিডিএফ খুব সহজে ম্যানেজ করতে পারবেন।';
+  }
+
+  if (q.includes('who made you') || q.includes('ke banieche') || q.includes('কে বানিয়েছে') || q.includes('developer')) {
+    return 'আমাকে তৈরি করেছেন ইনদনীল রুইদাস (Indranil Ruidas), DocuCraft AI প্রজেক্টের প্রতিষ্ঠাতা ও ডেভেলপার!';
   }
 
   return dict.default;
@@ -215,7 +211,6 @@ function removeAiMessage(id) {
   if (el) el.remove();
 }
 
-// ভয়েস ইনপুট ও লাইভ স্ট্যাটাস বার হ্যান্ডলার
 function startVoiceInput() {
   const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
   if (!SpeechRecognition) {
