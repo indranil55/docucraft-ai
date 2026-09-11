@@ -1,4 +1,4 @@
-// DocuCraft AI - Fully Fixed, Optimized & Enhanced Tool Execution Script (All Tools Functional)
+// DocuCraft AI - Fully Fixed, Optimized & Secure Tool Execution Script (All Tools Functional)
 
 let activeTool = '';
 let selectedFiles = [];
@@ -383,7 +383,10 @@ document.addEventListener('DOMContentLoaded', () => {
       if (list) {
         list.innerHTML = '';
         selectedFiles.forEach((file) => {
-          list.innerHTML += `<div style="background:#f1f5f9; padding:4px 8px; border-radius:6px; font-size:12px; display:inline-block; margin-right:4px; margin-bottom:4px;">📄 ${escapeHtml(file.name)}</div>`;
+          const tag = document.createElement('div');
+          tag.style.cssText = "background:#f1f5f9; padding:4px 8px; border-radius:6px; font-size:12px; display:inline-block; margin-right:4px; margin-bottom:4px;";
+          tag.textContent = `📄 ${file.name}`;
+          list.appendChild(tag);
         });
       }
     });
