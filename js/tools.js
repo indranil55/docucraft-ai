@@ -381,13 +381,7 @@ document.addEventListener('DOMContentLoaded', () => {
       selectedFiles = Array.from(e.target.files);
       const list = document.getElementById('wsFileList');
       if (list) {
-        list.innerHTML = '';
-        selectedFiles.forEach((file) => {
-          const tag = document.createElement('div');
-          tag.style.cssText = "background:#f1f5f9; padding:4px 8px; border-radius:6px; font-size:12px; display:inline-block; margin-right:4px; margin-bottom:4px;";
-          tag.textContent = `📄 ${file.name}`;
-          list.appendChild(tag);
-        });
+        list.textContent = selectedFiles.length > 0 ? `Selected: ${selectedFiles.length} file(s)` : '';
       }
     });
   }
@@ -779,10 +773,6 @@ function showSuccessPopup(msg) {
   } else {
     alert(msg);
   }
-}
-
-function escapeHtml(value) {
-  return String(value).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
 }
 
 function parseRange(str, total) {
