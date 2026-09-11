@@ -5,8 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, interactive-widget=resizes-content">
   <title>DocuCraft AI - Smart All-in-One PDF & Document Studio</title>
 
-  <!-- ব্রাউজারের ট্যাবের জন্য ফেভিকন -->
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 50 50'><rect width='50' height='50' rx='12' fill='%23DC2626'/><path d='M12 38L38 12' stroke='%23FFFFFF' stroke-width='6' stroke-linecap='round'/><circle cx='14' cy='14' r='3' fill='%23FFFFFF'/><circle cx='36' cy='36' r='3' fill='%23FFFFFF'/></svg>">
+  <!-- ক্যানভায় তৈরি লোগোটি ফেভিকন হিসেবে যুক্ত করা হলো -->
+  <link rel="icon" type="image/png" href="logo.png">
+  <link rel="shortcut icon" type="image/png" href="logo.png">
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -362,7 +363,7 @@
           <select id="chatLangSelect" class="lang-select-box" onchange="changeChatLanguage(this.value)">
             <option value="en" selected>English</option>
             <option value="hi">हिन्दी (Hindi)</option>
-            <option value="bn">বাংলা (Bengali)</option>
+            <option value="bn" selected>বাংলা (Bengali)</option>
           </select>
           <button id="voiceMuteToggle" class="voice-toggle-btn" onclick="toggleVoiceOutput()">
             <i class="fa-solid fa-volume-high"></i> Voice ON
@@ -407,7 +408,7 @@
 
       <div id="wsFileList" style="margin-bottom: 8px;"></div>
       <div class="processing-progress" id="processingProgress">
-        <div class="progress-label"><span id="progressText">Preparing...</span><span id="progressPercent">0%</span></div>
+        <div class="processing-label"><span id="progressText">Preparing...</span><span id="progressPercent">0%</span></div>
         <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
       </div>
       <div id="wsCustomUI"></div>
