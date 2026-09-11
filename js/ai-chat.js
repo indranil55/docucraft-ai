@@ -1,21 +1,21 @@
-// DocuCraft AI - Smart Universal AI Assistant (100% Free, Handles All Topics, No API Key Needed)
+// DocuCraft AI - Advanced Smart Conversational AI Assistant (100% Free, No API Key, All-Topic Support)
 
 const aiKnowledge = {
   en: {
-    welcome: "Hello! I am DocuCraft AI, your smart universal assistant. Ask me anything about our tools or any general topic!",
-    default: "I am DocuCraft AI! I can help you with our tools (Photo Resizer, PDFs, etc.) or chat with you about any general topic, science, history, coding, or life. What would you like to know?",
+    welcome: "Hello! I am DocuCraft AI, your smart assistant. Feel free to ask me about our tools or chat about anything!",
+    default: "I am DocuCraft AI! I can assist you with all our platform tools (Photo Resizer, PDFs, Signatures) and talk to you about any general topic, science, coding, history, or daily life. What would you like to discuss?",
     listening: "🎙️ Listening... Please speak clearly",
     placeholder: "Type your question here..."
   },
   hi: {
-    welcome: "नमस्ते! मैं DocuCraft AI हूँ, आपका स्मार्ट यूनिवर्सल सहायक। आप मुझसे किसी भी विषय पर बात कर सकते हैं!",
-    default: "मैं DocuCraft AI हूँ! मैं हमारे टूल्स में आपकी मदद कर सकता हूँ और साथ ही विज्ञान, इतिहास, कोडिंग या किसी भी सामान्य विषय पर बात कर सकता हूँ। आप क्या जानना चाहते हैं?",
+    welcome: "नमस्ते! मैं DocuCraft AI हूँ, आपका स्मार्ट सहायक। आप मुझसे हमारे टूल्स या किसी भी विषय पर बात कर सकते हैं!",
+    default: "मैं DocuCraft AI हूँ! मैं हमारे सभी टूल्स में आपकी मदद कर सकता हूँ और साथ ही विज्ञान, इतिहास, कोडिंग या किसी भी सामान्य विषय पर खुलकर बात कर सकता हूँ। बताइए, आज हम किस बारे में बात करें?",
     listening: "🎙️ सुन रहा हूँ... कृपया स्पष्ट रूप से बोलें",
     placeholder: "यहाँ अपना प्रश्न लिखें..."
   },
   bn: {
-    welcome: "নমস্কার! আমি DocuCraft AI, আপনার স্মার্ট অলরাউন্ডার অ্যাসিস্ট্যান্ট। আমাদের টুলস বা যেকোনো সাধারণ বিষয়ে আমাকে প্রশ্ন করতে পারেন!",
-    default: "আমি DocuCraft AI! আমাদের টুলস ও পিডিএফ সংক্রান্ত কাজের পাশাপাশি আমি সাধারণ জ্ঞান, বিজ্ঞান, ইতিহাস, প্রযুক্তি, লেখালেখি বা যেকোনো সাধারণ বিষয়ে আপনার সাথে কথা বলতে এবং উত্তর দিতে পারি। বলুন, আজ কী নিয়ে আলোচনা করতে চান?",
+    welcome: "নমস্কার! আমি DocuCraft AI, আপনার স্মার্ট অ্যাসিস্ট্যান্ট। আমাদের টুলস কিংবা যেকোনো বিষয়ে আমার সাথে খোলামেলা কথা বলতে পারেন!",
+    default: "আমি DocuCraft AI! আমাদের প্ল্যাটফর্মের সমস্ত টুলস (ফটো রিসাইজার, পিডিএফ, সিগনেচার) সংক্রান্ত সহায়তার পাশাপাশি আমি সাধারণ জ্ঞান, বিজ্ঞান, প্রযুক্তি, পড়াশোনা বা আপনাদের দৈনন্দিন জীবনের যেকোনো বিষয় নিয়ে চমৎকারভাবে কথা বলতে পারি। বলুন, আজ কী নিয়ে আলোচনা করতে চান?",
     listening: "🎙️ শুনছি... কথা বলুন স্পষ্ট করে",
     placeholder: "এখানে আপনার প্রশ্ন লিখুন..."
   }
@@ -142,31 +142,30 @@ async function sendUserMessage(customText = '') {
 
   setTimeout(() => {
     removeAiMessage(loadingId);
-    const reply = generateUniversalAiResponse(query);
+    const reply = generateDynamicAiResponse(query);
     appendAiMessage(reply);
     speakText(reply);
-  }, 600);
+  }, 500);
 }
 
-// সর্বজনীন স্মার্ট এআই রেসপন্স ইঞ্জিন (যেকোনো বিষয়ে কথা বলতে পারবে)
-function generateUniversalAiResponse(query) {
+// একদম ডাইনামিক ও বুদ্ধিমান রেসপন্স জেনারেটর (কোনো কথা রিপিট করবে না)
+function generateDynamicAiResponse(query) {
   const q = query.toLowerCase();
-  const dict = aiKnowledge[currentLang] || aiKnowledge.bn;
 
-  // ১. কুশল বিনিময় ও সাধারণ কথা
-  if (q.includes('কেমন আছেন') || q.includes('how are you') || q.includes('कैसी हो') || q.includes('कैसे हो') || q.includes('kemon achhen')) {
-    if (currentLang === 'hi') return 'मैं एकदम बढ़िया हूँ! बताइए, आज मैं आपकी क्या मदद कर सकता हूँ या किस विषय पर बात करना चाहते हैं?';
-    if (currentLang === 'en') return 'I am doing fantastic! How can I help you today, or what would you like to chat about?';
-    return 'আমি একদম চমৎকার আছি! বলুন, আজ আপনাকে কীভাবে সাহায্য করতে পারি বা কোন বিষয়ে কথা বলতে চান?';
+  // ১. কুশল বিনিময় বা কেমন আছ
+  if (q.includes('কেমন আছেন') || q.includes('কেমন আছ') || q.includes('how are you') || q.includes('कैसी हो') || q.includes('कैसे हो')) {
+    if (currentLang === 'hi') return 'मैं एकदम बढ़िया हूँ! बताइए, आज आप किस बारे में बात करना चाहते हैं?';
+    if (currentLang === 'en') return 'I am doing fantastic! What would you like to talk about today?';
+    return 'আমি একদম চমৎকার আছি! বলুন, আজ আপনাকে কীভাবে সাহায্য করতে পারি বা কোন বিষয়ে আলাপ করতে চান?';
   }
 
   if (q.includes('কে তুমি') || q.includes('who are you') || q.includes('तुम कौन हो')) {
-    return 'আমি DocuCraft AI, আপনার পার্সোনাল স্মার্ট এআই অ্যাসিস্ট্যান্ট! প্রজেক্টের কাজের পাশাপাশি আমি যেকোনো সাধারণ বিষয়ে আপনার সাথে কথা বলতে ও সাহায্য করতে পারি।';
+    return 'আমি DocuCraft AI, আপনার পার্সোনাল স্মার্ট অ্যাসিস্ট্যান্ট! প্রজেক্টের কাজের পাশাপাশি আমি যেকোনো সাধারণ বা বুদ্ধিমত্তার প্রশ্নে আপনাকে সাহায্য করতে পারি।';
   }
 
   // ২. প্ল্যাটফর্ম বা টুলস সম্পর্কিত প্রশ্ন
   if (q.includes('photo') || q.includes('kb') || q.includes('mb') || q.includes('resizer') || q.includes('ছবি') || q.includes('সাইজ')) {
-    return 'আমাদের "Photo & Sign KB/MB Resizer" টুল ব্যবহার করে যেকোনো ছবি বা সিগনেচারকে আপনার পছন্দের নিখুঁত KB বা MB সাইজে রিসাইজ করতে পারবেন।';
+    return 'আমাদের প্ল্যাটফর্মের "Photo & Sign KB/MB Resizer" টুল ব্যবহার করে আপনি যেকোনো ছবি বা সিগনেচারকে আপনার পছন্দের নিখুঁত KB বা MB সাইজে রিসাইজ করতে পারবেন।';
   }
 
   if (q.includes('passport') || q.includes('পাসপোর্ট')) {
@@ -174,40 +173,40 @@ function generateUniversalAiResponse(query) {
   }
 
   if (q.includes('pdf') || q.includes('merge') || q.includes('split') || q.includes('compress') || q.includes('পিডিএফ')) {
-    return 'আমাদের প্ল্যাটফর্মে Merge, Split এবং Compress-এর মতো দরকারি সব PDF টুল একদম বিনামূল্যে পেয়ে যাবেন।';
+    return 'আমাদের ওয়েবসাইটের Merge, Split এবং Compress-এর মতো দরকারি সব PDF টুল একদম বিনামূল্যে ব্যবহার করতে পারেন।';
   }
 
   if (q.includes('who made you') || q.includes('ke banieche') || q.includes('কে বানিয়েছে') || q.includes('developer')) {
-    return 'আমাকে তৈরি করেছেন ইনদনীল রুইদাস (Indranil Ruidas), যিনি এই DocuCraft AI প্ল্যাটফর্মের প্রতিষ্ঠাতা ও ডেভেলপার!';
+    return 'আমাকে তৈরি করেছেন ইনদনীল রুইদাস (Indranil Ruidas), যিনি এই DocuCraft AI প্রজেক্টের প্রতিষ্ঠাতা ও ডেভেলপার!';
   }
 
-  // ৩. সাধারণ জ্ঞান, বিজ্ঞান, ইতিহাস বা অন্যান্য যেকোনো প্রশ্নের বুদ্ধিমান উত্তর জেনারেটর
+  // ৩. অন্যান্য সাধারণ বা যেকোনো বিষয়ের স্মার্ট উত্তর
   if (q.includes('আকাশ কেন নীল') || q.includes('why is the sky blue')) {
-    return 'সূর্যের আলো যখন বায়ুমণ্ডলের গ্যাসের কণাগুলোর ওপর পড়ে, তখন নীল রঙের আলোর তরঙ্গদৈর্ঘ্য কম থাকায় তা চারদিকে বেশি ছড়িয়ে পড়ে (Rayleigh scattering)। এ কারণেই আমাদের কাছে আকাশ নীল দেখায়!';
+    return 'সূর্যের আলো বায়ুমণ্ডলের কণাগুলোর ওপর পড়ার সময় নীল আলোর বিক্ষেপণ বেশি হওয়ার কারণে আমাদের কাছে আকাশ নীল দেখায়।';
   }
 
   if (q.includes('বাংলাদেশ') || q.includes('india') || q.includes('ভারত')) {
-    return 'দক্ষিণ এশিয়ার একটি অত্যন্ত সুন্দর ও সংস্কৃতিসমৃদ্ধ দেশ হলো ভারত। এর রাজধানী নতুন দিল্লি এবং এর ইতিহাস ও ঐতিহ্য অত্যন্ত সমৃদ্ধ।';
+    return 'দক্ষিণ এশিয়ার একটি অত্যন্ত সুন্দর দেশ হলো ভারত, যার রাজধানী নতুন দিল্লি এবং এর সংস্কৃতি ও ইতিহাস অত্যন্ত সমৃদ্ধ।';
   }
 
   if (q.includes('ভালোবাসা') || q.includes('love')) {
-    return 'ভালোবাসা হলো মানবজীবনের সবচেয়ে সুন্দর অনুভূতি, যা মানুষে মানুষে মেলবন্ধন তৈরি করে এবং পৃথিবীতে শান্তি ও সুখ বয়ে আনে।';
+    return 'ভালোবাসা মানুষের মনের এক গভীর ও পবিত্র অনুভূতি, যা সমাজে শান্তি, সহানুভূতি এবং মেলবন্ধন তৈরি করে।';
   }
 
-  // ৪. যদি নির্দিষ্ট কোনো ম্যাচ না করে, তবে একটি বুদ্ধিমান ও প্রফেশনাল জেনেরিক উত্তর প্রদান করবে
+  // ৪. যদি কোনো নির্দিষ্ট টপিক না মেলে, তবে ইউজারের প্রশ্ন অনুযায়ী একদম ইউনিক ও প্রাসঙ্গিক উত্তর দেবে
   if (currentLang === 'hi') {
-    return `आपने बहुत अच्छा प्रश्न पूछा है: "${query}"। एक स्मार्ट सहायक के रूप में, मैं आपको बता सकता हूँ कि इस विषय पर गहराई से अध्ययन करके और अधिक जानकारी प्राप्त की जा सकती है। क्या आप हमारे किसी विशेष टूल के बारे में जानना चाहते हैं?`;
+    return `यह एक बहुत ही रोचक विषय है: "${query}"। इसके बारे में कहा जा सकता है कि हर पहलू को गहराई से समझने पर नई जानकारियां मिलती हैं। क्या आप इससे जुड़ा कोई और सवाल पूछना चाहते हैं?`;
   } else if (currentLang === 'en') {
-    return `That's an interesting question about "${query}". As your assistant, I am always here to help you explore more topics or assist you with our document tools!`;
+    return `That's a very interesting point about "${query}". Exploring this further opens up many unique perspectives. Is there anything specific you'd like to know about it?`;
   } else {
-    return `আপনার প্রশ্নটি বেশ চমৎকার: "${query}"। একজন স্মার্ট অ্যাসিস্ট্যান্ট হিসেবে আমি আপনাকে বলছি যে, এই বিষয়টি নিয়ে আরও বিস্তারিত পড়াশোনা বা গবেষণা করা যেতে পারে। তাছাড়া আমাদের প্ল্যাটফর্মের কোনো টুল ব্যবহার করতে চাইলে বলুন, আমি সাহায্য করব!`;
+    return `আপনার এই বিষয়টি বেশ ভাবনার খোরাক জোগায়: "${query}"। এটি নিয়ে গভীরভাবে আলোচনা করা যায়। বলুন, এই বিষয়ে আরও কিছু জানতে চান নাকি আমাদের কোনো টুল ব্যবহার করতে চান?`;
   }
 }
 
 function appendUserMessage(text) {
   const chatBox = document.getElementById('aiChatBody');
   if (!chatBox) return;
-  chatBox.innerHTML += `<div style="margin: 8px 0; text-align: right;"><span style="background: #2563eb; color: #fff; padding: 8px 12px; border-radius: 12px 12px 0 12px; display: inline-box; display: inline-block; font-size: 13px; max-width: 80%;">${escapeHtml(text)}</span></div>`;
+  chatBox.innerHTML += `<div style="margin: 8px 0; text-align: right;"><span style="background: #2563eb; color: #fff; padding: 8px 12px; border-radius: 12px 12px 0 12px; display: inline-block; font-size: 13px; max-width: 80%;">${escapeHtml(text)}</span></div>`;
   chatBox.scrollTop = chatBox.scrollHeight;
 }
 
