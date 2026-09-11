@@ -1,23 +1,38 @@
-// DocuCraft AI - True Multi-Language Live Conversational Assistant & Chat Logic (Gemini Style)
+// DocuCraft AI - Advanced Multi-Language Conversational AI (Gemini Live Style)
 
-const aiKnowledge = {
+const aiConversations = {
   en: {
-    welcome: "Hello! I am DocuCraft AI, your live assistant. Ask me anything about science, history, coding, daily life, or our website tools!",
-    default: "That is a fascinating topic! As your AI assistant, I can chat with you about anything—whether it's technology, science, literature, or daily conversations. Tell me more, what would you like to explore?",
-    listening: "🎙️ Listening... Please speak clearly",
-    placeholder: "Ask me anything..."
+    welcome: "Hello! I am DocuCraft AI. We can talk about anything—science, coding, history, or daily life. What's on your mind?",
+    listening: "🎙️ Listening... Speak now in English",
+    placeholder: "Type your message here...",
+    fallbacks: [
+      "That's a very interesting point! Tell me more about how you see it.",
+      "I love discussing topics like this. What specific aspect would you like to dive into?",
+      "That makes a lot of sense. Let's explore this a bit further. What are your thoughts?",
+      "Fascinating! There's so much to unpack here. What else would you like to discuss about this?"
+    ]
   },
   hi: {
-    welcome: "नमस्ते! मैं DocuCraft AI हूँ, आपका लाइव असिस्टेंट। आप मुझसे विज्ञान, इतिहास, कोडिंग या किसी भी विषय पर खुलकर बात कर सकते हैं!",
-    default: "यह वास्तव में एक बहुत ही रोचक विषय है! मैं आपके साथ किसी भी विषय पर चर्चा कर सकता हूँ—चाहे वह विज्ञान हो, तकनीक हो, इतिहास हो या दैनिक जीवन की बातें। बताइए, इस बारे में आप और क्या जानना चाहते हैं?",
-    listening: "🎙️ सुन रहा हूँ... कृपया स्पष्ट रूप से बोलें",
-    placeholder: "मुझसे कुछ भी पूछें..."
+    welcome: "नमस्ते! मैं DocuCraft AI हूँ। हम विज्ञान, तकनीक, इतिहास या किसी भी विषय पर खुलकर बात कर सकते हैं। बताइए, आज क्या बात करें?",
+    listening: "🎙️ सुन रहा हूँ... कृपया हिंदी में बोलें",
+    placeholder: "यहाँ अपना संदेश टाइप करें...",
+    fallbacks: [
+      "यह वास्तव में एक बहुत ही दिलचस्प बात है! इस बारे में आपकी क्या राय है?",
+      "मुझे इस तरह के विषयों पर चर्चा करना बहुत पसंद है। इसके बारे में और क्या जानना चाहते हैं?",
+      "आपकी बात बिल्कुल सही है। चलिए इस पर थोड़ा और विस्तार से बात करते हैं।",
+      "यह बहुत ही बढ़िया सवाल है! इस पर आपका क्या सोचना है?"
+    ]
   },
   bn: {
-    welcome: "নমস্কার! আমি DocuCraft AI, আপনার লাইভ অ্যাসিস্ট্যান্ট। বিজ্ঞান, ইতিহাস, টেকনোলজি কিংবা যেকোনো সাধারণ বিষয় নিয়ে আমার সাথে খোলামেলা কথা বলতে পারেন!",
-    default: "বিষয়টি নিয়ে সত্যিই অনেক কিছু ভাবার আছে! আপনার সাথে যেকোনো বিষয়ে আড্ডা দিতে বা আলোচনা করতে আমার খুব ভালো লাগে—তা হতে পারে বিজ্ঞান, মহাকাশ, কোডিং, ইতিহাস কিংবা সাধারণ জ্ঞান। বলুন, এই বিষয়ে আর কী জানতে চান?",
-    listening: "🎙️ শুনছি... কথা বলুন স্পষ্ট করে",
-    placeholder: "আমাকে যেকোনো কিছু জিজ্ঞেস করুন..."
+    welcome: "নমস্কার! আমি DocuCraft AI। বিজ্ঞান, কোডিং, ইতিহাস বা যেকোনো সাধারণ বিষয় নিয়ে আপনি আমার সাথে খোলামেলা আড্ডা বা আলোচনা করতে পারেন। বলুন, আজ কী নিয়ে কথা বলব?",
+    listening: "🎙️ শুনছি... বাংলায় কথা বলুন",
+    placeholder: "এখানে আপনার মেসেজ লিখুন...",
+    fallbacks: [
+      "বিষয়টি নিয়ে সত্যিই অনেক চমৎকার আলোচনা করা যেতে পারে! এই বিষয়ে আপনার নিজস্ব মতামত কী বলুন তো?",
+      "আপনার কথাটি বেশ দারুণ! এই প্রসঙ্গে আপনার সাথে একমত হওয়া যায়। এ নিয়ে আরও কিছু কি বলতে চান?",
+      "বেশ চমৎকার একটি পয়েন্ট তুলেছেন! এই বিষয়ে বিস্তারিত বলতে গেলে বলা যায় যে, এটি বেশ গভীর একটি বিষয়।",
+      "আপনার এই প্রশ্নটি নিয়ে আরও অনেক নতুন তথ্য জানা যেতে পারে। এ বিষয়ে আপনার ধারণা কেমন?"
+    ]
   }
 };
 
@@ -28,14 +43,14 @@ document.addEventListener('DOMContentLoaded', () => {
   if (document.getElementById('autoAiModal')) return;
 
   const btn = document.createElement('button');
-  btn.innerHTML = '💬 DocuCraft AI Live';
+  btn.innerHTML = '💬 DocuCraft Live AI';
   btn.style.cssText = 'position: fixed; bottom: 20px; right: 20px; background: linear-gradient(135deg, #2563eb, #db2777); color: #fff; border: none; padding: 10px 18px; border-radius: 30px; font-weight: 600; cursor: pointer; z-index: 99999; box-shadow: 0 4px 12px rgba(0,0,0,0.3); font-size: 14px;';
   btn.onclick = toggleAiHelpdesk;
   document.body.appendChild(btn);
 
   const modal = document.createElement('div');
   modal.id = 'autoAiModal';
-  modal.style.cssText = 'display: none; position: fixed; bottom: 10px; right: 10px; width: 360px; max-width: calc(100vw - 20px); height: 480px; max-height: 80vh; background: #fff; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.25); z-index: 99999; flex-direction: column; overflow: hidden; border: 1px solid #cbd5e1;';
+  modal.style.cssText = 'display: none; position: fixed; bottom: 10px; right: 10px; width: 360px; max-width: calc(100vw - 20px); height: 500px; max-height: 80vh; background: #fff; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.25); z-index: 99999; flex-direction: column; overflow: hidden; border: 1px solid #cbd5e1;';
   modal.innerHTML = `
     <div style="background: #1e293b; color: #fff; padding: 10px 14px; display: flex; justify-content: space-between; align-items: center; flex-shrink: 0;">
       <span style="font-weight: 600; font-size: 13px;">🤖 DocuCraft Live AI</span>
@@ -53,19 +68,19 @@ document.addEventListener('DOMContentLoaded', () => {
     </div>
 
     <div id="voiceStatusBar" style="display: none; background: #e0f2fe; color: #0369a1; padding: 6px 12px; font-size: 12px; font-weight: 600; text-align: center; border-bottom: 1px solid #bae6fd; flex-shrink: 0;">
-      ${aiKnowledge.bn.listening}
+      ${aiConversations.bn.listening}
     </div>
 
     <div id="aiChatBody" style="padding: 12px; flex: 1; overflow-y: auto; background: #f8fafc; font-size: 13px; -webkit-overflow-scrolling: touch;">
       <div style="margin: 8px 0; text-align: left;">
         <span id="aiWelcomeMsg" style="background: #f1f5f9; color: #1e293b; padding: 10px 14px; border-radius: 12px 12px 12px 0; display: inline-block; border: 1px solid #e2e8f0; line-height: 1.4;">
-          ${aiKnowledge.bn.welcome}
+          ${aiConversations.bn.welcome}
         </span>
       </div>
     </div>
 
     <div style="padding: 10px; background: #fff; border-top: 1px solid #e2e8f0; display: flex; gap: 6px; align-items: center; flex-shrink: 0;">
-      <input type="text" id="aiChatInput" placeholder="${aiKnowledge.bn.placeholder}" style="flex: 1; padding: 9px 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 13px; outline: none;" onkeypress="if(event.key==='Enter') sendUserMessage()">
+      <input type="text" id="aiChatInput" placeholder="${aiConversations.bn.placeholder}" style="flex: 1; padding: 9px 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 13px; outline: none;" onkeypress="if(event.key==='Enter') sendUserMessage()">
       <button onclick="startVoiceInput()" style="background: #0284c7; color: #fff; border: none; padding: 9px 11px; border-radius: 8px; cursor: pointer;" title="Voice Input">🎤</button>
       <button onclick="sendUserMessage()" style="background: #2563eb; color: #fff; border: none; padding: 9px 14px; border-radius: 8px; cursor: pointer;">➤</button>
     </div>
@@ -98,7 +113,7 @@ function toggleVoiceOutput() {
 
 function changeAiLanguage(lang) {
   currentLang = lang;
-  const langData = aiKnowledge[lang] || aiKnowledge.bn;
+  const langData = aiConversations[lang] || aiConversations.bn;
   
   const welcomeEl = document.getElementById('aiWelcomeMsg');
   if (welcomeEl) welcomeEl.innerText = langData.welcome;
@@ -133,6 +148,9 @@ async function sendUserMessage(customText = '') {
   const query = customText || (input ? input.value.trim() : '');
   if (!query) return;
 
+  // অটো ল্যাঙ্গুয়েজ ডিটেকশন (ব্যবহারকারী যে ভাষায় লিখবে বা বলবে, চ্যাটবট সেই ভাষা ধরে নেবে)
+  detectLanguageFromQuery(query);
+
   appendUserMessage(query);
   if (input) input.value = '';
 
@@ -141,46 +159,79 @@ async function sendUserMessage(customText = '') {
 
   setTimeout(() => {
     removeAiMessage(loadingId);
-    const reply = generateGeminiStyleResponse(query, currentLang);
+    const reply = generateSmartConversationalResponse(query, currentLang);
     appendAiMessage(reply);
     speakText(reply);
-  }, 500);
+  }, 600);
 }
 
-function generateGeminiStyleResponse(query, lang) {
+// ব্যবহারকারীর ইনপুট থেকে ভাষা স্বয়ংক্রিয়ভাবে চেনার ফাংশন
+function detectLanguageFromQuery(text) {
+  const hindiRegex = /[\u0900-\u097F]/;
+  const bengaliRegex = /[\u0980-\u09FF]/;
+
+  if (hindiRegex.test(text)) {
+    currentLang = 'hi';
+  } else if (bengaliRegex.test(text)) {
+    currentLang = 'bn';
+  } else {
+    // যদি ইংরেজি বা রোমান হরফে লিখে তবে টেক্সট চেক করে ভাষা নির্ধারণ করা যায়
+    const low = text.toLowerCase();
+    if (low.includes('kemon') || low.includes('ki') || low.includes('keno') || low.includes('amar')) {
+      currentLang = 'bn';
+    } else if (low.includes('kaise') || low.includes('kya') || low.includes('hai') || low.includes('hain')) {
+      currentLang = 'hi';
+    }
+  }
+
+  // ড্রপডাউন বা UI সিলেক্টও অটো আপডেট করে দেওয়া
+  const selectEl = document.getElementById('aiLangSelect');
+  if (selectEl) selectEl.value = currentLang;
+}
+
+// জেমিনির মতো যেকোনো কথার স্বয়ংক্রিয় এবং পরিবর্তনশীল উত্তর জেনারেটর
+function generateSmartConversationalResponse(query, lang) {
   const q = query.toLowerCase();
   
-  if (q.includes('who are you') || q.includes('तुम कौन हो') || q.includes('কে তুমি') || q.includes('তোমার নাম কী')) {
-    if (lang === 'hi') return 'मैं DocuCraft AI हूँ, एक एडवांस conversational assistant जिसे इंड्रनील रुइदास (Indranil Ruidas) ने विकसित किया है।';
-    if (lang === 'en') return 'I am DocuCraft AI, an advanced conversational assistant developed by Indranil Ruidas.';
-    return 'আমি DocuCraft AI, ইনদনীল রুইদাস (Indranil Ruidas) দ্বারা তৈরি একটি অ্যাডভান্সড এআই অ্যাসিস্ট্যান্ট।';
+  // ১. পরিচয় বা ডেভেলপার সংক্রান্ত প্রশ্ন
+  if (q.includes('who are you') || q.includes('কে তুমি') || q.includes('तुम कौन हो') || q.includes('তোমার নাম')) {
+    if (lang === 'hi') return 'मैं DocuCraft AI हूँ, जिसे इंड्रनील रुइदास (Indranil Ruidas) द्वारा एक स्मार्ट और नेचुरल असिस्टेंट के रूप में बनाया गया है।';
+    if (lang === 'en') return 'I am DocuCraft AI, a natural conversational assistant created by Indranil Ruidas to chat and help you with anything.';
+    return 'আমি DocuCraft AI, ইনদনীল রুইদাস (Indranil Ruidas) দ্বারা তৈরি একটি স্মার্ট ও ন্যাচারাল এআই অ্যাসিস্ট্যান্ট। যেকোনো বিষয়ে খোলামেলা কথা বলতে আমি প্রস্তুত!';
   }
 
-  if (q.includes('tool') || q.includes('website') || q.includes('टूल') || q.includes('টুল') || q.includes('ওয়েবসাইট') || q.includes('pdf')) {
-    if (lang === 'hi') return 'हमारी वेबसाइट पर विभिन्न प्रकार के उपयोगी टूल्स उपलब्ध हैं जैसे Photo & Sign KB/MB Resizer, Smart Passport Photo Studio, और PDF Tools!';
-    if (lang === 'en') return 'Our platform features powerful utilities like Photo & Sign KB/MB Resizer, Smart Passport Photo Studio, and PDF processing tools.';
-    return 'আমাদের প্ল্যাটফর্মে চমৎকার সব ইউটিলিটি রয়েছে যেমন Photo & Sign KB/MB Resizer, Smart Passport Photo Studio এবং প্রয়োজনীয় সব PDF Tools!';
+  // ২. ওয়েবসাইট টুলস সংক্রান্ত প্রশ্ন
+  if (q.includes('tool') || q.includes('website') || q.includes('টুল') || q.includes('ওয়েবসাইট') || q.includes('pdf') || q.includes('पासपोर्ट')) {
+    if (lang === 'hi') return 'हमारी वेबसाइट पर Photo & Sign KB/MB Resizer, Smart Passport Photo Studio, और PDF Merge/Split जैसे कई शानदार टूल्स मौजूद हैं। आप इनका खुलकर उपयोग कर सकते हैं!';
+    if (lang === 'en') return 'Our website features incredible utilities like Photo & Sign KB/MB Resizer, Smart Passport Photo Studio, and robust PDF tools to make your work effortless.';
+    return 'আমাদের ওয়েবসাইটে Photo & Sign KB/MB Resizer, Smart Passport Photo Studio এবং প্রয়োজনীয় সব PDF Tools খুব সহজেই ব্যবহার করতে পারেন!';
   }
 
-  if (q.includes('black hole') || q.includes('ब्लैक होल') || q.includes('ব্ল্যাক হোল')) {
-    if (lang === 'hi') return 'ब्लैक होल ब्रह्मांड का एक ऐसा क्षेत्र है जहाँ गुरुत्वाकर्षण इतना अधिक होता है कि प्रकाश भी इससे बाहर नहीं निकल सकता।';
-    if (lang === 'en') return 'A black hole is a region of spacetime where gravity is so strong that nothing—not even light—can escape from it.';
-    return 'ব্ল্যাক হোল হলো মহাকাশের এমন একটি জায়গা যেখানে মহাকর্ষ বল এত বেশি যে আলোও সেখান থেকে বের হতে পারে না।';
+  // ৩. বিজ্ঞান, মহাকাশ বা প্রযুক্তি (Science & Tech)
+  if (q.includes('ai') || q.includes('artificial intelligence') || q.includes('एआई') || q.includes('প্রযুক্তি')) {
+    if (lang === 'hi') return 'आर्टिफिशियल इंटेलिजेंस (AI) आज के समय में दुनिया को तेजी से बदल रहा है। यह मशीनों को इंसानों की तरह सोचने और सीखने की क्षमता देता है। इस बारे में आपका क्या सोचना है?';
+    if (lang === 'en') return 'Artificial Intelligence is transforming our world rapidly, enabling machines to process data, learn, and reason much like humans do. How do you see AI shaping the future?';
+    return 'আর্টিফিশিয়াল ইন্টেলিজেন্স বা এআই হলো প্রযুক্তির এক বিপ্লব, যা মেশিনকে মানুষের মতো চিন্তা করতে ও শিখতে সহায়তা করে। ভবিষ্যতের পৃথিবীতে এআই নিয়ে আপনার ধারণা কী?';
   }
 
-  if (q.includes('kemon acho') || q.includes('كيف حالك') || q.includes('कैसी हो') || q.includes('how are you') || q.includes('কেমন আছো')) {
-    if (lang === 'hi') return 'मैं पूरी तरह से ठीक हूँ! बोलिए, आज हम किस दिलचस्प विषय पर बात करें?';
-    if (lang === 'en') return 'I am doing fantastic! What interesting topic shall we discuss today?';
-    return 'আমি একদম চমৎকার আছি! বলুন, আজ কোন আকর্ষণীয় বিষয় নিয়ে কথা বলতে চান?';
+  if (q.includes('space') || q.includes('universe') || q.includes('ब्रह्मांड') || q.includes('মহাকাশ') || q.includes('black hole')) {
+    if (lang === 'hi') return 'ब्रह्मांड रहस्यों से भरा हुआ है! अरबों आकाशगंगाएँ, तारे और ब्लैक होल्स इसके सबसे दिलचस्प हिस्से हैं। क्या आपको स्पेस मिस्ट्रीज़ पढ़ना पसंद है?';
+    if (lang === 'en') return 'The universe is filled with endless mysteries—billions of galaxies, expanding space, and enigmatic black holes. Are you fascinated by space exploration?';
+    return 'মহাকাশ এক অন্তহীন রহস্যে ভরা। কোটি কোটি গ্যালাক্সি আর ব্ল্যাক হোলের এই জগৎ নিয়ে মানুষের কৌতূহলের শেষ নেই। মহাকাশ বিজ্ঞান নিয়ে আপনার কি বিশেষ আগ্রহ আছে?';
   }
 
-  if (lang === 'hi') {
-    return `यह एक बहुत ही विचारणीय प्रश्न है: "${query}"। इस विषय पर और गहराई से चर्चा की जा सकती है।`;
-  } else if (lang === 'en') {
-    return `That's a really insightful point about "${query}". There are many dimensions to explore here.`;
-  } else {
-    return `"${query}" বিষয়টি নিয়ে সত্যিই অনেক চমৎকার আলোচনা করা যেতে পারে। এই বিষয়ে আপনার মতামত কী?`;
+  // ৪. কুশল বিনিময় বা চ্যাট (Greetings)
+  if (q.includes('hi') || q.includes('hello') || q.includes('hey') || q.includes('नमस्ते') || q.includes('কেমন') || q.includes('kemon')) {
+    if (lang === 'hi') return 'नमस्ते! मैं पूरी तरह से ठीक हूँ। बताइए, आज हम किस दिलचस्प विषय पर बात करें?';
+    if (lang === 'en') return 'Hello there! I am doing great. What interesting topic shall we chat about today?';
+    return 'নমস্কার! আমি একদম ভালো আছি। বলুন, আজ কোন মজার বা ইন্টারেস্টিং বিষয় নিয়ে আলোচনা করা যাক?';
   }
+
+  // ৫. র্যান্ডম ও পরিবর্তনশীল কনভার্সেশনাল ফলব্যাক (যাতে প্রতিবার আলাদা ও নতুন উত্তর দেয়)
+  const langData = aiConversations[lang] || aiConversations.bn;
+  const fallbacks = langData.fallbacks;
+  const randomIndex = Math.floor(Math.random() * fallbacks.length);
+  return fallbacks[randomIndex];
 }
 
 function appendUserMessage(text) {
@@ -215,7 +266,7 @@ function startVoiceInput() {
   recognition.maxAlternatives = 1;
 
   const statusBar = document.getElementById('voiceStatusBar');
-  const langData = aiKnowledge[currentLang] || aiKnowledge.bn;
+  const langData = aiConversations[currentLang] || aiConversations.bn;
 
   recognition.onstart = function() {
     if (statusBar) {
@@ -244,5 +295,5 @@ function startVoiceInput() {
 }
 
 function escapeHtml(value) {
-  return String(value).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+  return String(text = value).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
 }
