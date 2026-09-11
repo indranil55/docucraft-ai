@@ -1,5 +1,4 @@
-// DocuCraft AI - Ultimate Gemini Live Assistant with Built-in Guide & Universal Knowledge
-
+// DocuCraft AI 
 const aiConversations = {
   en: {
     welcome: "Hello! I am DocuCraft AI Live. I know all about our website tools (KB Resizer, PDF tools, Invoice Maker) and can chat about anything else in the world. How can I help you today?",
