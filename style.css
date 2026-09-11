@@ -16,11 +16,11 @@
   -webkit-tap-highlight-color: transparent;
 }
 
-/* পুরো ওয়েবসাইটের ব্যাকগ্রাউন্ডে রোমান্টিক ও জাদুকরী অ্যানিমেটেড কালার মিক্সিং */
+/* ব্যাকগ্রাউন্ডে রোমান্টিক, প্রাণবন্ত এবং স্পষ্ট চলমান কালার ফ্লো অ্যানিমেশন */
 body {
-  background: linear-gradient(120deg, #fdf2f8, #f0fdf4, #eff6ff, #fef2f2, #faf5ff);
+  background: linear-gradient(135deg, #fbcfe8, #fed7aa, #bfdbfe, #bbf7d0, #e9d5ff, #fecaca);
   background-size: 400% 400%;
-  animation: romanticColorFlow 15s ease infinite;
+  animation: romanticColorFlow 8s ease infinite;
   color: var(--slate-dark);
   min-height: 100vh;
   min-height: 100dvh;
