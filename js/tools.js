@@ -826,7 +826,6 @@ function downloadBlob(content, name, type) {
   a.href = blobUrl;
   a.download = name;
   document.body.appendChild(a);
-  // Immediate trigger fix to prevent double tapping
   setTimeout(() => {
     a.click();
     setTimeout(() => {
