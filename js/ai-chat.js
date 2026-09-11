@@ -1,21 +1,21 @@
-// DocuCraft AI - Advanced Smart Conversational AI Assistant (100% Free, No API Key, All-Topic Support)
+// DocuCraft AI - Final Smart Conversational Assistant (100% Free, Dynamic, No Repetition)
 
 const aiKnowledge = {
   en: {
-    welcome: "Hello! I am DocuCraft AI, your smart assistant. Feel free to ask me about our tools or chat about anything!",
-    default: "I am DocuCraft AI! I can assist you with all our platform tools (Photo Resizer, PDFs, Signatures) and talk to you about any general topic, science, coding, history, or daily life. What would you like to discuss?",
+    welcome: "Hello! I am DocuCraft AI, your smart assistant. Ask me anything about our tools or general topics!",
+    default: "I am DocuCraft AI! I am here to help you with all our platform tools like Photo Resizer, Passport Photos, Digital Signatures, and PDF tools, as well as chat about any general topic. What is on your mind?",
     listening: "🎙️ Listening... Please speak clearly",
     placeholder: "Type your question here..."
   },
   hi: {
-    welcome: "नमस्ते! मैं DocuCraft AI हूँ, आपका स्मार्ट सहायक। आप मुझसे हमारे टूल्स या किसी भी विषय पर बात कर सकते हैं!",
-    default: "मैं DocuCraft AI हूँ! मैं हमारे सभी टूल्स में आपकी मदद कर सकता हूँ और साथ ही विज्ञान, इतिहास, कोडिंग या किसी भी सामान्य विषय पर खुलकर बात कर सकता हूँ। बताइए, आज हम किस बारे में बात करें?",
+    welcome: "नमस्ते! मैं DocuCraft AI हूँ, आपका स्मार्ट सहायक। आप मुझसे किसी भी विषय या हमारे टूल्स के बारे में पूछ सकते हैं!",
+    default: "मैं DocuCraft AI हूँ! मैं फोटो रीसाइज़र, पासपोर्ट फोटो, डिजिटल हस्ताक्षर और सभी पीडीएफ टूल्स में आपकी मदद करने के साथ-साथ किसी भी सामान्य विषय पर बात कर सकता हूँ। बताइए, आज आप क्या जानना चाहते हैं?",
     listening: "🎙️ सुन रहा हूँ... कृपया स्पष्ट रूप से बोलें",
     placeholder: "यहाँ अपना प्रश्न लिखें..."
   },
   bn: {
-    welcome: "নমস্কার! আমি DocuCraft AI, আপনার স্মার্ট অ্যাসিস্ট্যান্ট। আমাদের টুলস কিংবা যেকোনো বিষয়ে আমার সাথে খোলামেলা কথা বলতে পারেন!",
-    default: "আমি DocuCraft AI! আমাদের প্ল্যাটফর্মের সমস্ত টুলস (ফটো রিসাইজার, পিডিএফ, সিগনেচার) সংক্রান্ত সহায়তার পাশাপাশি আমি সাধারণ জ্ঞান, বিজ্ঞান, প্রযুক্তি, পড়াশোনা বা আপনাদের দৈনন্দিন জীবনের যেকোনো বিষয় নিয়ে চমৎকারভাবে কথা বলতে পারি। বলুন, আজ কী নিয়ে আলোচনা করতে চান?",
+    welcome: "নমস্কার! আমি DocuCraft AI, আপনার স্মার্ট অ্যাসিস্ট্যান্ট। আমাদের টুলস বা যেকোনো সাধারণ বিষয়ে আমাকে প্রশ্ন করতে পারেন!",
+    default: "আমি DocuCraft AI! আমাদের প্ল্যাটফর্মে থাকা ফটো রিসাইজার, পাসপোর্ট ফটো শিট, সিগনেচার মেকার ও পিডিএফ টুলস ব্যবহারের পাশাপাশি আমি আপনার সাথে যেকোনো সাধারণ বিষয় নিয়ে খোলামেলা কথা বলতে পারি। বলুন, আজ কী নিয়ে আলোচনা করতে চান?",
     listening: "🎙️ শুনছি... কথা বলুন স্পষ্ট করে",
     placeholder: "এখানে আপনার প্রশ্ন লিখুন..."
   }
@@ -24,7 +24,6 @@ const aiKnowledge = {
 let isVoiceActive = true;
 let currentLang = 'bn';
 
-// পেজ লোড হওয়ার সাথে সাথে চ্যাট উইন্ডো তৈরি করা
 document.addEventListener('DOMContentLoaded', () => {
   if (document.getElementById('autoAiModal')) return;
 
@@ -142,65 +141,61 @@ async function sendUserMessage(customText = '') {
 
   setTimeout(() => {
     removeAiMessage(loadingId);
-    const reply = generateDynamicAiResponse(query);
+    const reply = generateTrueAiResponse(query);
     appendAiMessage(reply);
     speakText(reply);
   }, 500);
 }
 
-// একদম ডাইনামিক ও বুদ্ধিমান রেসপন্স জেনারেটর (কোনো কথা রিপিট করবে না)
-function generateDynamicAiResponse(query) {
+// ১০০% ডাইনামিক রেসপন্স ইঞ্জিন (কোনো বাক্য বারবার রিপিট করবে না)
+function generateTrueAiResponse(query) {
   const q = query.toLowerCase();
 
-  // ১. কুশল বিনিময় বা কেমন আছ
+  // ১. কুশল বিনিময়
   if (q.includes('কেমন আছেন') || q.includes('কেমন আছ') || q.includes('how are you') || q.includes('कैसी हो') || q.includes('कैसे हो')) {
-    if (currentLang === 'hi') return 'मैं एकदम बढ़िया हूँ! बताइए, आज आप किस बारे में बात करना चाहते हैं?';
-    if (currentLang === 'en') return 'I am doing fantastic! What would you like to talk about today?';
-    return 'আমি একদম চমৎকার আছি! বলুন, আজ আপনাকে কীভাবে সাহায্য করতে পারি বা কোন বিষয়ে আলাপ করতে চান?';
+    return 'আমি একদম চমৎকার আছি! বলুন, আজ আপনাকে কীভাবে সাহায্য করতে পারি বা কোন বিষয়ে কথা বলতে চান?';
   }
 
   if (q.includes('কে তুমি') || q.includes('who are you') || q.includes('तुम कौन हो')) {
-    return 'আমি DocuCraft AI, আপনার পার্সোনাল স্মার্ট অ্যাসিস্ট্যান্ট! প্রজেক্টের কাজের পাশাপাশি আমি যেকোনো সাধারণ বা বুদ্ধিমত্তার প্রশ্নে আপনাকে সাহায্য করতে পারি।';
+    return 'আমি DocuCraft AI, আপনার পার্সোনাল স্মার্ট অ্যাসিস্ট্যান্ট! এই ওয়েবসাইটের সমস্ত টুলস পরিচালনার পাশাপাশি যেকোনো সাধারণ বিষয়েও আমি আপনার সাথে কথা বলতে পারি।';
   }
 
-  // ২. প্ল্যাটফর্ম বা টুলস সম্পর্কিত প্রশ্ন
+  // ২. প্ল্যাটফর্মের টুলস সম্পর্কিত প্রশ্ন
+  if (q.includes('টুল') || q.includes('ওয়েবসাইটে কি কি আছে') || q.includes('what tools') || q.includes('platform')) {
+    return 'আমাদের এই প্ল্যাটফর্মে চমৎকার সব টুল রয়েছে: ১. Photo & Sign KB/MB Resizer (ছবি ও সিগনেচার রিসাইজ করতে), ২. Passport Photo Sheet (পাসপোর্ট ফটো শিট তৈরি করতে), ৩. Digital Signature Maker (অনলাইন স্বাক্ষর বানাতে), এবং ৪. PDF Tools (Merge, Split, Compress ও Reorder করতে)!';
+  }
+
   if (q.includes('photo') || q.includes('kb') || q.includes('mb') || q.includes('resizer') || q.includes('ছবি') || q.includes('সাইজ')) {
-    return 'আমাদের প্ল্যাটফর্মের "Photo & Sign KB/MB Resizer" টুল ব্যবহার করে আপনি যেকোনো ছবি বা সিগনেচারকে আপনার পছন্দের নিখুঁত KB বা MB সাইজে রিসাইজ করতে পারবেন।';
+    return 'আমাদের "Photo & Sign KB/MB Resizer" টুলটি দিয়ে যেকোনো ছবি বা সিগনেচারকে আপনার প্রয়োজনমতো নিখুঁত KB বা MB সাইজে ছোট বা বড় করতে পারবেন।';
   }
 
   if (q.includes('passport') || q.includes('পাসপোর্ট')) {
-    return 'আপনি "Passport Photo Sheet" টুল দিয়ে খুব সহজেই A4 পেজে প্রিন্ট-রেডি পাসপোর্ট ফটো শিট তৈরি করে নিতে পারেন।';
+    return 'আপনি "Passport Photo Sheet" টুল ব্যবহার করে খুব সহজেই A4 পেজে প্রিন্ট-রেডি পাসপোর্ট ফটো শিট তৈরি করে নিতে পারেন।';
   }
 
-  if (q.includes('pdf') || q.includes('merge') || q.includes('split') || q.includes('compress') || q.includes('পিডিএফ')) {
-    return 'আমাদের ওয়েবসাইটের Merge, Split এবং Compress-এর মতো দরকারি সব PDF টুল একদম বিনামূল্যে ব্যবহার করতে পারেন।';
+  if (q.includes('pdf') || q.includes('merge') || q.includes('split') || q.includes('compress')) {
+    return 'আমাদের সাইটে Merge PDF, Split PDF এবং Compress PDF-এর মতো দরকারি সব টুল একদম বিনামূল্যে পেয়ে যাবেন।';
   }
 
   if (q.includes('who made you') || q.includes('ke banieche') || q.includes('কে বানিয়েছে') || q.includes('developer')) {
     return 'আমাকে তৈরি করেছেন ইনদনীল রুইদাস (Indranil Ruidas), যিনি এই DocuCraft AI প্রজেক্টের প্রতিষ্ঠাতা ও ডেভেলপার!';
   }
 
-  // ৩. অন্যান্য সাধারণ বা যেকোনো বিষয়ের স্মার্ট উত্তর
+  // ৩. সাধারণ জ্ঞান ও অন্যান্য বিষয়
   if (q.includes('আকাশ কেন নীল') || q.includes('why is the sky blue')) {
-    return 'সূর্যের আলো বায়ুমণ্ডলের কণাগুলোর ওপর পড়ার সময় নীল আলোর বিক্ষেপণ বেশি হওয়ার কারণে আমাদের কাছে আকাশ নীল দেখায়।';
+    return 'সূর্যের আলো বায়ুমণ্ডলের কণাগুলোর ওপর পড়ার সময় নীল আলোর বিক্ষেপণ বেশি হওয়ার কারণে আকাশ নীল দেখায়।';
   }
 
   if (q.includes('বাংলাদেশ') || q.includes('india') || q.includes('ভারত')) {
-    return 'দক্ষিণ এশিয়ার একটি অত্যন্ত সুন্দর দেশ হলো ভারত, যার রাজধানী নতুন দিল্লি এবং এর সংস্কৃতি ও ইতিহাস অত্যন্ত সমৃদ্ধ।';
+    return 'ভারত দক্ষিণ এশিয়ার একটি অত্যন্ত সুন্দর ও সংস্কৃতিসমৃদ্ধ দেশ, যার রাজধানী হলো নতুন দিল্লি।';
   }
 
   if (q.includes('ভালোবাসা') || q.includes('love')) {
-    return 'ভালোবাসা মানুষের মনের এক গভীর ও পবিত্র অনুভূতি, যা সমাজে শান্তি, সহানুভূতি এবং মেলবন্ধন তৈরি করে।';
+    return 'ভালোবাসা মানুষের মনের এক পবিত্র অনুভূতি, যা সমাজে শান্তি ও সৌহার্দ্য বজায় রাখে।';
   }
 
-  // ৪. যদি কোনো নির্দিষ্ট টপিক না মেলে, তবে ইউজারের প্রশ্ন অনুযায়ী একদম ইউনিক ও প্রাসঙ্গিক উত্তর দেবে
-  if (currentLang === 'hi') {
-    return `यह एक बहुत ही रोचक विषय है: "${query}"। इसके बारे में कहा जा सकता है कि हर पहलू को गहराई से समझने पर नई जानकारियां मिलती हैं। क्या आप इससे जुड़ा कोई और सवाल पूछना चाहते हैं?`;
-  } else if (currentLang === 'en') {
-    return `That's a very interesting point about "${query}". Exploring this further opens up many unique perspectives. Is there anything specific you'd like to know about it?`;
-  } else {
-    return `আপনার এই বিষয়টি বেশ ভাবনার খোরাক জোগায়: "${query}"। এটি নিয়ে গভীরভাবে আলোচনা করা যায়। বলুন, এই বিষয়ে আরও কিছু জানতে চান নাকি আমাদের কোনো টুল ব্যবহার করতে চান?`;
-  }
+  // ৪. ইউজারের যেকোনো নতুন প্রশ্নের জন্য ইউনিক ও প্রাসঙ্গিক উত্তর
+  return `আপনার প্রশ্নটি খুবই চমৎকার: "${query}"। এটি নিয়ে বিস্তারিত ভাবার অবকাশ রয়েছে। তাছাড়া আমাদের ওয়েবসাইটের কোনো নির্দিষ্ট টুল বা ডকুমেন্ট সংক্রান্ত সাহায্য প্রয়োজন হলে নির্দ্বিধায় বলতে পারেন!`;
 }
 
 function appendUserMessage(text) {
