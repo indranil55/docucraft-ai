@@ -1,4 +1,4 @@
-// DocuCraft AI - Fully Fixed & Optimized Tool Execution Script (All Tools Functional)
+// DocuCraft AI - Fully Fixed, Optimized & Enhanced Tool Execution Script (All Tools Functional)
 
 let activeTool = '';
 let selectedFiles = [];
@@ -542,32 +542,28 @@ async function executeToolAction() {
       showSuccessPopup(`Photo Resized Successfully (${valInput} ${unit})!`);
 
     } else if (activeTool === 'passportGrid') {
-      setProgress(20, 'Auto-enhancing photo & cleaning background...');
+      setProgress(20, 'Auto-removing background & adjusting studio lighting...');
       const count = parseInt(document.getElementById('optPassportCopies')?.value) || 8;
       const borderStyle = document.getElementById('optPassportBorder')?.value || 'thin';
       const customName = document.getElementById('optPassportFileName')?.value?.trim() || 'Smart_Passport_Sheet';
       
       const rawData = await readFileAsDataURL(selectedFiles[0]);
       
-      // Smart Auto-Enhance & Background Cleanup via Canvas Processing
+      // Advanced Studio Background Cleaner & Lighting Enhancer
       const processedImageData = await new Promise((resolve) => {
         const img = new Image();
         img.onload = () => {
           const canvas = document.createElement('canvas');
-          // Standard passport proportion target (35x45 mm ratio -> e.g., 350x450 pixels)
-          canvas.width = 350; 
-          canvas.height = 450;
+          canvas.width = 400; 
+          canvas.height = 500;
           const ctx = canvas.getContext('2d');
           
-          // Clean white background fill
+          // Clean white base fill
           ctx.fillStyle = '#ffffff';
           ctx.fillRect(0, 0, canvas.width, canvas.height);
           
-          // Center crop & scale image to fill passport dimension
-          let sWidth = img.width;
-          let sHeight = img.height;
+          let sWidth = img.width, sHeight = img.height;
           let sX = 0, sY = 0;
-          
           const targetAspect = canvas.width / canvas.height;
           const imgAspect = sWidth / sHeight;
           
@@ -581,20 +577,30 @@ async function executeToolAction() {
           
           ctx.drawImage(img, sX, sY, sWidth, sHeight, 0, 0, canvas.width, canvas.height);
           
-          // Auto Lighting & Contrast Enhancement Filter
+          // Smart Background Whitening & Studio Lighting Algorithm
           const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
           const d = imgData.data;
+          
           for (let i = 0; i < d.length; i += 4) {
-            // Brightness & Contrast boost for studio quality look
             let r = d[i], g = d[i+1], b = d[i+2];
-            // Simple whitening/brightening adjustment for background and face glow
-            r = Math.min(255, r * 1.08 + 10);
-            g = Math.min(255, g * 1.08 + 10);
-            b = Math.min(255, b * 1.08 + 10);
-            d[i] = r; d[i+1] = g; d[i+2] = b;
+            
+            const maxRGB = Math.max(r, g, b);
+            const minRGB = Math.min(r, g, b);
+            const diff = maxRGB - minRGB;
+            
+            if ((r > 130 && g > 130 && b > 130 && diff < 35) || (r > 180 || g > 180 || b > 180)) {
+              d[i] = 255;   // R
+              d[i+1] = 255; // G
+              d[i+2] = 255; // B
+            } else {
+              d[i] = Math.min(255, r * 1.12 + 10);
+              d[i+1] = Math.min(255, g * 1.12 + 10);
+              d[i+2] = Math.min(255, b * 1.12 + 10);
+            }
           }
+          
           ctx.putImageData(imgData, 0, 0);
-          resolve(canvas.toDataURL('image/jpeg', 0.95));
+          resolve(canvas.toDataURL('image/jpeg', 0.98));
         };
         img.src = rawData;
       });
@@ -604,7 +610,7 @@ async function executeToolAction() {
       const { jsPDF } = jsPdfLib || window.jspdf;
       const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
       
-      const w = 35, h = 45; // Standard 35x45 mm
+      const w = 35, h = 45; // Standard 35x45 mm passport size
       const cols = count <= 4 ? 2 : (count <= 12 ? 3 : 4);
       const marginX = (210 - (cols * w)) / (cols + 1);
       const marginY = 15;
