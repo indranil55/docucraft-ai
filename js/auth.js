@@ -4,6 +4,11 @@ let isResetMode = false;
 // আপনার গুগল শিটের সঠিক Web App URL
 const GOOGLE_SHEET_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbw7ypSy3VkabsXyc0aiDStAC7xCsEW5Xks-OPGa9SUmpDIlgaXidHT7jC56cQlw-LpXsw/exec";
 
+// পেজ লোড হওয়ার সাথে সাথে হেডার বা নেভিগেশনের ইউজার স্টেট আপডেট করা
+document.addEventListener('DOMContentLoaded', () => {
+  updateHeaderAuthUI();
+});
+
 function openAuthModal() {
   const modal = document.getElementById('authModal');
   if (modal) modal.style.display = 'flex';
@@ -160,6 +165,7 @@ async function handleAuthSubmit() {
 
     alert('Account created and gate opened successfully!');
     closeAuthModal();
+    updateHeaderAuthUI(); // হেডার আপডেট করা
     
     const pendingTool = sessionStorage.getItem('pending_tool');
     if (pendingTool && typeof launchTool === 'function') {
@@ -187,6 +193,7 @@ async function handleAuthSubmit() {
       await sendDataToGoogleSheet(email, 'Login');
 
       closeAuthModal();
+      updateHeaderAuthUI(); // হেডার আপডেট করা
       
       const pendingTool = sessionStorage.getItem('pending_tool');
       if (pendingTool && typeof launchTool === 'function') {
@@ -199,10 +206,7 @@ async function handleAuthSubmit() {
   }
 }
 
-// -----------------------------------------------------------------
-// মূল পরিবর্তন: ইউজার হোমপেজ ও সব টুলস দেখতে পাবে, কিন্তু যেকোনো টুলে 
-// ক্লিক করলেই গেট বা লগইন পপআপ আটকে ধরবে।
-// -----------------------------------------------------------------
+// ইউজার অ্যাক্সেস চেক: একবার লগইন করলে আর বারবার পপআপ আটকাবে না
 function checkUserAccess(toolName, event) {
   const loggedUser = localStorage.getItem('docuCraft_logged_in_user');
   if (!loggedUser) {
@@ -211,10 +215,36 @@ function checkUserAccess(toolName, event) {
       event.stopPropagation();
     }
     sessionStorage.setItem('pending_tool', toolName);
-    openAuthModal(); // এখানে ইউজার যখনই টুলে হাত দিবে তখনই গেট আটকাবে
+    openAuthModal(); 
     return false;
   }
   return true;
+}
+
+// হেডারের ডানপাশের ইউজার আইকন বা স্টータস আপডেট করার ফাংশন
+function updateHeaderAuthUI() {
+  const loggedUser = localStorage.getItem('docuCraft_logged_in_user');
+  const authBtnContainer = document.querySelector('.nav-actions');
+  
+  if (authBtnContainer) {
+    let profileIndicator = document.getElementById('userProfileIndicator');
+    
+    if (loggedUser) {
+      if (!profileIndicator) {
+        profileIndicator = document.createElement('div');
+        profileIndicator.id = 'userProfileIndicator';
+        profileIndicator.style.cssText = 'display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 700; color: #10b981; background: #ecfdf5; padding: 6px 12px; border-radius: 99px; border: 1px solid #10b981; cursor: pointer;';
+        profileIndicator.title = 'Click to Logout';
+        profileIndicator.onclick = handleLogout;
+        profileIndicator.innerHTML = `<i class="fas fa-user-check"></i> <span>${loggedUser.split('@')[0]}</span>`;
+        authBtnContainer.prepend(profileIndicator);
+      }
+    } else {
+      if (profileIndicator) {
+        profileIndicator.remove();
+      }
+    }
+  }
 }
 
 // গুগল শিটে ডেটা পাঠানোর ফাংশন
