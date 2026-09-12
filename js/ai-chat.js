@@ -1,11 +1,10 @@
-// ================= js/ai-chat.js (Custom Backend Version) =================
-// এই কোডটি কোনো API Key ধারণ করে না। এটি আপনার নিজের Vercel ব্যাকএন্ডের সাথে কথা বলে।
+// ================= js/ai-chat.js (Error-Revealing Version) =================
 
 let isVoiceActive = true;
-let currentLang = 'bn'; // ডিফল্ট ভাষা বাংলা
+let currentLang = 'bn';
 
 const welcomeMessages = {
-  bn: "নমস্কার! আমি DocuCraftAI। আমি আপনার নিজের তৈরি AI অ্যাসিস্ট্যান্ট। যেকোনো বিষয়ে প্রশ্ন করুন!",
+  bn: "নমস্কার! আমি DocuCraftAI। আমি আপনার নিজের তৈরি AI অ্যাসিস্ট্যান্ট। যেকোনো বিষয়ে প্রশ্ন করুন!",
   hi: "नमस्ते! मैं DocuCraftAI हूँ। मैं आपका अपना बनाया हुआ AI सहायक हूँ। कुछ भी पूछें!",
   en: "Hello! I am DocuCraftAI. I am your own custom AI assistant. Ask me anything!"
 };
@@ -13,14 +12,12 @@ const welcomeMessages = {
 document.addEventListener('DOMContentLoaded', () => {
   if (document.getElementById('autoAiModal')) return;
 
-  // ফ্লোটিং চ্যাট বাটন তৈরি
   const btn = document.createElement('button');
   btn.innerHTML = '💬 DocuCraftAI';
   btn.style.cssText = 'position: fixed; bottom: 20px; right: 20px; background: linear-gradient(135deg, #2563eb, #7c3aed, #db2777); color: #fff; border: none; padding: 11px 20px; border-radius: 30px; font-weight: 700; cursor: pointer; z-index: 99999; box-shadow: 0 6px 20px rgba(37,99,235,0.4); font-size: 14px;';
   btn.onclick = toggleAiHelpdesk;
   document.body.appendChild(btn);
 
-  // চ্যাট উইন্ডো তৈরি
   const modal = document.createElement('div');
   modal.id = 'autoAiModal';
   modal.style.cssText = 'display: none; position: fixed; bottom: 10px; right: 10px; width: 380px; max-width: calc(100vw - 20px); height: 540px; max-height: 85vh; background: #fff; border-radius: 20px; box-shadow: 0 15px 35px rgba(0,0,0,0.3); z-index: 99999; flex-direction: column; overflow: hidden; border: 1px solid #cbd5e1;';
@@ -44,7 +41,7 @@ document.addEventListener('DOMContentLoaded', () => {
       </div>
     </div>
     <div style="padding: 12px; background: #fff; border-top: 1px solid #e2e8f0; display: flex; gap: 8px; align-items: center; flex-shrink: 0;">
-      <input type="text" id="aiChatInput" placeholder="যেকোনো বিষয়ে প্রশ্ন করুন..." style="flex: 1; padding: 10px 14px; border: 1px solid #cbd5e1; border-radius: 10px; font-size: 13.5px; outline: none; background: #f8fafc;" onkeypress="if(event.key==='Enter') sendUserMessage()">
+      <input type="text" id="aiChatInput" placeholder="যেকোনো বিষয়ে প্রশ্ন করুন..." style="flex: 1; padding: 10px 14px; border: 1px solid #cbd5e1; border-radius: 10px; font-size: 13.5px; outline: none; background: #f8fafc;" onkeypress="if(event.key==='Enter') sendUserMessage()">
       <button onclick="startVoiceInput()" style="background: #0284c7; color: #fff; border: none; padding: 10px 12px; border-radius: 10px; cursor: pointer;">🎤</button>
       <button onclick="sendUserMessage()" style="background: linear-gradient(135deg, #2563eb, #db2777); color: #fff; border: none; padding: 10px 15px; border-radius: 10px; cursor: pointer;">➤</button>
     </div>
@@ -82,7 +79,6 @@ function speakText(text) {
   }, 250);
 }
 
-// === আসল AI কল করার ফাংশন (আমাদের নিজের ব্যাকএন্ডে রিকোয়েস্ট পাঠায়) ===
 async function sendUserMessage(customText = '') {
   const input = document.getElementById('aiChatInput');
   const query = customText || (input ? input.value.trim() : '');
@@ -94,22 +90,27 @@ async function sendUserMessage(customText = '') {
   const loadingId = 'loading_' + Date.now();
   appendAiMessage("টাইপ করছে...", loadingId);
 
-  // ভাষা ডিটেক্ট করা
   const hindiRegex = /[\u0900-\u097F]/;
   const bengaliRegex = /[\u0980-\u09FF]/;
   if (hindiRegex.test(query)) currentLang = 'hi';
   else if (bengaliRegex.test(query)) currentLang = 'bn';
 
   try {
-    // আপনার নিজের Vercel ব্যাকএন্ডে রিকোয়েস্ট পাঠানো
     const response = await fetch('/api/chat', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ 
-        message: query, 
-        lang: currentLang 
-      })
+      body: JSON.stringify({ message: query, lang: currentLang })
     });
+
+    // 🔥 আসল এরর মেসেজটি এখানে ধরা হচ্ছে
+    if (!response.ok) {
+      let errorMsg = `HTTP Error: ${response.status}`;
+      try {
+        const errorData = await response.json();
+        if (errorData.error) errorMsg = errorData.error;
+      } catch(e) {}
+      throw new Error(errorMsg);
+    }
 
     const data = await response.json();
 
@@ -118,12 +119,13 @@ async function sendUserMessage(customText = '') {
       appendAiMessage(data.reply);
       speakText(data.reply);
     } else {
-      throw new Error(data.error || "No reply from backend");
+      throw new Error("ব্যাকএন্ড থেকে কোনো উত্তর আসেনি (Empty Reply)");
     }
   } catch (error) {
     console.error("Chat Error:", error);
     removeAiMessage(loadingId);
-    appendAiMessage("দুঃখিত, এই মুহূর্তে উত্তর দিতে পারছি না। দয়া করে ইন্টারনেট বা সার্ভার চেক করুন।");
+    // 🔥 এখন আসল সমস্যাটি চ্যাটবক্সে দেখা যাবে
+    appendAiMessage(`⚠️ সমস্যা: ${error.message}`);
   }
 }
 
