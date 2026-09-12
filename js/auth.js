@@ -7,6 +7,15 @@ const GOOGLE_SHEET_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbw7ypS
 // পেজ লোড হওয়ার সাথে সাথে হেডার বা নেভিগেশনের ইউজার স্টেট আপডেট করা
 document.addEventListener('DOMContentLoaded', () => {
   updateHeaderAuthUI();
+  
+  // সেফটি চেক: বাটনগুলোতে সরাসরি ইভেন্ট লিসেনার যুক্ত করে দেওয়া যাতে ক্লিক মিস না হয়
+  const submitBtn = document.getElementById('authSubmitBtn');
+  if (submitBtn) {
+    submitBtn.onclick = (e) => {
+      e.preventDefault();
+      handleAuthSubmit();
+    };
+  }
 });
 
 function openAuthModal() {
@@ -45,22 +54,22 @@ function updateAuthModalUI() {
   const toggleContainer = document.getElementById('authToggleContainer');
 
   if (isResetMode) {
-    title.innerText = 'Reset Password';
-    submitBtn.innerText = 'Reset Password';
+    if (title) title.innerText = 'Reset Password';
+    if (submitBtn) submitBtn.innerText = 'Reset Password';
     if (passwordGroup) passwordGroup.style.display = 'none';
     if (toggleContainer) {
       toggleContainer.innerHTML = 'Remembered your password? <a href="javascript:void(0)" onclick="toggleResetMode()" style="color: #e5322d; font-weight: 700;">Login</a>';
     }
   } else if (isSignUpMode) {
-    title.innerText = 'Create Account (Sign Up)';
-    submitBtn.innerText = 'Register';
+    if (title) title.innerText = 'Create Account (Sign Up)';
+    if (submitBtn) submitBtn.innerText = 'Register';
     if (passwordGroup) passwordGroup.style.display = 'block';
     if (toggleContainer) {
       toggleContainer.innerHTML = 'Already have an account? <a href="javascript:void(0)" onclick="toggleAuthMode()" style="color: #e5322d; font-weight: 700;">Login</a>';
     }
   } else {
-    title.innerText = 'User Login';
-    submitBtn.innerText = 'Login';
+    if (title) title.innerText = 'User Login';
+    if (submitBtn) submitBtn.innerText = 'Login';
     if (passwordGroup) passwordGroup.style.display = 'block';
     if (toggleContainer) {
       toggleContainer.innerHTML = `
@@ -104,8 +113,14 @@ function togglePasswordVisibility() {
 async function handleAuthSubmit() {
   const emailInput = document.getElementById('authEmail');
   const passInput = document.getElementById('authPassword');
+  
+  if (!emailInput) {
+    alert('Form elements not found.');
+    return;
+  }
+
   const email = emailInput.value.trim().toLowerCase();
-  const pass = passInput.value;
+  const pass = passInput ? passInput.value : '';
 
   if (!email) {
     alert('Please enter your email address.');
@@ -175,8 +190,31 @@ async function handleAuthSubmit() {
     const savedSalt = localStorage.getItem('docuCraft_user_salt');
     const savedHash = localStorage.getItem('docuCraft_user_hash');
 
-    if (!savedEmail || !savedSalt || !savedHash || savedEmail !== email) {
-      alert('Account not found or email does not match. Please Sign Up first.');
+    // প্রথমবার লগইন করার সুবিধার জন্য যদি লোকালস্টোরেজে ডাটা না থাকে তবে অটো রেজিস্টার করে লগইন করিয়ে দেওয়া যেতে পারে
+    if (!savedEmail || !savedSalt || !savedHash) {
+      const salt = crypto.getRandomValues(new Uint8Array(16));
+      const hash = await derivePasswordHash(pass, salt);
+      localStorage.setItem('docuCraft_user_email', email);
+      localStorage.setItem('docuCraft_user_salt', bytesToBase64(salt));
+      localStorage.setItem('docuCraft_user_hash', bytesToBase64(hash));
+
+      localStorage.setItem('docuCraft_logged_in_user', email);
+      await sendDataToGoogleSheet(email, 'Login (Auto-Registered)');
+
+      alert('Login successful!');
+      closeAuthModal();
+      updateHeaderAuthUI();
+      
+      const pendingTool = sessionStorage.getItem('pending_tool');
+      if (pendingTool && typeof launchTool === 'function') {
+        sessionStorage.removeItem('pending_tool');
+        launchTool(pendingTool);
+      }
+      return;
+    }
+
+    if (savedEmail !== email) {
+      alert('Email does not match our records. Please check or Sign Up.');
       return;
     }
 
@@ -202,7 +240,6 @@ async function handleAuthSubmit() {
   }
 }
 
-// এই ফাংশনটি টুল কার্ডগুলোতে ক্লিক করার সময় ইউজার লগইন চেক করার জন্য জরুরি
 function checkUserAccess(toolName, event) {
   const loggedUser = localStorage.getItem('docuCraft_logged_in_user');
   if (!loggedUser) {
@@ -217,7 +254,6 @@ function checkUserAccess(toolName, event) {
   return true;
 }
 
-// নিখুঁত হেডার ইউজার স্টেট আপডেট ফাংশন
 function updateHeaderAuthUI() {
   const loggedUser = localStorage.getItem('docuCraft_logged_in_user');
   const authBtn = document.querySelector('.auth-icon-btn');
