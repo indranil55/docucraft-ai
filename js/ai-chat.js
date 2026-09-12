@@ -35,7 +35,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const btn = document.createElement('button');
   btn.innerHTML = '💬 DocuCraftAI';
-  btn.style.cssText = 'position: fixed; bottom: 80px; right: 20px; background: linear-gradient(135deg, #2563eb, #7c3aed, #db2777); color: #fff; border: none; padding: 11px 20px; border-radius: 30px; font-weight: 700; cursor: pointer; z-index: 99999; box-shadow: 0 6px 20px rgba(37,99,235,0.4); font-size: 14px;';
+  // চ্যাটবট বাটনটি একদম নিচে নামানোর জন্য bottom: 10px করা হয়েছে
+  btn.style.cssText = 'position: fixed; bottom: 10px; right: 20px; background: linear-gradient(135deg, #2563eb, #7c3aed, #db2777); color: #fff; border: none; padding: 11px 20px; border-radius: 30px; font-weight: 700; cursor: pointer; z-index: 99999; box-shadow: 0 6px 20px rgba(37,99,235,0.4); font-size: 14px;';
   btn.onclick = toggleAiHelpdesk;
   document.body.appendChild(btn);
 
