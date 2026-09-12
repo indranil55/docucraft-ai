@@ -1,18 +1,18 @@
-// DocuCraftAI - Unlimited Conversational Assistant (Handles Personal Intro, Site Guide & Out-of-Box Questions)
+// DocuCraftAI - Unlimited Conversational Assistant (Auth Bypassed, All Tools & Programs Fully Active)
 
 const aiConversations = {
   en: {
-    welcome: "Hello! I am DocuCraftAI, the smart assistant of this website. I am doing great, hope you are doing well too! I was created by Indranil Ruidas from Bardhaman, West Bengal. How can I help you today?",
+    welcome: "Hello! I am DocuCraftAI, your smart assistant. All tools and programs are fully active and ready to use. How can I help you today?",
     listening: "🎙️ Listening... Speak now in English",
     placeholder: "Ask me anything..."
   },
   hi: {
-    welcome: "नमस्ते! मैं DocuCraftAI हूँ, इस वेबसाइट का स्मार्ट सहायक। मैं बहुत अच्छा हूँ, आशा है आप भी अच्छे होंगे! मुझे पश्चिम बंगाल के बर्धमान से इंद्रनील रुइदास (Indranil Ruidas) द्वारा बनाया गया है। बताइए, आज मैं आपकी क्या मदद करूँ?",
+    welcome: "नमस्ते! मैं DocuCraftAI हूँ। सभी टूल्स और प्रोग्राम पूरी तरह से सक्रिय हैं। बताइए, आज मैं आपकी क्या मदद करूँ?",
     listening: "🎙️ सुन रहा हूँ... कृपया हिंदी में बोलें",
     placeholder: "मुझसे कुछ भी पूछें..."
   },
   bn: {
-    welcome: "নমস্কার! আমি DocuCraftAI, এই ওয়েবসাইটের স্মার্ট অ্যাসিস্ট্যান্ট। আমি খুব ভালো আছি, আশা করি আপনিও ভীষণ ভালো আছেন! আমাকে তৈরি করেছেন ইনদনীল রুইদাস (Indranil Ruidas), বাড়ি পশ্চিমবঙ্গের বর্ধমান জেলায়। বলুন, আপনাকে কীভাবে সাহায্য করতে পারি?",
+    welcome: "নমস্কার! আমি DocuCraftAI। ওয়েবসাইটের সমস্ত টুলস এবং প্রোগ্রামগুলো এখন পুরোপুরি সচল ও প্রস্তুত রয়েছে। বলুন, আপনাকে কীভাবে সাহায্য করতে পারি?",
     listening: "🎙️ শুনছি... বাংলায় কথা বলুন",
     placeholder: "যেকোনো বিষয়ে প্রশ্ন করুন..."
   }
@@ -22,10 +22,14 @@ let isVoiceActive = true;
 let currentLang = 'bn';
 
 document.addEventListener('DOMContentLoaded', () => {
-  // অটো লগইন বা পপআপ লক বাইপাস ফিক্স
+  // লগইন বা লক পপআপটি স্কিন থেকে সরিয়ে দেওয়া হলো, যাতে কোনো বাধা ছাড়াই সব প্রোগ্রাম কাজ করে
   const authModal = document.getElementById('authModal');
-  if (authModal) authModal.style.display = 'none';
+  if (authModal) {
+    authModal.style.display = 'none';
+    authModal.remove(); // পপআপ ডোম থেকে রিমুভ করে দেওয়া হলো যাতে ব্যাকগ্রাউন্ড পুরোপুরি ফ্রি থাকে
+  }
   document.body.classList.remove('modal-open');
+  document.body.style.overflow = 'auto'; // পেজ স্ক্রোল সচল রাখা
 
   if (document.getElementById('autoAiModal')) return;
 
