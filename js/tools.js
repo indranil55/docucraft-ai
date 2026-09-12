@@ -134,8 +134,8 @@ function launchTool(toolKey) {
         </div>`;
     }
   } else if (toolKey === 'passportGrid') {
-    if (title) title.innerText = 'Smart Passport Photo Studio (Auto-Enhance)';
-    if (desc) desc.innerText = 'Upload normal photo: safe background cleanup & print-ready grid.';
+    if (title) title.innerText = 'Smart Passport Photo Studio';
+    if (desc) desc.innerText = 'Upload normal photo: generates clean, high-quality print-ready passport grid.';
     if (fileInput) { fileInput.accept = 'image/*'; fileInput.multiple = false; }
     if (dropText) dropText.innerText = 'Tap to select normal photo';
     if (customUI) {
@@ -539,14 +539,14 @@ async function executeToolAction() {
       showSuccessPopup(`Photo Resized Successfully (${valInput} ${unit})!`);
 
     } else if (activeTool === 'passportGrid') {
-      setProgress(20, 'Processing passport photo with clean white background...');
+      setProgress(20, 'Preparing standard passport photo grid...');
       const count = parseInt(document.getElementById('optPassportCopies')?.value) || 8;
       const borderStyle = document.getElementById('optPassportBorder')?.value || 'thin';
       const customName = document.getElementById('optPassportFileName')?.value?.trim() || 'Smart_Passport_Sheet';
       
       const rawData = await readFileAsDataURL(selectedFiles[0]);
       
-      // নিখুঁত সেন্টার-প্রোটেক্টেড ব্যাকগ্রাউন্ড ক্লিনার: মুখ বা ফেসের কোনো পিক্সেল নষ্ট না করে শুধু বাইরের ব্যাকগ্রাউন্ড সাদা করা
+      // নরমাল আসল ফটো ঠিক রেখে ক্যানভাসে ড্র করার লজিক (কোনো কালার ফ্র্যাকচার হবে না)
       const processedImageData = await new Promise((resolve) => {
         const img = new Image();
         img.onload = () => {
@@ -571,35 +571,10 @@ async function executeToolAction() {
             sY = (img.height - sHeight) / 2;
           }
           
+          // আসল ছবির রং ও ফেস নিখুঁত রেখে ড্র করা হচ্ছে
           ctx.drawImage(img, sX, sY, sWidth, sHeight, 0, 0, canvas.width, canvas.height);
           
-          const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-          const d = imgData.data;
-          
-          // ফেস বা মুখমণ্ডল (সেন্টার অংশ) সম্পূর্ণ সুরক্ষিত রেখে শুধুমাত্র দূরের ব্যাকগ্রাউন্ডের হালকা নীল/অন্যান্য টোন হোয়াইট করা
-          const cx = canvas.width / 2;
-          const cy = canvas.height / 2;
-          const safeRadius = 110; // সেন্টারের ফেস প্রটেকশন ব্যাসার্ধ
-
-          for (let y = 0; y < canvas.height; y++) {
-            for (let x = 0; x < canvas.width; x++) {
-              const idx = (y * canvas.width + x) * 4;
-              const distFromCenter = Math.sqrt(Math.pow(x - cx, 2) + Math.pow(y - cy, 2));
-
-              if (distFromCenter > safeRadius) {
-                let r = d[idx], g = d[idx+1], b = d[idx+2];
-                // ব্যাকগ্রাউন্ডের হালকা নীল, লালচে বা ময়লা ভাব রিমুভ করে ক্লিন সাদা করা
-                if ((r > 120 && g > 130 && b > 160) || (r > 190 && g > 170 && b > 170) || (r > 210 && g > 210 && b > 210)) {
-                  d[idx] = 255;
-                  d[idx+1] = 255;
-                  d[idx+2] = 255;
-                }
-              }
-            }
-          }
-          
-          ctx.putImageData(imgData, 0, 0);
-          resolve(canvas.toDataURL('image/jpeg', 0.98));
+          resolve(canvas.toDataURL('image/jpeg', 0.95));
         };
         img.src = rawData;
       });
@@ -609,7 +584,7 @@ async function executeToolAction() {
       const { jsPDF } = jsPdfLib || window.jspdf;
       const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
       
-      const w = 35, h = 45; // স্ট্যান্ডার্ড ৩৫x৪৫ মিমি পাসপোর্ট সাইজ
+      const w = 35, h = 45; // স্ট্যান্ডার্ড পাসপোর্ট সাইজ (35x45 mm)
       const cols = count <= 4 ? 2 : (count <= 12 ? 3 : 4);
       const marginX = (210 - (cols * w)) / (cols + 1);
       const marginY = 15;
@@ -622,6 +597,7 @@ async function executeToolAction() {
         
         pdf.addImage(processedImageData, 'JPEG', x, y, w, h);
         
+        // বর্ডার অপশন
         if (borderStyle === 'thin') {
           pdf.setDrawColor(180, 180, 180);
           pdf.setLineWidth(0.2);
