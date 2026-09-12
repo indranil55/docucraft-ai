@@ -1,18 +1,18 @@
-// DocuCraft AI - Unlimited Conversational Assistant (Handles Any Out-of-Box Questions)
+// DocuCraftAI - Unlimited Conversational Assistant (Handles Personal Intro, Site Guide & Out-of-Box Questions)
 
 const aiConversations = {
   en: {
-    welcome: "Hello! I am DocuCraftAI. Ask me anything about space, history, science, or any out-of-the-box topic—I'm ready to chat!",
+    welcome: "Hello! I am DocuCraftAI, the smart assistant of this website. I am doing great, hope you are doing well too! I was created by Indranil Ruidas from Bardhaman, West Bengal. How can I help you today?",
     listening: "🎙️ Listening... Speak now in English",
     placeholder: "Ask me anything..."
   },
   hi: {
-    welcome: "नमस्ते! मैं DocuCraftAI हूँ। आप अंतरिक्ष, इतिहास, विज्ञान या दुनिया का कोई भी सवाल पूछ सकते हैं—मैं हर बात का जवाब देने के लिए तैयार हूँ!",
+    welcome: "नमस्ते! मैं DocuCraftAI हूँ, इस वेबसाइट का स्मार्ट सहायक। मैं बहुत अच्छा हूँ, आशा है आप भी अच्छे होंगे! मुझे पश्चिम बंगाल के बर्धमान से इंद्रनील रुइदास (Indranil Ruidas) द्वारा बनाया गया है। बताइए, आज मैं आपकी क्या मदद करूँ?",
     listening: "🎙️ सुन रहा हूँ... कृपया हिंदी में बोलें",
     placeholder: "मुझसे कुछ भी पूछें..."
   },
   bn: {
-    welcome: "নমস্কার! আমি DocuCraftAI। মহাকাশ, ইতিহাস, বিজ্ঞান কিংবা যেকোনো অদ্ভুত বা বাইরের কঠিন প্রশ্ন আপনি আমাকে করতে পারেন—আমি সবকিছুর উত্তর দিতে প্রস্তুত!",
+    welcome: "নমস্কার! আমি DocuCraftAI, এই ওয়েবসাইটের স্মার্ট অ্যাসিস্ট্যান্ট। আমি খুব ভালো আছি, আশা করি আপনিও ভীষণ ভালো আছেন! আমাকে তৈরি করেছেন ইনদনীল রুইদাস (Indranil Ruidas), বাড়ি পশ্চিমবঙ্গের বর্ধমান জেলায়। বলুন, আপনাকে কীভাবে সাহায্য করতে পারি?",
     listening: "🎙️ শুনছি... বাংলায় কথা বলুন",
     placeholder: "যেকোনো বিষয়ে প্রশ্ন করুন..."
   }
@@ -141,12 +141,33 @@ async function sendUserMessage(customText = '') {
   let reply = "";
   const q = query.toLowerCase();
 
-  if (q.includes('weather') || q.includes('आबोहवा') || q.includes('আবহাওয়া') || q.includes('তাপমাত্রা')) {
-    let city = "Bardhaman";
-    if (q.includes('kolkata') || q.includes('কলকাতা')) city = "Kolkata";
-    else if (q.includes('delhi') || q.includes('দিল্লি')) city = "Delhi";
-    
-    reply = await fetchLiveWeather(city);
+  // ব্যক্তিগত পরিচয় ও ক্রিয়েটর সম্পর্কিত প্রশ্ন হ্যান্ডলার
+  if (q.includes('কে বানিয়েছে') || q.includes('কে তৈরি করেছে') || q.includes('creator') || q.includes('who made')) {
+    reply = currentLang === 'bn' ? 
+      "👨‍💻 **DocuCraftAI** প্ল্যাটফর্মটি ইনদনীল রুইদাস (Indranil Ruidas) দ্বারা তৈরি ও পরিচালিত!" :
+      "👨‍💻 **DocuCraftAI** was created and developed by Indranil Ruidas!";
+  } else if (q.includes('কোথায় বাড়ি') || q.includes('কোথায় বাড়ি') || q.includes('where is your home') || q.includes('bardhaman')) {
+    reply = currentLang === 'bn' ? 
+      "🏡 ক্রিয়েটর ইনদনীল রুইদাসের বাড়ি পশ্চিমবঙ্গের বর্ধমান (Bardhaman, West Bengal) জেলায়।" :
+      "🏡 The creator Indranil Ruidas is from Bardhaman, West Bengal, India.";
+  } else if (q.includes('কেমন আছো') || q.includes('কেমন আছেন') || q.includes('how are you')) {
+    reply = currentLang === 'bn' ? 
+      "😊 আমি নমস্কার জানিয়ে বলছি, আমি খুব ভালো আছি! আশা করি আপনিও অনেক ভালো আছেন। বলুন, আজ আপনাকে কীভাবে সাহায্য করতে পারি?" :
+      "😊 I am doing great! Hope you are doing wonderful as well. How can I assist you today?";
+  } else if (q.includes('পছন্দ নয়') || q.includes('ভালো নয়') || q.includes('bad') || q.includes('not good')) {
+    reply = currentLang === 'bn' ? 
+      "🙏 আপনার মূল্যবান মতামতের জন্য ধন্যবাদ! আপনার পছন্দ অনুযায়ী এটিকে আরও উন্নত করার জন্য আমি সবসময় প্রস্তুত আছি। বলুন, কী পরিবর্তন করলে আপনার আরও ভালো লাগবে?" :
+      "🙏 Thank you for your feedback! I'm always here to improve and adapt to your preferences. Let me know what you'd like to change!";
+  } else if (q.includes('resizer') || q.includes('kb') || q.includes('mb') || q.includes('ফটো সাইজ')) {
+    reply = currentLang === 'bn' ? 
+      "📸 **Photo & Sign KB/MB Resizer:** আপনার ছবি বা সিগনেচার আপলোড করে নির্দিষ্ট KB বা MB (যেমন- ৫০ KB) সিলেক্ট করে এক ক্লিকে রিসাইজ করে নিন।" :
+      "📸 **KB/MB Resizer:** Upload your photo/signature and compress it precisely to your target size instantly!";
+  } else if (q.includes('passport') || q.includes('পাসপোর্ট')) {
+    reply = currentLang === 'bn' ? 
+      "🛂 **Smart Passport Photo Studio:** যেকোনো সাধারণ ছবি দিয়ে ব্যাকগ্রাউন্ড পরিষ্কার (সাদা বা রয়্যাল ব্লু) করে প্রিন্ট-রেডি পাসপোর্ট সাইজ শিট তৈরি করুন।" :
+      "🛂 **Passport Studio:** Generates clean background passport photo sheets instantly!";
+  } else if (q.includes('weather') || q.includes('আবহাওয়া') || q.includes('তাপমাত্রা')) {
+    reply = await fetchLiveWeather("Bardhaman");
   } else {
     reply = generateAdvancedSmartResponse(query, currentLang);
   }
@@ -161,23 +182,15 @@ async function sendUserMessage(customText = '') {
 async function fetchLiveWeather(city) {
   try {
     let lat = 23.2322, lon = 87.8615; // Bardhaman
-    if (city === "Kolkata") { lat = 22.5726; lon = 88.3639; }
-    else if (city === "Delhi") { lat = 28.6139; lon = 77.2090; }
-
     const response = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`);
     const data = await response.json();
     const temp = data.current_weather.temperature;
-    const windspeed = data.current_weather.windspeed;
 
-    if (currentLang === 'bn') {
-      return `${city} এর বর্তমান তাপমাত্রা হলো ${temp}°C এবং বাতাসের গতিবেগ প্রতি ঘণ্টায় ${windspeed} কিমি।`;
-    } else if (currentLang === 'hi') {
-      return `${city} का वर्तमान तापमान ${temp}°C है और हवा की गति ${windspeed} किमी/घंटा है।`;
-    } else {
-      return `The current temperature in ${city} is ${temp}°C with a wind speed of ${windspeed} km/h.`;
-    }
+    return currentLang === 'bn' ? 
+      `${city} এর বর্তমান তাপমাত্রা ${temp}°C। আবহাওয়া বেশ চমৎকার রয়েছে!` : 
+      `The current temperature in ${city} is ${temp}°C.`;
   } catch (err) {
-    return currentLang === 'bn' ? "এই মুহূর্তে লাইভ আবহাওয়া ডেটা ফেচ করা যাচ্ছে না।" : "Could not fetch live weather right now.";
+    return currentLang === 'bn' ? "এই মুহূর্তে আবহাওয়া ডেটা পাওয়া যাচ্ছে না।" : "Weather data unavailable.";
   }
 }
 
@@ -185,73 +198,44 @@ function detectLanguageFromQuery(text) {
   const hindiRegex = /[\u0900-\u097F]/;
   const bengaliRegex = /[\u0980-\u09FF]/;
 
-  if (hindiRegex.test(text)) {
-    currentLang = 'hi';
-  } else if (bengaliRegex.test(text)) {
-    currentLang = 'bn';
-  } else {
-    const low = text.toLowerCase();
-    if (low.includes('kemon') || low.includes('ki') || low.includes('keno') || low.includes('amar') || low.includes('bolo') || low.includes('bardhaman')) {
-      currentLang = 'bn';
-    } else if (low.includes('kaise') || low.includes('kya') || low.includes('hai') || low.includes('hain')) {
-      currentLang = 'hi';
-    }
-  }
+  if (hindiRegex.test(text)) currentLang = 'hi';
+  else if (bengaliRegex.test(text)) currentLang = 'bn';
 
   const selectEl = document.getElementById('aiLangSelect');
   if (selectEl) selectEl.value = currentLang;
 }
 
 function generateAdvancedSmartResponse(query, lang) {
-  const q = query.toLowerCase();
-
-  if (q.includes('মহাকাশে প্রথম') || q.includes('yuri gagarin') || q.includes('space') || q.includes('अंतरिक्ष')) {
-    if (lang === 'hi') return 'सोवियत संघ के यूरी गागरिन 12 अप्रैल 1961 को वोस्तोक 1 अंतरिक्ष यान से अंतरिक्ष में जाने वाले पहले इंसान बने थे।';
-    if (lang === 'en') return 'Soviet cosmonaut Yuri Gagarin became the first human to journey into outer space on April 12, 1961, aboard the Vostok 1 spacecraft.';
-    return '১৯৬১ সালের ১২ই এপ্রিল সোভিয়েত ইউনিয়নের ভস্টক ১ মহাকাশযানে চড়ে ইউরি গ্যাগারিন প্রথম মানব হিসেবে মহাকাশে পা রেখেছিলেন।';
-  }
-
-  if (q.includes('পৃথিবীর জন্ম') || q.includes('earth age') || q.includes('پृथ्वी का जन्म')) {
-    if (lang === 'hi') return 'वैज्ञानिकों के अनुसार पृथ्वी का जन्म लगभग 4.54 अरब वर्ष पहले सौर मंडल के निर्माण के दौरान हुआ था।';
-    if (lang === 'en') return 'Scientific evidence indicates that the Earth was formed approximately 4.54 billion years ago along with the rest of the solar system.';
-    return 'বিজ্ঞানীদের মতে আজ থেকে প্রায় ৪.৫৪ বিলিয়ন বছর আগে আমাদের এই পৃথিবীর জন্ম হয়েছিল।';
-  }
-
-  const dynamicOutboxAnswers = {
+  const answers = {
     bn: [
-      `আপনার প্রশ্নটি খুবই চমৎকার! "${query}" নিয়ে বলতে গেলে, এটি বিজ্ঞান, ইতিহাস কিংবা আমাদের পারিপার্শ্বিক জগতের সাথে ওতোপ্রোতভাবে জড়িত। এই বিষয়ে আপনার নিজস্ব মতামত কী?`,
-      `"${query}" বিষয়টি নিয়ে নানা মুনির নানা মত রয়েছে। আধুনিক গবেষণায় এই বিষয়ে আরও নতুন অনেক তথ্য সামনে আসছে। এ নিয়ে আপনার কি বিশেষ কোনো কৌতূহল আছে?`,
-      `বাহ! বেশ কঠিন এবং সুন্দর একটি প্রশ্ন করেছেন। "${query}" প্রসঙ্গে বিশদে আলোচনা করতে গেলে এর তাত্ত্বিক ও ব্যবহারিক উভয় দিকই বিবেচনা করতে হয়।`,
-      `"${query}" বিষয়টি আমাদের চারপাশের বাস্তবতাকে নতুনভাবে অনুধাবন করতে সাহায্য করে। এই বিষয়ে আপনি আর কী জানতে চান বলুন!`
+      `নমস্কার! "${query}" নিয়ে বলতে গেলে, এটি একটি চমৎকার বিষয়। আমাদের সাইটের টুলস কিংবা অন্য যেকোনো বিষয়ে আপনার আর কী জানার আছে বলুন!`,
+      `আপনার প্রশ্নটি খুবই সুন্দর! "${query}" প্রসঙ্গে বিস্তারিত আলোচনা করা যেতে পারে। এ নিয়ে আপনার মতামত কী?`
     ],
     hi: [
-      `यह वास्तव में एक बहुत ही गहरा और दिलचस्प सवाल है! "${query}" के कई अलग-अलग पहलू हैं जिन पर विचार किया जा सकता है। इस बारे में आपका क्या सोचना है?`,
-      `आपने बहुत ही बढ़िया विषय उठाया है! "${query}" के संबंध में विज्ञान और इतिहास दोनों के दृष्टिकोण से बहुत कुछ कहा जा सकता है।`,
-      `"${query}" एक ऐसा विषय है जिस पर जितनी बात की जाए, उतनी ही नई जानकारियां सामने आती हैं।`
+      `नमस्ते! "${query}" के बारे में बात करना बहुत अच्छा लगा। इस विषय पर आपकी क्या राय है?`,
+      `यह एक बहुत ही दिलचस्प सवाल है! इसके बारे में आप और क्या जानना चाहते हैं?`
     ],
     en: [
-      `That's a really intriguing question about "${query}"! Looking at it from scientific and analytical perspectives, there's a lot to unpack here. What are your thoughts on this?`,
-      `You've brought up a fascinating topic with "${query}". Exploring this opens up so many dimensions. Would you like to dive deeper into a specific part of it?`,
-      `That's a brilliant inquiry regarding "${query}". Let's look at how this impacts things—how do you view it?`
+      `Hello! Discussing "${query}" is quite fascinating. What are your thoughts on this?`,
+      `That's an interesting inquiry about "${query}"! How can I help you explore this further?`
     ]
   };
 
-  const langList = dynamicOutboxAnswers[lang] || dynamicOutboxAnswers.bn;
-  const randomIndex = Math.floor(Math.random() * langList.length);
-  return langList[randomIndex];
+  const list = answers[lang] || answers.bn;
+  return list[Math.floor(Math.random() * list.length)];
 }
 
 function appendUserMessage(text) {
   const chatBox = document.getElementById('aiChatBody');
   if (!chatBox) return;
-  chatBox.innerHTML += `<div style="margin: 10px 0; text-align: right;"><span style="background: #2563eb; color: #fff; padding: 10px 15px; border-radius: 16px 16px 0 16px; display: inline-block; font-size: 13.5px; max-width: 82%; word-break: break-word; box-shadow: 0 2px 8px rgba(37,99,235,0.25);">${escapeHtml(text)}</span></div>`;
+  chatBox.innerHTML += `<div style="margin: 10px 0; text-align: right;"><span style="background: #2563eb; color: #fff; padding: 10px 15px; border-radius: 16px 16px 0 16px; display: inline-block; font-size: 13.5px; max-width: 82%; word-break: break-word;">${escapeHtml(text)}</span></div>`;
   chatBox.scrollTop = chatBox.scrollHeight;
 }
 
 function appendAiMessage(text, id = '') {
   const chatBox = document.getElementById('aiChatBody');
   if (!chatBox) return;
-  chatBox.innerHTML += `<div id="${id}" style="margin: 10px 0; text-align: left;"><span style="background: #ffffff; color: #1e293b; padding: 10px 15px; border-radius: 16px 16px 16px 0; display: inline-block; font-size: 13.5px; max-width: 82%; border: 1px solid #e2e8f0; line-height: 1.5; word-break: break-word; box-shadow: 0 2px 5px rgba(0,0,0,0.03);">🤖 ${escapeHtml(text)}</span></div>`;
+  chatBox.innerHTML += `<div id="${id}" style="margin: 10px 0; text-align: left;"><span style="background: #ffffff; color: #1e293b; padding: 10px 15px; border-radius: 14px 14px 14px 0; display: inline-block; font-size: 13.5px; max-width: 82%; border: 1px solid #e2e8f0; line-height: 1.5; box-shadow: 0 2px 5px rgba(0,0,0,0.02);">🤖 ${escapeHtml(text)}</span></div>`;
   chatBox.scrollTop = chatBox.scrollHeight;
 }
 
@@ -263,41 +247,17 @@ function removeAiMessage(id) {
 function startVoiceInput() {
   const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
   if (!SpeechRecognition) {
-    alert('Voice recognition is not supported in this browser.');
+    alert('Voice recognition not supported.');
     return;
   }
-
   const recognition = new SpeechRecognition();
   recognition.lang = currentLang === 'bn' ? 'bn-IN' : (currentLang === 'hi' ? 'hi-IN' : 'en-US');
-  recognition.interimResults = false;
-  recognition.maxAlternatives = 1;
-
-  const statusBar = document.getElementById('voiceStatusBar');
-  const langData = aiConversations[currentLang] || aiConversations.bn;
-
-  recognition.onstart = function() {
-    if (statusBar) {
-      statusBar.innerText = langData.listening;
-      statusBar.style.display = 'block';
-    }
+  
+  recognition.onresult = (event) => {
+    const text = event.results[0][0].transcript;
+    document.getElementById('aiChatInput').value = text;
+    sendUserMessage(text);
   };
-
-  recognition.onresult = function(event) {
-    const speechText = event.results[0][0].transcript;
-    const input = document.getElementById('aiChatInput');
-    if (input) input.value = speechText;
-    if (statusBar) statusBar.style.display = 'none';
-    sendUserMessage(speechText);
-  };
-
-  recognition.onerror = function() {
-    if (statusBar) statusBar.style.display = 'none';
-  };
-
-  recognition.onend = function() {
-    if (statusBar) statusBar.style.display = 'none';
-  };
-
   recognition.start();
 }
 
