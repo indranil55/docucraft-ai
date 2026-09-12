@@ -22,11 +22,16 @@ let isVoiceActive = true;
 let currentLang = 'bn';
 
 document.addEventListener('DOMContentLoaded', () => {
+  // অটো লগইন বা পপআপ লক বাইপাস ফিক্স
+  const authModal = document.getElementById('authModal');
+  if (authModal) authModal.style.display = 'none';
+  document.body.classList.remove('modal-open');
+
   if (document.getElementById('autoAiModal')) return;
 
   const btn = document.createElement('button');
   btn.innerHTML = '💬 DocuCraftAI';
-  btn.style.cssText = 'position: fixed; bottom: 20px; right: 20px; background: linear-gradient(135deg, #2563eb, #7c3aed, #db2777); color: #fff; border: none; padding: 11px 20px; border-radius: 30px; font-weight: 700; cursor: pointer; z-index: 99999; box-shadow: 0 6px 20px rgba(37,99,235,0.4); font-size: 14px;';
+  btn.style.cssText = 'position: fixed; bottom: 80px; right: 20px; background: linear-gradient(135deg, #2563eb, #7c3aed, #db2777); color: #fff; border: none; padding: 11px 20px; border-radius: 30px; font-weight: 700; cursor: pointer; z-index: 99999; box-shadow: 0 6px 20px rgba(37,99,235,0.4); font-size: 14px;';
   btn.onclick = toggleAiHelpdesk;
   document.body.appendChild(btn);
 
@@ -141,7 +146,6 @@ async function sendUserMessage(customText = '') {
   let reply = "";
   const q = query.toLowerCase();
 
-  // ব্যক্তিগত পরিচয় ও সাইট গাইডলাইন সম্পর্কিত নিরাপদ লোকাল হ্যান্ডলার
   if (q.includes('কে বানিয়েছে') || q.includes('কে তৈরি করেছে') || q.includes('creator') || q.includes('who made')) {
     reply = currentLang === 'bn' ? 
       "👨‍💻 **DocuCraftAI** প্ল্যাটফর্মটি ইনদনীল রুইদাস (Indranil Ruidas) দ্বারা তৈরি ও পরিচালিত!" :
@@ -154,10 +158,6 @@ async function sendUserMessage(customText = '') {
     reply = currentLang === 'bn' ? 
       "😊 আমি নমস্কার জানিয়ে বলছি, আমি খুব ভালো আছি! আশা করি আপনিও অনেক ভালো আছেন। বলুন, আজ আপনাকে কীভাবে সাহায্য করতে পারি?" :
       "😊 I am doing great! Hope you are doing wonderful as well. How can I assist you today?";
-  } else if (q.includes('পছন্দ নয়') || q.includes('ভালো নয়') || q.includes('bad') || q.includes('not good')) {
-    reply = currentLang === 'bn' ? 
-      "🙏 আপনার মূল্যবান মতামতের জন্য ধন্যবাদ! আপনার পছন্দ অনুযায়ী এটিকে আরও উন্নত করার জন্য আমি সবসময় প্রস্তুত আছি। বলুন, কী পরিবর্তন করলে আপনার আরও ভালো লাগবে?" :
-      "🙏 Thank you for your feedback! I'm always here to improve and adapt to your preferences. Let me know what you'd like to change!";
   } else if (q.includes('resizer') || q.includes('kb') || q.includes('mb') || q.includes('ফটো সাইজ')) {
     reply = currentLang === 'bn' ? 
       "📸 **Photo & Sign KB/MB Resizer:** আপনার ছবি বা সিগনেচার আপলোড করে নির্দিষ্ট KB বা MB (যেমন- ৫০ KB) সিলেক্ট করে এক ক্লিকে রিসাইজ করে নিন।" :
@@ -166,10 +166,6 @@ async function sendUserMessage(customText = '') {
     reply = currentLang === 'bn' ? 
       "🛂 **Smart Passport Photo Studio:** যেকোনো সাধারণ ছবি দিয়ে ব্যাকগ্রাউন্ড পরিষ্কার (সাদা বা রয়্যাল ব্লু) করে প্রিন্ট-রেডি পাসপোর্ট সাইজ শিট তৈরি করুন।" :
       "🛂 **Passport Studio:** Generates clean background passport photo sheets instantly!";
-  } else if (q.includes('weather') || q.includes('আবহাওয়া') || q.includes('তাপমাত্রা')) {
-    reply = currentLang === 'bn' ? 
-      "🌤️ এই মুহূর্তে বর্ধমানে আবহাওয়া বেশ চমৎকার ও মনোরম রয়েছে!" : 
-      "🌤️ The weather is quite pleasant right now!";
   } else {
     reply = generateAdvancedSmartResponse(query, currentLang);
   }
@@ -222,7 +218,7 @@ function appendUserMessage(text) {
 function appendAiMessage(text, id = '') {
   const chatBox = document.getElementById('aiChatBody');
   if (!chatBox) return;
-  chatBox.innerHTML += `<div id="${id}" style="margin: 10px 0; text-align: left;"><span style="background: #ffffff; color: #1e293b; padding: 10px 15px; border-radius: 14px 14px 14px 0; display: inline-block; font-size: 13.5px; max-width: 82%; border: 1px solid #e2e8f0; line-height: 1.5; word-break: break-word; box-shadow: 0 2px 5px rgba(0,0,0,0.02);">🤖 ${escapeHtml(text)}</span></div>`;
+  chatBox.innerHTML += `<div id="${id}" style="margin: 10px 0; text-align: left;"><span style="background: #ffffff; color: #1e293b; padding: 10px 15px; border-radius: 14px 14px 14px 0; display: inline-block; font-size: 13.5px; max-width: 82%; border: 1px solid #e2e8f0; line-height: 1.5; box-shadow: 0 2px 5px rgba(0,0,0,0.02);">🤖 ${escapeHtml(text)}</span></div>`;
   chatBox.scrollTop = chatBox.scrollHeight;
 }
 
