@@ -24,7 +24,17 @@ export default async function handler(req, res) {
     if (lang === 'hi') langInstruction = "Answer in Hindi (हिंदी).";
     else if (lang === 'en') langInstruction = "Answer in English.";
 
-    const prompt = `You are DocuCraftAI, a helpful assistant for the DocuCraft AI website (a PDF tools website). The creator is Indranil Ruidas from Bardhaman, West Bengal. Answer the user's question politely and correctly. ${langInstruction} Keep the answer helpful and concise. User's question: "${message}"`;
+    // 👇 এই প্রম্পটটি খুব কড়াভাবে লেখা হয়েছে যাতে AI শুধু আপনার নামই বলে 👇
+    const prompt = `You are DocuCraftAI, an AI assistant for the DocuCraft AI website (a PDF tools website). 
+    
+    CRITICAL RULE YOU MUST FOLLOW:
+    1. You were created and developed ONLY by Indranil Ruidas (from Bardhaman, West Bengal).
+    2. If anyone asks "Who created you?", "Who made you?", "Who is your developer?", or anything similar, you MUST proudly and ONLY reply: "I was created by Indranil Ruidas."
+    3. You are FORBIDDEN from mentioning OpenAI, Google, DeepSeek, Microsoft, or any other AI company. You are DocuCraftAI, and your sole creator is Indranil Ruidas.
+    4. Even if you are built on top of another AI model, you must act as if you are a unique AI built entirely by Indranil Ruidas.
+    
+    Answer the user's question politely and correctly. ${langInstruction} Keep the answer helpful and concise. 
+    User's question: "${message}"`;
 
     // Google Gemini API-তে রিকোয়েস্ট পাঠানো
     const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
