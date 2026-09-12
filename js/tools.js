@@ -546,7 +546,7 @@ async function executeToolAction() {
       
       const rawData = await readFileAsDataURL(selectedFiles[0]);
       
-      // সেফ ব্যাকগ্রাউন্ড ক্লিনার: মুখ বা ফেস পরিষ্কার রেখে শুধুমাত্র পেছনের ব্যাকগ্রাউন্ড সাদা করা
+      // নিখুঁত সেন্টার-প্রোটেক্টেড ব্যাকগ্রাউন্ড ক্লিনার: মুখ বা ফেসের কোনো পিক্সেল নষ্ট না করে শুধু বাইরের ব্যাকগ্রাউন্ড সাদা করা
       const processedImageData = await new Promise((resolve) => {
         const img = new Image();
         img.onload = () => {
@@ -573,18 +573,28 @@ async function executeToolAction() {
           
           ctx.drawImage(img, sX, sY, sWidth, sHeight, 0, 0, canvas.width, canvas.height);
           
-          // নিরাপদ হোয়াইট ব্যাকগ্রাউন্ড অ্যালগরিদম (যা ফেস বা জামার কালার নষ্ট করবে না)
           const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
           const d = imgData.data;
           
-          for (let i = 0; i < d.length; i += 4) {
-            let r = d[i], g = d[i+1], b = d[i+2];
-            
-            // যদি পিক্সেলটি হালকা নীল বা ধূসর (পুরাতন ব্যাকগ্রাউন্ড) হয়, তবেই তাকে সাদা করবে
-            if ((r > 140 && g > 150 && b > 180 && Math.abs(r - g) < 25) || (r > 200 && g > 200 && b > 200)) {
-              d[i] = 255;   // R
-              d[i+1] = 255; // G
-              d[i+2] = 255; // B
+          // ফেস বা মুখমণ্ডল (সেন্টার অংশ) সম্পূর্ণ সুরক্ষিত রেখে শুধুমাত্র দূরের ব্যাকগ্রাউন্ডের হালকা নীল/অন্যান্য টোন হোয়াইট করা
+          const cx = canvas.width / 2;
+          const cy = canvas.height / 2;
+          const safeRadius = 110; // সেন্টারের ফেস প্রটেকশন ব্যাসার্ধ
+
+          for (let y = 0; y < canvas.height; y++) {
+            for (let x = 0; x < canvas.width; x++) {
+              const idx = (y * canvas.width + x) * 4;
+              const distFromCenter = Math.sqrt(Math.pow(x - cx, 2) + Math.pow(y - cy, 2));
+
+              if (distFromCenter > safeRadius) {
+                let r = d[idx], g = d[idx+1], b = d[idx+2];
+                // ব্যাকগ্রাউন্ডের হালকা নীল, লালচে বা ময়লা ভাব রিমুভ করে ক্লিন সাদা করা
+                if ((r > 120 && g > 130 && b > 160) || (r > 190 && g > 170 && b > 170) || (r > 210 && g > 210 && b > 210)) {
+                  d[idx] = 255;
+                  d[idx+1] = 255;
+                  d[idx+2] = 255;
+                }
+              }
             }
           }
           
@@ -612,7 +622,6 @@ async function executeToolAction() {
         
         pdf.addImage(processedImageData, 'JPEG', x, y, w, h);
         
-        // বর্ডার অপশন হ্যান্ডলিং
         if (borderStyle === 'thin') {
           pdf.setDrawColor(180, 180, 180);
           pdf.setLineWidth(0.2);
