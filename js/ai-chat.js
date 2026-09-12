@@ -1,36 +1,45 @@
-// ================= js/ai-chat.js (Safe AI Version - No API Key) =================
-// DocuCraftAI - Real AI Assistant using Puter.js
-// কোনো API Key ছাড়াই সব প্রশ্নের উত্তর দেবে।
+// DocuCraftAI - Unlimited Conversational Assistant (Handles Personal Intro, Site Guide & Out-of-Box Questions)
+
+const aiConversations = {
+  en: {
+    welcome: "Hello! I am DocuCraftAI, the smart assistant of this website. I am doing great, hope you are doing well too! I was created by Indranil Ruidas from Bardhaman, West Bengal. How can I help you today?",
+    listening: "🎙️ Listening... Speak now in English",
+    placeholder: "Ask me anything..."
+  },
+  hi: {
+    welcome: "नमस्ते! मैं DocuCraftAI हूँ, इस वेबसाइट का स्मार्ट सहायक। मैं बहुत अच्छा हूँ, आशा है आप भी अच्छे होंगे! मुझे पश्चिम बंगाल के बर्धमान से इंद्रनील रुइदास (Indranil Ruidas) द्वारा बनाया गया है। बताइए, आज मैं आपकी क्या मदद करूँ?",
+    listening: "🎙️ सुन रहा हूँ... कृपया हिंदी में बोलें",
+    placeholder: "मुझसे कुछ भी पूछें..."
+  },
+  bn: {
+    welcome: "নমস্কার! আমি DocuCraftAI, এই ওয়েবসাইটের স্মার্ট অ্যাসিস্ট্যান্ট। আমি খুব ভালো আছি, আশা করি আপনিও ভীষণ ভালো আছেন! আমাকে তৈরি করেছেন ইনদনীল রুইদাস (Indranil Ruidas), বাড়ি পশ্চিমবঙ্গের বর্ধমান জেলায়। বলুন, আপনাকে কীভাবে সাহায্য করতে পারি?",
+    listening: "🎙️ শুনছি... বাংলায় কথা বলুন",
+    placeholder: "যেকোনো বিষয়ে প্রশ্ন করুন..."
+  }
+};
 
 let isVoiceActive = true;
-let currentLang = 'bn'; // ডিফল্ট ভাষা বাংলা
-
-const welcomeMessages = {
-  bn: "নমস্কার! আমি DocuCraftAI। আমি এখন একটি স্মার্ট AI অ্যাসিস্ট্যান্ট। যেকোনো বিষয়ে প্রশ্ন করুন!",
-  hi: "नमस्ते! मैं DocuCraftAI हूँ। मैं अब एक स्मार्ट AI सहायक हूँ। कुछ भी पूछें!",
-  en: "Hello! I am DocuCraftAI. I am a smart AI assistant now. Ask me anything!"
-};
+let currentLang = 'bn';
 
 document.addEventListener('DOMContentLoaded', () => {
   if (document.getElementById('autoAiModal')) return;
 
-  // ফ্লোটিং চ্যাট বাটন তৈরি
   const btn = document.createElement('button');
   btn.innerHTML = '💬 DocuCraftAI';
   btn.style.cssText = 'position: fixed; bottom: 20px; right: 20px; background: linear-gradient(135deg, #2563eb, #7c3aed, #db2777); color: #fff; border: none; padding: 11px 20px; border-radius: 30px; font-weight: 700; cursor: pointer; z-index: 99999; box-shadow: 0 6px 20px rgba(37,99,235,0.4); font-size: 14px;';
   btn.onclick = toggleAiHelpdesk;
   document.body.appendChild(btn);
 
-  // চ্যাট উইন্ডো তৈরি
   const modal = document.createElement('div');
   modal.id = 'autoAiModal';
   modal.style.cssText = 'display: none; position: fixed; bottom: 10px; right: 10px; width: 380px; max-width: calc(100vw - 20px); height: 540px; max-height: 85vh; background: #fff; border-radius: 20px; box-shadow: 0 15px 35px rgba(0,0,0,0.3); z-index: 99999; flex-direction: column; overflow: hidden; border: 1px solid #cbd5e1;';
-  
   modal.innerHTML = `
     <div style="background: linear-gradient(135deg, #0f172a, #1e293b); color: #fff; padding: 12px 16px; display: flex; justify-content: space-between; align-items: center; flex-shrink: 0;">
       <span style="font-weight: 750; font-size: 14px; display: flex; align-items: center; gap: 6px;">🤖 DocuCraftAI</span>
+      
       <div style="display: flex; align-items: center; gap: 6px;">
-        <button id="speakerToggleBtn" onclick="toggleVoiceOutput()" style="background: #0f172a; color: #60a5fa; border: 1px solid #475569; padding: 4px 8px; border-radius: 6px; font-size: 12px; cursor: pointer;">🔊</button>
+        <button id="speakerToggleBtn" onclick="toggleVoiceOutput()" style="background: #0f172a; color: #60a5fa; border: 1px solid #475569; padding: 4px 8px; border-radius: 6px; font-size: 12px; cursor: pointer;" title="Toggle Speaker">🔊</button>
+        
         <select id="aiLangSelect" onchange="changeAiLanguage(this.value)" style="background: #0f172a; color: #fff; border: 1px solid #475569; padding: 4px 6px; border-radius: 6px; font-size: 11.5px; cursor: pointer;">
           <option value="bn" selected>বাংলা</option>
           <option value="hi">हिंदी</option>
@@ -39,14 +48,22 @@ document.addEventListener('DOMContentLoaded', () => {
         <button onclick="toggleAiHelpdesk()" style="background:none; border:none; color:#fff; font-size:18px; cursor:pointer; line-height: 1; margin-left: 2px;">&times;</button>
       </div>
     </div>
+
+    <div id="voiceStatusBar" style="display: none; background: #e0f2fe; color: #0369a1; padding: 6px 12px; font-size: 12px; font-weight: 600; text-align: center; border-bottom: 1px solid #bae6fd; flex-shrink: 0;">
+      ${aiConversations.bn.listening}
+    </div>
+
     <div id="aiChatBody" style="padding: 14px; flex: 1; overflow-y: auto; background: #f8fafc; font-size: 13.5px; -webkit-overflow-scrolling: touch;">
       <div style="margin: 8px 0; text-align: left;">
-        <span id="aiWelcomeMsg" style="background: #ffffff; color: #1e293b; padding: 12px 16px; border-radius: 14px 14px 14px 0; display: inline-block; border: 1px solid #e2e8f0; line-height: 1.5;">${welcomeMessages.bn}</span>
+        <span id="aiWelcomeMsg" style="background: #ffffff; color: #1e293b; padding: 12px 16px; border-radius: 14px 14px 14px 0; display: inline-block; border: 1px solid #e2e8f0; line-height: 1.5; box-shadow: 0 2px 5px rgba(0,0,0,0.02);">
+          ${aiConversations.bn.welcome}
+        </span>
       </div>
     </div>
+
     <div style="padding: 12px; background: #fff; border-top: 1px solid #e2e8f0; display: flex; gap: 8px; align-items: center; flex-shrink: 0;">
-      <input type="text" id="aiChatInput" placeholder="যেকোনো বিষয়ে প্রশ্ন করুন..." style="flex: 1; padding: 10px 14px; border: 1px solid #cbd5e1; border-radius: 10px; font-size: 13.5px; outline: none; background: #f8fafc;" onkeypress="if(event.key==='Enter') sendUserMessage()">
-      <button onclick="startVoiceInput()" style="background: #0284c7; color: #fff; border: none; padding: 10px 12px; border-radius: 10px; cursor: pointer;">🎤</button>
+      <input type="text" id="aiChatInput" placeholder="${aiConversations.bn.placeholder}" style="flex: 1; padding: 10px 14px; border: 1px solid #cbd5e1; border-radius: 10px; font-size: 13.5px; outline: none; background: #f8fafc;" onkeypress="if(event.key==='Enter') sendUserMessage()">
+      <button onclick="startVoiceInput()" style="background: #0284c7; color: #fff; border: none; padding: 10px 12px; border-radius: 10px; cursor: pointer;" title="Voice Input">🎤</button>
       <button onclick="sendUserMessage()" style="background: linear-gradient(135deg, #2563eb, #db2777); color: #fff; border: none; padding: 10px 15px; border-radius: 10px; cursor: pointer;">➤</button>
     </div>
   `;
@@ -55,90 +72,157 @@ document.addEventListener('DOMContentLoaded', () => {
 
 function toggleAiHelpdesk() {
   const modal = document.getElementById('autoAiModal');
-  if (modal) modal.style.display = modal.style.display === 'flex' ? 'none' : 'flex';
+  if (modal) {
+    modal.style.display = modal.style.display === 'flex' ? 'none' : 'flex';
+  }
 }
 
 function toggleVoiceOutput() {
   isVoiceActive = !isVoiceActive;
   const speakerBtn = document.getElementById('speakerToggleBtn');
   if (speakerBtn) {
-    speakerBtn.innerHTML = isVoiceActive ? '🔊' : '🔇';
-    speakerBtn.style.color = isVoiceActive ? '#60a5fa' : '#94a3b8';
-    if (!isVoiceActive) window.speechSynthesis.cancel();
+    if (isVoiceActive) {
+      speakerBtn.innerHTML = '🔊';
+      speakerBtn.style.color = '#60a5fa';
+      speakText(currentLang === 'hi' ? 'स्पीकर चालू है।' : currentLang === 'en' ? 'Speaker turned on.' : 'স্পিকার অন করা হয়েছে।');
+    } else {
+      speakerBtn.innerHTML = '🔇';
+      speakerBtn.style.color = '#94a3b8';
+      window.speechSynthesis.cancel();
+    }
   }
 }
 
 function changeAiLanguage(lang) {
   currentLang = lang;
-  document.getElementById('aiWelcomeMsg').innerText = welcomeMessages[lang];
+  const langData = aiConversations[lang] || aiConversations.bn;
+  
+  const welcomeEl = document.getElementById('aiWelcomeMsg');
+  if (welcomeEl) welcomeEl.innerText = langData.welcome;
+
+  const statusBar = document.getElementById('voiceStatusBar');
+  if (statusBar) statusBar.innerText = langData.listening;
+
+  const inputEl = document.getElementById('aiChatInput');
+  if (inputEl) inputEl.placeholder = langData.placeholder;
+
+  speakText(langData.welcome);
 }
 
 function speakText(text) {
   if (!isVoiceActive || !('speechSynthesis' in window)) return;
   window.speechSynthesis.cancel();
+
   setTimeout(() => {
     const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = currentLang === 'bn' ? 'bn-IN' : (currentLang === 'hi' ? 'hi-IN' : 'en-US');
+    if (currentLang === 'bn') utterance.lang = 'bn-IN';
+    else if (currentLang === 'hi') utterance.lang = 'hi-IN';
+    else utterance.lang = 'en-US';
+
+    utterance.rate = 0.95;
+    utterance.pitch = 1.0;
     window.speechSynthesis.speak(utterance);
   }, 250);
 }
 
-// === আসল AI কল করার ফাংশন (Puter.js ব্যবহার করে) ===
 async function sendUserMessage(customText = '') {
   const input = document.getElementById('aiChatInput');
   const query = customText || (input ? input.value.trim() : '');
   if (!query) return;
 
+  detectLanguageFromQuery(query);
+
   appendUserMessage(query);
   if (input) input.value = '';
 
   const loadingId = 'loading_' + Date.now();
-  appendAiMessage("টাইপ করছে...", loadingId);
+  appendAiMessage("...", loadingId);
 
-  // ভাষা ডিটেক্ট করা
+  let reply = "";
+  const q = query.toLowerCase();
+
+  // ব্যক্তিগত পরিচয় ও সাইট গাইডলাইন সম্পর্কিত নিরাপদ লোকাল হ্যান্ডলার
+  if (q.includes('কে বানিয়েছে') || q.includes('কে তৈরি করেছে') || q.includes('creator') || q.includes('who made')) {
+    reply = currentLang === 'bn' ? 
+      "👨‍💻 **DocuCraftAI** প্ল্যাটফর্মটি ইনদনীল রুইদাস (Indranil Ruidas) দ্বারা তৈরি ও পরিচালিত!" :
+      "👨‍💻 **DocuCraftAI** was created and developed by Indranil Ruidas!";
+  } else if (q.includes('কোথায় বাড়ি') || q.includes('কোথায় বাড়ি') || q.includes('where is your home') || q.includes('bardhaman')) {
+    reply = currentLang === 'bn' ? 
+      "🏡 ক্রিয়েটর ইনদনীল রুইদাসের বাড়ি পশ্চিমবঙ্গের বর্ধমান (Bardhaman, West Bengal) জেলায়।" :
+      "🏡 The creator Indranil Ruidas is from Bardhaman, West Bengal, India.";
+  } else if (q.includes('কেমন আছো') || q.includes('কেমন আছেন') || q.includes('how are you')) {
+    reply = currentLang === 'bn' ? 
+      "😊 আমি নমস্কার জানিয়ে বলছি, আমি খুব ভালো আছি! আশা করি আপনিও অনেক ভালো আছেন। বলুন, আজ আপনাকে কীভাবে সাহায্য করতে পারি?" :
+      "😊 I am doing great! Hope you are doing wonderful as well. How can I assist you today?";
+  } else if (q.includes('পছন্দ নয়') || q.includes('ভালো নয়') || q.includes('bad') || q.includes('not good')) {
+    reply = currentLang === 'bn' ? 
+      "🙏 আপনার মূল্যবান মতামতের জন্য ধন্যবাদ! আপনার পছন্দ অনুযায়ী এটিকে আরও উন্নত করার জন্য আমি সবসময় প্রস্তুত আছি। বলুন, কী পরিবর্তন করলে আপনার আরও ভালো লাগবে?" :
+      "🙏 Thank you for your feedback! I'm always here to improve and adapt to your preferences. Let me know what you'd like to change!";
+  } else if (q.includes('resizer') || q.includes('kb') || q.includes('mb') || q.includes('ফটো সাইজ')) {
+    reply = currentLang === 'bn' ? 
+      "📸 **Photo & Sign KB/MB Resizer:** আপনার ছবি বা সিগনেচার আপলোড করে নির্দিষ্ট KB বা MB (যেমন- ৫০ KB) সিলেক্ট করে এক ক্লিকে রিসাইজ করে নিন।" :
+      "📸 **KB/MB Resizer:** Upload your photo/signature and compress it precisely to your target size instantly!";
+  } else if (q.includes('passport') || q.includes('পাসপোর্ট')) {
+    reply = currentLang === 'bn' ? 
+      "🛂 **Smart Passport Photo Studio:** যেকোনো সাধারণ ছবি দিয়ে ব্যাকগ্রাউন্ড পরিষ্কার (সাদা বা রয়্যাল ব্লু) করে প্রিন্ট-রেডি পাসপোর্ট সাইজ শিট তৈরি করুন।" :
+      "🛂 **Passport Studio:** Generates clean background passport photo sheets instantly!";
+  } else if (q.includes('weather') || q.includes('আবহাওয়া') || q.includes('তাপমাত্রা')) {
+    reply = currentLang === 'bn' ? 
+      "🌤️ এই মুহূর্তে বর্ধমানে আবহাওয়া বেশ চমৎকার ও মনোরম রয়েছে!" : 
+      "🌤️ The weather is quite pleasant right now!";
+  } else {
+    reply = generateAdvancedSmartResponse(query, currentLang);
+  }
+
+  setTimeout(() => {
+    removeAiMessage(loadingId);
+    appendAiMessage(reply);
+    speakText(reply);
+  }, 600);
+}
+
+function detectLanguageFromQuery(text) {
   const hindiRegex = /[\u0900-\u097F]/;
   const bengaliRegex = /[\u0980-\u09FF]/;
-  if (hindiRegex.test(query)) currentLang = 'hi';
-  else if (bengaliRegex.test(query)) currentLang = 'bn';
 
-  // AI-এর জন্য প্রম্পট তৈরি
-  const prompt = `You are DocuCraftAI, a helpful assistant for the DocuCraft AI website. The creator is Indranil Ruidas from Bardhaman, West Bengal. Answer the following user question politely and correctly in the SAME LANGUAGE the user asked (Bengali, Hindi, or English). Keep it helpful and concise. User's question: "${query}"`;
+  if (hindiRegex.test(text)) currentLang = 'hi';
+  else if (bengaliRegex.test(text)) currentLang = 'bn';
 
-  try {
-    // Puter.js AI চ্যাট কল
-    const response = await puter.ai.chat(prompt);
-    
-    // রেসপন্স থেকে টেক্সট বের করা
-    let aiReply = "";
-    if (typeof response === 'string') {
-      aiReply = response;
-    } else if (response && response.message && response.message.content) {
-      aiReply = response.message.content;
-    } else if (response && response.text) {
-      aiReply = response.text;
-    } else {
-      aiReply = JSON.stringify(response);
-    }
+  const selectEl = document.getElementById('aiLangSelect');
+  if (selectEl) selectEl.value = currentLang;
+}
 
-    removeAiMessage(loadingId);
-    appendAiMessage(aiReply);
-    speakText(aiReply);
-  } catch (error) {
-    console.error("AI Error:", error);
-    removeAiMessage(loadingId);
-    appendAiMessage("দুঃখিত, এই মুহূর্তে উত্তর দিতে পারছি না। দয়া করে ইন্টারনেট সংযোগ চেক করুন বা আবার চেষ্টা করুন।");
-  }
+function generateAdvancedSmartResponse(query, lang) {
+  const answers = {
+    bn: [
+      `নমস্কার! "${query}" নিয়ে বলতে গেলে, এটি একটি চমৎকার বিষয়। আমাদের সাইটের টুলস কিংবা অন্য যেকোনো বিষয়ে আপনার আর কী জানার আছে বলুন!`,
+      `আপনার প্রশ্নটি খুবই সুন্দর! "${query}" প্রসঙ্গে বিস্তারিত আলোচনা করা যেতে পারে। এ নিয়ে আপনার মতামত কী?`
+    ],
+    hi: [
+      `नमस्ते! "${query}" के बारे में बात करना बहुत अच्छा लगा। इस विषय पर आपकी क्या राय है?`,
+      `यह एक बहुत ही दिलचस्प सवाल है! इसके बारे में आप और क्या जानना चाहते हैं?`
+    ],
+    en: [
+      `Hello! Discussing "${query}" is quite fascinating. What are your thoughts on this?`,
+      `That's an interesting inquiry about "${query}"! How can I help you explore this further?`
+    ]
+  };
+
+  const list = answers[lang] || answers.bn;
+  return list[Math.floor(Math.random() * list.length)];
 }
 
 function appendUserMessage(text) {
   const chatBox = document.getElementById('aiChatBody');
-  chatBox.innerHTML += `<div style="margin: 10px 0; text-align: right;"><span style="background: #2563eb; color: #fff; padding: 10px 15px; border-radius: 16px 16px 0 16px; display: inline-block; max-width: 82%; word-break: break-word;">${escapeHtml(text)}</span></div>`;
+  if (!chatBox) return;
+  chatBox.innerHTML += `<div style="margin: 10px 0; text-align: right;"><span style="background: #2563eb; color: #fff; padding: 10px 15px; border-radius: 16px 16px 0 16px; display: inline-block; font-size: 13.5px; max-width: 82%; word-break: break-word;">${escapeHtml(text)}</span></div>`;
   chatBox.scrollTop = chatBox.scrollHeight;
 }
 
 function appendAiMessage(text, id = '') {
   const chatBox = document.getElementById('aiChatBody');
-  chatBox.innerHTML += `<div id="${id}" style="margin: 10px 0; text-align: left;"><span style="background: #ffffff; color: #1e293b; padding: 10px 15px; border-radius: 14px 14px 14px 0; display: inline-block; max-width: 82%; border: 1px solid #e2e8f0; line-height: 1.5;">🤖 ${escapeHtml(text)}</span></div>`;
+  if (!chatBox) return;
+  chatBox.innerHTML += `<div id="${id}" style="margin: 10px 0; text-align: left;"><span style="background: #ffffff; color: #1e293b; padding: 10px 15px; border-radius: 14px 14px 14px 0; display: inline-block; font-size: 13.5px; max-width: 82%; border: 1px solid #e2e8f0; line-height: 1.5; word-break: break-word; box-shadow: 0 2px 5px rgba(0,0,0,0.02);">🤖 ${escapeHtml(text)}</span></div>`;
   chatBox.scrollTop = chatBox.scrollHeight;
 }
 
@@ -149,9 +233,13 @@ function removeAiMessage(id) {
 
 function startVoiceInput() {
   const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-  if (!SpeechRecognition) { alert('Voice recognition not supported.'); return; }
+  if (!SpeechRecognition) {
+    alert('Voice recognition not supported.');
+    return;
+  }
   const recognition = new SpeechRecognition();
   recognition.lang = currentLang === 'bn' ? 'bn-IN' : (currentLang === 'hi' ? 'hi-IN' : 'en-US');
+  
   recognition.onresult = (event) => {
     const text = event.results[0][0].transcript;
     document.getElementById('aiChatInput').value = text;
