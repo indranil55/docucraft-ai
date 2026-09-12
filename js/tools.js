@@ -159,7 +159,6 @@ function launchTool(toolKey) {
         </div>`;
     }
   } else if (toolKey === 'examResizer') {
-    // ==================== NEW TOOL: EXAM PHOTO RESIZER ====================
     if (title) title.innerText = 'Exam Photo & Signature Resizer';
     if (desc) desc.innerText = 'Resize photo and signature to exact size required for government exam forms (SSC, UPSC, NEET, etc.).';
     if (fileInput) { fileInput.accept = 'image/*'; fileInput.multiple = false; }
@@ -179,7 +178,6 @@ function launchTool(toolKey) {
         </div>`;
     }
   } else if (toolKey === 'ocr') {
-    // ==================== NEW TOOL: OCR (Image to Text) ====================
     if (title) title.innerText = 'OCR - Image to Text';
     if (desc) desc.innerText = 'Extract text from any image (JPG, PNG) in Bengali, Hindi, or English.';
     if (fileInput) { fileInput.accept = 'image/*'; fileInput.multiple = false; }
@@ -602,7 +600,7 @@ function renderFileList() {
 
   selectedFiles.forEach((file, index) => {
     const fileSize = (file.size / 1024).toFixed(1) + ' KB';
-    const safeFileName = escapeHtml(file.name); // 🔥 স্যানিটাইজ করা হচ্ছে
+    const safeFileName = escapeHtml(file.name); 
     
     html += `<div style="display: flex; justify-content: space-between; align-items: center; padding: 6px 0; border-bottom: 1px solid #e2e8f0; font-size: 12px;">
       <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 170px; color: #334155;" title="${safeFileName}">${index + 1}. ${safeFileName} (${fileSize})</span>`;
@@ -624,7 +622,7 @@ function moveFileUp(index) {
     const temp = selectedFiles[index];
     selectedFiles[index] = selectedFiles[index - 1];
     selectedFiles[index - 1] = temp;
-    renderFileList();
+    renderFileList(); 
   }
 }
 
@@ -633,7 +631,7 @@ function moveFileDown(index) {
     const temp = selectedFiles[index];
     selectedFiles[index] = selectedFiles[index + 1];
     selectedFiles[index + 1] = temp;
-    renderFileList();
+    renderFileList(); 
   }
 }
 // ==========================================================================
@@ -740,7 +738,6 @@ async function executeToolAction() {
     return;
   }
 
-  // নতুন টুল: Exam Resizer
   if (activeTool === 'examResizer') {
     if (selectedFiles.length === 0) { alert('Please select an image.'); return; }
     if (btn) { btn.innerText = 'Processing...'; btn.disabled = true; }
@@ -753,10 +750,10 @@ async function executeToolAction() {
       
       let targetBytes, maxWidth, maxHeight;
       if (examType === 'photo') {
-        targetBytes = 50 * 1024; // 50 KB
+        targetBytes = 50 * 1024; 
         maxWidth = 200; maxHeight = 230;
       } else {
-        targetBytes = 20 * 1024; // 20 KB
+        targetBytes = 20 * 1024; 
         maxWidth = 140; maxHeight = 60;
       }
 
@@ -767,7 +764,6 @@ async function executeToolAction() {
       const canvas = document.createElement('canvas');
       let width = img.width, height = img.height;
       
-      // Maintain aspect ratio while fitting within max dimensions
       const ratio = Math.min(maxWidth / width, maxHeight / height);
       width = Math.round(width * ratio);
       height = Math.round(height * ratio);
@@ -798,7 +794,6 @@ async function executeToolAction() {
     return;
   }
 
-  // নতুন টুল: OCR (Image to Text)
   if (activeTool === 'ocr') {
     if (selectedFiles.length === 0) { alert('Please select an image.'); return; }
     if (btn) { btn.innerText = 'Processing OCR...'; btn.disabled = true; }
@@ -842,7 +837,7 @@ async function executeToolAction() {
   }
 
   if (fileNeeded.includes(activeTool)) {
-    const maxSizeAllowed = 5 * 1024 * 1024; // 5 MB
+    const maxSizeAllowed = 5 * 1024 * 1024; 
     for (const file of selectedFiles) {
       if (file.size > maxSizeAllowed) {
         alert(`File "${file.name}" is larger than 5MB. Please select a smaller file to avoid issues.`);
@@ -1296,3 +1291,63 @@ async function executeToolAction() {
     setTimeout(() => resetProgress(), 180);
   }
 }
+
+function showSuccessPopup(msg) {
+  if (window.Swal) {
+    Swal.fire({ icon: 'success', title: 'Downloaded!', text: msg, timer: 2000, showConfirmButton: false });
+  } else {
+    alert(msg);
+  }
+}
+
+function parseRange(str, total) {
+  const indices = new Set();
+  if (!str) {
+    for (let i = 0; i < total; i++) indices.add(i);
+    return Array.from(indices);
+  }
+  str.split(',').forEach(p => {
+    const trimmed = p.trim();
+    if (trimmed.includes('-')) {
+      const [s, e] = trimmed.split('-').map(Number);
+      for (let i = s; i <= e; i++) if (i >= 1 && i <= total) indices.add(i - 1);
+    } else {
+      const n = Number(trimmed);
+      if (!isNaN(n) && n >= 1 && n <= total) indices.add(n - 1);
+    }
+  });
+  return Array.from(indices).sort((a, b) => a - b);
+}
+
+// ==================== 🔥 THE MISSING FUNCTIONS (FIXED) ====================
+
+function readFileAsDataURL(file) {
+  return new Promise((res, rej) => {
+    const r = new FileReader();
+    r.onload = () => res(r.result);
+    r.onerror = rej;
+    r.readAsDataURL(file);
+  });
+}
+
+function imageToJpegDataUrl(dataUrl, quality = 0.92) {
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      canvas.width = img.width; canvas.height = img.height;
+      const ctx = canvas.getContext('2d');
+      ctx.fillStyle = '#ffffff'; ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.drawImage(img, 0, 0);
+      resolve(canvas.toDataURL('image/jpeg', quality));
+    };
+    img.src = dataUrl;
+  });
+}
+
+function downloadBlob(content, name, type) {
+  let blob = content instanceof Blob ? content : new Blob([content], { type });
+  
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const a = document.createEleme
