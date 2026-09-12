@@ -22,7 +22,7 @@ function loadScript(url) {
 async function ensurePdfLibLoaded() {
   if (window.PDFLib || window.pdfLib) return window.PDFLib || window.pdfLib;
   try {
-    await loadScript('https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js');
+    await loadScript('https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.9/pdf-lib.min.js');
     return window.PDFLib || window.pdfLib;
   } catch {
     return null;
@@ -574,7 +574,6 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 });
 
-// ================= 🔥 FIXED: XSS Vulnerability Fix (CodeQL Alert) =================
 function escapeHtml(value) {
   return String(value)
     .replace(/&/g, '&amp;')
@@ -634,7 +633,6 @@ function moveFileDown(index) {
     renderFileList(); 
   }
 }
-// ==========================================================================
 
 function resetProgress() {
   const box = document.getElementById('processingProgress');
@@ -1304,51 +1302,4 @@ function parseRange(str, total) {
   const indices = new Set();
   if (!str) {
     for (let i = 0; i < total; i++) indices.add(i);
-    return Array.from(indices);
-  }
-  str.split(',').forEach(p => {
-    const trimmed = p.trim();
-    if (trimmed.includes('-')) {
-      const [s, e] = trimmed.split('-').map(Number);
-      for (let i = s; i <= e; i++) if (i >= 1 && i <= total) indices.add(i - 1);
-    } else {
-      const n = Number(trimmed);
-      if (!isNaN(n) && n >= 1 && n <= total) indices.add(n - 1);
-    }
-  });
-  return Array.from(indices).sort((a, b) => a - b);
-}
-
-// ==================== 🔥 UTILITY FUNCTIONS ====================
-
-function readFileAsDataURL(file) {
-  return new Promise((res, rej) => {
-    const r = new FileReader();
-    r.onload = () => res(r.result);
-    r.onerror = rej;
-    r.readAsDataURL(file);
-  });
-}
-
-function imageToJpegDataUrl(dataUrl, quality = 0.92) {
-  return new Promise((resolve) => {
-    const img = new Image();
-    img.onload = () => {
-      const canvas = document.createElement('canvas');
-      canvas.width = img.width; canvas.height = img.height;
-      const ctx = canvas.getContext('2d');
-      ctx.fillStyle = '#ffffff'; ctx.fillRect(0, 0, canvas.width, canvas.height);
-      ctx.drawImage(img, 0, 0);
-      resolve(canvas.toDataURL('image/jpeg', quality));
-    };
-    img.src = dataUrl;
-  });
-}
-
-function downloadBlob(content, name, type) {
-  let blob = content instanceof Blob ? content : new Blob([content], { type });
-  
-  const reader = new FileReader();
-  reader.onload = function(e) {
-    const a = document.createElement('a');
-   
+    ret
