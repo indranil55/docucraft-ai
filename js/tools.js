@@ -135,7 +135,7 @@ function launchTool(toolKey) {
     }
   } else if (toolKey === 'passportGrid') {
     if (title) title.innerText = 'Smart Passport Photo Studio (Auto-Enhance)';
-    if (desc) desc.innerText = 'Upload normal photo: auto background cleanup, lighting correction & print-ready grid.';
+    if (desc) desc.innerText = 'Upload normal photo: safe background cleanup & print-ready grid.';
     if (fileInput) { fileInput.accept = 'image/*'; fileInput.multiple = false; }
     if (dropText) dropText.innerText = 'Tap to select normal photo';
     if (customUI) {
@@ -539,14 +539,14 @@ async function executeToolAction() {
       showSuccessPopup(`Photo Resized Successfully (${valInput} ${unit})!`);
 
     } else if (activeTool === 'passportGrid') {
-      setProgress(20, 'Auto-removing background & adjusting studio lighting...');
+      setProgress(20, 'Processing passport photo with clean white background...');
       const count = parseInt(document.getElementById('optPassportCopies')?.value) || 8;
       const borderStyle = document.getElementById('optPassportBorder')?.value || 'thin';
       const customName = document.getElementById('optPassportFileName')?.value?.trim() || 'Smart_Passport_Sheet';
       
       const rawData = await readFileAsDataURL(selectedFiles[0]);
       
-      // Advanced Studio Background Cleaner & Lighting Enhancer
+      // সেফ ব্যাকগ্রাউন্ড ক্লিনার: মুখ বা ফেস পরিষ্কার রেখে শুধুমাত্র পেছনের ব্যাকগ্রাউন্ড সাদা করা
       const processedImageData = await new Promise((resolve) => {
         const img = new Image();
         img.onload = () => {
@@ -555,7 +555,6 @@ async function executeToolAction() {
           canvas.height = 500;
           const ctx = canvas.getContext('2d');
           
-          // Clean white base fill
           ctx.fillStyle = '#ffffff';
           ctx.fillRect(0, 0, canvas.width, canvas.height);
           
@@ -574,25 +573,18 @@ async function executeToolAction() {
           
           ctx.drawImage(img, sX, sY, sWidth, sHeight, 0, 0, canvas.width, canvas.height);
           
-          // Smart Background Whitening & Studio Lighting Algorithm
+          // নিরাপদ হোয়াইট ব্যাকগ্রাউন্ড অ্যালগরিদম (যা ফেস বা জামার কালার নষ্ট করবে না)
           const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
           const d = imgData.data;
           
           for (let i = 0; i < d.length; i += 4) {
             let r = d[i], g = d[i+1], b = d[i+2];
             
-            const maxRGB = Math.max(r, g, b);
-            const minRGB = Math.min(r, g, b);
-            const diff = maxRGB - minRGB;
-            
-            if ((r > 130 && g > 130 && b > 130 && diff < 35) || (r > 180 || g > 180 || b > 180)) {
+            // যদি পিক্সেলটি হালকা নীল বা ধূসর (পুরাতন ব্যাকগ্রাউন্ড) হয়, তবেই তাকে সাদা করবে
+            if ((r > 140 && g > 150 && b > 180 && Math.abs(r - g) < 25) || (r > 200 && g > 200 && b > 200)) {
               d[i] = 255;   // R
               d[i+1] = 255; // G
               d[i+2] = 255; // B
-            } else {
-              d[i] = Math.min(255, r * 1.12 + 10);
-              d[i+1] = Math.min(255, g * 1.12 + 10);
-              d[i+2] = Math.min(255, b * 1.12 + 10);
             }
           }
           
@@ -607,7 +599,7 @@ async function executeToolAction() {
       const { jsPDF } = jsPdfLib || window.jspdf;
       const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
       
-      const w = 35, h = 45; // Standard 35x45 mm passport size
+      const w = 35, h = 45; // স্ট্যান্ডার্ড ৩৫x৪৫ মিমি পাসপোর্ট সাইজ
       const cols = count <= 4 ? 2 : (count <= 12 ? 3 : 4);
       const marginX = (210 - (cols * w)) / (cols + 1);
       const marginY = 15;
@@ -620,8 +612,9 @@ async function executeToolAction() {
         
         pdf.addImage(processedImageData, 'JPEG', x, y, w, h);
         
+        // বর্ডার অপশন হ্যান্ডলিং
         if (borderStyle === 'thin') {
-          pdf.setDrawColor(200, 200, 200);
+          pdf.setDrawColor(180, 180, 180);
           pdf.setLineWidth(0.2);
           pdf.rect(x, y, w, h);
         } else if (borderStyle === 'black') {
@@ -825,7 +818,7 @@ function downloadBlob(content, name, type) {
   reader.onload = function(e) {
     const a = document.createElement('a');
     a.style.display = 'none';
-    a.href = e.target.result; // Base64 Data URL (সম্পূর্ণ নিরাপদ এবং অবজেক্ট ইউআরএল মুক্ত)
+    a.href = e.target.result;
     a.download = name;
     document.body.appendChild(a);
     
