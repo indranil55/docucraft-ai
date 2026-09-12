@@ -1,18 +1,18 @@
-// DocuCraftAI - Unlimited Conversational Assistant (Auth Bypassed, All Tools & Programs Fully Active)
+// DocuCraftAI - New Modern Secured Login & Authentication Lock System
 
 const aiConversations = {
   en: {
-    welcome: "Hello! I am DocuCraftAI, your smart assistant. All tools and programs are fully active and ready to use. How can I help you today?",
+    welcome: "Hello! Please login or sign up to access DocuCraftAI tools securely.",
     listening: "🎙️ Listening... Speak now in English",
     placeholder: "Ask me anything..."
   },
   hi: {
-    welcome: "नमस्ते! मैं DocuCraftAI हूँ। सभी टूल्स और प्रोग्राम पूरी तरह से सक्रिय हैं। बताइए, आज मैं आपकी क्या मदद करूँ?",
+    welcome: "नमस्ते! DocuCraftAI टूल्स का सुरक्षित रूप से उपयोग करने के लिए कृपया लॉगिन या साइन अप करें।",
     listening: "🎙️ सुन रहा हूँ... कृपया हिंदी में बोलें",
     placeholder: "मुझसे कुछ भी पूछें..."
   },
   bn: {
-    welcome: "নমস্কার! আমি DocuCraftAI। ওয়েবসাইটের সমস্ত টুলস এবং প্রোগ্রামগুলো এখন পুরোপুরি সচল ও প্রস্তুত রয়েছে। বলুন, আপনাকে কীভাবে সাহায্য করতে পারি?",
+    welcome: "নমস্কার! DocuCraftAI-এর সমস্ত টুলস নিরাপদে ব্যবহার করতে অনুগ্রহ করে প্রথমে লগইন বা সাইন আপ করুন।",
     listening: "🎙️ শুনছি... বাংলায় কথা বলুন",
     placeholder: "যেকোনো বিষয়ে প্রশ্ন করুন..."
   }
@@ -22,20 +22,20 @@ let isVoiceActive = true;
 let currentLang = 'bn';
 
 document.addEventListener('DOMContentLoaded', () => {
-  // লগইন বা লক পপআপটি স্কিন থেকে সরিয়ে দেওয়া হলো, যাতে কোনো বাধা ছাড়াই সব প্রোগ্রাম কাজ করে
+  // নতুন এবং প্রিমিয়াম লক সিস্টেম সক্রিয় করা
   const authModal = document.getElementById('authModal');
   if (authModal) {
-    authModal.style.display = 'none';
-    authModal.remove(); // পপআপ ডোম থেকে রিমুভ করে দেওয়া হলো যাতে ব্যাকগ্রাউন্ড পুরোপুরি ফ্রি থাকে
+    authModal.style.display = 'flex';
+    authModal.style.background = 'rgba(15, 23, 42, 0.85)';
+    authModal.style.backdropFilter = 'blur(12px)';
   }
-  document.body.classList.remove('modal-open');
-  document.body.style.overflow = 'auto'; // পেজ স্ক্রোল সচল রাখা
+  document.body.classList.add('modal-open');
+  document.body.style.overflow = 'hidden';
 
   if (document.getElementById('autoAiModal')) return;
 
   const btn = document.createElement('button');
   btn.innerHTML = '💬 DocuCraftAI';
-  // চ্যাটবট বাটনটি একদম নিচে নামানোর জন্য bottom: 10px করা হয়েছে
   btn.style.cssText = 'position: fixed; bottom: 10px; right: 20px; background: linear-gradient(135deg, #2563eb, #7c3aed, #db2777); color: #fff; border: none; padding: 11px 20px; border-radius: 30px; font-weight: 700; cursor: pointer; z-index: 99999; box-shadow: 0 6px 20px rgba(37,99,235,0.4); font-size: 14px;';
   btn.onclick = toggleAiHelpdesk;
   document.body.appendChild(btn);
@@ -141,7 +141,6 @@ async function sendUserMessage(customText = '') {
   if (!query) return;
 
   detectLanguageFromQuery(query);
-
   appendUserMessage(query);
   if (input) input.value = '';
 
@@ -155,22 +154,6 @@ async function sendUserMessage(customText = '') {
     reply = currentLang === 'bn' ? 
       "👨‍💻 **DocuCraftAI** প্ল্যাটফর্মটি ইনদনীল রুইদাস (Indranil Ruidas) দ্বারা তৈরি ও পরিচালিত!" :
       "👨‍💻 **DocuCraftAI** was created and developed by Indranil Ruidas!";
-  } else if (q.includes('কোথায় বাড়ি') || q.includes('কোথায় বাড়ি') || q.includes('where is your home') || q.includes('bardhaman')) {
-    reply = currentLang === 'bn' ? 
-      "🏡 ক্রিয়েটর ইনদনীল রুইদাসের বাড়ি পশ্চিমবঙ্গের বর্ধমান (Bardhaman, West Bengal) জেলায়।" :
-      "🏡 The creator Indranil Ruidas is from Bardhaman, West Bengal, India.";
-  } else if (q.includes('কেমন আছো') || q.includes('কেমন আছেন') || q.includes('how are you')) {
-    reply = currentLang === 'bn' ? 
-      "😊 আমি নমস্কার জানিয়ে বলছি, আমি খুব ভালো আছি! আশা করি আপনিও অনেক ভালো আছেন। বলুন, আজ আপনাকে কীভাবে সাহায্য করতে পারি?" :
-      "😊 I am doing great! Hope you are doing wonderful as well. How can I assist you today?";
-  } else if (q.includes('resizer') || q.includes('kb') || q.includes('mb') || q.includes('ফটো সাইজ')) {
-    reply = currentLang === 'bn' ? 
-      "📸 **Photo & Sign KB/MB Resizer:** আপনার ছবি বা সিগনেচার আপলোড করে নির্দিষ্ট KB বা MB (যেমন- ৫০ KB) সিলেক্ট করে এক ক্লিকে রিসাইজ করে নিন।" :
-      "📸 **KB/MB Resizer:** Upload your photo/signature and compress it precisely to your target size instantly!";
-  } else if (q.includes('passport') || q.includes('পাসপোর্ট')) {
-    reply = currentLang === 'bn' ? 
-      "🛂 **Smart Passport Photo Studio:** যেকোনো সাধারণ ছবি দিয়ে ব্যাকগ্রাউন্ড পরিষ্কার (সাদা বা রয়্যাল ব্লু) করে প্রিন্ট-রেডি পাসপোর্ট সাইজ শিট তৈরি করুন।" :
-      "🛂 **Passport Studio:** Generates clean background passport photo sheets instantly!";
   } else {
     reply = generateAdvancedSmartResponse(query, currentLang);
   }
@@ -196,16 +179,13 @@ function detectLanguageFromQuery(text) {
 function generateAdvancedSmartResponse(query, lang) {
   const answers = {
     bn: [
-      `নমস্কার! "${query}" নিয়ে বলতে গেলে, এটি একটি চমৎকার বিষয়। আমাদের সাইটের টুলস কিংবা অন্য যেকোনো বিষয়ে আপনার আর কী জানার আছে বলুন!`,
-      `আপনার প্রশ্নটি খুবই সুন্দর! "${query}" প্রসঙ্গে বিস্তারিত আলোচনা করা যেতে পারে। এ নিয়ে আপনার মতামত কী?`
+      `নমস্কার! "${query}" নিয়ে বলতে গেলে, এটি একটি চমৎকার বিষয়। আমাদের সাইটের টুলস কিংবা অন্য যেকোনো বিষয়ে আপনার আর কী জানার আছে বলুন!`
     ],
     hi: [
-      `नमस्ते! "${query}" के बारे में बात करना बहुत अच्छा लगा। इस विषय पर आपकी क्या राय है?`,
-      `यह एक बहुत ही दिलचस्प सवाल है! इसके बारे में आप और क्या जानना चाहते हैं?`
+      `नमस्ते! "${query}" के बारे में बात करना बहुत अच्छा लगा। इस विषय पर आपकी क्या राय है?`
     ],
     en: [
-      `Hello! Discussing "${query}" is quite fascinating. What are your thoughts on this?`,
-      `That's an interesting inquiry about "${query}"! How can I help you explore this further?`
+      `Hello! Discussing "${query}" is quite fascinating. What are your thoughts on this?`
     ]
   };
 
