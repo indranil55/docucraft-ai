@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, interactive-widget=resizes-content">
   <title>DocuCraft AI - Smart All-in-One PDF & Document Studio</title>
 
-  <!-- ব্রাউজার ট্যাব ও গুগল সার্চের ফেভিকন -->
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='40' cy='50' r='35' fill='%232563EB'/><text x='38' y='63' font-family='Arial, sans-serif' font-weight='bold' font-size='42' fill='%230F172A' text-anchor='middle'>D</text><text x='65' y='63' font-family='Arial, sans-serif' font-weight='bold' font-size='42' fill='%23DC2626' text-anchor='middle'>C</text></svg>">
   <link rel="shortcut icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='40' cy='50' r='35' fill='%232563EB'/><text x='38' y='63' font-family='Arial, sans-serif' font-weight='bold' font-size='42' fill='%230F172A' text-anchor='middle'>D</text><text x='65' y='63' font-family='Arial, sans-serif' font-weight='bold' font-size='42' fill='%23DC2626' text-anchor='middle'>C</text></svg>">
 
@@ -13,7 +12,6 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   
-  <!-- FontAwesome -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer">
   
   <link rel="stylesheet" href="style.css">
@@ -29,24 +27,6 @@
       display: flex;
       align-items: center;
       text-decoration: none;
-    }
-    .auth-icon-btn {
-      width: 42px;
-      height: 42px;
-      border-radius: 50%;
-      background: #10B981;
-      border: none;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #ffffff;
-      font-size: 16px;
-      cursor: pointer;
-      box-shadow: 0 2px 6px rgba(16, 185, 129, 0.3);
-      transition: transform 0.2s ease;
-    }
-    .auth-icon-btn:hover {
-      transform: scale(1.05);
     }
   </style>
 
@@ -83,12 +63,6 @@
           </g>
         </svg>
       </a>
-
-      <div class="nav-actions">
-        <button class="auth-icon-btn" onclick="openAuthModal()" title="Login / Sign Up" id="authNavBtn">
-          <i class="fa-solid fa-user"></i>
-        </button>
-      </div>
     </div>
   </header>
 
@@ -111,203 +85,203 @@
 
   <main class="main-grid-container">
     <div class="tools-grid" id="toolsGrid">
-      <div class="tool-card" data-cat="cyber" onclick="if(checkUserAccess('kbResizer', event)) { launchTool('kbResizer'); }">
+      <div class="tool-card" data-cat="cyber" onclick="launchTool('kbResizer')">
         <div class="tool-icon" style="background:#dbeafe; color:#2563eb;"><i class="fa-solid fa-compress"></i></div>
         <h3>Photo & Sign KB / MB Resizer</h3>
         <p>Compress image precisely to exact target KB or MB as per your requirement.</p>
         <span class="tool-meta">Open Resizer &rarr;</span>
       </div>
 
-      <div class="tool-card" data-cat="cyber" onclick="if(checkUserAccess('passportGrid', event)) { launchTool('passportGrid'); }">
+      <div class="tool-card" data-cat="cyber" onclick="launchTool('passportGrid')">
         <div class="tool-icon" style="background:#fef3c7; color:#d97706;"><i class="fa-solid fa-id-card-clip"></i></div>
         <h3>Passport Photo Sheet (Custom / Grid)</h3>
         <p>Generate print-ready sheets of custom passport photo copies on a single A4 page.</p>
         <span class="tool-meta">Open Passport Grid &rarr;</span>
       </div>
 
-      <div class="tool-card" data-cat="cyber" onclick="if(checkUserAccess('sigPad', event)) { launchTool('sigPad'); }">
+      <div class="tool-card" data-cat="cyber" onclick="launchTool('sigPad')">
         <div class="tool-icon" style="background:#fce7f3; color:#db2777;"><i class="fa-solid fa-signature"></i></div>
         <h3>Digital Signature Maker (Sign Pad)</h3>
         <p>Draw your signature on screen and download as transparent PNG for form uploads.</p>
         <span class="tool-meta">Open Sign Pad &rarr;</span>
       </div>
 
-      <div class="tool-card" data-cat="cyber" onclick="if(checkUserAccess('qrGen', event)) { launchTool('qrGen'); }">
+      <div class="tool-card" data-cat="cyber" onclick="launchTool('qrGen')">
         <div class="tool-icon" style="background:#e0f2fe; color:#0284c7;"><i class="fa-solid fa-qrcode"></i></div>
         <h3>QR Code & UPI Generator</h3>
         <p>Generate instant QR codes for payment links, UPI IDs, or website URLs.</p>
         <span class="tool-meta">Open QR Generator &rarr;</span>
       </div>
 
-      <div class="tool-card" data-cat="cyber" onclick="if(checkUserAccess('examResizer', event)) { launchTool('examResizer'); }">
+      <div class="tool-card" data-cat="cyber" onclick="launchTool('examResizer')">
         <div class="tool-icon" style="background:#fee2e2; color:#e5322d;"><i class="fa-solid fa-user-graduate"></i></div>
         <h3>Exam Photo & Signature Resizer</h3>
         <p>Resize photo and signature to exact size required for government exam forms (SSC, UPSC, NEET, etc.).</p>
         <span class="tool-meta">Open Resizer &rarr;</span>
       </div>
 
-      <div class="tool-card" data-cat="organize" onclick="if(checkUserAccess('merge', event)) { launchTool('merge'); }">
+      <div class="tool-card" data-cat="organize" onclick="launchTool('merge')">
         <div class="tool-icon" style="background:#fee2e2; color:#e5322d;"><i class="fa-solid fa-object-group"></i></div>
         <h3>Merge PDF</h3>
         <p>Combine multiple PDF documents into a single organized file in seconds.</p>
         <span class="tool-meta">Open Tool &rarr;</span>
       </div>
 
-      <div class="tool-card" data-cat="organize" onclick="if(checkUserAccess('split', event)) { launchTool('split'); }">
+      <div class="tool-card" data-cat="organize" onclick="launchTool('split')">
         <div class="tool-icon" style="background:#fee2e2; color:#e5322d;"><i class="fa-solid fa-scissors"></i></div>
         <h3>Split PDF</h3>
         <p>Separate one page or an entire set for easy conversion into independent PDF files.</p>
         <span class="tool-meta">Open Tool &rarr;</span>
       </div>
 
-      <div class="tool-card" data-cat="organize" onclick="if(checkUserAccess('compress', event)) { launchTool('compress'); }">
+      <div class="tool-card" data-cat="organize" onclick="launchTool('compress')">
         <div class="tool-icon" style="background:#ecfdf5; color:#059669;"><i class="fa-solid fa-file-zipper"></i></div>
         <h3>Compress PDF</h3>
         <p>Reduce file size while optimizing for maximal visual and document quality.</p>
         <span class="tool-meta">Open Tool &rarr;</span>
       </div>
 
-      <div class="tool-card" data-cat="organize" onclick="if(checkUserAccess('organize', event)) { launchTool('organize'); }">
+      <div class="tool-card" data-cat="organize" onclick="launchTool('organize')">
         <div class="tool-icon" style="background:#fee2e2; color:#e5322d;"><i class="fa-solid fa-arrow-down-up-across-line"></i></div>
         <h3>Organize / Reorder Pages</h3>
         <p>Rearrange, reverse, or reorder the page sequence of your PDF document.</p>
         <span class="tool-meta">Open Tool &rarr;</span>
       </div>
 
-      <div class="tool-card" data-cat="organize" onclick="if(checkUserAccess('rotate', event)) { launchTool('rotate'); }">
+      <div class="tool-card" data-cat="organize" onclick="launchTool('rotate')">
         <div class="tool-icon" style="background:#fef3c7; color:#d97706;"><i class="fa-solid fa-rotate-right"></i></div>
         <h3>Rotate PDF</h3>
         <p>Rotate upside-down or sideways pages by 90, 180, or 270 degrees.</p>
         <span class="tool-meta">Open Tool &rarr;</span>
       </div>
 
-      <div class="tool-card" data-cat="organize" onclick="if(checkUserAccess('removePages', event)) { launchTool('removePages'); }">
+      <div class="tool-card" data-cat="organize" onclick="launchTool('removePages')">
         <div class="tool-icon" style="background:#fee2e2; color:#e5322d;"><i class="fa-solid fa-trash-can"></i></div>
         <h3>Delete PDF Pages</h3>
         <p>Remove unwanted, defective, or blank pages from an existing PDF file.</p>
         <span class="tool-meta">Open Tool &rarr;</span>
       </div>
 
-      <div class="tool-card" data-cat="toPdf" onclick="if(checkUserAccess('jpgToPdf', event)) { launchTool('jpgToPdf'); }">
+      <div class="tool-card" data-cat="toPdf" onclick="launchTool('jpgToPdf')">
         <div class="tool-icon" style="background:#eff6ff; color:#2563eb;"><i class="fa-solid fa-file-image"></i></div>
         <h3>Image to PDF (JPG/PNG to PDF)</h3>
         <p>Convert gallery pictures, screenshots, or document scans into a standard A4 PDF.</p>
         <span class="tool-meta">Open Tool &rarr;</span>
       </div>
 
-      <div class="tool-card" data-cat="toPdf" onclick="if(checkUserAccess('wordToPdf', event)) { launchTool('wordToPdf'); }">
+      <div class="tool-card" data-cat="toPdf" onclick="launchTool('wordToPdf')">
         <div class="tool-icon" style="background:#eff6ff; color:#2563eb;"><i class="fa-solid fa-file-word"></i></div>
         <h3>Word to PDF (DOC/DOCX to PDF)</h3>
         <p>Convert Microsoft Word documents to clean, standardized PDF format.</p>
         <span class="tool-meta">Open Tool &rarr;</span>
       </div>
 
-      <div class="tool-card" data-cat="toPdf" onclick="if(checkUserAccess('excelToPdf', event)) { launchTool('excelToPdf'); }">
+      <div class="tool-card" data-cat="toPdf" onclick="launchTool('excelToPdf')">
         <div class="tool-icon" style="background:#eff6ff; color:#2563eb;"><i class="fa-solid fa-file-excel"></i></div>
         <h3>Excel to PDF (XLS/XLSX to PDF)</h3>
         <p>Convert Excel spreadsheets and tables into formatted, printable PDF documents.</p>
         <span class="tool-meta">Open Tool &rarr;</span>
       </div>
 
-      <div class="tool-card" data-cat="toPdf" onclick="if(checkUserAccess('pptToPdf', event)) { launchTool('pptToPdf'); }">
+      <div class="tool-card" data-cat="toPdf" onclick="launchTool('pptToPdf')">
         <div class="tool-icon" style="background:#eff6ff; color:#2563eb;"><i class="fa-solid fa-file-powerpoint"></i></div>
         <h3>PowerPoint to PDF (PPT/PPTX to PDF)</h3>
         <p>Transform slideshow decks and presentations into portable PDF files.</p>
         <span class="tool-meta">Open Tool &rarr;</span>
       </div>
 
-      <div class="tool-card" data-cat="toPdf" onclick="if(checkUserAccess('htmlToPdf', event)) { launchTool('htmlToPdf'); }">
+      <div class="tool-card" data-cat="toPdf" onclick="launchTool('htmlToPdf')">
         <div class="tool-icon" style="background:#eff6ff; color:#2563eb;"><i class="fa-solid fa-code"></i></div>
         <h3>HTML / Web to PDF</h3>
         <p>Convert HTML text, markup, or web content into downloadable PDF pages.</p>
         <span class="tool-meta">Open Tool &rarr;</span>
       </div>
 
-      <div class="tool-card" data-cat="fromPdf" onclick="if(checkUserAccess('pdfToJpg', event)) { launchTool('pdfToJpg'); }">
+      <div class="tool-card" data-cat="fromPdf" onclick="launchTool('pdfToJpg')">
         <div class="tool-icon" style="background:#eff6ff; color:#2563eb;"><i class="fa-solid fa-image"></i></div>
         <h3>PDF to Image (PDF to JPG/PNG)</h3>
         <p>Extract all pages or individual visual graphics from a PDF into JPG images.</p>
         <span class="tool-meta">Open Tool &rarr;</span>
       </div>
 
-      <div class="tool-card" data-cat="fromPdf" onclick="if(checkUserAccess('pdfToWord', event)) { launchTool('pdfToWord'); }">
+      <div class="tool-card" data-cat="fromPdf" onclick="launchTool('pdfToWord')">
         <div class="tool-icon" style="background:#eff6ff; color:#2563eb;"><i class="fa-solid fa-file-lines"></i></div>
         <h3>PDF to Word (PDF to DOCX)</h3>
         <p>Convert PDF documents into editable Word files with intact textual layout.</p>
         <span class="tool-meta">Open Tool &rarr;</span>
       </div>
 
-      <div class="tool-card" data-cat="fromPdf" onclick="if(checkUserAccess('pdfToExcel', event)) { launchTool('pdfToExcel'); }">
+      <div class="tool-card" data-cat="fromPdf" onclick="launchTool('pdfToExcel')">
         <div class="tool-icon" style="background:#eff6ff; color:#2563eb;"><i class="fa-solid fa-table-cells"></i></div>
         <h3>PDF to Excel (PDF to XLSX)</h3>
         <p>Extract tables, cell grids, and numerical sheets from PDF files into Excel.</p>
         <span class="tool-meta">Open Tool &rarr;</span>
       </div>
 
-      <div class="tool-card" data-cat="fromPdf" onclick="if(checkUserAccess('ocr', event)) { launchTool('ocr'); }">
+      <div class="tool-card" data-cat="fromPdf" onclick="launchTool('ocr')">
         <div class="tool-icon" style="background:#f3e8ff; color:#9333ea;"><i class="fa-solid fa-file-lines"></i></div>
         <h3>OCR - Image to Text</h3>
         <p>Extract text from any image (JPG, PNG) in Bengali, Hindi, or English.</p>
         <span class="tool-meta">Open OCR &rarr;</span>
       </div>
 
-      <div class="tool-card" data-cat="editSecurity" onclick="if(checkUserAccess('editPdf', event)) { launchTool('editPdf'); }">
+      <div class="tool-card" data-cat="editSecurity" onclick="launchTool('editPdf')">
         <div class="tool-icon" style="background:#fef3c7; color:#d97706;"><i class="fa-solid fa-pen-nib"></i></div>
         <h3>Edit PDF</h3>
         <p>Add text annotations, markings, or additional notes onto PDF documents.</p>
         <span class="tool-meta">Open Tool &rarr;</span>
       </div>
 
-      <div class="tool-card" data-cat="editSecurity" onclick="if(checkUserAccess('sign', event)) { launchTool('sign'); }">
+      <div class="tool-card" data-cat="editSecurity" onclick="launchTool('sign')">
         <div class="tool-icon" style="background:#f1f5f9; color:#475569;"><i class="fa-solid fa-signature"></i></div>
         <h3>Sign PDF</h3>
         <p>Add handwritten digital signatures or formal verification stamps to your file.</p>
         <span class="tool-meta">Open Tool &rarr;</span>
       </div>
 
-      <div class="tool-card" data-cat="editSecurity" onclick="if(checkUserAccess('watermark', event)) { launchTool('watermark'); }">
+      <div class="tool-card" data-cat="editSecurity" onclick="launchTool('watermark')">
         <div class="tool-icon" style="background:#fef3c7; color:#d97706;"><i class="fa-solid fa-stamp"></i></div>
         <h3>Watermark PDF</h3>
         <p>Stamp customized text like 'CONFIDENTIAL' or business logos across pages.</p>
         <span class="tool-meta">Open Tool &rarr;</span>
       </div>
 
-      <div class="tool-card" data-cat="editSecurity" onclick="if(checkUserAccess('protect', event)) { launchTool('protect'); }">
+      <div class="tool-card" data-cat="editSecurity" onclick="launchTool('protect')">
         <div class="tool-icon" style="background:#fef2f2; color:#dc2626;"><i class="fa-solid fa-lock"></i></div>
         <h3>Protect / Lock PDF</h3>
         <p>Encrypt PDF files with a secret password to prevent unauthorized viewing.</p>
         <span class="tool-meta">Open Tool &rarr;</span>
       </div>
 
-      <div class="tool-card" data-cat="editSecurity" onclick="if(checkUserAccess('unlock', event)) { launchTool('unlock'); }">
+      <div class="tool-card" data-cat="editSecurity" onclick="launchTool('unlock')">
         <div class="tool-icon" style="background:#f1f5f9; color:#475569;"><i class="fa-solid fa-lock-open"></i></div>
         <h3>Unlock PDF</h3>
         <p>Remove security permissions and password locks from unlocked documents.</p>
         <span class="tool-meta">Open Tool &rarr;</span>
       </div>
 
-      <div class="tool-card" data-cat="editSecurity" onclick="if(checkUserAccess('pageNumbers', event)) { launchTool('pageNumbers'); }">
+      <div class="tool-card" data-cat="editSecurity" onclick="launchTool('pageNumbers')">
         <div class="tool-icon" style="background:#fef3c7; color:#d97706;"><i class="fa-solid fa-list-ol"></i></div>
         <h3>Add Page Numbers</h3>
         <p>Add standardized Page N of M stamps at the bottom center of each page.</p>
         <span class="tool-meta">Open Tool &rarr;</span>
       </div>
 
-      <div class="tool-card" data-cat="generator" onclick="if(checkUserAccess('invoiceMaker', event)) { launchTool('invoiceMaker'); }">
+      <div class="tool-card" data-cat="generator" onclick="launchTool('invoiceMaker')">
         <div class="tool-icon" style="background:#fefce8; color:#ca8a04;"><i class="fa-solid fa-receipt"></i></div>
         <h3>Invoice / Bill Generator</h3>
         <p>Generate professional customer billing receipts, invoices, and service memos.</p>
         <span class="tool-meta">Open Tool &rarr;</span>
       </div>
 
-      <div class="tool-card" data-cat="generator" onclick="if(checkUserAccess('resumeMaker', event)) { launchTool('resumeMaker'); }">
+      <div class="tool-card" data-cat="generator" onclick="launchTool('resumeMaker')">
         <div class="tool-icon" style="background:#f0fdf4; color:#15803d;"><i class="fa-solid fa-file-user"></i></div>
         <h3>Resume / CV Maker to PDF</h3>
         <p>Build and format clean resumes or curriculum vitae ready for job applications.</p>
         <span class="tool-meta">Open Tool &rarr;</span>
       </div>
 
-      <div class="tool-card" data-cat="generator" onclick="if(checkUserAccess('docMaker', event)) { launchTool('docMaker'); }">
+      <div class="tool-card" data-cat="generator" onclick="launchTool('docMaker')">
         <div class="tool-icon" style="background:#eff6ff; color:#2563eb;"><i class="fa-solid fa-prescription"></i></div>
         <h3>Prescription / Memo Maker</h3>
         <p>Create clean digital prescriptions, diagnostic notes, or customer memos.</p>
@@ -324,76 +298,6 @@
       </div>
     </div>
   </main>
-
-  <div id="authModal" style="position: fixed; inset: 0; background: rgba(15, 23, 42, 0.75); backdrop-filter: blur(6px); z-index: 10000; display: none; align-items: center; justify-content: center; padding: 16px;">
-    <div style="background: #fff; width: 100%; max-width: 400px; padding: 24px; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.2);">
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-        <h3 id="authTitle" style="font-size: 18px; font-weight: 700;">User Login</h3>
-        <button onclick="closeAuthModal()" style="background:none; border:none; font-size:18px; cursor:pointer;">✕</button>
-      </div>
-      
-      <div class="form-group">
-        <label>Email Address:</label>
-        <input type="email" id="authEmail" class="form-control" placeholder="user@example.com">
-      </div>
-      
-      <div class="form-group" id="passwordGroup" style="position: relative;">
-        <label>Password:</label>
-        <div style="display: flex; align-items: center; position: relative;">
-          <input type="password" id="authPassword" class="form-control" placeholder="Minimum 8 characters" minlength="8" autocomplete="current-password" style="width: 100%; padding-right: 40px;">
-          <button type="button" onclick="togglePasswordVisibility()" style="position: absolute; right: 10px; background: none; border: none; cursor: pointer; color: #64748b;" title="Show/Hide Password">
-            <i class="fa-solid fa-eye" id="eyeIcon"></i>
-          </button>
-        </div>
-      </div>
-
-      <button class="btn-main" onclick="handleAuthSubmit()" id="authSubmitBtn" style="margin-top: 10px;">Login</button>
-      
-      <div id="authToggleContainer" style="text-align: center; font-size: 12px; margin-top: 12px; color: #64748b;">
-        <span id="authToggleText">Don't have an account?</span> 
-        <a href="javascript:void(0)" onclick="toggleAuthMode()" style="color: #e5322d; font-weight: 700;">Sign Up</a>
-        <br>
-        <a href="javascript:void(0)" onclick="toggleResetMode()" style="color: #64748b; font-size: 11px; font-weight: 650; display: inline-block; margin-top: 4px;">Forgot Password?</a>
-      </div>
-    </div>
-  </div>
-
-  <div id="smartAiChatModal">
-    <div class="ai-chat-card">
-      <div class="ai-chat-header">
-        <h3><i class="fa-solid fa-sparkles" style="color: #60a5fa;"></i> DocuCraft AI Helpdesk</h3>
-        <div style="display: flex; align-items: center; gap: 8px;">
-          <select id="chatLangSelect" class="lang-select-box" onchange="changeChatLanguage(this.value)">
-            <option value="en" selected>English</option>
-            <option value="hi">हिन्दी (Hindi)</option>
-            <option value="bn" selected>বাংলা (Bengali)</option>
-          </select>
-          <button id="voiceMuteToggle" class="voice-toggle-btn" onclick="toggleVoiceOutput()">
-            <i class="fa-solid fa-volume-high"></i> Voice ON
-          </button>
-          <button class="close-btn" style="background: transparent; color:#fff;" onclick="closeSmartAiChat()">✕</button>
-        </div>
-      </div>
-
-      <div class="ai-chat-messages" id="chatMessages">
-        <div class="msg bot" id="welcomeMsg">
-          Hello! I am your DocuCraft AI Assistant. How can I help you today? You can ask me about any tool or formatting in Bengali, Hindi, or English.
-        </div>
-      </div>
-
-      <div class="ai-quick-tags">
-        <button class="tag-btn" onclick="sendQuickQuery('How to resize photo to KB size?')">📷 KB Photo Resizer</button>
-        <button class="tag-btn" onclick="sendQuickQuery('How to create passport photo sheet?')">🖼️ Passport Grid</button>
-        <button class="tag-btn" onclick="sendQuickQuery('How to compress PDF file size?')">⚡ Compress PDF</button>
-        <button class="tag-btn" onclick="sendQuickQuery('How to make digital signature?')">✍️ Signature Pad</button>
-      </div>
-
-      <div class="ai-chat-input-bar">
-        <input type="text" id="chatInput" placeholder="Ask DocuCraft AI anything or type in Bengali/Hindi/English..." onkeypress="handleEnter(event)">
-        <button onclick="sendUserMessage()"><i class="fa-solid fa-paper-plane"></i></button>
-      </div>
-    </div>
-  </div>
 
   <div class="workspace-overlay" id="workspaceOverlay" onclick="handleBackdropClick(event)">
     <div class="workspace-box" id="workspaceBox">
@@ -447,11 +351,10 @@
     </div>
   </footer>
 
-  <!-- যদি ফাইলগুলো সরাসরি মূল ফোল্ডারে থাকে তবে নিচের পাথগুলো ব্যবহার করবেন (js/ ফোল্ডারে থাকলে সামনে js/ যোগ করে দেবেন) -->
   <script src="auth.js"></script>
-<script src="js/ai-chat.js"></script>
-<script src="js/tools.js"></script>
-<script src="js/main.js"></script>
+  <script src="js/ai-chat.js"></script>
+  <script src="js/tools.js"></script>
+  <script src="js/main.js"></script>
 
 </body>
 </html>
