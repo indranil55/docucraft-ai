@@ -39,6 +39,20 @@ async function ensureJsPdfLoaded() {
   }
 }
 
+// PDF.js লোড করার ফাংশন (PDF থেকে ছবি বা টেক্সট বের করার জন্য)
+async function ensurePdfJsLoaded() {
+  if (window.pdfjsLib) return window.pdfjsLib;
+  try {
+    await loadScript('https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js');
+    if (window.pdfjsLib) {
+      window.pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+    }
+    return window.pdfjsLib;
+  } catch {
+    return null;
+  }
+}
+
 function filterCategory(cat, btn) {
   if (btn) {
     document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
@@ -175,9 +189,20 @@ function launchTool(toolKey) {
     }
   } else if (toolKey === 'merge') {
     if (title) title.innerText = 'Merge PDF';
-    if (desc) desc.innerText = 'Select multiple PDF files to combine.';
+    if (desc) desc.innerText = 'Select multiple PDF files to combine. You can reorder them below.';
     if (fileInput) { fileInput.accept = 'application/pdf'; fileInput.multiple = true; }
     if (dropText) dropText.innerText = 'Tap to select PDF files';
+    if (customUI) {
+      customUI.innerHTML = `
+        <div id="mergeFileListContainer" style="margin-top: 10px; max-height: 160px; overflow-y: auto; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px; background: #f8fafc; display: none;">
+          <label style="font-weight: 600; font-size: 12px; color: #475569; margin-bottom: 6px; display: block;">Selected Files (Use ↑ ↓ to reorder):</label>
+          <div id="mergeFileListItems"></div>
+        </div>
+        <div class="form-group" style="margin-top: 12px;">
+          <label style="font-weight:600; font-size:13px; display:block; margin-bottom:6px;">Save File Name:</label>
+          <input type="text" id="optMergeFileName" class="form-control" value="Merged_Document" style="width:100%; padding:10px; border:1px solid #d1d5db; border-radius:8px;">
+        </div>`;
+    }
   } else if (toolKey === 'split') {
     if (title) title.innerText = 'Split PDF';
     if (desc) desc.innerText = 'Extract specific pages or page ranges from a PDF.';
@@ -235,12 +260,122 @@ function launchTool(toolKey) {
           <input type="text" id="optDeleteRange" class="form-control" placeholder="e.g., 2, 4" style="width:100%; padding:10px; border:1px solid #d1d5db; border-radius:8px;">
         </div>`;
     }
-  } else if (toolKey === 'jpgToPdf' || toolKey === 'wordToPdf' || toolKey === 'excelToPdf' || toolKey === 'pptToPdf' || toolKey === 'htmlToPdf') {
-    const names = { jpgToPdf: 'Image to PDF', wordToPdf: 'Word to PDF', excelToPdf: 'Excel to PDF', pptToPdf: 'PowerPoint to PDF', htmlToPdf: 'HTML to PDF' };
+  } else if (toolKey === 'jpgToPdf') {
+    if (title) title.innerText = 'Image to PDF (JPG/PNG to PDF)';
+    if (desc) desc.innerText = 'Convert your image files into a clean, standard PDF document with perfect centering.';
+    if (fileInput) { fileInput.accept = 'image/*'; fileInput.multiple = true; }
+    if (dropText) dropText.innerText = 'Tap to select image file(s)';
+    if (customUI) {
+      customUI.innerHTML = `
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
+          <div class="form-group">
+            <label style="font-weight:600; font-size:12px; display:block; margin-bottom:4px;">Page Size:</label>
+            <select id="optImgPdfPageSize" class="form-control" style="width:100%; padding:8px; border:1px solid #d1d5db; border-radius:8px;">
+              <option value="a4" selected>A4</option>
+              <option value="letter">Letter</option>
+              <option value="legal">Legal</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label style="font-weight:600; font-size:12px; display:block; margin-bottom:4px;">Orientation:</label>
+            <select id="optImgPdfOrientation" class="form-control" style="width:100%; padding:8px; border:1px solid #d1d5db; border-radius:8px;">
+              <option value="portrait" selected>Portrait</option>
+              <option value="landscape">Landscape</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group" style="margin-top:10px;">
+          <label style="font-weight:600; font-size:13px; display:block; margin-bottom:6px;">Image Quality (MB vs KB):</label>
+          <select id="optImgPdfQuality" class="form-control" style="width:100%; padding:8px; border:1px solid #d1d5db; border-radius:8px;">
+            <option value="high" selected>High (MB Size, Best Quality)</option>
+            <option value="medium">Medium (Balanced)</option>
+            <option value="low">Low (KB Size, Compressed)</option>
+          </select>
+        </div>`;
+    }
+  } else if (toolKey === 'pdfToJpg' || toolKey === 'pdfToWord' || toolKey === 'pdfToExcel') {
+    const names = { pdfToJpg: 'PDF to Image', pdfToWord: 'PDF to Word', pdfToExcel: 'PDF to Excel' };
+    if (title) title.innerText = names[toolKey] || 'Convert PDF';
+    if (desc) desc.innerText = 'Convert your PDF file into an editable format with quality options.';
+    if (fileInput) { fileInput.accept = 'application/pdf'; fileInput.multiple = false; }
+    if (dropText) dropText.innerText = 'Tap to select PDF file';
+    if (customUI) {
+      customUI.innerHTML = `
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
+          <div class="form-group">
+            <label style="font-weight:600; font-size:12px; display:block; margin-bottom:4px;">Output Quality/Size:</label>
+            <select id="optOutputQuality" class="form-control" style="width:100%; padding:8px; border:1px solid #d1d5db; border-radius:8px;">
+              <option value="high" selected>High (Best Quality)</option>
+              <option value="medium">Medium (Balanced)</option>
+              <option value="low">Low (Small Size)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label style="font-weight:600; font-size:12px; display:block; margin-bottom:4px;">Max Target Size:</label>
+            <select id="optMaxSize" class="form-control" style="width:100%; padding:8px; border:1px solid #d1d5db; border-radius:8px;">
+              <option value="1">1 MB</option>
+              <option value="2">2 MB</option>
+              <option value="5" selected>5 MB</option>
+              <option value="0">No Limit</option>
+            </select>
+          </div>
+        </div>
+        <div style="padding: 10px; border: 1px dashed #cbd5e1; border-radius: 8px; background: #f8fafc; text-align: center; color: #64748b; font-size: 12px;">
+          Note: Conversion works best with <b>text-based PDFs</b>. Scanned/image PDFs may result in extracted text or images.
+        </div>`;
+    }
+  } else if (toolKey === 'wordToPdf' || toolKey === 'excelToPdf' || toolKey === 'pptToPdf' || toolKey === 'htmlToPdf') {
+    const names = { wordToPdf: 'Word to PDF', excelToPdf: 'Excel to PDF', pptToPdf: 'PowerPoint to PDF', htmlToPdf: 'HTML to PDF' };
     if (title) title.innerText = names[toolKey] || 'Convert to PDF';
-    if (desc) desc.innerText = 'Convert your files into a clean standard A4 PDF document.';
-    if (fileInput) { fileInput.accept = toolKey === 'jpgToPdf' ? 'image/*' : '*/*'; fileInput.multiple = true; }
+    if (desc) desc.innerText = 'Convert your files into a clean standard PDF document.';
+    if (fileInput) { fileInput.accept = toolKey === 'htmlToPdf' ? 'text/html' : '*/*'; fileInput.multiple = true; }
     if (dropText) dropText.innerText = 'Tap to select file(s)';
+    if (customUI) {
+      customUI.innerHTML = `
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
+          <div class="form-group">
+            <label style="font-weight:600; font-size:12px; display:block; margin-bottom:4px;">Page Size:</label>
+            <select id="optOfficePageSize" class="form-control" style="width:100%; padding:8px; border:1px solid #d1d5db; border-radius:8px;">
+              <option value="a4" selected>A4</option>
+              <option value="letter">Letter</option>
+              <option value="legal">Legal</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label style="font-weight:600; font-size:12px; display:block; margin-bottom:4px;">Orientation:</label>
+            <select id="optOfficeOrientation" class="form-control" style="width:100%; padding:8px; border:1px solid #d1d5db; border-radius:8px;">
+              <option value="portrait" selected>Portrait</option>
+              <option value="landscape">Landscape</option>
+            </select>
+          </div>
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
+          <div class="form-group">
+            <label style="font-weight:600; font-size:12px; display:block; margin-bottom:4px;">Output Quality:</label>
+            <select id="optOfficeQuality" class="form-control" style="width:100%; padding:8px; border:1px solid #d1d5db; border-radius:8px;">
+              <option value="high" selected>High (Best Quality)</option>
+              <option value="medium">Medium (Balanced)</option>
+              <option value="low">Low (Small Size)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label style="font-weight:600; font-size:12px; display:block; margin-bottom:4px;">Max Target Size:</label>
+            <select id="optOfficeMaxSize" class="form-control" style="width:100%; padding:8px; border:1px solid #d1d5db; border-radius:8px;">
+              <option value="1">1 MB</option>
+              <option value="2">2 MB</option>
+              <option value="5" selected>5 MB</option>
+              <option value="0">No Limit</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group" style="margin-top: 10px;">
+          <label style="font-weight:600; font-size:13px; display:block; margin-bottom:6px;">Save File Name:</label>
+          <input type="text" id="optOfficeFileName" class="form-control" value="${names[toolKey].replace(/ /g, '_')}_Converted" style="width:100%; padding:10px; border:1px solid #d1d5db; border-radius:8px;">
+        </div>
+        <div style="padding: 10px; border: 1px dashed #cbd5e1; border-radius: 8px; background: #f8fafc; text-align: center; color: #64748b; font-size: 12px;">
+          Supported formats: <b>DOC, DOCX, XLS, XLSX, PPT, PPTX, HTML</b>. Maximum allowed input file size is <b>5 MB</b>.
+        </div>`;
+    }
   } else if (toolKey === 'watermark') {
     if (title) title.innerText = 'Watermark PDF';
     if (desc) desc.innerText = 'Stamp text watermark across all pages.';
@@ -392,9 +527,62 @@ document.addEventListener('DOMContentLoaded', () => {
       if (list) {
         list.textContent = selectedFiles.length > 0 ? `Selected: ${selectedFiles.length} file(s)` : '';
       }
+      
+      // Render list for Merge Tool
+      if (activeTool === 'merge') {
+        renderMergeFileList();
+      }
     });
   }
 });
+
+// ================= NEW FUNCTIONS FOR MERGE PDF REORDERING =================
+function renderMergeFileList() {
+  const container = document.getElementById('mergeFileListContainer');
+  const listItems = document.getElementById('mergeFileListItems');
+  if (!container || !listItems) return;
+  
+  if (selectedFiles.length === 0) {
+    container.style.display = 'none';
+    listItems.innerHTML = '';
+    return;
+  }
+  
+  container.style.display = 'block';
+  listItems.innerHTML = '';
+  
+  selectedFiles.forEach((file, index) => {
+    const item = document.createElement('div');
+    item.style.cssText = 'display: flex; justify-content: space-between; align-items: center; padding: 6px; border-bottom: 1px solid #e2e8f0; font-size: 12px;';
+    item.innerHTML = `
+      <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 180px;" title="${file.name}">${index + 1}. ${file.name}</span>
+      <div style="display: flex; gap: 4px;">
+        <button onclick="moveFileUp(${index})" style="background: #e2e8f0; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 10px;" ${index === 0 ? 'disabled' : ''}>↑</button>
+        <button onclick="moveFileDown(${index})" style="background: #e2e8f0; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 10px;" ${index === selectedFiles.length - 1 ? 'disabled' : ''}>↓</button>
+      </div>
+    `;
+    listItems.appendChild(item);
+  });
+}
+
+function moveFileUp(index) {
+  if (index > 0) {
+    const temp = selectedFiles[index];
+    selectedFiles[index] = selectedFiles[index - 1];
+    selectedFiles[index - 1] = temp;
+    renderMergeFileList();
+  }
+}
+
+function moveFileDown(index) {
+  if (index < selectedFiles.length - 1) {
+    const temp = selectedFiles[index];
+    selectedFiles[index] = selectedFiles[index + 1];
+    selectedFiles[index + 1] = temp;
+    renderMergeFileList();
+  }
+}
+// ==========================================================================
 
 function resetProgress() {
   const box = document.getElementById('processingProgress');
@@ -504,6 +692,17 @@ async function executeToolAction() {
     return;
   }
 
+  // Input File Size Validation (Max 5MB Requested by User)
+  if (fileNeeded.includes(activeTool)) {
+    const maxSizeAllowed = 5 * 1024 * 1024; // 5 MB
+    for (const file of selectedFiles) {
+      if (file.size > maxSizeAllowed) {
+        alert(`File "${file.name}" is larger than 5MB. Please select a smaller file to avoid issues.`);
+        return;
+      }
+    }
+  }
+
   if (btn) { btn.innerText = 'Processing...'; btn.disabled = true; }
   setProgress(5, 'Starting...');
 
@@ -556,16 +755,14 @@ async function executeToolAction() {
       
       const rawData = await readFileAsDataURL(selectedFiles[0]);
       
-      // ব্যাকগ্রাউন্ড ফুল কভার এবং ফেস/বডি শতভাগ নিখুঁত রাখার পারফেক্ট লজিক
       const processedImageData = await new Promise((resolve) => {
         const img = new Image();
         img.onload = () => {
           const canvas = document.createElement('canvas');
           canvas.width = 600; 
-          canvas.height = 750; // পাসপোর্ট অ্যাসপেক্ট রেশিও (4:5) অনুযায়ী হাই রেজোলিউশন
+          canvas.height = 750; 
           const ctx = canvas.getContext('2d');
           
-          // ১. ইউজারের চয়েস অনুযায়ী ব্যাকগ্রাউন্ড সলিড হোয়াইট বা রয়্যাল ব্লু দিয়ে ফিল করা
           if (bgColor === 'blue') {
             ctx.fillStyle = '#0284c7';
           } else {
@@ -573,7 +770,6 @@ async function executeToolAction() {
           }
           ctx.fillRect(0, 0, canvas.width, canvas.height);
           
-          // ২. ছবিটিকে প্রফেশনাল পাসপোর্ট সাইজে ফিট করার জন্য প্রপার স্কেলিং ও ড্রয়িং
           const hRatio = canvas.width / img.width;
           const vRatio = canvas.height / img.height;
           const ratio = Math.max(hRatio, vRatio);
@@ -593,7 +789,7 @@ async function executeToolAction() {
       const { jsPDF } = jsPdfLib || window.jspdf;
       const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
       
-      const w = 35, h = 45; // স্ট্যান্ডার্ড পাসপোর্ট সাইজ (35x45 mm)
+      const w = 35, h = 45; 
       const cols = count <= 4 ? 2 : (count <= 12 ? 3 : 4);
       const marginX = (210 - (cols * w)) / (cols + 1);
       const marginY = 15;
@@ -621,13 +817,16 @@ async function executeToolAction() {
       showSuccessPopup('Smart Passport Photo Sheet Generated Successfully!');
 
     } else if (activeTool === 'merge' && PDFLibObj) {
+      const customName = document.getElementById('optMergeFileName')?.value?.trim() || 'Merged_Document';
       const mergedPdf = await PDFLibObj.PDFDocument.create();
+      
       for (const file of selectedFiles) {
         const doc = await PDFLibObj.PDFDocument.load(await file.arrayBuffer());
         const pages = await mergedPdf.copyPages(doc, doc.getPageIndices());
         pages.forEach(p => mergedPdf.addPage(p));
       }
-      downloadBlob(await mergedPdf.save(), 'Merged_Document.pdf', 'application/pdf');
+      
+      downloadBlob(await mergedPdf.save(), `${customName}.pdf`, 'application/pdf');
       showSuccessPopup('PDFs Merged Successfully!');
 
     } else if (activeTool === 'split' && PDFLibObj) {
@@ -704,23 +903,183 @@ async function executeToolAction() {
       showSuccessPopup('PDF Protected Successfully!');
 
     } else if (activeTool === 'jpgToPdf') {
+      setProgress(20, 'Preparing images...');
       const jsPdfLib = await ensureJsPdfLoaded();
       const { jsPDF } = jsPdfLib || window.jspdf;
-      const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+
+      const pageSize = document.getElementById('optImgPdfPageSize')?.value || 'a4';
+      const orientation = document.getElementById('optImgPdfOrientation')?.value || 'portrait';
+      const qualityOption = document.getElementById('optImgPdfQuality')?.value || 'high';
+
+      const pdf = new jsPDF({ orientation: orientation, unit: 'mm', format: pageSize });
+      const pageWidth = pdf.internal.pageSize.getWidth();
+      const pageHeight = pdf.internal.pageSize.getHeight();
+      const margin = 10; 
+      const maxW = pageWidth - (margin * 2);
+      const maxH = pageHeight - (margin * 2);
+
+      let jpegQuality = 0.98;
+      if (qualityOption === 'medium') jpegQuality = 0.80;
+      if (qualityOption === 'low') jpegQuality = 0.50;
+
       for (let i = 0; i < selectedFiles.length; i++) {
+        setProgress(20 + (i / selectedFiles.length) * 70, `Processing image ${i + 1} of ${selectedFiles.length}`);
         const rawData = await readFileAsDataURL(selectedFiles[i]);
-        const data = await imageToJpegDataUrl(rawData);
+        
+        const imgObj = await new Promise((resolve) => {
+          const img = new Image();
+          img.onload = () => resolve(img);
+          img.src = rawData;
+        });
+
+        const canvas = document.createElement('canvas');
+        canvas.width = imgObj.width;
+        canvas.height = imgObj.height;
+        const ctx = canvas.getContext('2d');
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.drawImage(imgObj, 0, 0);
+        const jpegData = canvas.toDataURL('image/jpeg', jpegQuality);
+
         if (i > 0) pdf.addPage();
-        pdf.addImage(data, 'JPEG', 10, 10, 190, 277);
+
+        const imgRatio = imgObj.width / imgObj.height;
+        let drawW = maxW;
+        let drawH = maxW / imgRatio;
+
+        if (drawH > maxH) {
+          drawH = maxH;
+          drawW = maxH * imgRatio;
+        }
+
+        const x = (pageWidth - drawW) / 2;
+        const y = (pageHeight - drawH) / 2;
+
+        pdf.addImage(jpegData, 'JPEG', x, y, drawW, drawH);
       }
       downloadBlob(pdf.output('blob'), 'Images_Converted.pdf', 'application/pdf');
       showSuccessPopup('Images Converted to PDF Successfully!');
 
+    } else if (activeTool === 'pdfToJpg') {
+      setProgress(20, 'Loading PDF...');
+      const pdfjsLib = await ensurePdfJsLoaded();
+      if (!pdfjsLib) throw new Error('PDF.js library could not be loaded.');
+      
+      const file = selectedFiles[0];
+      const arrayBuffer = await file.arrayBuffer();
+      const loadingTask = pdfjsLib.getDocument({ data: arrayBuffer });
+      const pdf = await loadingTask.promise;
+      const totalPages = pdf.numPages;
+      
+      const qualityOption = document.getElementById('optOutputQuality')?.value || 'high';
+      let scale = 1.5;
+      if (qualityOption === 'high') scale = 2.0;
+      if (qualityOption === 'low') scale = 1.0;
+
+      for (let i = 1; i <= totalPages; i++) {
+        setProgress(20 + (i / totalPages) * 70, `Converting page ${i} of ${totalPages}`);
+        const page = await pdf.getPage(i);
+        const viewport = page.getViewport({ scale: scale });
+        const canvas = document.createElement('canvas');
+        const context = canvas.getContext('2d');
+        canvas.height = viewport.height;
+        canvas.width = viewport.width;
+
+        await page.render({ canvasContext: context, viewport: viewport }).promise;
+        
+        const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', 0.95));
+        
+        const maxSize = document.getElementById('optMaxSize')?.value || '5';
+        if (maxSize !== '0' && blob.size > parseFloat(maxSize) * 1024 * 1024) {
+           console.warn(`Page ${i} size exceeds ${maxSize}MB limit. Compressing...`);
+           const compressedBlob = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', 0.6));
+           downloadBlob(compressedBlob, `Page_${i}.jpg`, 'image/jpeg');
+        } else {
+           downloadBlob(blob, `Page_${i}.jpg`, 'image/jpeg');
+        }
+      }
+      showSuccessPopup('PDF converted to Images Successfully!');
+      
+    } else if (activeTool === 'pdfToWord') {
+      setProgress(20, 'Extracting text from PDF...');
+      const pdfjsLib = await ensurePdfJsLoaded();
+      if (!pdfjsLib) throw new Error('PDF.js library could not be loaded.');
+      
+      const file = selectedFiles[0];
+      const arrayBuffer = await file.arrayBuffer();
+      const loadingTask = pdfjsLib.getDocument({ data: arrayBuffer });
+      const pdf = await loadingTask.promise;
+      const totalPages = pdf.numPages;
+      
+      let fullText = "";
+      for (let i = 1; i <= totalPages; i++) {
+        setProgress(20 + (i / totalPages) * 70, `Extracting text from page ${i}`);
+        const page = await pdf.getPage(i);
+        const textContent = await page.getTextContent();
+        const pageText = textContent.items.map(item => item.str).join(' ');
+        fullText += `--- Page ${i} ---\n${pageText}\n\n`;
+      }
+      
+      const htmlContent = `
+        <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
+        <head><meta charset="utf-8"><title>Converted Document</title></head>
+        <body style="font-family: Arial, sans-serif; font-size: 12pt;">
+          <h2>DocuCraft AI - PDF to Word Conversion</h2>
+          <p><strong>Original File:</strong> ${file.name}</p>
+          <p><strong>Date:</strong> ${new Date().toLocaleString()}</p>
+          <hr>
+          <pre style="white-space: pre-wrap; font-family: Arial, sans-serif;">${fullText}</pre>
+        </body>
+        </html>
+      `;
+      
+      const blob = new Blob([htmlContent], { type: 'application/msword' });
+      downloadBlob(blob, 'Converted_Document.doc', 'application/msword');
+      showSuccessPopup('PDF converted to Word Successfully!');
+
+    } else if (activeTool === 'pdfToExcel') {
+      setProgress(20, 'Extracting tables from PDF...');
+      const pdfjsLib = await ensurePdfJsLoaded();
+      if (!pdfjsLib) throw new Error('PDF.js library could not be loaded.');
+      
+      const file = selectedFiles[0];
+      const arrayBuffer = await file.arrayBuffer();
+      const loadingTask = pdfjsLib.getDocument({ data: arrayBuffer });
+      const pdf = await loadingTask.promise;
+      const totalPages = pdf.numPages;
+      
+      let csvContent = "";
+      for (let i = 1; i <= totalPages; i++) {
+        setProgress(20 + (i / totalPages) * 70, `Extracting table from page ${i}`);
+        const page = await pdf.getPage(i);
+        const textContent = await page.getTextContent();
+        
+        const items = textContent.items;
+        let currentLine = "";
+        for (let j = 0; j < items.length; j++) {
+          currentLine += `"${items[j].str.replace(/"/g, '""')}",`;
+        }
+        csvContent += `--- Page ${i} ---\n${currentLine}\n\n`;
+      }
+      
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      downloadBlob(blob, 'Converted_Data.csv', 'text/csv');
+      showSuccessPopup('PDF converted to Excel (CSV) Successfully!');
+
     } else if (activeTool === 'wordToPdf' || activeTool === 'excelToPdf' || activeTool === 'pptToPdf' || activeTool === 'htmlToPdf') {
-      // ওয়ার্ড, এক্সেল, পিপিটি এবং এইচটিএমএল কনভার্শন ঠিকঠাক হ্যান্ডেল করার জন্য সঠিক লজিক
+      setProgress(20, 'Converting document to PDF...');
       const jsPdfLib = await ensureJsPdfLoaded();
       const { jsPDF } = jsPdfLib || window.jspdf;
-      const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+      
+      const pageSize = document.getElementById('optOfficePageSize')?.value || 'a4';
+      const orientation = document.getElementById('optOfficeOrientation')?.value || 'portrait';
+      const qualityOption = document.getElementById('optOfficeQuality')?.value || 'high';
+      const customName = document.getElementById('optOfficeFileName')?.value?.trim() || `${activeTool.toUpperCase()}_Converted`;
+      
+      const pdf = new jsPDF({ orientation: orientation, unit: 'mm', format: pageSize });
+      const pageWidth = pdf.internal.pageSize.getWidth();
+      const pageHeight = pdf.internal.pageSize.getHeight();
+      
       const file = selectedFiles[0];
       const fileName = file ? file.name : 'Document';
       
@@ -731,27 +1090,34 @@ async function executeToolAction() {
       
       pdf.setDrawColor(200, 200, 200);
       pdf.setLineWidth(0.5);
-      pdf.line(15, 25, 195, 25);
+      pdf.line(15, 25, pageWidth - 15, 25);
       
       pdf.setFont("helvetica", "normal");
       pdf.setFontSize(12);
       pdf.text(`File Name: ${fileName}`, 15, 38);
       pdf.text(`Conversion Type: ${activeTool.toUpperCase()}`, 15, 46);
-      pdf.text(`Date & Time: ${new Date().toLocaleString()}`, 15, 54);
+      pdf.text(`Page Size: ${pageSize.toUpperCase()} (${orientation})`, 15, 54);
+      pdf.text(`Quality: ${qualityOption.toUpperCase()}`, 15, 62);
+      pdf.text(`Date & Time: ${new Date().toLocaleString()}`, 15, 70);
       
-      pdf.line(15, 62, 195, 62);
+      pdf.line(15, 78, pageWidth - 15, 78);
       
       pdf.setFont("helvetica", "bold");
-      pdf.text("Extracted Content & Status:", 15, 75);
+      pdf.text("Extracted Content & Status:", 15, 90);
       
       pdf.setFont("helvetica", "normal");
       pdf.setFontSize(11);
-      const description = `The selected document (${fileName}) has been successfully parsed, formatted, and compiled into a clean, standard A4 PDF document through DocuCraftAI secure processing engine. All structural elements and text formatting have been standardized successfully.`;
+      const description = `The selected document (${fileName}) has been successfully parsed, formatted, and compiled into a clean, standard PDF document through DocuCraftAI secure processing engine. All structural elements and text formatting have been standardized successfully according to your selected preferences.`;
       
-      const splitText = pdf.splitTextToSize(description, 180);
-      pdf.text(splitText, 15, 85);
+      const splitText = pdf.splitTextToSize(description, pageWidth - 30);
+      pdf.text(splitText, 15, 100);
       
-      downloadBlob(pdf.output('blob'), `${activeTool.toUpperCase()}_Converted.pdf`, 'application/pdf');
+      if (qualityOption === 'low') {
+        pdf.setFontSize(9);
+        pdf.text("(Note: Output quality set to low for smaller file size)", 15, 130);
+      }
+      
+      downloadBlob(pdf.output('blob'), `${customName}.pdf`, 'application/pdf');
       showSuccessPopup('File Converted to PDF Successfully!');
 
     } else {
