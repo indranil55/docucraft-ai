@@ -39,7 +39,7 @@ async function ensureJsPdfLoaded() {
   }
 }
 
-// PDF.js লোড করার ফাংশন (PDF থেকে ছবি বা টেক্সট বের করার জন্য)
+// PDF.js লোড করার ফাংশন
 async function ensurePdfJsLoaded() {
   if (window.pdfjsLib) return window.pdfjsLib;
   try {
@@ -194,10 +194,6 @@ function launchTool(toolKey) {
     if (dropText) dropText.innerText = 'Tap to select PDF files';
     if (customUI) {
       customUI.innerHTML = `
-        <div id="mergeFileListContainer" style="margin-top: 10px; max-height: 160px; overflow-y: auto; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px; background: #f8fafc; display: none;">
-          <label style="font-weight: 600; font-size: 12px; color: #475569; margin-bottom: 6px; display: block;">Selected Files (Use ↑ ↓ to reorder):</label>
-          <div id="mergeFileListItems"></div>
-        </div>
         <div class="form-group" style="margin-top: 12px;">
           <label style="font-weight:600; font-size:13px; display:block; margin-bottom:6px;">Save File Name:</label>
           <input type="text" id="optMergeFileName" class="form-control" value="Merged_Document" style="width:100%; padding:10px; border:1px solid #d1d5db; border-radius:8px;">
@@ -523,46 +519,43 @@ document.addEventListener('DOMContentLoaded', () => {
   if (fileInput) {
     fileInput.addEventListener('change', function(e) {
       selectedFiles = Array.from(e.target.files);
-      const list = document.getElementById('wsFileList');
-      if (list) {
-        list.textContent = selectedFiles.length > 0 ? `Selected: ${selectedFiles.length} file(s)` : '';
-      }
-      
-      // Render list for Merge Tool
-      if (activeTool === 'merge') {
-        renderMergeFileList();
-      }
+      renderFileList(); // এখানে কল করা হয়েছে
     });
   }
 });
 
-// ================= NEW FUNCTIONS FOR MERGE PDF REORDERING =================
-function renderMergeFileList() {
-  const container = document.getElementById('mergeFileListContainer');
-  const listItems = document.getElementById('mergeFileListItems');
-  if (!container || !listItems) return;
-  
+// ================= NEW UNIFIED FILE LIST RENDERING =================
+function renderFileList() {
+  const listContainer = document.getElementById('wsFileList');
+  if (!listContainer) return;
+
   if (selectedFiles.length === 0) {
-    container.style.display = 'none';
-    listItems.innerHTML = '';
+    listContainer.innerHTML = '';
     return;
   }
-  
-  container.style.display = 'block';
-  listItems.innerHTML = '';
-  
+
+  // একটি সুন্দর বক্স তৈরি করা হচ্ছে যা সব টুলেই দেখাবে
+  let html = `<div style="background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px; padding: 10px; margin-top: 10px; max-height: 150px; overflow-y: auto; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
+    <div style="font-size: 12px; font-weight: 700; color: #1e293b; margin-bottom: 8px; display: flex; align-items: center; gap: 6px;">
+      <i class="fa-solid fa-list-check" style="color: #2563eb;"></i> Selected File(s):
+    </div>`;
+
   selectedFiles.forEach((file, index) => {
-    const item = document.createElement('div');
-    item.style.cssText = 'display: flex; justify-content: space-between; align-items: center; padding: 6px; border-bottom: 1px solid #e2e8f0; font-size: 12px;';
-    item.innerHTML = `
-      <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 180px;" title="${file.name}">${index + 1}. ${file.name}</span>
-      <div style="display: flex; gap: 4px;">
-        <button onclick="moveFileUp(${index})" style="background: #e2e8f0; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 10px;" ${index === 0 ? 'disabled' : ''}>↑</button>
-        <button onclick="moveFileDown(${index})" style="background: #e2e8f0; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 10px;" ${index === selectedFiles.length - 1 ? 'disabled' : ''}>↓</button>
-      </div>
-    `;
-    listItems.appendChild(item);
+    const fileSize = (file.size / 1024).toFixed(1) + ' KB';
+    html += `<div style="display: flex; justify-content: space-between; align-items: center; padding: 6px 0; border-bottom: 1px solid #e2e8f0; font-size: 12px;">
+      <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 170px; color: #334155;" title="${file.name}">${index + 1}. ${file.name} (${fileSize})</span>`;
+
+    // শুধুমাত্র Merge PDF টুলে ↑ ↓ বাটন দেখাবে
+    if (activeTool === 'merge') {
+      html += `<div style="display: flex; gap: 4px;">
+        <button type="button" onclick="moveFileUp(${index})" style="background: #cbd5e1; color: #0f172a; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 10px;" ${index === 0 ? 'disabled' : ''}>↑</button>
+        <button type="button" onclick="moveFileDown(${index})" style="background: #cbd5e1; color: #0f172a; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 10px;" ${index === selectedFiles.length - 1 ? 'disabled' : ''}>↓</button>
+      </div>`;
+    }
+    html += `</div>`;
   });
+  html += `</div>`;
+  listContainer.innerHTML = html;
 }
 
 function moveFileUp(index) {
@@ -570,7 +563,7 @@ function moveFileUp(index) {
     const temp = selectedFiles[index];
     selectedFiles[index] = selectedFiles[index - 1];
     selectedFiles[index - 1] = temp;
-    renderMergeFileList();
+    renderFileList(); // লিস্ট আবার রেন্ডার করা হচ্ছে
   }
 }
 
@@ -579,7 +572,7 @@ function moveFileDown(index) {
     const temp = selectedFiles[index];
     selectedFiles[index] = selectedFiles[index + 1];
     selectedFiles[index + 1] = temp;
-    renderMergeFileList();
+    renderFileList(); // লিস্ট আবার রেন্ডার করা হচ্ছে
   }
 }
 // ==========================================================================
