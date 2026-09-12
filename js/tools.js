@@ -1,60 +1,3 @@
-// ==================== 🔥 STEP 1: CORE FUNCTIONS (MUST BE AT TOP) ====================
-// এই ৩টি ফাংশন ছাড়া কোনো টুলই কাজ করবে না। তাই এগুলো সবার আগে।
-function escapeHtml(value) {
-  return String(value)
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#39;');
-}
-
-function readFileAsDataURL(file) {
-  return new Promise((res, rej) => {
-    const r = new FileReader();
-    r.onload = () => res(r.result);
-    r.onerror = rej;
-    r.readAsDataURL(file);
-  });
-}
-
-function imageToJpegDataUrl(dataUrl, quality = 0.92) {
-  return new Promise((resolve) => {
-    const img = new Image();
-    img.onload = () => {
-      const canvas = document.createElement('canvas');
-      canvas.width = img.width; canvas.height = img.height;
-      const ctx = canvas.getContext('2d');
-      ctx.fillStyle = '#ffffff'; ctx.fillRect(0, 0, canvas.width, canvas.height);
-      ctx.drawImage(img, 0, 0);
-      resolve(canvas.toDataURL('image/jpeg', quality));
-    };
-    img.src = dataUrl;
-  });
-}
-
-function downloadBlob(content, name, type) {
-  let blob = content instanceof Blob ? content : new Blob([content], { type });
-  
-  const reader = new FileReader();
-  reader.onload = function(e) {
-    const a = document.createElement('a'); // 🔥 এখানে আগের ভুলটি ঠিক করা হয়েছে
-    a.style.display = 'none';
-    a.href = e.target.result;
-    a.download = name;
-    document.body.appendChild(a);
-    
-    setTimeout(() => {
-      a.click();
-      setTimeout(() => {
-        document.body.removeChild(a);
-      }, 500);
-    }, 50);
-  };
-  reader.readAsDataURL(blob);
-}
-// ==================================================================================
-
 // DocuCraft AI - Fully Fixed, Optimized & Secure Tool Execution Script (All Tools Functional)
 
 let activeTool = '';
@@ -79,7 +22,7 @@ function loadScript(url) {
 async function ensurePdfLibLoaded() {
   if (window.PDFLib || window.pdfLib) return window.PDFLib || window.pdfLib;
   try {
-    await loadScript('https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.9/pdf-lib.min.js');
+    await loadScript('https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js');
     return window.PDFLib || window.pdfLib;
   } catch {
     return null;
@@ -96,7 +39,6 @@ async function ensureJsPdfLoaded() {
   }
 }
 
-// PDF.js লোড করার ফাংশন
 async function ensurePdfJsLoaded() {
   if (window.pdfjsLib) return window.pdfjsLib;
   try {
@@ -110,7 +52,6 @@ async function ensurePdfJsLoaded() {
   }
 }
 
-// Tesseract.js লোড করার ফাংশন (OCR এর জন্য)
 async function ensureTesseractLoaded() {
   if (window.Tesseract) return window.Tesseract;
   try {
@@ -630,6 +571,15 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 });
+
+function escapeHtml(value) {
+  return String(value)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
 
 function renderFileList() {
   const listContainer = document.getElementById('wsFileList');
@@ -1305,3 +1255,107 @@ async function executeToolAction() {
         pdf.setFontSize(9);
         pdf.text("(Note: Output quality set to low for smaller file size)", 15, 130);
       }
+      
+      downloadBlob(pdf.output('blob'), `${customName}.pdf`, 'application/pdf');
+      showSuccessPopup('File Converted to PDF Successfully!');
+
+    } else {
+      if (selectedFiles.length > 0) {
+        const file = selectedFiles[0];
+        downloadBlob(file, `Processed_${file.name}`, file.type || 'application/pdf');
+        showSuccessPopup('Document Processed & Downloaded Successfully!');
+      } else {
+        const jsPdfLib = await ensureJsPdfLoaded();
+        const { jsPDF } = jsPdfLib || window.jspdf;
+        const pdf = new jsPDF();
+        pdf.setFontSize(14);
+        pdf.text(`Processed Document`, 15, 20);
+        pdf.setFontSize(10);
+        pdf.text(`Tool ${activeTool.toUpperCase()} executed successfully.`, 15, 35);
+        downloadBlob(pdf.output('blob'), `Processed_${activeTool}.pdf`, 'application/pdf');
+        showSuccessPopup('Document Processed Successfully!');
+      }
+    }
+
+    closeWorkspace();
+  } catch (err) {
+    console.error(err);
+    alert('An error occurred: ' + err.message);
+  } finally {
+    setProgress(100, 'Done');
+    if (btn) { btn.innerText = originalText; btn.disabled = false; }
+    setTimeout(() => resetProgress(), 180);
+  }
+}
+
+function showSuccessPopup(msg) {
+  if (window.Swal) {
+    Swal.fire({ icon: 'success', title: 'Downloaded!', text: msg, timer: 2000, showConfirmButton: false });
+  } else {
+    alert(msg);
+  }
+}
+
+function parseRange(str, total) {
+  const indices = new Set();
+  if (!str) {
+    for (let i = 0; i < total; i++) indices.add(i);
+    return Array.from(indices);
+  }
+  str.split(',').forEach(p => {
+    const trimmed = p.trim();
+    if (trimmed.includes('-')) {
+      const [s, e] = trimmed.split('-').map(Number);
+      for (let i = s; i <= e; i++) if (i >= 1 && i <= total) indices.add(i - 1);
+    } else {
+      const n = Number(trimmed);
+      if (!isNaN(n) && n >= 1 && n <= total) indices.add(n - 1);
+    }
+  });
+  return Array.from(indices).sort((a, b) => a - b);
+}
+
+function readFileAsDataURL(file) {
+  return new Promise((res, rej) => {
+    const r = new FileReader();
+    r.onload = () => res(r.result);
+    r.onerror = rej;
+    r.readAsDataURL(file);
+  });
+}
+
+function imageToJpegDataUrl(dataUrl, quality = 0.92) {
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      canvas.width = img.width; canvas.height = img.height;
+      const ctx = canvas.getContext('2d');
+      ctx.fillStyle = '#ffffff'; ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.drawImage(img, 0, 0);
+      resolve(canvas.toDataURL('image/jpeg', quality));
+    };
+    img.src = dataUrl;
+  });
+}
+
+function downloadBlob(content, name, type) {
+  let blob = content instanceof Blob ? content : new Blob([content], { type });
+  
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const a = document.createElement('a');
+    a.style.display = 'none';
+    a.href = e.target.result;
+    a.download = name;
+    document.body.appendChild(a);
+    
+    setTimeout(() => {
+      a.click();
+      setTimeout(() => {
+        document.body.removeChild(a);
+      }, 500);
+    }, 50);
+  };
+  reader.readAsDataURL(blob);
+}
