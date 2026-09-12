@@ -19,7 +19,6 @@
   -webkit-tap-highlight-color: transparent;
 }
 
-/* ==================== ঝিকঝিকে কালারফুল অ্যানিমেটেড ব্যাকগ্রাউন্ড ==================== */
 body {
   background: linear-gradient(135deg, #fbcfe8, #fed7aa, #bfdbfe, #bbf7d0, #e9d5ff, #fecaca);
   background-size: 300% 300%;
@@ -39,7 +38,6 @@ body {
   100% { background-position: 0% 50%; }
 }
 
-/* মডাল ওপেন থাকলে স্ক্রল লক */
 body.modal-open {
   overflow: hidden !important;
   position: fixed !important;
@@ -47,7 +45,6 @@ body.modal-open {
   height: 100% !important;
 }
 
-/* ==================== হেডার (গ্লাস ইফেক্ট) ==================== */
 header {
   background: rgba(255, 255, 255, 0.75);
   backdrop-filter: blur(16px);
@@ -122,7 +119,6 @@ header {
   transform: scale(1.08);
 }
 
-/* ==================== হিরো সেকশন (মোবাইলে ফিটিং) ==================== */
 .hero {
   text-align: center;
   padding: 32px 16px 16px;
@@ -132,8 +128,7 @@ header {
 }
 
 .hero h1 {
-  /* মোবাইলে লেখা বড় হয়ে যেন বেরিয়ে না যায়, সেজন্য clamp() */
-  font-size: clamp(24px, 6vw, 42px); 
+  font-size: clamp(24px, 6vw, 42px);
   font-weight: 800;
   letter-spacing: -0.5px;
   margin-bottom: 12px;
@@ -157,7 +152,6 @@ header {
   padding: 0 8px;
 }
 
-/* ==================== ফিল্টার ট্যাব (মোবাইলে স্ক্রলযোগ্য) ==================== */
 .filter-wrapper {
   width: 100%;
   padding: 16px 0;
@@ -200,7 +194,6 @@ header {
   transform: translateY(-2px);
 }
 
-/* ==================== মেইন গ্রিড ==================== */
 .main-grid-container {
   width: 100%;
   max-width: 1320px;
@@ -215,7 +208,6 @@ header {
   gap: 16px;
 }
 
-/* ==================== টুল কার্ড (গ্লাস ও হোভার ইফেক্ট) ==================== */
 .tool-card {
   background: rgba(255, 255, 255, 0.75);
   backdrop-filter: blur(16px);
@@ -283,7 +275,6 @@ header {
   gap: 10px;
 }
 
-/* ==================== ওয়ার্কস্পেস মডাল ==================== */
 .workspace-overlay {
   position: fixed;
   inset: 0;
@@ -344,7 +335,6 @@ header {
   color: var(--primary);
 }
 
-/* ড্রপজোন */
 .dropzone {
   border: 2px dashed #cbd5e1;
   border-radius: 16px;
@@ -361,7 +351,6 @@ header {
   background: #fff1f2;
 }
 
-/* প্রোগ্রেস বার */
 .processing-progress {
   display: none;
   margin: 12px 0 4px;
@@ -389,7 +378,6 @@ header {
   margin-bottom: 4px;
 }
 
-/* ফর্ম ইনপুট */
 .form-group { margin-bottom: 16px; }
 .form-group label {
   display: block;
@@ -413,7 +401,6 @@ header {
   box-shadow: 0 0 0 3px rgba(229, 50, 45, 0.1);
 }
 
-/* মেইন বাটন */
 .btn-main {
   background: linear-gradient(135deg, var(--primary), #db2777);
   color: #ffffff;
@@ -438,7 +425,6 @@ header {
   transform: scale(0.98);
 }
 
-/* ==================== AI চ্যাট মডাল ==================== */
 #smartAiChatModal {
   position: fixed;
   inset: 0;
@@ -587,7 +573,6 @@ header {
   box-shadow: 0 3px 10px rgba(219, 39, 119, 0.4);
 }
 
-/* ==================== ফুটার ==================== */
 footer {
   background: rgba(15, 23, 42, 0.95);
   backdrop-filter: blur(10px);
@@ -642,7 +627,6 @@ footer {
 }
 .trust-badges i { color: #10b981; margin-right: 6px; }
 
-/* ==================== রেসপন্সিভ ডিজাইন (মোবাইল, ট্যাবলেট, ডেস্কটপ) ==================== */
 @media (min-width: 640px) {
   .workspace-overlay { align-items: center; padding: 20px; }
   .workspace-box { border-radius: 24px; padding: 28px; }
