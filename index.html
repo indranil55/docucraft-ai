@@ -19,7 +19,6 @@
   <link rel="stylesheet" href="style.css">
 
   <style>
-    /* হেডার এবং লোগো স্টাইল */
     .nav-container {
       display: flex;
       align-items: center;
@@ -31,7 +30,6 @@
       align-items: center;
       text-decoration: none;
     }
-    /* ডানপাশের ইউজার অ্যাকাউন্ট বাটন */
     .auth-icon-btn {
       width: 42px;
       height: 42px;
@@ -69,21 +67,16 @@
   <header>
     <div class="nav-container">
       <a href="#" class="brand-logo-svg" style="display: flex; align-items: center; gap: 8px; text-decoration: none;">
-        <!-- আপনার চাহিদা অনুযায়ী তৈরি হেডার লোগো (Docu ব্ল্যাক, Craft রেড, AI নীল বক্সে) -->
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 45" width="180" height="38" style="vertical-align: middle;">
-          <!-- নীল রঙের সার্কেল এবং DC আইকন -->
           <circle cx="20" cy="22" r="18" fill="#2563EB"/>
           <text x="18" y="29" font-family="Arial, sans-serif" font-weight="bold" font-size="20" fill="#0F172A" text-anchor="middle">D</text>
           <text x="31" y="29" font-family="Arial, sans-serif" font-weight="bold" font-size="20" fill="#DC2626" text-anchor="middle">C</text>
           
-          <!-- Docu (Black) ও Craft (Red) টেক্সট -->
           <text x="52" y="22" font-family="Plus Jakarta Sans, sans-serif" font-weight="800" font-size="18" fill="#0F172A">Docu</text>
           <text x="96" y="22" font-family="Plus Jakarta Sans, sans-serif" font-weight="800" font-size="18" fill="#DC2626">Craft</text>
           
-          <!-- নিচে Work With PDFs সাবটাইটেল -->
           <text x="52" y="35" font-family="Plus Jakarta Sans, sans-serif" font-weight="600" font-size="9" fill="#64748b">Work With PDFs</text>
           
-          <!-- নীল বক্সের ভেতরে AI টেক্সট -->
           <g transform="translate(148, 8)">
             <rect width="30" height="22" rx="6" fill="#2563EB"/>
             <text x="15" y="15" font-family="Plus Jakarta Sans, sans-serif" font-weight="700" font-size="11" fill="#FFFFFF" text-anchor="middle">AI</text>
@@ -91,7 +84,6 @@
         </svg>
       </a>
 
-      <!-- ডানপাশে ইউজার অ্যাকাউন্ট বাটন (মানুষের আইকন) -->
       <div class="nav-actions">
         <button class="auth-icon-btn" onclick="openAuthModal()" title="Login / Sign Up" id="authNavBtn">
           <i class="fa-solid fa-user"></i>
@@ -147,7 +139,6 @@
         <span class="tool-meta">Open QR Generator &rarr;</span>
       </div>
 
-      <!-- ==================== 🆕 NEW: EXAM PHOTO RESIZER CARD ==================== -->
       <div class="tool-card" data-cat="cyber" onclick="if(checkUserAccess('examResizer', event)) { launchTool('examResizer'); }">
         <div class="tool-icon" style="background:#fee2e2; color:#e5322d;"><i class="fa-solid fa-user-graduate"></i></div>
         <h3>Exam Photo & Signature Resizer</h3>
@@ -253,7 +244,6 @@
         <span class="tool-meta">Open Tool &rarr;</span>
       </div>
 
-      <!-- ==================== 🆕 NEW: OCR (IMAGE TO TEXT) CARD ==================== -->
       <div class="tool-card" data-cat="fromPdf" onclick="if(checkUserAccess('ocr', event)) { launchTool('ocr'); }">
         <div class="tool-icon" style="background:#f3e8ff; color:#9333ea;"><i class="fa-solid fa-file-lines"></i></div>
         <h3>OCR - Image to Text</h3>
@@ -347,7 +337,6 @@
         <input type="email" id="authEmail" class="form-control" placeholder="user@example.com">
       </div>
       
-      <!-- পাসওয়ার্ড ফিল্ড চোখের আইকনসহ -->
       <div class="form-group" id="passwordGroup" style="position: relative;">
         <label>Password:</label>
         <div style="display: flex; align-items: center; position: relative;">
@@ -458,11 +447,11 @@
     </div>
   </footer>
 
-  <!-- আপনার প্রজেক্টের অন্যান্য স্ক্রিপ্ট -->
-  <script src="js/auth.js"></script>
-  <script src="js/ai-chat.js"></script>
-  <script src="js/tools.js"></script>
-  <script src="js/main.js"></script>
+  <!-- যদি ফাইলগুলো সরাসরি মূল ফোল্ডারে থাকে তবে নিচের পাথগুলো ব্যবহার করবেন (js/ ফোল্ডারে থাকলে সামনে js/ যোগ করে দেবেন) -->
+  <script src="auth.js"></script>
+  <script src="ai-chat.js"></script>
+  <script src="tools.js"></script>
+  <script src="main.js"></script>
 
 </body>
 </html>
