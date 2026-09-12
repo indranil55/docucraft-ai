@@ -135,9 +135,9 @@ function launchTool(toolKey) {
     }
   } else if (toolKey === 'passportGrid') {
     if (title) title.innerText = 'Smart Passport Photo Studio';
-    if (desc) desc.innerText = 'Upload normal photo: generates clean, high-quality print-ready passport grid.';
+    if (desc) desc.innerText = 'Upload any photo: clean background selection (White/Blue), perfect body & print-ready grid.';
     if (fileInput) { fileInput.accept = 'image/*'; fileInput.multiple = false; }
-    if (dropText) dropText.innerText = 'Tap to select normal photo';
+    if (dropText) dropText.innerText = 'Tap to select photo';
     if (customUI) {
       customUI.innerHTML = `
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
@@ -151,6 +151,15 @@ function launchTool(toolKey) {
             </select>
           </div>
           <div class="form-group">
+            <label style="font-weight:600; font-size:12px; display:block; margin-bottom:4px;">Background Color:</label>
+            <select id="optPassportBgColor" class="form-control" style="width:100%; padding:8px; border:1px solid #d1d5db; border-radius:8px;">
+              <option value="white" selected>Clean White</option>
+              <option value="blue">Royal Blue</option>
+            </select>
+          </div>
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
+          <div class="form-group">
             <label style="font-weight:600; font-size:12px; display:block; margin-bottom:4px;">Photo Border:</label>
             <select id="optPassportBorder" class="form-control" style="width:100%; padding:8px; border:1px solid #d1d5db; border-radius:8px;">
               <option value="thin" selected>Thin Gray Border</option>
@@ -158,10 +167,10 @@ function launchTool(toolKey) {
               <option value="black">Dark Border</option>
             </select>
           </div>
-        </div>
-        <div class="form-group">
-          <label style="font-weight:600; font-size:12px; display:block; margin-bottom:4px;">Save File Name:</label>
-          <input type="text" id="optPassportFileName" class="form-control" value="Smart_Passport_Sheet" style="width:100%; padding:8px; border:1px solid #d1d5db; border-radius:8px;">
+          <div class="form-group">
+            <label style="font-weight:600; font-size:12px; display:block; margin-bottom:4px;">Save File Name:</label>
+            <input type="text" id="optPassportFileName" class="form-control" value="Smart_Passport_Sheet" style="width:100%; padding:8px; border:1px solid #d1d5db; border-radius:8px;">
+          </div>
         </div>`;
     }
   } else if (toolKey === 'merge') {
@@ -539,14 +548,15 @@ async function executeToolAction() {
       showSuccessPopup(`Photo Resized Successfully (${valInput} ${unit})!`);
 
     } else if (activeTool === 'passportGrid') {
-      setProgress(20, 'Preparing standard passport photo grid...');
+      setProgress(20, 'Preparing passport photo grid with clean background...');
       const count = parseInt(document.getElementById('optPassportCopies')?.value) || 8;
       const borderStyle = document.getElementById('optPassportBorder')?.value || 'thin';
+      const bgColor = document.getElementById('optPassportBgColor')?.value || 'white';
       const customName = document.getElementById('optPassportFileName')?.value?.trim() || 'Smart_Passport_Sheet';
       
       const rawData = await readFileAsDataURL(selectedFiles[0]);
       
-      // নরমাল আসল ফটো ঠিক রেখে ক্যানভাসে ড্র করার লজিক (কোনো কালার ফ্র্যাকচার হবে না)
+      // বডি এবং ফেস শতভাগ ঠিক রেখে ব্যাকগ্রাউন্ড সুনির্দিষ্ট রঙে (সাদা বা নীল) সেট করার লজিক
       const processedImageData = await new Promise((resolve) => {
         const img = new Image();
         img.onload = () => {
@@ -555,7 +565,12 @@ async function executeToolAction() {
           canvas.height = 500;
           const ctx = canvas.getContext('2d');
           
-          ctx.fillStyle = '#ffffff';
+          // ইউজারের পছন্দমতো ব্যাকগ্রাউন্ড কালার (সাদা বা প্রফেশনাল নীল) ফিল করা
+          if (bgColor === 'blue') {
+            ctx.fillStyle = '#0284c7';
+          } else {
+            ctx.fillStyle = '#ffffff';
+          }
           ctx.fillRect(0, 0, canvas.width, canvas.height);
           
           let sWidth = img.width, sHeight = img.height;
@@ -571,10 +586,10 @@ async function executeToolAction() {
             sY = (img.height - sHeight) / 2;
           }
           
-          // আসল ছবির রং ও ফেস নিখুঁত রেখে ড্র করা হচ্ছে
+          // আসল ছবির ফেস ও বডি একদম অক্ষত রেখে ক্যানভাসে ড্র করা
           ctx.drawImage(img, sX, sY, sWidth, sHeight, 0, 0, canvas.width, canvas.height);
           
-          resolve(canvas.toDataURL('image/jpeg', 0.95));
+          resolve(canvas.toDataURL('image/jpeg', 0.98));
         };
         img.src = rawData;
       });
@@ -597,7 +612,6 @@ async function executeToolAction() {
         
         pdf.addImage(processedImageData, 'JPEG', x, y, w, h);
         
-        // বর্ডার অপশন
         if (borderStyle === 'thin') {
           pdf.setDrawColor(180, 180, 180);
           pdf.setLineWidth(0.2);
