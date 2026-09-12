@@ -1,14 +1,13 @@
-// ================= js/ai-chat.js (Safe AI Version - No API Key) =================
-// DocuCraftAI - Real AI Assistant using Puter.js
-// কোনো API Key ছাড়াই সব প্রশ্নের উত্তর দেবে।
+// ================= js/ai-chat.js (Custom Backend Version) =================
+// এই কোডটি কোনো API Key ধারণ করে না। এটি আপনার নিজের Vercel ব্যাকএন্ডের সাথে কথা বলে।
 
 let isVoiceActive = true;
 let currentLang = 'bn'; // ডিফল্ট ভাষা বাংলা
 
 const welcomeMessages = {
-  bn: "নমস্কার! আমি DocuCraftAI। আমি এখন একটি স্মার্ট AI অ্যাসিস্ট্যান্ট। যেকোনো বিষয়ে প্রশ্ন করুন!",
-  hi: "नमस्ते! मैं DocuCraftAI हूँ। मैं अब एक स्मार्ट AI सहायक हूँ। कुछ भी पूछें!",
-  en: "Hello! I am DocuCraftAI. I am a smart AI assistant now. Ask me anything!"
+  bn: "নমস্কার! আমি DocuCraftAI। আমি আপনার নিজের তৈরি AI অ্যাসিস্ট্যান্ট। যেকোনো বিষয়ে প্রশ্ন করুন!",
+  hi: "नमस्ते! मैं DocuCraftAI हूँ। मैं आपका अपना बनाया हुआ AI सहायक हूँ। कुछ भी पूछें!",
+  en: "Hello! I am DocuCraftAI. I am your own custom AI assistant. Ask me anything!"
 };
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -83,7 +82,7 @@ function speakText(text) {
   }, 250);
 }
 
-// === আসল AI কল করার ফাংশন (Puter.js ব্যবহার করে) ===
+// === আসল AI কল করার ফাংশন (আমাদের নিজের ব্যাকএন্ডে রিকোয়েস্ট পাঠায়) ===
 async function sendUserMessage(customText = '') {
   const input = document.getElementById('aiChatInput');
   const query = customText || (input ? input.value.trim() : '');
@@ -101,32 +100,30 @@ async function sendUserMessage(customText = '') {
   if (hindiRegex.test(query)) currentLang = 'hi';
   else if (bengaliRegex.test(query)) currentLang = 'bn';
 
-  // AI-এর জন্য প্রম্পট তৈরি
-  const prompt = `You are DocuCraftAI, a helpful assistant for the DocuCraft AI website. The creator is Indranil Ruidas from Bardhaman, West Bengal. Answer the following user question politely and correctly in the SAME LANGUAGE the user asked (Bengali, Hindi, or English). Keep it helpful and concise. User's question: "${query}"`;
-
   try {
-    // Puter.js AI চ্যাট কল
-    const response = await puter.ai.chat(prompt);
-    
-    // রেসপন্স থেকে টেক্সট বের করা
-    let aiReply = "";
-    if (typeof response === 'string') {
-      aiReply = response;
-    } else if (response && response.message && response.message.content) {
-      aiReply = response.message.content;
-    } else if (response && response.text) {
-      aiReply = response.text;
-    } else {
-      aiReply = JSON.stringify(response);
-    }
+    // আপনার নিজের Vercel ব্যাকএন্ডে রিকোয়েস্ট পাঠানো
+    const response = await fetch('/api/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ 
+        message: query, 
+        lang: currentLang 
+      })
+    });
 
-    removeAiMessage(loadingId);
-    appendAiMessage(aiReply);
-    speakText(aiReply);
+    const data = await response.json();
+
+    if (data.reply) {
+      removeAiMessage(loadingId);
+      appendAiMessage(data.reply);
+      speakText(data.reply);
+    } else {
+      throw new Error(data.error || "No reply from backend");
+    }
   } catch (error) {
-    console.error("AI Error:", error);
+    console.error("Chat Error:", error);
     removeAiMessage(loadingId);
-    appendAiMessage("দুঃখিত, এই মুহূর্তে উত্তর দিতে পারছি না। দয়া করে ইন্টারনেট সংযোগ চেক করুন বা আবার চেষ্টা করুন।");
+    appendAiMessage("দুঃখিত, এই মুহূর্তে উত্তর দিতে পারছি না। দয়া করে ইন্টারনেট বা সার্ভার চেক করুন।");
   }
 }
 
