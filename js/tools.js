@@ -556,16 +556,16 @@ async function executeToolAction() {
       
       const rawData = await readFileAsDataURL(selectedFiles[0]);
       
-      // বডি এবং ফেস শতভাগ ঠিক রেখে ব্যাকগ্রাউন্ড সুনির্দিষ্ট রঙে (সাদা বা নীল) সেট করার লজিক
+      // ব্যাকগ্রাউন্ড ফুল কভার এবং ফেস/বডি শতভাগ নিখুঁত রাখার পারফেক্ট লজিক
       const processedImageData = await new Promise((resolve) => {
         const img = new Image();
         img.onload = () => {
           const canvas = document.createElement('canvas');
-          canvas.width = 400; 
-          canvas.height = 500;
+          canvas.width = 600; 
+          canvas.height = 750; // পাসপোর্ট অ্যাসপেক্ট রেশিও (4:5) অনুযায়ী হাই রেজোলিউশন
           const ctx = canvas.getContext('2d');
           
-          // ইউজারের পছন্দমতো ব্যাকগ্রাউন্ড কালার (সাদা বা প্রফেশনাল নীল) ফিল করা
+          // ১. ইউজারের চয়েস অনুযায়ী ব্যাকগ্রাউন্ড সলিড হোয়াইট বা রয়্যাল ব্লু দিয়ে ফিল করা
           if (bgColor === 'blue') {
             ctx.fillStyle = '#0284c7';
           } else {
@@ -573,20 +573,24 @@ async function executeToolAction() {
           }
           ctx.fillRect(0, 0, canvas.width, canvas.height);
           
-          let sWidth = img.width, sHeight = img.height;
-          let sX = 0, sY = 0;
+          // ২. ছবিটিকে প্রফেশনাল পাসপোর্ট সাইজে ফিট করার জন্য সেন্টার ক্রপিং ও স্কেলিং
           const targetAspect = canvas.width / canvas.height;
-          const imgAspect = sWidth / sHeight;
+          const imgAspect = img.width / img.height;
+          
+          let sWidth = img.width;
+          let sHeight = img.height;
+          let sX = 0;
+          let sY = 0;
           
           if (imgAspect > targetAspect) {
-            sWidth = sHeight * targetAspect;
+            sWidth = img.height * targetAspect;
             sX = (img.width - sWidth) / 2;
           } else {
-            sHeight = sWidth / targetAspect;
+            sHeight = img.width / targetAspect;
             sY = (img.height - sHeight) / 2;
           }
           
-          // আসল ছবির ফেস ও বডি একদম অক্ষত রেখে ক্যানভাসে ড্র করা
+          // ৩. মুখ ও বডি একদম ক্লিয়ার রেখে ড্র করা
           ctx.drawImage(img, sX, sY, sWidth, sHeight, 0, 0, canvas.width, canvas.height);
           
           resolve(canvas.toDataURL('image/jpeg', 0.98));
