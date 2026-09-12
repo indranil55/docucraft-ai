@@ -202,6 +202,7 @@ async function handleAuthSubmit() {
   }
 }
 
+// এই ফাংশনটি টুল কার্ডগুলোতে ক্লিক করার সময় ইউজার লগইন চেক করার জন্য জরুরি
 function checkUserAccess(toolName, event) {
   const loggedUser = localStorage.getItem('docuCraft_logged_in_user');
   if (!loggedUser) {
@@ -216,14 +217,13 @@ function checkUserAccess(toolName, event) {
   return true;
 }
 
-// নিখুঁত হেডার ইউজার স্টেট আপডেট ফাংশন (ডাবল আইকন সমস্যা সমাধান করা হয়েছে)
+// নিখুঁত হেডার ইউজার স্টেট আপডেট ফাংশন
 function updateHeaderAuthUI() {
   const loggedUser = localStorage.getItem('docuCraft_logged_in_user');
   const authBtn = document.querySelector('.auth-icon-btn');
   
   if (authBtn) {
     if (loggedUser) {
-      // লগইন থাকলে মূল আইকনটির ভেতরে বা স্টাইলে ইউজারের নাম দেখাবে এবং ক্লিক করলে লগআউট হবে
       authBtn.style.background = '#ecfdf5';
       authBtn.style.color = '#10b981';
       authBtn.style.border = '1px solid #10b981';
@@ -234,7 +234,6 @@ function updateHeaderAuthUI() {
       authBtn.innerHTML = `<i class="fas fa-user-check" style="margin-right: 5px;"></i> <span style="font-size: 12px; font-weight: 700;">${loggedUser.split('@')[0]}</span>`;
       authBtn.onclick = handleLogout;
     } else {
-      // লগইন না থাকলে স্বাভাবিক অবস্থায় ফিরিয়ে নেওয়া
       authBtn.style.background = '#10b981';
       authBtn.style.color = '#ffffff';
       authBtn.style.border = 'none';
