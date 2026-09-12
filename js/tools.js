@@ -22,7 +22,7 @@ function loadScript(url) {
 async function ensurePdfLibLoaded() {
   if (window.PDFLib || window.pdfLib) return window.PDFLib || window.pdfLib;
   try {
-    await loadScript('https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.9/pdf-lib.min.js');
+    await loadScript('https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js');
     return window.PDFLib || window.pdfLib;
   } catch {
     return null;
@@ -1319,7 +1319,7 @@ function parseRange(str, total) {
   return Array.from(indices).sort((a, b) => a - b);
 }
 
-// ==================== 🔥 THE MISSING FUNCTIONS (FIXED) ====================
+// ==================== 🔥 UTILITY FUNCTIONS ====================
 
 function readFileAsDataURL(file) {
   return new Promise((res, rej) => {
@@ -1350,4 +1350,5 @@ function downloadBlob(content, name, type) {
   
   const reader = new FileReader();
   reader.onload = function(e) {
-    const a = document.createEleme
+    const a = document.createElement('a');
+   
