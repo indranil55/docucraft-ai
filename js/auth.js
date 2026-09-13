@@ -8,7 +8,6 @@ const GOOGLE_SHEET_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbw7ypS
 document.addEventListener('DOMContentLoaded', () => {
   updateHeaderAuthUI();
   
-  // সেফটি চেক: বাটনগুলোতে সরাসরি ইভেন্ট লিসেনার যুক্ত করে দেওয়া যাতে ক্লিক মিস না হয়
   const submitBtn = document.getElementById('authSubmitBtn');
   if (submitBtn) {
     submitBtn.onclick = (e) => {
@@ -19,13 +18,42 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function openAuthModal() {
-  const modal = document.getElementById('authModal');
-  if (modal) modal.style.display = 'flex';
+  let modal = document.getElementById('authModal');
+  if (!modal) {
+    // যদি HTML এ মোডাল না থাকে, তবে ডাইনামিকলি তৈরি করে নেওয়া
+    const modalHTML = `
+      <div id="authModal" class="workspace-overlay" style="display: flex;" onclick="if(event.target.id==='authModal') closeAuthModal()">
+        <div class="workspace-box" style="max-width: 420px; border-radius: 24px;">
+          <div class="workspace-header">
+            <h3 id="authTitle">User Login</h3>
+            <button class="close-btn" onclick="closeAuthModal()">&times;</button>
+          </div>
+          <div class="form-group">
+            <label>Email Address:</label>
+            <input type="email" id="authEmail" class="form-control" placeholder="Enter your email" autocomplete="email">
+          </div>
+          <div class="form-group" id="passwordGroup">
+            <label>Password:</label>
+            <div style="position: relative;">
+              <input type="password" id="authPassword" class="form-control" placeholder="Enter password (min 8 chars)" style="padding-right: 40px;" autocomplete="current-password">
+              <span onclick="togglePasswordVisibility()" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); cursor: pointer; color: #64748b;">
+                <i class="fas fa-eye" id="eyeIcon"></i>
+              </span>
+            </div>
+          </div>
+          <button class="btn-main" id="authSubmitBtn" onclick="handleAuthSubmit()" style="margin-top: 8px;">Login</button>
+          <div id="authToggleContainer" style="text-align: center; margin-top: 14px; font-size: 13px; color: #64748b;">
+            Don't have an account? <a href="javascript:void(0)" onclick="toggleAuthMode()" style="color: #e5322d; font-weight: 700;">Sign Up</a>
+            <br><a href="javascript:void(0)" onclick="toggleResetMode()" style="color: #64748b; font-size: 11px; font-weight: 650; display: inline-block; margin-top: 4px;">Forgot Password?</a>
+          </div>
+        </div>
+      </div>
+    `;
+    document.body.insertAdjacentHTML('beforeend', modalHTML);
+  } else {
+    modal.style.display = 'flex';
+  }
   document.body.classList.add('modal-open');
-  setTimeout(() => {
-    const emailInput = document.getElementById('authEmail');
-    if (emailInput) emailInput.focus();
-  }, 200);
 }
 
 function closeAuthModal() {
@@ -73,7 +101,7 @@ function updateAuthModalUI() {
     if (passwordGroup) passwordGroup.style.display = 'block';
     if (toggleContainer) {
       toggleContainer.innerHTML = `
-        <span id="authToggleText">Don't have an account?</span> 
+        <span>Don't have an account?</span> 
         <a href="javascript:void(0)" onclick="toggleAuthMode()" style="color: #e5322d; font-weight: 700;">Sign Up</a>
         <br><a href="javascript:void(0)" onclick="toggleResetMode()" style="color: #64748b; font-size: 11px; font-weight: 650; display: inline-block; margin-top: 4px;">Forgot Password?</a>
       `;
@@ -114,19 +142,12 @@ async function handleAuthSubmit() {
   const emailInput = document.getElementById('authEmail');
   const passInput = document.getElementById('authPassword');
   
-  if (!emailInput) {
-    alert('Form elements not found.');
-    return;
-  }
+  if (!emailInput) return;
 
   const email = emailInput.value.trim().toLowerCase();
   const pass = passInput ? passInput.value : '';
 
-  if (!email) {
-    alert('Please enter your email address.');
-    return;
-  }
-  if (!/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/.test(email)) {
+  if (!email || !/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/.test(email)) {
     alert('Please enter a valid email address.');
     return;
   }
@@ -137,30 +158,22 @@ async function handleAuthSubmit() {
       alert('No account found with this email address.');
       return;
     }
-
     const newPass = prompt('Enter your new password (minimum 8 characters):');
-    if (!newPass) return;
-    if (newPass.length < 8) {
+    if (!newPass || newPass.length < 8) {
       alert('Password must be at least 8 characters.');
       return;
     }
-
     const salt = crypto.getRandomValues(new Uint8Array(16));
     const hash = await derivePasswordHash(newPass, salt);
     localStorage.setItem('docuCraft_user_salt', bytesToBase64(salt));
     localStorage.setItem('docuCraft_user_hash', bytesToBase64(hash));
-
     await sendDataToGoogleSheet(email, 'Reset Password');
     alert('Password updated successfully! Please login with your new password.');
     toggleResetMode();
     return;
   }
 
-  if (!pass) {
-    alert('Please enter your password.');
-    return;
-  }
-  if (pass.length < 8) {
+  if (!pass || pass.length < 8) {
     alert('Password must be at least 8 characters.');
     return;
   }
@@ -190,7 +203,6 @@ async function handleAuthSubmit() {
     const savedSalt = localStorage.getItem('docuCraft_user_salt');
     const savedHash = localStorage.getItem('docuCraft_user_hash');
 
-    // প্রথমবার লগইন করার সুবিধার জন্য যদি লোকালস্টোরেজে ডাটা না থাকে তবে অটো রেজিস্টার করে লগইন করিয়ে দেওয়া যেতে পারে
     if (!savedEmail || !savedSalt || !savedHash) {
       const salt = crypto.getRandomValues(new Uint8Array(16));
       const hash = await derivePasswordHash(pass, salt);
@@ -240,13 +252,10 @@ async function handleAuthSubmit() {
   }
 }
 
-function checkUserAccess(toolName, event) {
+// টুল ব্যবহারের আগে চেক করার ফাংশন (লক সিস্টেম)
+function checkUserAccess(toolName) {
   const loggedUser = localStorage.getItem('docuCraft_logged_in_user');
   if (!loggedUser) {
-    if (event) {
-      event.preventDefault();
-      event.stopPropagation();
-    }
     sessionStorage.setItem('pending_tool', toolName);
     openAuthModal(); 
     return false;
@@ -256,9 +265,26 @@ function checkUserAccess(toolName, event) {
 
 function updateHeaderAuthUI() {
   const loggedUser = localStorage.getItem('docuCraft_logged_in_user');
-  const authBtn = document.querySelector('.auth-icon-btn');
   
-  if (authBtn) {
+  // যদি হেডারে ইউজার বাটন না থাকে তবে তৈরি করে নেওয়া
+  let navActions = document.querySelector('.nav-actions');
+  if (!navActions) {
+    const navContainer = document.querySelector('.nav-container');
+    if (navContainer) {
+      navActions = document.createElement('div');
+      navActions.className = 'nav-actions';
+      navContainer.appendChild(navActions);
+    }
+  }
+
+  if (navActions) {
+    let authBtn = navActions.querySelector('.auth-icon-btn');
+    if (!authBtn) {
+      authBtn = document.createElement('button');
+      authBtn.className = 'auth-icon-btn';
+      navActions.appendChild(authBtn);
+    }
+
     if (loggedUser) {
       authBtn.style.background = '#ecfdf5';
       authBtn.style.color = '#10b981';
@@ -273,7 +299,8 @@ function updateHeaderAuthUI() {
       authBtn.style.background = '#10b981';
       authBtn.style.color = '#ffffff';
       authBtn.style.border = 'none';
-      authBtn.style.width = '36px';
+      authBtn.style.width = '38px';
+      authBtn.style.height = '38px';
       authBtn.style.padding = '0';
       authBtn.style.borderRadius = '50%';
       authBtn.title = 'Login / Sign Up';
@@ -284,21 +311,13 @@ function updateHeaderAuthUI() {
 }
 
 async function sendDataToGoogleSheet(email, actionType) {
-  if (!GOOGLE_SHEET_WEB_APP_URL || GOOGLE_SHEET_WEB_APP_URL.includes("YOUR_URL")) {
-    return;
-  }
-
+  if (!GOOGLE_SHEET_WEB_APP_URL || GOOGLE_SHEET_WEB_APP_URL.includes("YOUR_URL")) return;
   try {
     await fetch(GOOGLE_SHEET_WEB_APP_URL, {
       method: 'POST',
       mode: 'no-cors',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        email: email,
-        action: actionType
-      })
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: email, action: actionType })
     });
   } catch (err) {
     console.error('Google Sheet Error:', err);
@@ -307,16 +326,10 @@ async function sendDataToGoogleSheet(email, actionType) {
 
 async function derivePasswordHash(password, saltBytes) {
   const material = await crypto.subtle.importKey(
-    'raw',
-    new TextEncoder().encode(password),
-    'PBKDF2',
-    false,
-    ['deriveBits']
+    'raw', new TextEncoder().encode(password), 'PBKDF2', false, ['deriveBits']
   );
   const bits = await crypto.subtle.deriveBits(
-    { name: 'PBKDF2', salt: saltBytes, iterations: 120000, hash: 'SHA-256' },
-    material,
-    256
+    { name: 'PBKDF2', salt: saltBytes, iterations: 120000, hash: 'SHA-256' }, material, 256
   );
   return new Uint8Array(bits);
 }
