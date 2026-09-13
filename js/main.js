@@ -49,7 +49,7 @@ function initDropzoneHandlers() {
     });
 
     dropzone.addEventListener('drop', (e) => {
-      if (!checkUserAccess(activeTool)) return;
+      if (!checkUserAccess(typeof activeTool !== 'undefined' ? activeTool : '')) return;
       const dt = e.dataTransfer;
       const files = dt.files;
       if (files.length > 0) {
@@ -64,7 +64,7 @@ function initDropzoneHandlers() {
     });
 
     fileInput.addEventListener('change', (e) => {
-      if (!checkUserAccess(activeTool)) return;
+      if (!checkUserAccess(typeof activeTool !== 'undefined' ? activeTool : '')) return;
       if (e.target.files.length > 0) {
         if (fileInput.hasAttribute('multiple')) {
           selectedFiles = [...selectedFiles, ...Array.from(e.target.files)];
@@ -93,9 +93,10 @@ function triggerFileSuccessAnimation(msg) {
 
 // কঠোর লক সিস্টেম: লগইন না থাকলে কোনো টুল বা ফাইল সিলেকশন করতে দেবে না
 function checkUserAccess(toolKey) {
-  const loggedUser = sessionStorage.getItem('docuCraft_logged_in_user') || localStorage.getItem('docucraft_logged_in');
+  const isLogged = localStorage.getItem('docucraft_logged_in') === 'true';
+  const loggedUserEmail = localStorage.getItem('docuCraft_user_email') || sessionStorage.getItem('docuCraft_logged_in_user');
   
-  if (!loggedUser || loggedUser !== 'true') {
+  if (!isLogged || !loggedUserEmail) {
     sessionStorage.setItem('pending_tool', toolKey);
     if (typeof closeWorkspace === 'function') closeWorkspace();
     if (typeof openAuthModal === 'function') {
