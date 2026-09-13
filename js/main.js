@@ -92,13 +92,13 @@ function triggerFileSuccessAnimation(msg) {
   }
 }
 
-// auth.js এর সাথে সামঞ্জস্যপূর্ণ সঠিক লগইন লক চেক সিস্টেম
+// কঠোর লক সিস্টেম: লগইন না থাকলে কোনো টুল ওপেন করতে দেবে না
 function checkUserAccess(toolKey) {
   const loggedUser = sessionStorage.getItem('docuCraft_logged_in_user');
   
   if (!loggedUser) {
+    sessionStorage.setItem('pending_tool', toolKey);
     if (typeof openAuthModal === 'function') {
-      sessionStorage.setItem('pending_tool', toolKey);
       openAuthModal();
     } else {
       alert('Please login or sign up first to use this tool.');
