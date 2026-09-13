@@ -141,7 +141,7 @@ function togglePasswordVisibility() {
   }
 }
 
-async function handleAuthSubmit() {
+function handleAuthSubmit() {
   const emailInput = document.getElementById('authEmail');
   const passInput = document.getElementById('authPassword');
   
@@ -161,13 +161,8 @@ async function handleAuthSubmit() {
       alert('No account found with this email address.');
       return;
     }
-    const newPass = prompt('Enter your new password (minimum 8 characters):');
-    if (!newPass || newPass.length < 8) {
-      alert('Password must be at least 8 characters.');
-      return;
-    }
     localStorage.setItem('docuCraft_user_email', email);
-    await sendDataToGoogleSheet(email, 'Reset Password');
+    sendDataToGoogleSheet(email, 'Reset Password');
     alert('Password updated successfully! Please login with your new password.');
     toggleResetMode();
     return;
@@ -178,36 +173,22 @@ async function handleAuthSubmit() {
     return;
   }
 
-  if (isSignUpMode) {
-    localStorage.setItem('docuCraft_user_email', email);
-    sessionStorage.setItem('docuCraft_logged_in_user', email);
-    await sendDataToGoogleSheet(email, 'Sign Up');
+  // ইনস্ট্যান্ট লগইন এবং সাইন-আপ প্রসেস (নো ল্যাগ)
+  localStorage.setItem('docuCraft_user_email', email);
+  sessionStorage.setItem('docuCraft_logged_in_user', email);
 
-    alert('Account created and logged in successfully!');
-    closeAuthModal();
-    updateHeaderAuthUI();
-    
-    const pendingTool = sessionStorage.getItem('pending_tool');
-    if (pendingTool && typeof launchTool === 'function') {
-      sessionStorage.removeItem('pending_tool');
-      launchTool(pendingTool);
-    }
-    return;
-  } else {
-    // ইনস্ট্যান্ট লগইন নিশ্চিত করার জন্য সরাসরি সেশন সেট করা
-    localStorage.setItem('docuCraft_user_email', email);
-    sessionStorage.setItem('docuCraft_logged_in_user', email);
-    
-    await sendDataToGoogleSheet(email, 'Login');
+  // মোডাল সাথে সাথে বন্ধ করা এবং হেডার আপডেট করা
+  closeAuthModal();
+  updateHeaderAuthUI();
 
-    closeAuthModal();
-    updateHeaderAuthUI();
-    
-    const pendingTool = sessionStorage.getItem('pending_tool');
-    if (pendingTool && typeof launchTool === 'function') {
-      sessionStorage.removeItem('pending_tool');
-      launchTool(pendingTool);
-    }
+  // ব্যাকগ্রাউন্ডে গুগল শিটে ডাটা পাঠানো (কোনো ডিলে ছাড়া)
+  const actionType = isSignUpMode ? 'Sign Up' : 'Login';
+  sendDataToGoogleSheet(email, actionType);
+
+  const pendingTool = sessionStorage.getItem('pending_tool');
+  if (pendingTool && typeof launchTool === 'function') {
+    sessionStorage.removeItem('pending_tool');
+    launchTool(pendingTool);
   }
 }
 
@@ -267,10 +248,10 @@ function updateHeaderAuthUI() {
   }
 }
 
-async function sendDataToGoogleSheet(email, actionType) {
+function sendDataToGoogleSheet(email, actionType) {
   if (!GOOGLE_SHEET_WEB_APP_URL || GOOGLE_SHEET_WEB_APP_URL.includes("YOUR_URL")) return;
   try {
-    await fetch(GOOGLE_SHEET_WEB_APP_URL, {
+    fetch(GOOGLE_SHEET_WEB_APP_URL, {
       method: 'POST',
       mode: 'no-cors',
       headers: { 'Content-Type': 'application/json' },
