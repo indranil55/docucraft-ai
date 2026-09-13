@@ -78,7 +78,6 @@ function filterCategory(cat, btn) {
 }
 
 function launchTool(toolKey) {
-  // যদি লগইন করা না থাকে, তবে main.js-এর checkUserAccess লক ধরবে
   if (typeof checkUserAccess === 'function' && !checkUserAccess(toolKey)) {
     return;
   }
