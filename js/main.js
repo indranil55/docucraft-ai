@@ -4,6 +4,9 @@ document.addEventListener('DOMContentLoaded', () => {
   console.log("DocuCraftAI Main Script Initialized.");
   initCategoryFilter();
   initDropzoneHandlers();
+  if (typeof updateHeaderAuthUI === 'function') {
+    updateHeaderAuthUI();
+  }
 });
 
 function initCategoryFilter() {
@@ -91,7 +94,7 @@ function triggerFileSuccessAnimation(msg) {
   }
 }
 
-// কঠোর লক সিস্টেম: ভিজিটর সাইট দেখতে পারবে, কিন্তু টুল ওপেন বা ফাইল সিলেক্ট করতে গেলেই লগইন চাইবে
+// কঠোর লক সিস্টেম: ভিজিটর সাইট ঘুরে দেখতে পারবে, কিন্তু টুল ওপেন করতে গেলেই লগইন চাইবে
 function checkUserAccess(toolKey) {
   const isLogged = localStorage.getItem('docucraft_logged_in') === 'true';
   const loggedUserEmail = localStorage.getItem('docuCraft_user_email') || sessionStorage.getItem('docuCraft_logged_in_user');
@@ -109,42 +112,13 @@ function checkUserAccess(toolKey) {
   return true;
 }
 
-function launchTool(toolKey) {
-  if (!checkUserAccess(toolKey)) {
-    return;
-  }
-
-  // tools.js-এর launchTool কল করার আগে সিকিউরিটি ও ভেরিয়েবল হ্যান্ডেল করা
-  if (typeof window.launchToolCustom === 'function') {
-    window.launchToolCustom(toolKey);
-  } else {
-    // সরাসরি tools.js এর নিজস্ব launchTool এক্সিকিউট হবে
-    if (typeof window.originalLaunchTool === 'function') {
-      window.originalLaunchTool(toolKey);
-    }
-  }
-}
-
-function closeWorkspace() {
-  const overlay = document.getElementById('workspaceOverlay');
-  if (overlay) overlay.style.display = 'none';
-  document.body.classList.remove('modal-open');
-  
-  if (typeof selectedFiles !== 'undefined') selectedFiles = [];
-  const fileList = document.getElementById('wsFileList');
-  const progress = document.getElementById('processingProgress');
-  const dropText = document.getElementById('wsDropText');
-  const fileInput = document.getElementById('wsFileInput');
-
-  if (fileList) fileList.innerHTML = '';
-  if (progress) progress.style.display = 'none';
-  if (fileInput) fileInput.value = '';
-  if (dropText) dropText.innerHTML = 'Tap to select file';
-}
+// আসল launchTool ফাংশনটি tools.js-এ আছে, তাই এখানে শুধু এক্সেস চেক রেখে বাকিটা গাইড করা হলো
+const originalLaunchTool = window.launchTool;
+// Note: launchTool is fully handled inside tools.js, secured via checkUserAccess check.
 
 function handleBackdropClick(event) {
   if (event.target.id === 'workspaceOverlay') {
-    closeWorkspace();
+    if (typeof closeWorkspace === 'function') closeWorkspace();
   }
 }
 
