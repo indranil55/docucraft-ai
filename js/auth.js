@@ -166,10 +166,7 @@ async function handleAuthSubmit() {
       alert('Password must be at least 8 characters.');
       return;
     }
-    const salt = crypto.getRandomValues(new Uint8Array(16));
-    const hash = await derivePasswordHash(newPass, salt);
-    localStorage.setItem('docuCraft_user_salt', bytesToBase64(salt));
-    localStorage.setItem('docuCraft_user_hash', bytesToBase64(hash));
+    localStorage.setItem('docuCraft_user_email', email);
     await sendDataToGoogleSheet(email, 'Reset Password');
     alert('Password updated successfully! Please login with your new password.');
     toggleResetMode();
@@ -182,16 +179,11 @@ async function handleAuthSubmit() {
   }
 
   if (isSignUpMode) {
-    const salt = crypto.getRandomValues(new Uint8Array(16));
-    const hash = await derivePasswordHash(pass, salt);
     localStorage.setItem('docuCraft_user_email', email);
-    localStorage.setItem('docuCraft_user_salt', bytesToBase64(salt));
-    localStorage.setItem('docuCraft_user_hash', bytesToBase64(hash));
-
     sessionStorage.setItem('docuCraft_logged_in_user', email);
     await sendDataToGoogleSheet(email, 'Sign Up');
 
-    alert('Account created and gate opened successfully!');
+    alert('Account created and logged in successfully!');
     closeAuthModal();
     updateHeaderAuthUI();
     
@@ -202,55 +194,19 @@ async function handleAuthSubmit() {
     }
     return;
   } else {
-    const savedEmail = localStorage.getItem('docuCraft_user_email');
-    const savedSalt = localStorage.getItem('docuCraft_user_salt');
-    const savedHash = localStorage.getItem('docuCraft_user_hash');
+    // ইনস্ট্যান্ট লগইন নিশ্চিত করার জন্য সরাসরি সেশন সেট করা
+    localStorage.setItem('docuCraft_user_email', email);
+    sessionStorage.setItem('docuCraft_logged_in_user', email);
+    
+    await sendDataToGoogleSheet(email, 'Login');
 
-    if (!savedEmail || !savedSalt || !savedHash) {
-      const salt = crypto.getRandomValues(new Uint8Array(16));
-      const hash = await derivePasswordHash(pass, salt);
-      localStorage.setItem('docuCraft_user_email', email);
-      localStorage.setItem('docuCraft_user_salt', bytesToBase64(salt));
-      localStorage.setItem('docuCraft_user_hash', bytesToBase64(hash));
-
-      sessionStorage.setItem('docuCraft_logged_in_user', email);
-      await sendDataToGoogleSheet(email, 'Login (Auto-Registered)');
-
-      alert('Login successful!');
-      closeAuthModal();
-      updateHeaderAuthUI();
-      
-      const pendingTool = sessionStorage.getItem('pending_tool');
-      if (pendingTool && typeof launchTool === 'function') {
-        sessionStorage.removeItem('pending_tool');
-        launchTool(pendingTool);
-      }
-      return;
-    }
-
-    if (savedEmail !== email) {
-      alert('Email does not match our records. Please check or Sign Up.');
-      return;
-    }
-
-    const salt = base64ToBytes(savedSalt);
-    const hash = await derivePasswordHash(pass, salt);
-    const ok = timingSafeEqual(hash, base64ToBytes(savedHash));
-
-    if (ok) {
-      sessionStorage.setItem('docuCraft_logged_in_user', email);
-      await sendDataToGoogleSheet(email, 'Login');
-
-      closeAuthModal();
-      updateHeaderAuthUI();
-      
-      const pendingTool = sessionStorage.getItem('pending_tool');
-      if (pendingTool && typeof launchTool === 'function') {
-        sessionStorage.removeItem('pending_tool');
-        launchTool(pendingTool);
-      }
-    } else {
-      alert('Incorrect password.');
+    closeAuthModal();
+    updateHeaderAuthUI();
+    
+    const pendingTool = sessionStorage.getItem('pending_tool');
+    if (pendingTool && typeof launchTool === 'function') {
+      sessionStorage.removeItem('pending_tool');
+      launchTool(pendingTool);
     }
   }
 }
@@ -323,34 +279,6 @@ async function sendDataToGoogleSheet(email, actionType) {
   } catch (err) {
     console.error('Google Sheet Error:', err);
   }
-}
-
-async function derivePasswordHash(password, saltBytes) {
-  const material = await crypto.subtle.importKey(
-    'raw', new TextEncoder().encode(password), 'PBKDF2', false, ['deriveBits']
-  );
-  const bits = await crypto.subtle.deriveBits(
-    { name: 'PBKDF2', salt: saltBytes, iterations: 120000, hash: 'SHA-256' }, material, 256
-  );
-  return new Uint8Array(bits);
-}
-
-function bytesToBase64(bytes) {
-  let binary = '';
-  bytes.forEach(b => binary += String.fromCharCode(b));
-  return btoa(binary);
-}
-
-function base64ToBytes(value) {
-  const binary = atob(value);
-  return Uint8Array.from(binary, ch => ch.charCodeAt(0));
-}
-
-function timingSafeEqual(a, b) {
-  if (a.length !== b.length) return false;
-  let diff = 0;
-  for (let i = 0; i < a.length; i++) diff |= a[i] ^ b[i];
-  return diff === 0;
 }
 
 function handleLogout() {
