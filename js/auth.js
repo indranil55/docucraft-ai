@@ -1,3 +1,5 @@
+// DocuCraft AI - Authentication & Gate Security Logic
+
 let isSignUpMode = false;
 let isResetMode = false;
 
@@ -193,16 +195,6 @@ function handleAuthSubmit() {
   }
 }
 
-function checkUserAccess(toolName) {
-  const loggedUser = sessionStorage.getItem('docuCraft_logged_in_user');
-  if (!loggedUser) {
-    sessionStorage.setItem('pending_tool', toolName);
-    openAuthModal(); 
-    return false;
-  }
-  return true;
-}
-
 function updateHeaderAuthUI() {
   const loggedUser = sessionStorage.getItem('docuCraft_logged_in_user');
   
@@ -225,7 +217,6 @@ function updateHeaderAuthUI() {
       navActions.appendChild(authBtn);
     }
 
-    // সবসময় ওপেনঅথমোডাল ফাংশন থাকবে, ভেতরে নিজেই চেক করবে লগইন না থাকলে পপআপ আর লগইন থাকলে লগআউট কনফার্ম করবে
     authBtn.setAttribute('onclick', 'openAuthModal()');
 
     if (loggedUser) {
@@ -236,7 +227,7 @@ function updateHeaderAuthUI() {
       authBtn.style.width = '38px';
       authBtn.style.height = '38px';
       authBtn.style.borderRadius = '50%';
-      authBtn.title = `Logged in as ${loggedUser} (Click to Logout)`;
+      authBtn.title = `Logged in as ${loggedUser} (Click to Lock Gate & Logout)`;
     } else {
       authBtn.innerHTML = `<i class="fas fa-user"></i>`;
       authBtn.style.background = '#10b981';
