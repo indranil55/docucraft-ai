@@ -1,5 +1,8 @@
 // DocuCraftAI - Main Core, Access Lock Controller & Tool Handlers
 
+let activeTool = '';
+let selectedFiles = [];
+
 document.addEventListener('DOMContentLoaded', () => {
   console.log("DocuCraftAI Main Script Initialized.");
   initCategoryFilter();
@@ -89,9 +92,11 @@ function triggerFileSuccessAnimation(msg) {
   }
 }
 
-// ইউজার লগইন করা আছে কিনা তা চেক করার লক সিস্টেম
+// স্থায়ী এবং সঠিক লগইন লক চেক সিস্টেম
 function checkUserAccess(toolKey) {
   const isLoggedIn = localStorage.getItem('docucraft_logged_in');
+  
+  // যদি ইউজার লগইন করা না থাকে (বা স্ট্যাটাস true না হয়)
   if (!isLoggedIn || isLoggedIn !== 'true') {
     if (typeof openAuthModal === 'function') {
       openAuthModal();
@@ -100,7 +105,7 @@ function checkUserAccess(toolKey) {
     }
     return false;
   }
-  return true;
+  return true; // লগইন করা থাকলে সরাসরি টুল খুলবে
 }
 
 function launchTool(toolKey) {
@@ -110,7 +115,7 @@ function launchTool(toolKey) {
   }
 
   activeTool = toolKey;
-  selectedFiles = []; // নতুন টুল খুললে আগের ফাইল লিস্ট ক্লিয়ার হয়ে যাবে
+  selectedFiles = [];
 
   const overlay = document.getElementById('workspaceOverlay');
   const titleEl = document.getElementById('wsTitle');
