@@ -20,7 +20,7 @@
 }
 
 body {
-  background: #0f172a; /* মোবাইলে পারফরম্যান্স ও স্মুথ স্ক্রোলিংয়ের জন্য স্ট্যাটিক ডার্ক ব্যাকগ্রাউন্ড */
+  background: #0f172a;
   color: #f1f5f9;
   min-height: 100vh;
   display: flex;
@@ -143,6 +143,74 @@ header {
   padding: 0 8px;
 }
 
+/* পপুলার টুলস সেকশন স্টাইল */
+.popular-section {
+  width: 100%;
+  max-width: 1320px;
+  margin: 0 auto;
+  padding: 12px 16px 24px;
+}
+
+.section-title {
+  font-size: 17px;
+  font-weight: 750;
+  color: #ffffff;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.popular-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
+}
+
+.popular-card {
+  background: linear-gradient(135deg, #1e293b, #273548);
+  border: 1px solid rgba(229, 50, 45, 0.3);
+  border-radius: 16px;
+  padding: 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  transition: all 0.25s ease;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+.popular-card:hover {
+  transform: translateY(-3px);
+  border-color: var(--primary);
+  background: #273548;
+  box-shadow: 0 8px 20px rgba(229, 50, 45, 0.3);
+}
+
+.popular-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: rgba(229, 50, 45, 0.15);
+  color: var(--primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+}
+
+.popular-info h4 {
+  font-size: 14px;
+  font-weight: 750;
+  color: #ffffff;
+  margin-bottom: 2px;
+}
+
+.popular-info span {
+  font-size: 11.5px;
+  color: #94a3b8;
+}
+
 .filter-wrapper {
   width: 100%;
   padding: 16px 0;
@@ -199,7 +267,7 @@ header {
 }
 
 .tool-card {
-  background: #1e293b; /* ঝাপসা ভাব দূর করতে সলিড কালার */
+  background: #1e293b;
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 20px;
   padding: 22px;
@@ -324,6 +392,7 @@ header {
   color: var(--primary);
 }
 
+/* ড্র্যাগ অ্যান্ড ড্রপ গ্রিন চেকমার্ক অ্যানিমেশন ও স্টাইল */
 .dropzone {
   border: 2px dashed rgba(255, 255, 255, 0.2);
   border-radius: 16px;
@@ -332,12 +401,25 @@ header {
   background: #0f172a;
   cursor: pointer;
   margin-bottom: 16px;
-  transition: all 0.25s ease;
+  transition: all 0.3s ease;
 }
 
-.dropzone:hover {
-  border-color: var(--primary);
-  background: rgba(229, 50, 45, 0.05);
+.dropzone.dragover {
+  border-color: #10b981;
+  background: rgba(16, 185, 129, 0.08);
+  transform: scale(1.02);
+}
+
+.dropzone-success {
+  border-color: #10b981 !important;
+  background: rgba(16, 185, 129, 0.12) !important;
+  animation: pulseSuccess 0.4s ease;
+}
+
+@keyframes pulseSuccess {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.03); }
+  100% { transform: scale(1); }
 }
 
 .processing-progress {
