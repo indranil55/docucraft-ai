@@ -22,8 +22,9 @@ window.addEventListener('DOMContentLoaded', () => {
 });
 
 function openAuthModal() {
-  const loggedUser = sessionStorage.getItem('docuCraft_logged_in_user');
-  if (loggedUser) {
+  // যদি ইতিমধ্যে লগইন করা থাকে, তবে ইউজার প্রোফাইল বা লগআউট অপশন দেখাবে
+  const isLogged = localStorage.getItem('docucraft_logged_in') === 'true';
+  if (isLogged) {
     handleLogout();
     return;
   }
@@ -179,9 +180,10 @@ function handleAuthSubmit() {
     return;
   }
 
+  // পার্মানেন্ট লগইন স্টেট সেট করা
   localStorage.setItem('docuCraft_user_email', email);
+  localStorage.setItem('docucraft_logged_in', 'true');
   sessionStorage.setItem('docuCraft_logged_in_user', email);
-  localStorage.setItem('docucraft_logged_in', 'true'); // এটি সফলভাবে যুক্ত করা হলো
 
   closeAuthModal();
   updateHeaderAuthUI();
@@ -197,7 +199,8 @@ function handleAuthSubmit() {
 }
 
 function updateHeaderAuthUI() {
-  const loggedUser = sessionStorage.getItem('docuCraft_logged_in_user');
+  const isLogged = localStorage.getItem('docucraft_logged_in') === 'true';
+  const loggedUser = localStorage.getItem('docuCraft_user_email') || sessionStorage.getItem('docuCraft_logged_in_user');
   
   let navActions = document.querySelector('.nav-actions');
   if (!navActions) {
@@ -220,7 +223,7 @@ function updateHeaderAuthUI() {
 
     authBtn.setAttribute('onclick', 'openAuthModal()');
 
-    if (loggedUser) {
+    if (isLogged) {
       authBtn.innerHTML = `<i class="fa-solid fa-user-check"></i>`;
       authBtn.style.background = '#64748b';
       authBtn.style.color = '#ffffff';
@@ -228,7 +231,7 @@ function updateHeaderAuthUI() {
       authBtn.style.width = '38px';
       authBtn.style.height = '38px';
       authBtn.style.borderRadius = '50%';
-      authBtn.title = `Logged in as ${loggedUser} (Click to Lock Gate & Logout)`;
+      authBtn.title = `Logged in as ${loggedUser || 'User'} (Click to Lock Gate & Logout)`;
     } else {
       authBtn.innerHTML = `<i class="fas fa-user"></i>`;
       authBtn.style.background = '#10b981';
@@ -258,8 +261,11 @@ function sendDataToGoogleSheet(email, actionType) {
 
 function handleLogout() {
   if (confirm('Are you sure you want to lock the gate and log out?')) {
+    // লগআউট করার সময় সম্পূর্ণ স্টোরেজ পরিষ্কার করা
+    localStorage.removeItem('docucraft_logged_in');
+    localStorage.removeItem('docuCraft_user_email');
     sessionStorage.removeItem('docuCraft_logged_in_user');
-    localStorage.removeItem('docucraft_logged_in'); // লগআউটের সময় লোকালস্টোরেজ লক ক্লিয়ার করার জন্য
+    sessionStorage.removeItem('pending_tool');
     alert('Gate locked successfully.');
     location.reload();
   }
