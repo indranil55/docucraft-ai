@@ -58,6 +58,11 @@ header {
   justify-content: space-between;
 }
 
+/* লোগো টেক্সট সাদা ও স্পষ্ট করার জন্য */
+.brand-logo-svg text[fill="#0F172A"] {
+  fill: #ffffff !important;
+}
+
 .brand-logo {
   display: flex;
   align-items: center;
