@@ -181,6 +181,7 @@ function handleAuthSubmit() {
 
   localStorage.setItem('docuCraft_user_email', email);
   sessionStorage.setItem('docuCraft_logged_in_user', email);
+  localStorage.setItem('docucraft_logged_in', 'true'); // এটি সফলভাবে যুক্ত করা হলো
 
   closeAuthModal();
   updateHeaderAuthUI();
@@ -258,6 +259,7 @@ function sendDataToGoogleSheet(email, actionType) {
 function handleLogout() {
   if (confirm('Are you sure you want to lock the gate and log out?')) {
     sessionStorage.removeItem('docuCraft_logged_in_user');
+    localStorage.removeItem('docucraft_logged_in'); // লগআউটের সময় লোকালস্টোরেজ লক ক্লিয়ার করার জন্য
     alert('Gate locked successfully.');
     location.reload();
   }
