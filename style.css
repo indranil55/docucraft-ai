@@ -336,10 +336,13 @@ header {
   gap: 10px;
 }
 
+/* ব্যাকগ্রাউন্ড হেভি ব্লার এবং ডার্ক ওভারলে ফিক্স */
 .workspace-overlay {
   position: fixed;
   inset: 0;
   background: rgba(15, 23, 42, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   z-index: 5000;
   display: none;
   align-items: flex-end;
@@ -506,6 +509,8 @@ header {
   position: fixed;
   inset: 0;
   background: rgba(15, 23, 42, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   z-index: 9999 !important;
   display: none;
   align-items: flex-end;
