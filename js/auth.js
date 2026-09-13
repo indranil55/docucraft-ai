@@ -4,8 +4,12 @@ let isResetMode = false;
 // আপনার গুগল শিটের সঠিক Web App URL
 const GOOGLE_SHEET_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbw7ypSy3VkabsXyc0aiDStAC7xCsEW5Xks-OPGa9SUmpDIlgaXidHT7jC56cQlw-LpXsw/exec";
 
-// পেজ লোড হওয়ার সাথে সাথে হেডার বা নেভিগেশনের ইউজার স্টেট আপডেট করা
-document.addEventListener('DOMContentLoaded', () => {
+// পেজ লোড হওয়ার সাথে সাথে পিডিএফ জেএস ওয়ার্কার এবং ইউজার সেশন চেক করা
+window.addEventListener('DOMContentLoaded', () => {
+  if (typeof pdfjsLib !== 'undefined') {
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+  }
+
   updateHeaderAuthUI();
   
   const submitBtn = document.getElementById('authSubmitBtn');
@@ -20,7 +24,6 @@ document.addEventListener('DOMContentLoaded', () => {
 function openAuthModal() {
   let modal = document.getElementById('authModal');
   if (!modal) {
-    // যদি HTML এ মোডাল না থাকে, তবে ডাইনামিকলি তৈরি করে নেওয়া
     const modalHTML = `
       <div id="authModal" class="workspace-overlay" style="display: flex;" onclick="if(event.target.id==='authModal') closeAuthModal()">
         <div class="workspace-box" style="max-width: 420px; border-radius: 24px;">
@@ -185,7 +188,7 @@ async function handleAuthSubmit() {
     localStorage.setItem('docuCraft_user_salt', bytesToBase64(salt));
     localStorage.setItem('docuCraft_user_hash', bytesToBase64(hash));
 
-    localStorage.setItem('docuCraft_logged_in_user', email);
+    sessionStorage.setItem('docuCraft_logged_in_user', email);
     await sendDataToGoogleSheet(email, 'Sign Up');
 
     alert('Account created and gate opened successfully!');
@@ -210,7 +213,7 @@ async function handleAuthSubmit() {
       localStorage.setItem('docuCraft_user_salt', bytesToBase64(salt));
       localStorage.setItem('docuCraft_user_hash', bytesToBase64(hash));
 
-      localStorage.setItem('docuCraft_logged_in_user', email);
+      sessionStorage.setItem('docuCraft_logged_in_user', email);
       await sendDataToGoogleSheet(email, 'Login (Auto-Registered)');
 
       alert('Login successful!');
@@ -235,7 +238,7 @@ async function handleAuthSubmit() {
     const ok = timingSafeEqual(hash, base64ToBytes(savedHash));
 
     if (ok) {
-      localStorage.setItem('docuCraft_logged_in_user', email);
+      sessionStorage.setItem('docuCraft_logged_in_user', email);
       await sendDataToGoogleSheet(email, 'Login');
 
       closeAuthModal();
@@ -252,9 +255,8 @@ async function handleAuthSubmit() {
   }
 }
 
-// টুল ব্যবহারের আগে চেক করার ফাংশন (লক সিস্টেম)
 function checkUserAccess(toolName) {
-  const loggedUser = localStorage.getItem('docuCraft_logged_in_user');
+  const loggedUser = sessionStorage.getItem('docuCraft_logged_in_user');
   if (!loggedUser) {
     sessionStorage.setItem('pending_tool', toolName);
     openAuthModal(); 
@@ -264,9 +266,8 @@ function checkUserAccess(toolName) {
 }
 
 function updateHeaderAuthUI() {
-  const loggedUser = localStorage.getItem('docuCraft_logged_in_user');
+  const loggedUser = sessionStorage.getItem('docuCraft_logged_in_user');
   
-  // যদি হেডারে ইউজার বাটন না থাকে তবে তৈরি করে নেওয়া
   let navActions = document.querySelector('.nav-actions');
   if (!navActions) {
     const navContainer = document.querySelector('.nav-container');
@@ -278,34 +279,34 @@ function updateHeaderAuthUI() {
   }
 
   if (navActions) {
-    let authBtn = navActions.querySelector('.auth-icon-btn');
+    let authBtn = navActions.querySelector('.auth-icon-btn') || document.getElementById('authNavBtn');
     if (!authBtn) {
       authBtn = document.createElement('button');
       authBtn.className = 'auth-icon-btn';
+      authBtn.id = 'authNavBtn';
       navActions.appendChild(authBtn);
     }
 
     if (loggedUser) {
-      authBtn.style.background = '#ecfdf5';
-      authBtn.style.color = '#10b981';
-      authBtn.style.border = '1px solid #10b981';
-      authBtn.style.width = 'auto';
-      authBtn.style.padding = '0 12px';
-      authBtn.style.borderRadius = '99px';
-      authBtn.title = 'Click to Logout';
-      authBtn.innerHTML = `<i class="fas fa-user-check" style="margin-right: 5px;"></i> <span style="font-size: 12px; font-weight: 700;">${loggedUser.split('@')[0]}</span>`;
-      authBtn.onclick = handleLogout;
+      authBtn.innerHTML = `<i class="fa-solid fa-user-check"></i>`;
+      authBtn.setAttribute('onclick', 'handleLogout()');
+      authBtn.style.background = '#64748b';
+      authBtn.style.color = '#ffffff';
+      authBtn.style.border = 'none';
+      authBtn.style.width = '38px';
+      authBtn.style.height = '38px';
+      authBtn.style.borderRadius = '50%';
+      authBtn.title = `Logged in as ${loggedUser} (Click to Logout)`;
     } else {
+      authBtn.innerHTML = `<i class="fas fa-user"></i>`;
+      authBtn.setAttribute('onclick', 'openAuthModal()');
       authBtn.style.background = '#10b981';
       authBtn.style.color = '#ffffff';
       authBtn.style.border = 'none';
       authBtn.style.width = '38px';
       authBtn.style.height = '38px';
-      authBtn.style.padding = '0';
       authBtn.style.borderRadius = '50%';
       authBtn.title = 'Login / Sign Up';
-      authBtn.innerHTML = `<i class="fas fa-user"></i>`;
-      authBtn.onclick = openAuthModal;
     }
   }
 }
@@ -354,7 +355,7 @@ function timingSafeEqual(a, b) {
 
 function handleLogout() {
   if (confirm('Are you sure you want to lock the gate and log out?')) {
-    localStorage.removeItem('docuCraft_logged_in_user');
+    sessionStorage.removeItem('docuCraft_logged_in_user');
     alert('Gate locked successfully.');
     location.reload();
   }
