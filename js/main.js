@@ -1,8 +1,5 @@
 // DocuCraftAI - Main Core, Access Lock Controller & Tool Handlers
 
-let activeTool = '';
-let selectedFiles = [];
-
 document.addEventListener('DOMContentLoaded', () => {
   console.log("DocuCraftAI Main Script Initialized.");
   initCategoryFilter();
