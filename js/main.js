@@ -92,24 +92,23 @@ function triggerFileSuccessAnimation(msg) {
   }
 }
 
-// স্থায়ী এবং সঠিক লগইন লক চেক সিস্টেম
+// auth.js এর সাথে সামঞ্জস্যপূর্ণ সঠিক লগইন লক চেক সিস্টেম
 function checkUserAccess(toolKey) {
-  const isLoggedIn = localStorage.getItem('docucraft_logged_in');
+  const loggedUser = sessionStorage.getItem('docuCraft_logged_in_user');
   
-  // যদি ইউজার লগইন করা না থাকে (বা স্ট্যাটাস true না হয়)
-  if (!isLoggedIn || isLoggedIn !== 'true') {
+  if (!loggedUser) {
     if (typeof openAuthModal === 'function') {
+      sessionStorage.setItem('pending_tool', toolKey);
       openAuthModal();
     } else {
       alert('Please login or sign up first to use this tool.');
     }
     return false;
   }
-  return true; // লগইন করা থাকলে সরাসরি টুল খুলবে
+  return true;
 }
 
 function launchTool(toolKey) {
-  // টুল ওপেন করার আগে লগইন লক চেক করবে
   if (!checkUserAccess(toolKey)) {
     return;
   }
@@ -138,7 +137,6 @@ function launchTool(toolKey) {
   if (dropText) dropText.innerText = toolInfo.dropText;
   if (customUI) customUI.innerHTML = toolInfo.customHTML || '';
 
-  // Merge PDF বা Image to PDF এর ক্ষেত্রে একাধিক ফাইল সিলেক্ট করার পারমিশন দেবে
   if (fileInput) {
     if (toolKey === 'merge' || toolKey === 'jpgToPdf' || toolKey === 'wordToPdf' || toolKey === 'excelToPdf') {
       fileInput.setAttribute('multiple', 'true');
