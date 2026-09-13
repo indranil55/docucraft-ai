@@ -91,7 +91,7 @@ function triggerFileSuccessAnimation(msg) {
   }
 }
 
-// কঠোর লক সিস্টেম: লগইন না থাকলে কোনো টুল বা ফাইল সিলেকশন করতে দেবে না
+// কঠোর লক সিস্টেম: ভিজিটর সাইট দেখতে পারবে, কিন্তু টুল ওপেন বা ফাইল সিলেক্ট করতে গেলেই লগইন চাইবে
 function checkUserAccess(toolKey) {
   const isLogged = localStorage.getItem('docucraft_logged_in') === 'true';
   const loggedUserEmail = localStorage.getItem('docuCraft_user_email') || sessionStorage.getItem('docuCraft_logged_in_user');
@@ -114,35 +114,13 @@ function launchTool(toolKey) {
     return;
   }
 
-  activeTool = toolKey;
-  selectedFiles = [];
-
-  const overlay = document.getElementById('workspaceOverlay');
-  const titleEl = document.getElementById('wsTitle');
-  const descEl = document.getElementById('wsDesc');
-  const customUI = document.getElementById('wsCustomUI');
-  const dropText = document.getElementById('wsDropText');
-  const fileInput = document.getElementById('wsFileInput');
-  const fileList = document.getElementById('wsFileList');
-  
-  if (!overlay) return;
-
-  overlay.style.display = 'flex';
-  document.body.classList.add('modal-open');
-  if (fileList) fileList.innerHTML = '';
-
-  const toolInfo = typeof getToolDetails === 'function' ? getToolDetails(toolKey) : { title: toolKey, desc: 'Process file', dropText: 'Tap to select file' };
-  
-  if (titleEl) titleEl.innerText = toolInfo.title;
-  if (descEl) descEl.innerText = toolInfo.desc;
-  if (dropText) dropText.innerText = toolInfo.dropText;
-  if (customUI) customUI.innerHTML = toolInfo.customHTML || '';
-
-  if (fileInput) {
-    if (toolKey === 'merge' || toolKey === 'jpgToPdf' || toolKey === 'wordToPdf' || toolKey === 'excelToPdf') {
-      fileInput.setAttribute('multiple', 'true');
-    } else {
-      fileInput.removeAttribute('multiple');
+  // tools.js-এর launchTool কল করার আগে সিকিউরিটি ও ভেরিয়েবল হ্যান্ডেল করা
+  if (typeof window.launchToolCustom === 'function') {
+    window.launchToolCustom(toolKey);
+  } else {
+    // সরাসরি tools.js এর নিজস্ব launchTool এক্সিকিউট হবে
+    if (typeof window.originalLaunchTool === 'function') {
+      window.originalLaunchTool(toolKey);
     }
   }
 }
@@ -152,7 +130,7 @@ function closeWorkspace() {
   if (overlay) overlay.style.display = 'none';
   document.body.classList.remove('modal-open');
   
-  selectedFiles = [];
+  if (typeof selectedFiles !== 'undefined') selectedFiles = [];
   const fileList = document.getElementById('wsFileList');
   const progress = document.getElementById('processingProgress');
   const dropText = document.getElementById('wsDropText');
