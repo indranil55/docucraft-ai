@@ -52,26 +52,37 @@ function initDropzoneHandlers() {
       const dt = e.dataTransfer;
       const files = dt.files;
       if (files.length > 0) {
-        fileInput.files = files;
-        triggerFileSuccessAnimation(files[0].name);
+        if (fileInput.hasAttribute('multiple')) {
+          selectedFiles = [...selectedFiles, ...Array.from(files)];
+        } else {
+          selectedFiles = Array.from(files);
+        }
+        if (typeof renderFileList === 'function') renderFileList();
+        triggerFileSuccessAnimation(`${selectedFiles.length} file(s) selected`);
       }
     });
 
-    fileInput.addEventListener('change', () => {
-      if (fileInput.files.length > 0) {
-        triggerFileSuccessAnimation(fileInput.files[0].name);
+    fileInput.addEventListener('change', (e) => {
+      if (e.target.files.length > 0) {
+        if (fileInput.hasAttribute('multiple')) {
+          selectedFiles = [...selectedFiles, ...Array.from(e.target.files)];
+        } else {
+          selectedFiles = Array.from(e.target.files);
+        }
+        if (typeof renderFileList === 'function') renderFileList();
+        triggerFileSuccessAnimation(`${selectedFiles.length} file(s) selected`);
       }
     });
   }
 }
 
-function triggerFileSuccessAnimation(fileName) {
+function triggerFileSuccessAnimation(msg) {
   const dropText = document.getElementById('wsDropText');
   const dropzone = document.getElementById('wsDropzone');
   
   if (dropzone && dropText) {
     dropzone.classList.add('dropzone-success');
-    dropText.innerHTML = `<i class="fa-solid fa-circle-check" style="color: #10b981; margin-right: 6px;"></i> ${fileName}`;
+    dropText.innerHTML = `<i class="fa-solid fa-circle-check" style="color: #10b981; margin-right: 6px;"></i> ${msg}`;
     setTimeout(() => {
       dropzone.classList.remove('dropzone-success');
     }, 1500);
@@ -98,17 +109,22 @@ function launchTool(toolKey) {
     return;
   }
 
+  activeTool = toolKey;
+  selectedFiles = []; // নতুন টুল খুললে আগের ফাইল লিস্ট ক্লিয়ার হয়ে যাবে
+
   const overlay = document.getElementById('workspaceOverlay');
   const titleEl = document.getElementById('wsTitle');
   const descEl = document.getElementById('wsDesc');
   const customUI = document.getElementById('wsCustomUI');
   const dropText = document.getElementById('wsDropText');
   const fileInput = document.getElementById('wsFileInput');
+  const fileList = document.getElementById('wsFileList');
   
   if (!overlay) return;
 
   overlay.style.display = 'flex';
   document.body.classList.add('modal-open');
+  if (fileList) fileList.innerHTML = '';
 
   const toolInfo = typeof getToolDetails === 'function' ? getToolDetails(toolKey) : { title: toolKey, desc: 'Process file', dropText: 'Tap to select file' };
   
@@ -119,7 +135,7 @@ function launchTool(toolKey) {
 
   // Merge PDF বা Image to PDF এর ক্ষেত্রে একাধিক ফাইল সিলেক্ট করার পারমিশন দেবে
   if (fileInput) {
-    if (toolKey === 'merge' || toolKey === 'jpgToPdf' || toolKey === 'wordToPdf') {
+    if (toolKey === 'merge' || toolKey === 'jpgToPdf' || toolKey === 'wordToPdf' || toolKey === 'excelToPdf') {
       fileInput.setAttribute('multiple', 'true');
     } else {
       fileInput.removeAttribute('multiple');
@@ -132,6 +148,7 @@ function closeWorkspace() {
   if (overlay) overlay.style.display = 'none';
   document.body.classList.remove('modal-open');
   
+  selectedFiles = [];
   const fileList = document.getElementById('wsFileList');
   const progress = document.getElementById('processingProgress');
   const dropText = document.getElementById('wsDropText');
