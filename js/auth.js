@@ -1,10 +1,8 @@
 let isSignUpMode = false;
 let isResetMode = false;
 
-// আপনার গুগল শিটের সঠিক Web App URL
 const GOOGLE_SHEET_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbw7ypSy3VkabsXyc0aiDStAC7xCsEW5Xks-OPGa9SUmpDIlgaXidHT7jC56cQlw-LpXsw/exec";
 
-// পেজ লোড হওয়ার সাথে সাথে পিডিএফ জেএস ওয়ার্কার এবং ইউজার সেশন চেক করা
 window.addEventListener('DOMContentLoaded', () => {
   if (typeof pdfjsLib !== 'undefined') {
     pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
@@ -22,6 +20,12 @@ window.addEventListener('DOMContentLoaded', () => {
 });
 
 function openAuthModal() {
+  const loggedUser = sessionStorage.getItem('docuCraft_logged_in_user');
+  if (loggedUser) {
+    handleLogout();
+    return;
+  }
+
   let modal = document.getElementById('authModal');
   if (!modal) {
     const modalHTML = `
@@ -173,15 +177,12 @@ function handleAuthSubmit() {
     return;
   }
 
-  // ইনস্ট্যান্ট লগইন এবং সাইন-আপ প্রসেস (নো ল্যাগ)
   localStorage.setItem('docuCraft_user_email', email);
   sessionStorage.setItem('docuCraft_logged_in_user', email);
 
-  // মোডাল সাথে সাথে বন্ধ করা এবং হেডার আপডেট করা
   closeAuthModal();
   updateHeaderAuthUI();
 
-  // ব্যাকগ্রাউন্ডে গুগল শিটে ডাটা পাঠানো (কোনো ডিলে ছাড়া)
   const actionType = isSignUpMode ? 'Sign Up' : 'Login';
   sendDataToGoogleSheet(email, actionType);
 
@@ -224,9 +225,11 @@ function updateHeaderAuthUI() {
       navActions.appendChild(authBtn);
     }
 
+    // সবসময় ওপেনঅথমোডাল ফাংশন থাকবে, ভেতরে নিজেই চেক করবে লগইন না থাকলে পপআপ আর লগইন থাকলে লগআউট কনফার্ম করবে
+    authBtn.setAttribute('onclick', 'openAuthModal()');
+
     if (loggedUser) {
       authBtn.innerHTML = `<i class="fa-solid fa-user-check"></i>`;
-      authBtn.setAttribute('onclick', 'handleLogout()');
       authBtn.style.background = '#64748b';
       authBtn.style.color = '#ffffff';
       authBtn.style.border = 'none';
@@ -236,7 +239,6 @@ function updateHeaderAuthUI() {
       authBtn.title = `Logged in as ${loggedUser} (Click to Logout)`;
     } else {
       authBtn.innerHTML = `<i class="fas fa-user"></i>`;
-      authBtn.setAttribute('onclick', 'openAuthModal()');
       authBtn.style.background = '#10b981';
       authBtn.style.color = '#ffffff';
       authBtn.style.border = 'none';
