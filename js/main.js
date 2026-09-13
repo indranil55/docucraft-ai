@@ -52,6 +52,7 @@ function initDropzoneHandlers() {
     });
 
     dropzone.addEventListener('drop', (e) => {
+      if (!checkUserAccess(activeTool)) return;
       const dt = e.dataTransfer;
       const files = dt.files;
       if (files.length > 0) {
@@ -66,6 +67,7 @@ function initDropzoneHandlers() {
     });
 
     fileInput.addEventListener('change', (e) => {
+      if (!checkUserAccess(activeTool)) return;
       if (e.target.files.length > 0) {
         if (fileInput.hasAttribute('multiple')) {
           selectedFiles = [...selectedFiles, ...Array.from(e.target.files)];
@@ -92,12 +94,13 @@ function triggerFileSuccessAnimation(msg) {
   }
 }
 
-// কঠোর লক সিস্টেম: লগইন না থাকলে কোনো টুল ওপেন করতে দেবে না
+// কঠোর লক সিস্টেম: লগইন না থাকলে কোনো টুল বা ফাইল সিলেকশন করতে দেবে না
 function checkUserAccess(toolKey) {
-  const loggedUser = sessionStorage.getItem('docuCraft_logged_in_user');
+  const loggedUser = sessionStorage.getItem('docuCraft_logged_in_user') || localStorage.getItem('docucraft_logged_in');
   
-  if (!loggedUser) {
+  if (!loggedUser || loggedUser !== 'true') {
     sessionStorage.setItem('pending_tool', toolKey);
+    if (typeof closeWorkspace === 'function') closeWorkspace();
     if (typeof openAuthModal === 'function') {
       openAuthModal();
     } else {
@@ -170,6 +173,9 @@ function handleBackdropClick(event) {
 }
 
 function openSmartAiChat() {
+  if (!checkUserAccess('aiChat')) {
+    return;
+  }
   const modal = document.getElementById('smartAiChatModal');
   if (modal) {
     modal.style.display = 'flex';
