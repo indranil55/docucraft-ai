@@ -108,7 +108,8 @@ function getToolDetails(key) {
           <label>Save File Name:</label>
           <input type="text" id="saveFileName" class="form-control" value="Merged_Document" placeholder="Enter file name">
         </div>
-      `
+      `,
+      multiple: true // একাধিক ফাইল সিলেক্ট করার সুবিধা নিশ্চিত করার জন্য
     },
     split: {
       title: 'Split PDF',
@@ -193,7 +194,8 @@ function getToolDetails(key) {
           <label>Save File Name:</label>
           <input type="text" id="saveFileName" class="form-control" value="Converted_PDF" placeholder="Enter file name">
         </div>
-      `
+      `,
+      multiple: true
     },
     wordToPdf: {
       title: 'Word to PDF (DOC/DOCX to PDF)',
