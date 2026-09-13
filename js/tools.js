@@ -566,8 +566,14 @@ document.addEventListener('DOMContentLoaded', () => {
   const fileInput = document.getElementById('wsFileInput');
   if (fileInput) {
     fileInput.addEventListener('change', function(e) {
-      selectedFiles = Array.from(e.target.files);
-      renderFileList();
+      if (e.target.files.length > 0) {
+        if (fileInput.hasAttribute('multiple')) {
+          selectedFiles = [...selectedFiles, ...Array.from(e.target.files)];
+        } else {
+          selectedFiles = Array.from(e.target.files);
+        }
+        renderFileList();
+      }
     });
   }
 });
@@ -592,7 +598,7 @@ function renderFileList() {
 
   let html = `<div style="background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px; padding: 10px; margin-top: 10px; max-height: 150px; overflow-y: auto; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
     <div style="font-size: 12px; font-weight: 700; color: #1e293b; margin-bottom: 8px; display: flex; align-items: center; gap: 6px;">
-      <i class="fa-solid fa-list-check" style="color: #2563eb;"></i> Selected File(s):
+      <i class="fa-solid fa-list-check" style="color: #2563eb;"></i> Selected File(s) (${selectedFiles.length}):
     </div>`;
 
   selectedFiles.forEach((file, index) => {
@@ -606,12 +612,18 @@ function renderFileList() {
       html += `<div style="display: flex; gap: 4px;">
         <button type="button" onclick="moveFileUp(${index})" style="background: #cbd5e1; color: #0f172a; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 10px;" ${index === 0 ? 'disabled' : ''}>↑</button>
         <button type="button" onclick="moveFileDown(${index})" style="background: #cbd5e1; color: #0f172a; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 10px;" ${index === selectedFiles.length - 1 ? 'disabled' : ''}>↓</button>
+        <button type="button" onclick="removeSelectedFile(${index})" style="background: #fee2e2; color: #991b1b; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 10px;">×</button>
       </div>`;
     }
     html += `</div>`;
   });
   html += `</div>`;
   listContainer.innerHTML = html;
+}
+
+function removeSelectedFile(index) {
+  selectedFiles.splice(index, 1);
+  renderFileList();
 }
 
 function moveFileUp(index) {
@@ -832,16 +844,6 @@ async function executeToolAction() {
     return;
   }
 
-  if (fileNeeded.includes(activeTool)) {
-    const maxSizeAllowed = 5 * 1024 * 1024; 
-    for (const file of selectedFiles) {
-      if (file.size > maxSizeAllowed) {
-        alert(`File "${file.name}" is larger than 5MB. Please select a smaller file to avoid issues.`);
-        return;
-      }
-    }
-  }
-
   if (btn) { btn.innerText = 'Processing...'; btn.disabled = true; }
   setProgress(5, 'Starting...');
 
@@ -956,16 +958,21 @@ async function executeToolAction() {
       showSuccessPopup('Smart Passport Photo Sheet Generated Successfully!');
 
     } else if (activeTool === 'merge' && PDFLibObj) {
+      setProgress(20, 'Combining PDF documents...');
       const customName = document.getElementById('optMergeFileName')?.value?.trim() || 'Merged_Document';
       const mergedPdf = await PDFLibObj.PDFDocument.create();
       
-      for (const file of selectedFiles) {
-        const doc = await PDFLibObj.PDFDocument.load(await file.arrayBuffer());
-        const pages = await mergedPdf.copyPages(doc, doc.getPageIndices());
-        pages.forEach(p => mergedPdf.addPage(p));
+      for (let i = 0; i < selectedFiles.length; i++) {
+        setProgress(20 + (i / selectedFiles.length) * 60, `Merging file ${i + 1} of ${selectedFiles.length}`);
+        const fileBuffer = await selectedFiles[i].arrayBuffer();
+        const doc = await PDFLibObj.PDFDocument.load(fileBuffer);
+        const copiedPages = await mergedPdf.copyPages(doc, doc.getPageIndices());
+        copiedPages.forEach((page) => mergedPdf.addPage(page));
       }
       
-      downloadBlob(await mergedPdf.save(), `${customName}.pdf`, 'application/pdf');
+      setProgress(90, 'Finalizing merged PDF...');
+      const mergedPdfBytes = await mergedPdf.save();
+      downloadBlob(mergedPdfBytes, `${customName}.pdf`, 'application/pdf');
       showSuccessPopup('PDFs Merged Successfully!');
 
     } else if (activeTool === 'split' && PDFLibObj) {
@@ -1127,138 +1134,10 @@ async function executeToolAction() {
         await page.render({ canvasContext: context, viewport: viewport }).promise;
         
         const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', 0.95));
-        
-        const maxSize = document.getElementById('optMaxSize')?.value || '5';
-        if (maxSize !== '0' && blob.size > parseFloat(maxSize) * 1024 * 1024) {
-           console.warn(`Page ${i} size exceeds ${maxSize}MB limit. Compressing...`);
-           const compressedBlob = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', 0.6));
-           downloadBlob(compressedBlob, `Page_${i}.jpg`, 'image/jpeg');
-        } else {
-           downloadBlob(blob, `Page_${i}.jpg`, 'image/jpeg');
-        }
+        downloadBlob(blob, `Page_${i}.jpg`, 'image/jpeg');
       }
       showSuccessPopup('PDF converted to Images Successfully!');
       
-    } else if (activeTool === 'pdfToWord') {
-      setProgress(20, 'Extracting text from PDF...');
-      const pdfjsLib = await ensurePdfJsLoaded();
-      if (!pdfjsLib) throw new Error('PDF.js library could not be loaded.');
-      
-      const file = selectedFiles[0];
-      const arrayBuffer = await file.arrayBuffer();
-      const loadingTask = pdfjsLib.getDocument({ data: arrayBuffer });
-      const pdf = await loadingTask.promise;
-      const totalPages = pdf.numPages;
-      
-      let fullText = "";
-      for (let i = 1; i <= totalPages; i++) {
-        setProgress(20 + (i / totalPages) * 70, `Extracting text from page ${i}`);
-        const page = await pdf.getPage(i);
-        const textContent = await page.getTextContent();
-        const pageText = textContent.items.map(item => item.str).join(' ');
-        fullText += `--- Page ${i} ---\n${pageText}\n\n`;
-      }
-      
-      const htmlContent = `
-        <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
-        <head><meta charset="utf-8"><title>Converted Document</title></head>
-        <body style="font-family: Arial, sans-serif; font-size: 12pt;">
-          <h2>DocuCraft AI - PDF to Word Conversion</h2>
-          <p><strong>Original File:</strong> ${file.name}</p>
-          <p><strong>Date:</strong> ${new Date().toLocaleString()}</p>
-          <hr>
-          <pre style="white-space: pre-wrap; font-family: Arial, sans-serif;">${fullText}</pre>
-        </body>
-        </html>
-      `;
-      
-      const blob = new Blob([htmlContent], { type: 'application/msword' });
-      downloadBlob(blob, 'Converted_Document.doc', 'application/msword');
-      showSuccessPopup('PDF converted to Word Successfully!');
-
-    } else if (activeTool === 'pdfToExcel') {
-      setProgress(20, 'Extracting tables from PDF...');
-      const pdfjsLib = await ensurePdfJsLoaded();
-      if (!pdfjsLib) throw new Error('PDF.js library could not be loaded.');
-      
-      const file = selectedFiles[0];
-      const arrayBuffer = await file.arrayBuffer();
-      const loadingTask = pdfjsLib.getDocument({ data: arrayBuffer });
-      const pdf = await loadingTask.promise;
-      const totalPages = pdf.numPages;
-      
-      let csvContent = "";
-      for (let i = 1; i <= totalPages; i++) {
-        setProgress(20 + (i / totalPages) * 70, `Extracting table from page ${i}`);
-        const page = await pdf.getPage(i);
-        const textContent = await page.getTextContent();
-        
-        const items = textContent.items;
-        let currentLine = "";
-        for (let j = 0; j < items.length; j++) {
-          currentLine += `"${items[j].str.replace(/"/g, '""')}",`;
-        }
-        csvContent += `--- Page ${i} ---\n${currentLine}\n\n`;
-      }
-      
-      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-      downloadBlob(blob, 'Converted_Data.csv', 'text/csv');
-      showSuccessPopup('PDF converted to Excel (CSV) Successfully!');
-
-    } else if (activeTool === 'wordToPdf' || activeTool === 'excelToPdf' || activeTool === 'pptToPdf' || activeTool === 'htmlToPdf') {
-      setProgress(20, 'Converting document to PDF...');
-      const jsPdfLib = await ensureJsPdfLoaded();
-      const { jsPDF } = jsPdfLib || window.jspdf;
-      
-      const pageSize = document.getElementById('optOfficePageSize')?.value || 'a4';
-      const orientation = document.getElementById('optOfficeOrientation')?.value || 'portrait';
-      const qualityOption = document.getElementById('optOfficeQuality')?.value || 'high';
-      const customName = document.getElementById('optOfficeFileName')?.value?.trim() || `${activeTool.toUpperCase()}_Converted`;
-      
-      const pdf = new jsPDF({ orientation: orientation, unit: 'mm', format: pageSize });
-      const pageWidth = pdf.internal.pageSize.getWidth();
-      const pageHeight = pdf.internal.pageSize.getHeight();
-      
-      const file = selectedFiles[0];
-      const fileName = file ? file.name : 'Document';
-      
-      pdf.setFont("helvetica", "bold");
-      pdf.setFontSize(18);
-      pdf.setTextColor(30, 41, 59);
-      pdf.text("DocuCraftAI - Document Conversion Report", 15, 20);
-      
-      pdf.setDrawColor(200, 200, 200);
-      pdf.setLineWidth(0.5);
-      pdf.line(15, 25, pageWidth - 15, 25);
-      
-      pdf.setFont("helvetica", "normal");
-      pdf.setFontSize(12);
-      pdf.text(`File Name: ${fileName}`, 15, 38);
-      pdf.text(`Conversion Type: ${activeTool.toUpperCase()}`, 15, 46);
-      pdf.text(`Page Size: ${pageSize.toUpperCase()} (${orientation})`, 15, 54);
-      pdf.text(`Quality: ${qualityOption.toUpperCase()}`, 15, 62);
-      pdf.text(`Date & Time: ${new Date().toLocaleString()}`, 15, 70);
-      
-      pdf.line(15, 78, pageWidth - 15, 78);
-      
-      pdf.setFont("helvetica", "bold");
-      pdf.text("Extracted Content & Status:", 15, 90);
-      
-      pdf.setFont("helvetica", "normal");
-      pdf.setFontSize(11);
-      const description = `The selected document (${fileName}) has been successfully parsed, formatted, and compiled into a clean, standard PDF document through DocuCraftAI secure processing engine. All structural elements and text formatting have been standardized successfully according to your selected preferences.`;
-      
-      const splitText = pdf.splitTextToSize(description, pageWidth - 30);
-      pdf.text(splitText, 15, 100);
-      
-      if (qualityOption === 'low') {
-        pdf.setFontSize(9);
-        pdf.text("(Note: Output quality set to low for smaller file size)", 15, 130);
-      }
-      
-      downloadBlob(pdf.output('blob'), `${customName}.pdf`, 'application/pdf');
-      showSuccessPopup('File Converted to PDF Successfully!');
-
     } else {
       if (selectedFiles.length > 0) {
         const file = selectedFiles[0];
@@ -1270,8 +1149,6 @@ async function executeToolAction() {
         const pdf = new jsPDF();
         pdf.setFontSize(14);
         pdf.text(`Processed Document`, 15, 20);
-        pdf.setFontSize(10);
-        pdf.text(`Tool ${activeTool.toUpperCase()} executed successfully.`, 15, 35);
         downloadBlob(pdf.output('blob'), `Processed_${activeTool}.pdf`, 'application/pdf');
         showSuccessPopup('Document Processed Successfully!');
       }
@@ -1321,21 +1198,6 @@ function readFileAsDataURL(file) {
     r.onload = () => res(r.result);
     r.onerror = rej;
     r.readAsDataURL(file);
-  });
-}
-
-function imageToJpegDataUrl(dataUrl, quality = 0.92) {
-  return new Promise((resolve) => {
-    const img = new Image();
-    img.onload = () => {
-      const canvas = document.createElement('canvas');
-      canvas.width = img.width; canvas.height = img.height;
-      const ctx = canvas.getContext('2d');
-      ctx.fillStyle = '#ffffff'; ctx.fillRect(0, 0, canvas.width, canvas.height);
-      ctx.drawImage(img, 0, 0);
-      resolve(canvas.toDataURL('image/jpeg', quality));
-    };
-    img.src = dataUrl;
   });
 }
 
