@@ -579,7 +579,10 @@ document.addEventListener('DOMContentLoaded', () => {
     fileInput.addEventListener('change', function(e) {
       if (e.target.files.length > 0) {
         if (fileInput.hasAttribute('multiple')) {
-          selectedFiles = [...selectedFiles, ...Array.from(e.target.files)];
+          // FIX: Prevent accidental duplicate file addition or previous merged files getting stuck
+          const newFiles = Array.from(e.target.files);
+          const uniqueFiles = newFiles.filter(nf => !selectedFiles.some(sf => sf.name === nf.name && sf.size === nf.size));
+          selectedFiles = [...selectedFiles, ...uniqueFiles];
         } else {
           selectedFiles = Array.from(e.target.files);
         }
@@ -608,8 +611,9 @@ function renderFileList() {
   }
 
   let html = `<div style="background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px; padding: 10px; margin-top: 10px; max-height: 150px; overflow-y: auto; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
-    <div style="font-size: 12px; font-weight: 700; color: #1e293b; margin-bottom: 8px; display: flex; align-items: center; gap: 6px;">
-      <i class="fa-solid fa-list-check" style="color: #2563eb;"></i> Selected File(s) (${selectedFiles.length}):
+    <div style="font-size: 12px; font-weight: 700; color: #1e293b; margin-bottom: 8px; display: flex; align-items: center; justify-content: space-between;">
+      <span><i class="fa-solid fa-list-check" style="color: #2563eb;"></i> Selected File(s) (${selectedFiles.length}):</span>
+      <button type="button" onclick="clearAllSelectedFiles()" style="background: #fee2e2; color: #991b1b; border: none; padding: 2px 8px; border-radius: 4px; font-size: 10px; cursor: pointer;">Clear All</button>
     </div>`;
 
   selectedFiles.forEach((file, index) => {
@@ -634,6 +638,13 @@ function renderFileList() {
 
 function removeSelectedFile(index) {
   selectedFiles.splice(index, 1);
+  renderFileList();
+}
+
+function clearAllSelectedFiles() {
+  selectedFiles = [];
+  const fileInput = document.getElementById('wsFileInput');
+  if (fileInput) fileInput.value = '';
   renderFileList();
 }
 
