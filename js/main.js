@@ -100,21 +100,8 @@ function triggerFileSuccessAnimation(msg) {
   }
 }
 
-// কঠোর লক সিস্টেম: ভিজিটর সাইট ঘুরে দেখতে পারবে, কিন্তু টুল ওপেন করতে গেলেই লগইন চাইবে
+// লক সিস্টেম রিমুভ করে সব টুল সবার জন্য উন্মুক্ত করা হলো
 function checkUserAccess(toolKey) {
-  const isLogged = localStorage.getItem('docucraft_logged_in') === 'true';
-  const loggedUserEmail = localStorage.getItem('docuCraft_user_email') || sessionStorage.getItem('docuCraft_logged_in_user');
-  
-  if (!isLogged || !loggedUserEmail) {
-    sessionStorage.setItem('pending_tool', toolKey);
-    if (typeof closeWorkspace === 'function') closeWorkspace();
-    if (typeof openAuthModal === 'function') {
-      openAuthModal();
-    } else {
-      alert('Please login or sign up first to use this tool.');
-    }
-    return false;
-  }
   return true;
 }
 
