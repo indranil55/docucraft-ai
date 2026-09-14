@@ -638,40 +638,90 @@ function renderFileList() {
   const listContainer = document.getElementById('wsFileList');
   if (!listContainer) return;
 
+  while (listContainer.firstChild) {
+    listContainer.removeChild(listContainer.firstChild);
+  }
+
   if (selectedFiles.length === 0) {
-    listContainer.innerHTML = '';
     return;
   }
 
-  let html = `<div style="background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px; padding: 10px; margin-top: 10px; max-height: 200px; overflow-y: auto; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
-    <div style="font-size: 12px; font-weight: 700; color: #1e293b; margin-bottom: 8px; display: flex; align-items: center; justify-content: space-between;">
-      <span><i class="fa-solid fa-list-check" style="color: #2563eb;"></i> Selected File(s) (${selectedFiles.length}):</span>
-      <button type="button" onclick="clearAllSelectedFiles()" style="background: #fee2e2; color: #991b1b; border: none; padding: 2px 8px; border-radius: 4px; font-size: 10px; cursor: pointer;">Clear All</button>
-    </div>`;
+  const wrapper = document.createElement('div');
+  wrapper.style.cssText = "background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px; padding: 10px; margin-top: 10px; max-height: 200px; overflow-y: auto; box-shadow: 0 2px 5px rgba(0,0,0,0.05);";
+
+  const header = document.createElement('div');
+  header.style.cssText = "font-size: 12px; font-weight: 700; color: #1e293b; margin-bottom: 8px; display: flex; align-items: center; justify-content: space-between;";
+  
+  const titleSpan = document.createElement('span');
+  titleSpan.textContent = `Selected File(s) (${selectedFiles.length}):`;
+  header.appendChild(titleSpan);
+
+  const clearBtn = document.createElement('button');
+  clearBtn.type = 'button';
+  clearBtn.textContent = 'Clear All';
+  clearBtn.style.cssText = "background: #fee2e2; color: #991b1b; border: none; padding: 2px 8px; border-radius: 4px; font-size: 10px; cursor: pointer;";
+  clearBtn.onclick = clearAllSelectedFiles;
+  header.appendChild(clearBtn);
+  wrapper.appendChild(header);
 
   selectedFiles.forEach((file, index) => {
     const fileSize = (file.size / 1024).toFixed(1) + ' KB';
-    const safeFileName = escapeHtml(file.name); 
+    const safeFileName = file.name; 
     const isImage = file.type.startsWith('image/');
-    const fileIcon = isImage ? URL.createObjectURL(file) : 'https://cdn-icons-png.flaticon.com/512/337/337946.png';
     
-    html += `<div style="display: flex; justify-content: space-between; align-items: center; padding: 6px 0; border-bottom: 1px solid #e2e8f0; font-size: 12px;">
-      <div style="display: flex; align-items: center; gap: 8px; overflow: hidden; max-width: 170px;">
-        <img src="${fileIcon}" style="width: 24px; height: 24px; object-fit: cover; border-radius: 4px; border: 1px solid #cbd5e1;" />
-        <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: #334155;" title="${safeFileName}">${index + 1}. ${safeFileName} (${fileSize})</span>
-      </div>`;
+    const row = document.createElement('div');
+    row.style.cssText = "display: flex; justify-content: space-between; align-items: center; padding: 6px 0; border-bottom: 1px solid #e2e8f0; font-size: 12px;";
+
+    const infoDiv = document.createElement('div');
+    infoDiv.style.cssText = "display: flex; align-items: center; gap: 8px; overflow: hidden; max-width: 170px;";
+
+    const img = document.createElement('img');
+    img.style.cssText = "width: 24px; height: 24px; object-fit: cover; border-radius: 4px; border: 1px solid #cbd5e1;";
+    img.src = isImage ? URL.createObjectURL(file) : 'https://cdn-icons-png.flaticon.com/512/337/337946.png';
+    infoDiv.appendChild(img);
+
+    const nameSpan = document.createElement('span');
+    nameSpan.style.cssText = "overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: #334155;";
+    nameSpan.title = safeFileName;
+    nameSpan.textContent = `${index + 1}. ${safeFileName} (${fileSize})`;
+    infoDiv.appendChild(nameSpan);
+
+    row.appendChild(infoDiv);
 
     if (activeTool === 'merge' || activeTool === 'jpgToPdf' || activeTool === 'wordToPdf' || activeTool === 'excelToPdf') {
-      html += `<div style="display: flex; gap: 4px;">
-        <button type="button" onclick="moveFileUp(${index})" style="background: #cbd5e1; color: #0f172a; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 10px;" ${index === 0 ? 'disabled' : ''}>↑</button>
-        <button type="button" onclick="moveFileDown(${index})" style="background: #cbd5e1; color: #0f172a; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 10px;" ${index === selectedFiles.length - 1 ? 'disabled' : ''}>↓</button>
-        <button type="button" onclick="removeSelectedFile(${index})" style="background: #fee2e2; color: #991b1b; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 10px;">×</button>
-      </div>`;
+      const btnGroup = document.createElement('div');
+      btnGroup.style.cssText = "display: flex; gap: 4px;";
+
+      const upBtn = document.createElement('button');
+      upBtn.type = 'button';
+      upBtn.textContent = '↑';
+      upBtn.disabled = index === 0;
+      upBtn.style.cssText = "background: #cbd5e1; color: #0f172a; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 10px;";
+      upBtn.onclick = () => moveFileUp(index);
+      btnGroup.appendChild(upBtn);
+
+      const downBtn = document.createElement('button');
+      downBtn.type = 'button';
+      downBtn.textContent = '↓';
+      downBtn.disabled = index === selectedFiles.length - 1;
+      downBtn.style.cssText = "background: #cbd5e1; color: #0f172a; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 10px;";
+      downBtn.onclick = () => moveFileDown(index);
+      btnGroup.appendChild(downBtn);
+
+      const removeBtn = document.createElement('button');
+      removeBtn.type = 'button';
+      removeBtn.textContent = '×';
+      removeBtn.style.cssText = "background: #fee2e2; color: #991b1b; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 10px;";
+      removeBtn.onclick = () => removeSelectedFile(index);
+      btnGroup.appendChild(removeBtn);
+
+      row.appendChild(btnGroup);
     }
-    html += `</div>`;
+
+    wrapper.appendChild(row);
   });
-  html += `</div>`;
-  listContainer.innerHTML = html;
+
+  listContainer.appendChild(wrapper);
 }
 
 function removeSelectedFile(index) {
@@ -1226,7 +1276,7 @@ async function executeToolAction() {
       if (qualityOption === 'low') scale = 1.0;
 
       for (let i = 1; i <= totalPages; i++) {
-        setProgress(20 + (i / totalPages) * 70, `Converting page ${i} of totalPages`);
+        setProgress(20 + (i / totalPages) * 70, `Converting page ${i} of ${totalPages}`);
         const page = await pdf.getPage(i);
         const viewport = page.getViewport({ scale: scale });
         const canvas = document.createElement('canvas');
@@ -1241,86 +1291,4 @@ async function executeToolAction() {
       }
       showSuccessPopup('PDF converted to Images Successfully!');
       
-    } else {
-      if (selectedFiles.length > 0) {
-        const file = selectedFiles[0];
-        downloadBlob(file, `Processed_${file.name}`, file.type || 'application/pdf');
-        showSuccessPopup('Document Processed & Downloaded Successfully!');
-      } else {
-        const jsPdfLib = await ensureJsPdfLoaded();
-        const { jsPDF } = jsPdfLib || window.jspdf;
-        const pdf = new jsPDF();
-        pdf.setFontSize(14);
-        pdf.text(`Processed Document`, 15, 20);
-        downloadBlob(pdf.output('blob'), `Processed_${activeTool}.pdf`, 'application/pdf');
-        showSuccessPopup('Document Processed Successfully!');
-      }
-    }
-
-    closeWorkspace();
-  } catch (err) {
-    console.error(err);
-    alert('An error occurred: ' + err.message);
-  } finally {
-    setProgress(100, 'Done');
-    if (btn) { btn.innerText = originalText; btn.disabled = false; }
-    setTimeout(() => resetProgress(), 180);
-  }
-}
-
-function showSuccessPopup(msg) {
-  if (window.Swal) {
-    Swal.fire({ icon: 'success', title: 'Downloaded!', text: msg, timer: 2000, showConfirmButton: false });
-  } else {
-    alert(msg);
-  }
-}
-
-function parseRange(str, total) {
-  const indices = new Set();
-  if (!str) {
-    for (let i = 0; i < total; i++) indices.add(i);
-    return Array.from(indices);
-  }
-  str.split(',').forEach(p => {
-    const trimmed = p.trim();
-    if (trimmed.includes('-')) {
-      const [s, e] = trimmed.split('-').map(Number);
-      for (let i = s; i <= e; i++) if (i >= 1 && i <= total) indices.add(i - 1);
-    } else {
-      const n = Number(trimmed);
-      if (!isNaN(n) && n >= 1 && n <= total) indices.add(n - 1);
-    }
-  });
-  return Array.from(indices).sort((a, b) => a - b);
-}
-
-function readFileAsDataURL(file) {
-  return new Promise((res, rej) => {
-    const r = new FileReader();
-    r.onload = () => res(r.result);
-    r.onerror = rej;
-    r.readAsDataURL(file);
-  });
-}
-
-function downloadBlob(content, name, type, isBlob) {
-  let blob = isBlob ? content : (content instanceof Blob ? content : new Blob([content], { type }));
-  
-  const reader = new FileReader();
-  reader.onload = function(e) {
-    const a = document.createElement('a');
-    a.style.display = 'none';
-    a.href = e.target.result;
-    a.download = name;
-    document.body.appendChild(a);
-    
-    setTimeout(() => {
-      a.click();
-      setTimeout(() => {
-        document.body.removeChild(a);
-      }, 500);
-    }, 50);
-  };
-  reader.readAsDataURL(blob);
-}
+<
