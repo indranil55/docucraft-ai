@@ -264,6 +264,7 @@ function launchTool(toolKey) {
   } else if (toolKey === 'merge') {
     if (title) title.innerText = 'Merge PDF';
     if (desc) desc.innerText = 'Select multiple PDF files to combine. You can reorder them below.';
+    if (fileInput) { fileInput.accept = 'application/pdf'; fileInput.setAttribute('multiple', 'true'); }
     if (dropText) dropText.innerText = 'Tap to select PDF files';
     if (customUI) {
       customUI.innerHTML = `
@@ -275,6 +276,7 @@ function launchTool(toolKey) {
   } else if (toolKey === 'split') {
     if (title) title.innerText = 'Split PDF';
     if (desc) desc.innerText = 'Extract specific pages or page ranges from a PDF.';
+    if (fileInput) { fileInput.accept = 'application/pdf'; fileInput.removeAttribute('multiple'); }
     if (dropText) dropText.innerText = 'Tap to select a PDF';
     if (customUI) {
       customUI.innerHTML = `
@@ -286,6 +288,7 @@ function launchTool(toolKey) {
   } else if (toolKey === 'compress') {
     if (title) title.innerText = 'Compress PDF to Target Size';
     if (desc) desc.innerText = 'Reduce PDF file size to your exact desired KB or MB.';
+    if (fileInput) { fileInput.accept = 'application/pdf'; fileInput.removeAttribute('multiple'); }
     if (dropText) dropText.innerText = 'Tap to select PDF to compress';
     if (customUI) {
       customUI.innerHTML = `
@@ -307,6 +310,7 @@ function launchTool(toolKey) {
   } else if (toolKey === 'organize') {
     if (title) title.innerText = 'Organize / Reorder Pages';
     if (desc) desc.innerText = 'Rearrange, reverse, or reorder the page sequence.';
+    if (fileInput) { fileInput.accept = 'application/pdf'; fileInput.removeAttribute('multiple'); }
     if (dropText) dropText.innerText = 'Tap to select a PDF';
     if (customUI) {
       customUI.innerHTML = `
@@ -318,6 +322,7 @@ function launchTool(toolKey) {
   } else if (toolKey === 'rotate') {
     if (title) title.innerText = 'Rotate PDF';
     if (desc) desc.innerText = 'Rotate pages 90, 180, or 270 degrees.';
+    if (fileInput) { fileInput.accept = 'application/pdf'; fileInput.removeAttribute('multiple'); }
     if (dropText) dropText.innerText = 'Tap to select a PDF';
     if (customUI) {
       customUI.innerHTML = `
@@ -333,6 +338,7 @@ function launchTool(toolKey) {
   } else if (toolKey === 'removePages') {
     if (title) title.innerText = 'Delete PDF Pages';
     if (desc) desc.innerText = 'Remove unwanted or blank pages from PDF.';
+    if (fileInput) { fileInput.accept = 'application/pdf'; fileInput.removeAttribute('multiple'); }
     if (dropText) dropText.innerText = 'Tap to select a PDF';
     if (customUI) {
       customUI.innerHTML = `
@@ -344,6 +350,7 @@ function launchTool(toolKey) {
   } else if (toolKey === 'jpgToPdf') {
     if (title) title.innerText = 'Image to PDF (JPG/PNG to PDF)';
     if (desc) desc.innerText = 'Convert your image files into a clean, standard PDF document with perfect centering.';
+    if (fileInput) { fileInput.accept = 'image/*'; fileInput.setAttribute('multiple', 'true'); }
     if (dropText) dropText.innerText = 'Tap to select image file(s)';
     if (customUI) {
       customUI.innerHTML = `
@@ -377,6 +384,7 @@ function launchTool(toolKey) {
     const names = { pdfToJpg: 'PDF to Image', pdfToWord: 'PDF to Word', pdfToExcel: 'PDF to Excel' };
     if (title) title.innerText = names[toolKey] || 'Convert PDF';
     if (desc) desc.innerText = 'Convert your PDF file into an editable format with quality options.';
+    if (fileInput) { fileInput.accept = 'application/pdf'; fileInput.removeAttribute('multiple'); }
     if (dropText) dropText.innerText = 'Tap to select PDF file';
     if (customUI) {
       customUI.innerHTML = `
@@ -457,6 +465,7 @@ function launchTool(toolKey) {
   } else if (toolKey === 'watermark') {
     if (title) title.innerText = 'Watermark PDF';
     if (desc) desc.innerText = 'Stamp text watermark across all pages.';
+    if (fileInput) { fileInput.accept = 'application/pdf'; fileInput.removeAttribute('multiple'); }
     if (dropText) dropText.innerText = 'Tap to select PDF';
     if (customUI) {
       customUI.innerHTML = `
@@ -468,6 +477,7 @@ function launchTool(toolKey) {
   } else if (toolKey === 'protect') {
     if (title) title.innerText = 'Protect / Lock PDF';
     if (desc) desc.innerText = 'Encrypt your PDF with a secret password.';
+    if (fileInput) { fileInput.accept = 'application/pdf'; fileInput.removeAttribute('multiple'); }
     if (dropText) dropText.innerText = 'Tap to select PDF';
     if (customUI) {
       customUI.innerHTML = `
@@ -590,9 +600,10 @@ function closeWorkspace() {
   if (overlay) overlay.style.display = 'none';
 }
 
-// ব্যাকগ্রাউন্ডে ক্লিক বা টাচ করলে পপআপ যেন বন্ধ না হয়, তার জন্য ইভেন্ট প্রপাগেশন স্টপ করা হলো
+// ব্যাকগ্রাউন্ডে টাচ বা ক্লিক করলে পপআপ যেন বন্ধ না হয় (Stop Propagation & Prevent Default)
 function handleBackdropClick(e) {
   e.stopPropagation();
+  e.preventDefault();
   return false;
 }
 
@@ -612,8 +623,8 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
   }
-  
-  // ওভারলে ব্যাকগ্রাউন্ডে ক্লিক করলে যেন ক্লোজ না হয় তার সেফটি লজিক
+
+  // ওভারলে ব্যাকগ্রাউন্ডে টাচ ইভেন্ট লক করার জন্য অতিরিক্ত সেফটি লজিক
   const overlay = document.getElementById('workspaceOverlay');
   if (overlay) {
     overlay.addEventListener('click', function(e) {
