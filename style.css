@@ -35,6 +35,7 @@ body.modal-open {
   position: fixed !important;
   width: 100% !important;
   height: 100% !important;
+  touch-action: none;
 }
 
 header {
@@ -336,11 +337,11 @@ header {
   gap: 10px;
 }
 
-/* ব্যাকগ্রাউন্ড হেভি ব্লার এবং ডার্ক ওভারলে ফিক্স (ফাঁকা জায়গায় ক্লিক বা স্ক্রল করলে পপআপ যাতে না কাটে) */
+/* ব্যাকগ্রাউন্ড ওভারলে লেআউট ফিক্স (পেছনের সাইট যাতে নিচে থেকে ভেসে না ওঠে) */
 .workspace-overlay {
   position: fixed !important;
   inset: 0 !important;
-  background: rgba(15, 23, 42, 0.95);
+  background: #0f172a !important;
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   z-index: 99999 !important;
@@ -348,8 +349,9 @@ header {
   align-items: flex-end;
   justify-content: center;
   padding: 0;
-  overflow-y: auto;
+  overflow: hidden !important;
   pointer-events: auto !important;
+  overscroll-behavior: none;
 }
 
 .workspace-box {
@@ -359,12 +361,15 @@ header {
   max-width: 580px;
   border-radius: 26px 26px 0 0;
   padding: 24px 20px 40px;
-  box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.9);
   max-height: 90vh;
   max-height: 90dvh;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
+  position: relative;
+  z-index: 100000;
   pointer-events: auto !important;
+  overscroll-behavior: contain;
 }
 
 .workspace-header {
@@ -517,6 +522,7 @@ header {
   display: none;
   align-items: flex-end;
   justify-content: center;
+  overscroll-behavior: none;
 }
 
 .ai-chat-card {
