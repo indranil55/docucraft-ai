@@ -336,11 +336,11 @@ header {
   gap: 10px;
 }
 
-/* ব্যাকগ্রাউন্ড হেভি ব্লার এবং ডার্ক ওভারলে ফিক্স (সম্পূর্ণ স্থির রাখার জন্য position fixed সহ) */
+/* ব্যাকগ্রাউন্ড হেভি ব্লার এবং ডার্ক ওভারলে ফিক্স (ফাঁকা জায়গায় ক্লিক রোধ করতে pointer-events যোগ করা হলো) */
 .workspace-overlay {
   position: fixed !important;
   inset: 0;
-  background: rgba(15, 23, 42, 0.85);
+  background: rgba(15, 23, 42, 0.95);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   z-index: 99999 !important;
@@ -349,6 +349,7 @@ header {
   justify-content: center;
   padding: 0;
   overflow-y: auto;
+  pointer-events: auto !important;
 }
 
 .workspace-box {
@@ -363,6 +364,7 @@ header {
   max-height: 90dvh;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
+  pointer-events: auto !important;
 }
 
 .workspace-header {
@@ -400,7 +402,7 @@ header {
   color: var(--primary);
 }
 
-/* ড্র্যাগ অ্যান্ড ড্রপ গ্রিন চেকমার্ক অ্যানিমেশন ও স্টાઇલ */
+/* ড্র্যাগ অ্যান্ড ড্রপ গ্রিন চেকমার্ক অ্যানিমেশন ও স্টাইল */
 .dropzone {
   border: 2px dashed rgba(255, 255, 255, 0.2);
   border-radius: 16px;
