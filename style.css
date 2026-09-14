@@ -735,3 +735,14 @@ footer {
   .tools-grid { grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 22px; }
   .nav-container { height: 72px; }
 }
+
+/* ==========================================================
+   ADDED FIX: Prevent Long-press text selection & bottom popup overlay
+   ========================================================== */
+.workspace-box, 
+.dropzone, 
+.dropzone * {
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+}
