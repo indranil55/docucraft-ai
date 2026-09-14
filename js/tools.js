@@ -590,8 +590,9 @@ function closeWorkspace() {
   if (overlay) overlay.style.display = 'none';
 }
 
+// ব্যাকগ্রাউন্ডে ক্লিক করলে পপআপ যেন বন্ধ না হয়, তার জন্য এটি খালি করে দেওয়া হলো
 function handleBackdropClick(e) {
-  if (e.target.id === 'workspaceOverlay') closeWorkspace();
+  return;
 }
 
 document.addEventListener('DOMContentLoaded', () => {
