@@ -590,9 +590,10 @@ function closeWorkspace() {
   if (overlay) overlay.style.display = 'none';
 }
 
-// ব্যাকগ্রাউন্ডে ক্লিক করলে পপআপ যেন বন্ধ না হয়, তার জন্য এটি খালি করে দেওয়া হলো
+// ব্যাকগ্রাউন্ডে ক্লিক বা টাচ করলে পপআপ যেন বন্ধ না হয়, তার জন্য ইভেন্ট প্রপাগেশন স্টপ করা হলো
 function handleBackdropClick(e) {
-  return;
+  e.stopPropagation();
+  return false;
 }
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -608,6 +609,17 @@ document.addEventListener('DOMContentLoaded', () => {
           selectedFiles = Array.from(e.target.files);
         }
         renderFileList();
+      }
+    });
+  }
+  
+  // ওভারলে ব্যাকগ্রাউন্ডে ক্লিক করলে যেন ক্লোজ না হয় তার সেফটি লজিক
+  const overlay = document.getElementById('workspaceOverlay');
+  if (overlay) {
+    overlay.addEventListener('click', function(e) {
+      if (e.target === overlay) {
+        e.stopPropagation();
+        e.preventDefault();
       }
     });
   }
