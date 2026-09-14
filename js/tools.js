@@ -97,14 +97,33 @@ function launchTool(toolKey) {
   if (fileList) fileList.innerHTML = '';
   if (customUI) customUI.innerHTML = '';
   resetProgress();
+  
   if (fileInput) {
     fileInput.value = '';
-    if (toolKey === 'merge' || toolKey === 'jpgToPdf' || toolKey === 'wordToPdf' || toolKey === 'excelToPdf') {
+    // Strict file type restriction per tool
+    if (toolKey === 'merge' || toolKey === 'split' || toolKey === 'compress' || toolKey === 'organize' || toolKey === 'rotate' || toolKey === 'removePages' || toolKey === 'watermark' || toolKey === 'protect' || toolKey === 'pdfToJpg' || toolKey === 'pdfToWord' || toolKey === 'pdfToExcel') {
+      fileInput.accept = 'application/pdf';
+    } else if (toolKey === 'jpgToPdf' || toolKey === 'kbResizer' || toolKey === 'examResizer' || toolKey === 'ocr' || toolKey === 'passportGrid') {
+      fileInput.accept = 'image/*';
+    } else if (toolKey === 'wordToPdf') {
+      fileInput.accept = '.doc,.docx,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document';
+    } else if (toolKey === 'excelToPdf') {
+      fileInput.accept = '.xls,.xlsx,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
+    } else if (toolKey === 'pptToPdf') {
+      fileInput.accept = '.ppt,.pptx,application/vnd.ms-powerpoint,application/vnd.openxmlformats-officedocument.presentationml.presentation';
+    } else if (toolKey === 'htmlToPdf') {
+      fileInput.accept = '.html,.htm,text/html';
+    } else {
+      fileInput.accept = '*/*';
+    }
+
+    if (['merge', 'jpgToPdf', 'wordToPdf', 'excelToPdf', 'pptToPdf', 'htmlToPdf'].includes(toolKey)) {
       fileInput.setAttribute('multiple', 'true');
     } else {
       fileInput.removeAttribute('multiple');
     }
   }
+
   if (dropzone) dropzone.style.display = 'block';
   if (overlay) overlay.style.display = 'flex';
 
@@ -137,7 +156,6 @@ function launchTool(toolKey) {
   } else if (toolKey === 'kbResizer') {
     if (title) title.innerText = 'Photo & Sign KB / MB Resizer';
     if (desc) desc.innerText = 'Compress image precisely to exact target KB or MB (up to 500 MB).';
-    if (fileInput) { fileInput.accept = 'image/*'; fileInput.removeAttribute('multiple'); }
     if (dropText) dropText.innerText = 'Tap to select photo/signature';
     if (customUI) {
       customUI.innerHTML = `
@@ -170,7 +188,6 @@ function launchTool(toolKey) {
   } else if (toolKey === 'examResizer') {
     if (title) title.innerText = 'Exam Photo & Signature Resizer';
     if (desc) desc.innerText = 'Resize photo and signature to exact size required for government exam forms (SSC, UPSC, NEET, etc.).';
-    if (fileInput) { fileInput.accept = 'image/*'; fileInput.removeAttribute('multiple'); }
     if (dropText) dropText.innerText = 'Tap to select photo or signature';
     if (customUI) {
       customUI.innerHTML = `
@@ -189,7 +206,6 @@ function launchTool(toolKey) {
   } else if (toolKey === 'ocr') {
     if (title) title.innerText = 'OCR - Image to Text';
     if (desc) desc.innerText = 'Extract text from any image (JPG, PNG) in Bengali, Hindi, or English.';
-    if (fileInput) { fileInput.accept = 'image/*'; fileInput.removeAttribute('multiple'); }
     if (dropText) dropText.innerText = 'Tap to select an image';
     if (customUI) {
       customUI.innerHTML = `
@@ -209,7 +225,6 @@ function launchTool(toolKey) {
   } else if (toolKey === 'passportGrid') {
     if (title) title.innerText = 'Smart Passport Photo Studio';
     if (desc) desc.innerText = 'Upload any photo: clean background selection (White/Blue), perfect body & print-ready grid.';
-    if (fileInput) { fileInput.accept = 'image/*'; fileInput.removeAttribute('multiple'); }
     if (dropText) dropText.innerText = 'Tap to select photo';
     if (customUI) {
       customUI.innerHTML = `
@@ -249,7 +264,6 @@ function launchTool(toolKey) {
   } else if (toolKey === 'merge') {
     if (title) title.innerText = 'Merge PDF';
     if (desc) desc.innerText = 'Select multiple PDF files to combine. You can reorder them below.';
-    if (fileInput) { fileInput.accept = 'application/pdf'; fileInput.setAttribute('multiple', 'true'); }
     if (dropText) dropText.innerText = 'Tap to select PDF files';
     if (customUI) {
       customUI.innerHTML = `
@@ -261,7 +275,6 @@ function launchTool(toolKey) {
   } else if (toolKey === 'split') {
     if (title) title.innerText = 'Split PDF';
     if (desc) desc.innerText = 'Extract specific pages or page ranges from a PDF.';
-    if (fileInput) { fileInput.accept = 'application/pdf'; fileInput.removeAttribute('multiple'); }
     if (dropText) dropText.innerText = 'Tap to select a PDF';
     if (customUI) {
       customUI.innerHTML = `
@@ -273,7 +286,6 @@ function launchTool(toolKey) {
   } else if (toolKey === 'compress') {
     if (title) title.innerText = 'Compress PDF to Target Size';
     if (desc) desc.innerText = 'Reduce PDF file size to your exact desired KB or MB.';
-    if (fileInput) { fileInput.accept = 'application/pdf'; fileInput.removeAttribute('multiple'); }
     if (dropText) dropText.innerText = 'Tap to select PDF to compress';
     if (customUI) {
       customUI.innerHTML = `
@@ -295,7 +307,6 @@ function launchTool(toolKey) {
   } else if (toolKey === 'organize') {
     if (title) title.innerText = 'Organize / Reorder Pages';
     if (desc) desc.innerText = 'Rearrange, reverse, or reorder the page sequence.';
-    if (fileInput) { fileInput.accept = 'application/pdf'; fileInput.removeAttribute('multiple'); }
     if (dropText) dropText.innerText = 'Tap to select a PDF';
     if (customUI) {
       customUI.innerHTML = `
@@ -307,7 +318,6 @@ function launchTool(toolKey) {
   } else if (toolKey === 'rotate') {
     if (title) title.innerText = 'Rotate PDF';
     if (desc) desc.innerText = 'Rotate pages 90, 180, or 270 degrees.';
-    if (fileInput) { fileInput.accept = 'application/pdf'; fileInput.removeAttribute('multiple'); }
     if (dropText) dropText.innerText = 'Tap to select a PDF';
     if (customUI) {
       customUI.innerHTML = `
@@ -323,7 +333,6 @@ function launchTool(toolKey) {
   } else if (toolKey === 'removePages') {
     if (title) title.innerText = 'Delete PDF Pages';
     if (desc) desc.innerText = 'Remove unwanted or blank pages from PDF.';
-    if (fileInput) { fileInput.accept = 'application/pdf'; fileInput.removeAttribute('multiple'); }
     if (dropText) dropText.innerText = 'Tap to select a PDF';
     if (customUI) {
       customUI.innerHTML = `
@@ -335,7 +344,6 @@ function launchTool(toolKey) {
   } else if (toolKey === 'jpgToPdf') {
     if (title) title.innerText = 'Image to PDF (JPG/PNG to PDF)';
     if (desc) desc.innerText = 'Convert your image files into a clean, standard PDF document with perfect centering.';
-    if (fileInput) { fileInput.accept = 'image/*'; fileInput.setAttribute('multiple', 'true'); }
     if (dropText) dropText.innerText = 'Tap to select image file(s)';
     if (customUI) {
       customUI.innerHTML = `
@@ -369,7 +377,6 @@ function launchTool(toolKey) {
     const names = { pdfToJpg: 'PDF to Image', pdfToWord: 'PDF to Word', pdfToExcel: 'PDF to Excel' };
     if (title) title.innerText = names[toolKey] || 'Convert PDF';
     if (desc) desc.innerText = 'Convert your PDF file into an editable format with quality options.';
-    if (fileInput) { fileInput.accept = 'application/pdf'; fileInput.removeAttribute('multiple'); }
     if (dropText) dropText.innerText = 'Tap to select PDF file';
     if (customUI) {
       customUI.innerHTML = `
@@ -400,7 +407,6 @@ function launchTool(toolKey) {
     const names = { wordToPdf: 'Word to PDF', excelToPdf: 'Excel to PDF', pptToPdf: 'PowerPoint to PDF', htmlToPdf: 'HTML to PDF' };
     if (title) title.innerText = names[toolKey] || 'Convert to PDF';
     if (desc) desc.innerText = 'Convert your files into a clean standard PDF document.';
-    if (fileInput) { fileInput.accept = toolKey === 'htmlToPdf' ? 'text/html' : '*/*'; fileInput.setAttribute('multiple', 'true'); }
     if (dropText) dropText.innerText = 'Tap to select file(s)';
     if (customUI) {
       customUI.innerHTML = `
@@ -451,7 +457,6 @@ function launchTool(toolKey) {
   } else if (toolKey === 'watermark') {
     if (title) title.innerText = 'Watermark PDF';
     if (desc) desc.innerText = 'Stamp text watermark across all pages.';
-    if (fileInput) { fileInput.accept = 'application/pdf'; fileInput.removeAttribute('multiple'); }
     if (dropText) dropText.innerText = 'Tap to select PDF';
     if (customUI) {
       customUI.innerHTML = `
@@ -463,7 +468,6 @@ function launchTool(toolKey) {
   } else if (toolKey === 'protect') {
     if (title) title.innerText = 'Protect / Lock PDF';
     if (desc) desc.innerText = 'Encrypt your PDF with a secret password.';
-    if (fileInput) { fileInput.accept = 'application/pdf'; fileInput.removeAttribute('multiple'); }
     if (dropText) dropText.innerText = 'Tap to select PDF';
     if (customUI) {
       customUI.innerHTML = `
@@ -639,7 +643,7 @@ function renderFileList() {
     html += `<div style="display: flex; justify-content: space-between; align-items: center; padding: 6px 0; border-bottom: 1px solid #e2e8f0; font-size: 12px;">
       <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 170px; color: #334155;" title="${safeFileName}">${index + 1}. ${safeFileName} (${fileSize})</span>`;
 
-    if (activeTool === 'merge' || activeTool === 'jpgToPdf') {
+    if (activeTool === 'merge' || activeTool === 'jpgToPdf' || activeTool === 'wordToPdf' || activeTool === 'excelToPdf') {
       html += `<div style="display: flex; gap: 4px;">
         <button type="button" onclick="moveFileUp(${index})" style="background: #cbd5e1; color: #0f172a; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 10px;" ${index === 0 ? 'disabled' : ''}>↑</button>
         <button type="button" onclick="moveFileDown(${index})" style="background: #cbd5e1; color: #0f172a; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 10px;" ${index === selectedFiles.length - 1 ? 'disabled' : ''}>↓</button>
