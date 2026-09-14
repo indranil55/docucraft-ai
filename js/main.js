@@ -57,7 +57,10 @@ function initDropzoneHandlers() {
       const files = dt.files;
       if (files.length > 0) {
         if (fileInput.hasAttribute('multiple')) {
-          selectedFiles = [...selectedFiles, ...Array.from(files)];
+          // FIX: Prevent duplicate or accidental accumulation of files on drop
+          const newFiles = Array.from(files);
+          const uniqueFiles = newFiles.filter(nf => !selectedFiles.some(sf => sf.name === nf.name && sf.size === nf.size));
+          selectedFiles = [...selectedFiles, ...uniqueFiles];
         } else {
           selectedFiles = Array.from(files);
         }
@@ -70,7 +73,10 @@ function initDropzoneHandlers() {
       if (!checkUserAccess(typeof activeTool !== 'undefined' ? activeTool : '')) return;
       if (e.target.files.length > 0) {
         if (fileInput.hasAttribute('multiple')) {
-          selectedFiles = [...selectedFiles, ...Array.from(e.target.files)];
+          // FIX: Prevent duplicate file addition on file input change
+          const newFiles = Array.from(e.target.files);
+          const uniqueFiles = newFiles.filter(nf => !selectedFiles.some(sf => sf.name === nf.name && sf.size === nf.size));
+          selectedFiles = [...selectedFiles, ...uniqueFiles];
         } else {
           selectedFiles = Array.from(e.target.files);
         }
