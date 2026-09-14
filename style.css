@@ -336,14 +336,14 @@ header {
   gap: 10px;
 }
 
-/* ব্যাকগ্রাউন্ড হেভি ব্লার এবং ডার্ক ওভারলে ফিক্স */
+/* ব্যাকগ্রাউন্ড হেভি ব্লার এবং ডার্ক ওভারলে ফিক্স (সম্পূর্ণ স্থির রাখার জন্য position fixed সহ) */
 .workspace-overlay {
-  position: fixed;
+  position: fixed !important;
   inset: 0;
   background: rgba(15, 23, 42, 0.85);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  z-index: 5000;
+  z-index: 99999 !important;
   display: none;
   align-items: flex-end;
   justify-content: center;
@@ -400,7 +400,7 @@ header {
   color: var(--primary);
 }
 
-/* ড্র্যাগ অ্যান্ড ড্রপ গ্রিন চেকমার্ক অ্যানিমেশন ও স্টাইল */
+/* ড্র্যাগ অ্যান্ড ড্রপ গ্রিন চেকমার্ক অ্যানিমেশন ও স্টایل */
 .dropzone {
   border: 2px dashed rgba(255, 255, 255, 0.2);
   border-radius: 16px;
@@ -506,12 +506,12 @@ header {
 }
 
 #smartAiChatModal {
-  position: fixed;
+  position: fixed !important;
   inset: 0;
   background: rgba(15, 23, 42, 0.85);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  z-index: 9999 !important;
+  z-index: 99999 !important;
   display: none;
   align-items: flex-end;
   justify-content: center;
