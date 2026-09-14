@@ -336,10 +336,10 @@ header {
   gap: 10px;
 }
 
-/* ব্যাকগ্রাউন্ড হেভি ব্লার এবং ডার্ক ওভারলে ফিক্স (ফাঁকা জায়গায় ক্লিক রোধ করতে pointer-events যোগ করা হলো) */
+/* ব্যাকগ্রাউন্ড হেভি ব্লার এবং ডার্ক ওভারলে ফিক্স (ফাঁকা জায়গায় ক্লিক বা স্ক্রল করলে পপআপ যাতে না কাটে) */
 .workspace-overlay {
   position: fixed !important;
-  inset: 0;
+  inset: 0 !important;
   background: rgba(15, 23, 42, 0.95);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
