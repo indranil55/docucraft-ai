@@ -124,7 +124,9 @@ const originalLaunchTool = window.launchTool;
 
 function handleBackdropClick(event) {
   if (event.target.id === 'workspaceOverlay') {
-    if (typeof closeWorkspace === 'function') closeWorkspace();
+    event.stopPropagation();
+    event.preventDefault();
+    return false;
   }
 }
 
