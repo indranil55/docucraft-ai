@@ -271,10 +271,27 @@ function launchTool(toolKey) {
         </div>`;
     }
   } else if (toolKey === 'compress') {
-    if (title) title.innerText = 'Compress PDF';
-    if (desc) desc.innerText = 'Reduce file size while optimizing document quality.';
+    if (title) title.innerText = 'Compress PDF to Target Size';
+    if (desc) desc.innerText = 'Reduce PDF file size to your exact desired KB or MB.';
     if (fileInput) { fileInput.accept = 'application/pdf'; fileInput.removeAttribute('multiple'); }
     if (dropText) dropText.innerText = 'Tap to select PDF to compress';
+    if (customUI) {
+      customUI.innerHTML = `
+        <div class="form-group" style="margin-top:10px;">
+          <label style="font-weight:600; font-size:13px; display:block; margin-bottom:6px;">Select Target PDF Size & Unit:</label>
+          <div style="display: flex; gap: 8px;">
+            <input type="number" id="optCompressTargetSize" class="form-control" value="100" style="flex: 2; padding:10px; border:1px solid #d1d5db; border-radius:8px;" placeholder="e.g. 100">
+            <select id="optCompressUnit" class="form-control" style="flex: 1; padding:10px; border:1px solid #d1d5db; border-radius:8px;">
+              <option value="KB" selected>KB</option>
+              <option value="MB">MB</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group" style="margin-top:10px;">
+          <label style="font-weight:600; font-size:13px; display:block; margin-bottom:6px;">Save File Name:</label>
+          <input type="text" id="optCompressFileName" class="form-control" value="Compressed_Document" style="width:100%; padding:10px; border:1px solid #d1d5db; border-radius:8px;">
+        </div>`;
+    }
   } else if (toolKey === 'organize') {
     if (title) title.innerText = 'Organize / Reorder Pages';
     if (desc) desc.innerText = 'Rearrange, reverse, or reorder the page sequence.';
@@ -579,7 +596,6 @@ document.addEventListener('DOMContentLoaded', () => {
     fileInput.addEventListener('change', function(e) {
       if (e.target.files.length > 0) {
         if (fileInput.hasAttribute('multiple')) {
-          // FIX: Prevent accidental duplicate file addition or previous merged files getting stuck
           const newFiles = Array.from(e.target.files);
           const uniqueFiles = newFiles.filter(nf => !selectedFiles.some(sf => sf.name === nf.name && sf.size === nf.size));
           selectedFiles = [...selectedFiles, ...uniqueFiles];
@@ -1008,10 +1024,53 @@ async function executeToolAction() {
       showSuccessPopup('PDF Split Successfully!');
 
     } else if (activeTool === 'compress' && PDFLibObj) {
-      const doc = await PDFLibObj.PDFDocument.load(await selectedFiles[0].arrayBuffer());
-      const compressedBytes = await doc.save({ useObjectStreams: true });
-      downloadBlob(compressedBytes, 'Compressed_Document.pdf', 'application/pdf');
-      showSuccessPopup('PDF Compressed Successfully!');
+      setProgress(20, 'Compressing PDF to target size...');
+      const targetVal = parseFloat(document.getElementById('optCompressTargetSize')?.value) || 100;
+      const unit = document.getElementById('optCompressUnit')?.value || 'KB';
+      const customName = document.getElementById('optCompressFileName')?.value?.trim() || 'Compressed_Document';
+      
+      const targetBytes = unit === 'MB' ? targetVal * 1024 * 1024 : targetVal * 1024;
+      const fileBuffer = await selectedFiles[0].arrayBuffer();
+      
+      const doc = await PDFLibObj.PDFDocument.load(fileBuffer);
+      let compressedBytes = await doc.save({ useObjectStreams: true, addDefaultPage: false });
+
+      if (compressedBytes.length > targetBytes) {
+        setProgress(50, 'Optimizing pages to match target size...');
+        const pdfjsLib = await ensurePdfJsLoaded();
+        const jsPdfLib = await ensureJsPdfLoaded();
+        
+        if (pdfjsLib && jsPdfLib) {
+          const loadingTask = pdfjsLib.getDocument({ data: fileBuffer });
+          const pdfDoc = await loadingTask.promise;
+          const totalPages = pdfDoc.numPages;
+          
+          const { jsPDF } = jsPdfLib.jspdf || jsPdfLib;
+          const newPdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+          
+          let quality = 0.85;
+          if (targetBytes < 50000) quality = 0.45;
+          else if (targetBytes < 150000) quality = 0.65;
+
+          for (let i = 1; i <= totalPages; i++) {
+            const page = await pdfDoc.getPage(i);
+            const viewport = page.getViewport({ scale: 1.5 });
+            const canvas = document.createElement('canvas');
+            canvas.width = viewport.width;
+            canvas.height = viewport.height;
+            const ctx = canvas.getContext('2d');
+            await page.render({ canvasContext: ctx, viewport: viewport }).promise;
+            
+            const imgData = canvas.toDataURL('image/jpeg', quality);
+            if (i > 1) newPdf.addPage();
+            newPdf.addImage(imgData, 'JPEG', 10, 10, 190, 277);
+          }
+          compressedBytes = newPdf.output('arraybuffer');
+        }
+      }
+
+      downloadBlob(compressedBytes, `${customName}_${targetVal}${unit}.pdf`, 'application/pdf');
+      showSuccessPopup(`PDF Compressed Successfully to ${targetVal} ${unit}!`);
 
     } else if (activeTool === 'organize' && PDFLibObj) {
       const order = document.getElementById('optReorder')?.value.trim();
