@@ -129,11 +129,34 @@ function launchTool(toolKey) {
 
   if (toolKey === 'sigPad') {
     if (title) title.innerText = 'Digital Signature Maker';
-    if (desc) desc.innerText = 'Draw your signature in the box below and download.';
+    if (desc) desc.innerText = 'Draw your signature, select color, format and download.';
     if (dropzone) dropzone.style.display = 'none';
     if (customUI) {
       customUI.innerHTML = `
         <div class="form-group">
+          <label style="font-weight:600; font-size:13px; display:block; margin-bottom:6px;">Select Pen Color:</label>
+          <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+            <button type="button" onclick="setSigColor('#000000', this)" class="sig-color-btn active" style="background:#000000; width:30px; height:30px; border-radius:50%; border:2px solid #2563eb; cursor:pointer;" title="Black"></button>
+            <button type="button" onclick="setSigColor('#1d4ed8', this)" class="sig-color-btn" style="background:#1d4ed8; width:30px; height:30px; border-radius:50%; border:2px solid transparent; cursor:pointer;" title="Blue"></button>
+            <button type="button" onclick="setSigColor('#dc2626', this)" class="sig-color-btn" style="background:#dc2626; width:30px; height:30px; border-radius:50%; border:2px solid transparent; cursor:pointer;" title="Red"></button>
+          </div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
+            <div>
+              <label style="font-weight:600; font-size:12px; display:block; margin-bottom:4px;">Download Format:</label>
+              <select id="sigFormat" class="form-control" style="width:100%; padding:8px; border:1px solid #d1d5db; border-radius:8px;">
+                <option value="image/png" selected>PNG (Transparent/White)</option>
+                <option value="image/jpeg">JPG (White BG)</option>
+              </select>
+            </div>
+            <div>
+              <label style="font-weight:600; font-size:12px; display:block; margin-bottom:4px;">Image Quality / Size:</label>
+              <select id="sigQuality" class="form-control" style="width:100%; padding:8px; border:1px solid #d1d5db; border-radius:8px;">
+                <option value="high" selected>High Quality (Standard)</option>
+                <option value="medium">Medium (Compressed)</option>
+                <option value="low">Small Size (KB Saver)</option>
+              </select>
+            </div>
+          </div>
           <label style="font-weight:600; font-size:13px; display:block; margin-bottom:6px;">Draw Signature Below:</label>
           <div style="border: 2px solid #cbd5e1; border-radius: 8px; background: #ffffff; touch-action: none; position: relative;">
             <canvas id="sigCanvas" width="480" height="180" style="width: 100%; height: 180px; display: block; cursor: crosshair;"></canvas>
@@ -553,18 +576,37 @@ function updateResizerOptions() {
   }
 }
 
+let currentSigColor = '#000000';
+
+function setSigColor(color, btn) {
+  currentSigColor = color;
+  document.querySelectorAll('.sig-color-btn').forEach(b => {
+    b.style.borderColor = 'transparent';
+  });
+  if (btn) {
+    btn.style.borderColor = '#2563eb';
+  }
+  if (sigCanvasInstance) {
+    const ctx = sigCanvasInstance.getContext('2d');
+    ctx.strokeStyle = currentSigColor;
+  }
+}
+
 function initSignaturePad() {
   const canvas = document.getElementById('sigCanvas');
   if (!canvas) return;
   const ctx = canvas.getContext('2d');
   let drawing = false;
+  let lastX = 0;
+  let lastY = 0;
 
   ctx.fillStyle = '#ffffff';
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-  ctx.strokeStyle = '#000000';
-  ctx.lineWidth = 3;
+  ctx.strokeStyle = currentSigColor;
+  ctx.lineWidth = 3.5;
   ctx.lineCap = 'round';
+  ctx.lineJoin = 'round';
 
   function getPos(e) {
     const rect = canvas.getBoundingClientRect();
@@ -576,13 +618,47 @@ function initSignaturePad() {
     };
   }
 
-  canvas.onmousedown = (e) => { drawing = true; ctx.beginPath(); const p = getPos(e); ctx.moveTo(p.x, p.y); };
-  canvas.onmousemove = (e) => { if (!drawing) return; const p = getPos(e); ctx.lineTo(p.x, p.y); ctx.stroke(); };
+  canvas.onmousedown = (e) => { 
+    drawing = true; 
+    const p = getPos(e); 
+    lastX = p.x; 
+    lastY = p.y; 
+    ctx.beginPath();
+    ctx.moveTo(lastX, lastY);
+  };
+  
+  canvas.onmousemove = (e) => { 
+    if (!drawing) return; 
+    const p = getPos(e); 
+    ctx.lineTo(p.x, p.y); 
+    ctx.stroke(); 
+    lastX = p.x; 
+    lastY = p.y;
+  };
+  
   canvas.onmouseup = () => { drawing = false; };
   canvas.onmouseleave = () => { drawing = false; };
 
-  canvas.ontouchstart = (e) => { drawing = true; ctx.beginPath(); const p = getPos(e); ctx.moveTo(p.x, p.y); e.preventDefault(); };
-  canvas.ontouchmove = (e) => { if (!drawing) return; const p = getPos(e); ctx.lineTo(p.x, p.y); ctx.stroke(); e.preventDefault(); };
+  canvas.ontouchstart = (e) => { 
+    drawing = true; 
+    const p = getPos(e); 
+    lastX = p.x; 
+    lastY = p.y; 
+    ctx.beginPath();
+    ctx.moveTo(lastX, lastY); 
+    e.preventDefault(); 
+  };
+  
+  canvas.ontouchmove = (e) => { 
+    if (!drawing) return; 
+    const p = getPos(e); 
+    ctx.lineTo(p.x, p.y); 
+    ctx.stroke(); 
+    lastX = p.x; 
+    lastY = p.y;
+    e.preventDefault(); 
+  };
+  
   canvas.ontouchend = () => { drawing = false; };
 
   sigCanvasInstance = canvas;
@@ -600,7 +676,6 @@ function closeWorkspace() {
   if (overlay) overlay.style.display = 'none';
 }
 
-// ব্যাকগ্রাউন্ডে টাচ বা ক্লিক করলে পপআপ যেন বন্ধ না হয় (Stop Propagation & Prevent Default)
 function handleBackdropClick(e) {
   e.stopPropagation();
   e.preventDefault();
@@ -624,7 +699,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // ওভারলে ব্যাকগ্রাউন্ডে টাচ ইভেন্ট লক করার জন্য অতিরিক্ত সেফটি লজিক
   const overlay = document.getElementById('workspaceOverlay');
   if (overlay) {
     overlay.addEventListener('click', function(e) {
@@ -734,10 +808,20 @@ async function executeToolAction() {
 
   if (activeTool === 'sigPad') {
     if (!sigCanvasInstance) return;
+    const format = document.getElementById('sigFormat')?.value || 'image/png';
+    const qualityOpt = document.getElementById('sigQuality')?.value || 'high';
+    let qualityVal = 0.95;
+    if (qualityOpt === 'medium') qualityVal = 0.75;
+    if (qualityOpt === 'low') qualityVal = 0.40;
+
+    let ext = 'png';
+    if (format === 'image/jpeg') ext = 'jpg';
+
     sigCanvasInstance.toBlob((blob) => {
-      downloadBlob(blob, 'Digital_Signature.png', 'image/png');
+      downloadBlob(blob, `Digital_Signature.${ext}`, format);
       showSuccessPopup('Digital Signature Downloaded Successfully!');
-    }, 'image/png');
+      closeWorkspace();
+    }, format, qualityVal);
     return;
   }
 
