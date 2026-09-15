@@ -129,13 +129,51 @@ function launchTool(toolKey) {
 
   if (toolKey === 'sigPad') {
     if (title) title.innerText = 'Digital Signature Maker';
-    if (desc) desc.innerText = 'Draw your signature in the box below and download.';
+    if (desc) desc.innerText = 'Draw your signature, choose color, thickness & exact target size to download.';
     if (dropzone) dropzone.style.display = 'none';
     if (customUI) {
       customUI.innerHTML = `
         <div class="form-group">
-          <label style="font-weight:600; font-size:13px; display:block; margin-bottom:6px;">Draw Signature Below:</label>
-          <div style="border: 2px solid #cbd5e1; border-radius: 8px; background: #ffffff; touch-action: none; position: relative;">
+          <label style="font-weight:600; font-size:13px; display:block; margin-bottom:6px;">Signature Customization:</label>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px;">
+            <div>
+              <label style="font-size: 11px; color: #94a3b8; display: block; margin-bottom: 4px;">Pen Color:</label>
+              <select id="sigColor" class="form-control" style="padding: 6px; font-size: 12px;" onchange="updateSigStyle()">
+                <option value="#000000" selected>Classic Black</option>
+                <option value="#1e3a8a">Professional Blue</option>
+                <option value="#b91c1c">Dark Red</option>
+              </select>
+            </div>
+            <div>
+              <label style="font-size: 11px; color: #94a3b8; display: block; margin-bottom: 4px;">Pen Thickness:</label>
+              <select id="sigWidth" class="form-control" style="padding: 6px; font-size: 12px;" onchange="updateSigStyle()">
+                <option value="2">Thin (2px)</option>
+                <option value="3.5" selected>Standard (3.5px)</option>
+                <option value="5">Thick (5px)</option>
+              </select>
+            </div>
+          </div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px;">
+            <div>
+              <label style="font-size: 11px; color: #94a3b8; display: block; margin-bottom: 4px;">Format:</label>
+              <select id="sigFormat" class="form-control" style="padding: 6px; font-size: 12px;">
+                <option value="image/png" selected>PNG (Transparent)</option>
+                <option value="image/jpeg">JPG (White BG)</option>
+              </select>
+            </div>
+            <div>
+              <label style="font-size: 11px; color: #94a3b8; display: block; margin-bottom: 4px;">Target Max Size (KB):</label>
+              <select id="sigTargetKb" class="form-control" style="padding: 6px; font-size: 12px;">
+                <option value="0" selected>Original / No Limit</option>
+                <option value="15">Under 15 KB</option>
+                <option value="20">Under 20 KB</option>
+                <option value="30">Under 30 KB</option>
+                <option value="50">Under 50 KB</option>
+                <option value="100">Under 100 KB</option>
+              </select>
+            </div>
+          </div>
+          <div style="border: 2px solid #cbd5e1; border-radius: 8px; background: #ffffff; touch-action: none; position: relative; overflow: hidden;">
             <canvas id="sigCanvas" width="480" height="180" style="width: 100%; height: 180px; display: block; cursor: crosshair;"></canvas>
           </div>
           <button type="button" onclick="clearSigCanvas()" style="margin-top: 8px; background: #64748b; color: #fff; border: none; padding: 6px 14px; border-radius: 6px; font-size: 12px; cursor: pointer;">Clear Canvas</button>
@@ -558,13 +596,13 @@ function initSignaturePad() {
   if (!canvas) return;
   const ctx = canvas.getContext('2d');
   let drawing = false;
+  let lastX = 0;
+  let lastY = 0;
 
   ctx.fillStyle = '#ffffff';
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-  ctx.strokeStyle = '#000000';
-  ctx.lineWidth = 3;
-  ctx.lineCap = 'round';
+  updateSigStyle();
 
   function getPos(e) {
     const rect = canvas.getBoundingClientRect();
@@ -576,16 +614,54 @@ function initSignaturePad() {
     };
   }
 
-  canvas.onmousedown = (e) => { drawing = true; ctx.beginPath(); const p = getPos(e); ctx.moveTo(p.x, p.y); };
-  canvas.onmousemove = (e) => { if (!drawing) return; const p = getPos(e); ctx.lineTo(p.x, p.y); ctx.stroke(); };
-  canvas.onmouseup = () => { drawing = false; };
-  canvas.onmouseleave = () => { drawing = false; };
+  function startDraw(e) {
+    drawing = true;
+    const p = getPos(e);
+    lastX = p.x;
+    lastY = p.y;
+    e.preventDefault();
+  }
 
-  canvas.ontouchstart = (e) => { drawing = true; ctx.beginPath(); const p = getPos(e); ctx.moveTo(p.x, p.y); e.preventDefault(); };
-  canvas.ontouchmove = (e) => { if (!drawing) return; const p = getPos(e); ctx.lineTo(p.x, p.y); ctx.stroke(); e.preventDefault(); };
-  canvas.ontouchend = () => { drawing = false; };
+  function draw(e) {
+    if (!drawing) return;
+    const p = getPos(e);
+    
+    ctx.beginPath();
+    ctx.moveTo(lastX, lastY);
+    ctx.lineTo(p.x, p.y);
+    ctx.stroke();
+    
+    lastX = p.x;
+    lastY = p.y;
+    e.preventDefault();
+  }
+
+  function stopDraw() {
+    drawing = false;
+  }
+
+  canvas.onmousedown = startDraw;
+  canvas.onmousemove = draw;
+  canvas.onmouseup = stopDraw;
+  canvas.onmouseleave = stopDraw;
+
+  canvas.ontouchstart = startDraw;
+  canvas.ontouchmove = draw;
+  canvas.ontouchend = stopDraw;
 
   sigCanvasInstance = canvas;
+}
+
+function updateSigStyle() {
+  if (!sigCanvasInstance) return;
+  const ctx = sigCanvasInstance.getContext('2d');
+  const colorSelect = document.getElementById('sigColor');
+  const widthSelect = document.getElementById('sigWidth');
+  
+  ctx.strokeStyle = colorSelect ? colorSelect.value : '#000000';
+  ctx.lineWidth = widthSelect ? parseFloat(widthSelect.value) : 3.5;
+  ctx.lineCap = 'round';
+  ctx.lineJoin = 'round';
 }
 
 function clearSigCanvas() {
@@ -734,10 +810,42 @@ async function executeToolAction() {
 
   if (activeTool === 'sigPad') {
     if (!sigCanvasInstance) return;
-    sigCanvasInstance.toBlob((blob) => {
-      downloadBlob(blob, 'Digital_Signature.png', 'image/png');
-      showSuccessPopup('Digital Signature Downloaded Successfully!');
-    }, 'image/png');
+    const format = document.getElementById('sigFormat')?.value || 'image/png';
+    const targetKb = parseInt(document.getElementById('sigTargetKb')?.value) || 0;
+    const ext = format === 'image/jpeg' ? 'jpg' : 'png';
+
+    if (format === 'image/png' || targetKb === 0) {
+      sigCanvasInstance.toBlob((blob) => {
+        downloadBlob(blob, `Digital_Signature.${ext}`, format);
+        showSuccessPopup('Digital Signature Downloaded Successfully!');
+      }, format, 0.95);
+    } else {
+      const targetBytes = targetKb * 1024;
+      let low = 0.05, high = 0.95, bestBlob = null;
+      
+      const tempCanvas = document.createElement('canvas');
+      tempCanvas.width = sigCanvasInstance.width;
+      tempCanvas.height = sigCanvasInstance.height;
+      const tCtx = tempCanvas.getContext('2d');
+      tCtx.fillStyle = '#ffffff';
+      tCtx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
+      tCtx.drawImage(sigCanvasInstance, 0, 0);
+
+      tempCanvas.toBlob(async (initialBlob) => {
+        if (initialBlob.size <= targetBytes) {
+          downloadBlob(initialBlob, `Digital_Signature_${targetKb}KB.jpg`, 'image/jpeg');
+        } else {
+          for (let i = 0; i < 10; i++) {
+            const quality = (low + high) / 2;
+            const blob = await new Promise(resolve => tempCanvas.toBlob(resolve, 'image/jpeg', quality));
+            if (blob.size <= targetBytes) { bestBlob = blob; low = quality; }
+            else { high = quality; }
+          }
+          downloadBlob(bestBlob || initialBlob, `Digital_Signature_${targetKb}KB.jpg`, 'image/jpeg');
+        }
+        showSuccessPopup(`Signature Downloaded (Under ${targetKb} KB)!`);
+      }, 'image/jpeg', 0.9);
+    }
     return;
   }
 
@@ -1222,111 +1330,4 @@ async function executeToolAction() {
       
       const file = selectedFiles[0];
       const arrayBuffer = await file.arrayBuffer();
-      const loadingTask = pdfjsLib.getDocument({ data: arrayBuffer });
-      const pdf = await loadingTask.promise;
-      const totalPages = pdf.numPages;
-      
-      const qualityOption = document.getElementById('optOutputQuality')?.value || 'high';
-      let scale = 1.5;
-      if (qualityOption === 'high') scale = 2.0;
-      if (qualityOption === 'low') scale = 1.0;
-
-      for (let i = 1; i <= totalPages; i++) {
-        setProgress(20 + (i / totalPages) * 70, `Converting page ${i} of ${totalPages}`);
-        const page = await pdf.getPage(i);
-        const viewport = page.getViewport({ scale: scale });
-        const canvas = document.createElement('canvas');
-        const context = canvas.getContext('2d');
-        canvas.height = viewport.height;
-        canvas.width = viewport.width;
-
-        await page.render({ canvasContext: context, viewport: viewport }).promise;
-        
-        const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', 0.95));
-        downloadBlob(blob, `Page_${i}.jpg`, 'image/jpeg');
-      }
-      showSuccessPopup('PDF converted to Images Successfully!');
-      
-    } else {
-      if (selectedFiles.length > 0) {
-        const file = selectedFiles[0];
-        downloadBlob(file, `Processed_${file.name}`, file.type || 'application/pdf');
-        showSuccessPopup('Document Processed & Downloaded Successfully!');
-      } else {
-        const jsPdfLib = await ensureJsPdfLoaded();
-        const { jsPDF } = jsPdfLib || window.jspdf;
-        const pdf = new jsPDF();
-        pdf.setFontSize(14);
-        pdf.text(`Processed Document`, 15, 20);
-        downloadBlob(pdf.output('blob'), `Processed_${activeTool}.pdf`, 'application/pdf');
-        showSuccessPopup('Document Processed Successfully!');
-      }
-    }
-
-    closeWorkspace();
-  } catch (err) {
-    console.error(err);
-    alert('An error occurred: ' + err.message);
-  } finally {
-    setProgress(100, 'Done');
-    if (btn) { btn.innerText = originalText; btn.disabled = false; }
-    setTimeout(() => resetProgress(), 180);
-  }
-}
-
-function showSuccessPopup(msg) {
-  if (window.Swal) {
-    Swal.fire({ icon: 'success', title: 'Downloaded!', text: msg, timer: 2000, showConfirmButton: false });
-  } else {
-    alert(msg);
-  }
-}
-
-function parseRange(str, total) {
-  const indices = new Set();
-  if (!str) {
-    for (let i = 0; i < total; i++) indices.add(i);
-    return Array.from(indices);
-  }
-  str.split(',').forEach(p => {
-    const trimmed = p.trim();
-    if (trimmed.includes('-')) {
-      const [s, e] = trimmed.split('-').map(Number);
-      for (let i = s; i <= e; i++) if (i >= 1 && i <= total) indices.add(i - 1);
-    } else {
-      const n = Number(trimmed);
-      if (!isNaN(n) && n >= 1 && n <= total) indices.add(n - 1);
-    }
-  });
-  return Array.from(indices).sort((a, b) => a - b);
-}
-
-function readFileAsDataURL(file) {
-  return new Promise((res, rej) => {
-    const r = new FileReader();
-    r.onload = () => res(r.result);
-    r.onerror = rej;
-    r.readAsDataURL(file);
-  });
-}
-
-function downloadBlob(content, name, type) {
-  let blob = content instanceof Blob ? content : new Blob([content], { type });
-  
-  const reader = new FileReader();
-  reader.onload = function(e) {
-    const a = document.createElement('a');
-    a.style.display = 'none';
-    a.href = e.target.result;
-    a.download = name;
-    document.body.appendChild(a);
-    
-    setTimeout(() => {
-      a.click();
-      setTimeout(() => {
-        document.body.removeChild(a);
-      }, 500);
-    }, 50);
-  };
-  reader.readAsDataURL(blob);
-}
+      const loadingTask = pdf
