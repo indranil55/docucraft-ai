@@ -1436,7 +1436,25 @@ function downloadBlob(content, name, type) {
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.style.display = 'none';
-  a.href = url;
+  function downloadBlob(content, name, type) {
+  const blob = content instanceof Blob ? content : new Blob([content], { type });
+  const url1 = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.style.display = 'none';
+
+  if (url1.startsWith('blob:')) {
+    a.href = url1;
+  }
+
+  a.download = name;
+  document.body.appendChild(a);
+  a.click();
+
+  setTimeout(() => {
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url1);
+  }, 1000);
+}
   a.download = name;
   document.body.appendChild(a);
   a.click();
