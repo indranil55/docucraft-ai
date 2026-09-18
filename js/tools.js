@@ -1455,7 +1455,7 @@ function downloadBlob(content, name, type) {
 
   // javascript: বা data: প্রোটোকল ব্লক করার নিশ্চিত প্রমাণ
   if (url.indexOf('blob:') === 0) {
-    a.href = url;
+    a.setAttribute('href',url);
   }
 
   document.body.appendChild(a);
