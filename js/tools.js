@@ -1432,34 +1432,23 @@ resetProgress();
 }); 
 
 function downloadBlob(content, name, type) {
-  const blob = content instanceof Blob ? content : new Blob([content], { type });
-  const url = URL.createObjectURL(blob);
+  if (!content) return;
+
+  // Blob তৈরি করা
+  const blob = content instanceof Blob ? content : new Blob([content], { type: type || 'application/octet-stream' });
+  const url = window.URL.createObjectURL(blob);
+  
   const a = document.createElement('a');
   a.style.display = 'none';
-  function downloadBlob(content, name, type) {
-  const blob = content instanceof Blob ? content : new Blob([content], { type });
-  const url1 = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.style.display = 'none';
+  a.href = url;
+  a.download = name || 'download';
 
-  if (url1.startsWith('blob:')) {
-    a.href = url1;
-  }
-
-  a.download = name;
   document.body.appendChild(a);
   a.click();
 
+  // মেমরি ক্লিনআপ
   setTimeout(() => {
     document.body.removeChild(a);
-    URL.revokeObjectURL(url1);
-  }, 1000);
-}
-  a.download = name;
-  document.body.appendChild(a);
-  a.click();
-  setTimeout(() => {
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-  }, 1000);
+    window.URL.revokeObjectURL(url);
+  }, 2000);
 }
