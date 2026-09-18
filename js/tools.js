@@ -1434,7 +1434,6 @@ resetProgress();
 function downloadBlob(content, name, type) {
   if (!content) return;
 
-  // Blob তৈরি করা
   const blob = content instanceof Blob ? content : new Blob([content], { type: type || 'application/octet-stream' });
   const url = window.URL.createObjectURL(blob);
   
@@ -1446,7 +1445,6 @@ function downloadBlob(content, name, type) {
   document.body.appendChild(a);
   a.click();
 
-  // মেমরি ক্লিনআপ
   setTimeout(() => {
     document.body.removeChild(a);
     window.URL.revokeObjectURL(url);
