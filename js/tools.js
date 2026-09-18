@@ -1414,3 +1414,19 @@ function downloadBlob(content, name, type) {
   };
   reader.readAsDataURL(blob);
 }
+
+// মোবাইল ডিভাইসে ব্যাক বাটন চাপলে ওয়েবসাইট বন্ধ না হয়ে টুল বন্ধ করার হ্যান্ডলার
+
+window.addEventListener('popstate', function (event) {
+
+const overlay = document.getElementById('workspaceOverlay');
+
+if (overlay && overlay.style.display !== 'none' && overlay.style.display !== '') {
+
+overlay.style.display = 'none';
+
+resetProgress();
+
+}
+
+}); 
