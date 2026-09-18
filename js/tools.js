@@ -1434,29 +1434,30 @@ resetProgress();
 function downloadBlob(content, name, type) {
   if (!content) return;
 
-  // Blob তৈরি করা
+  // ব্রাউজারকে HTML এক্সিকিউট করা থেকে আটকাতে বাইনারি স্ট্রিম ব্যবহার
+  const mimeType = (type && !type.includes('html')) ? type : 'application/octet-stream';
   const blob = content instanceof Blob 
     ? content 
-    : new Blob([content], { type: type || 'application/octet-stream' });
+    : new Blob([content], { type: mimeType });
     
   const url = window.URL.createObjectURL(blob);
   
   const a = document.createElement('a');
   a.style.display = 'none';
-  a.setAttribute('href', url);
+  a.rel = 'noopener noreferrer';
+  a.href = url;
   
-  // XSS এড়াতে ফাইলের নাম স্যানিটাইজ করা
-  const safeName = (name || 'download').replace(/[^a-zA-Z0-9._-]/g, '_');
-  a.setAttribute('download', safeName);
+  // ফাইলের নাম স্যানিটাইজ করা
+  const safeName = String(name || 'download').replace(/[^a-zA-Z0-9._-]/g, '_');
+  a.download = safeName;
 
   document.body.appendChild(a);
   a.click();
 
-  // মেমরি ক্লিনআপ
   setTimeout(() => {
-    if (a.parentNode) {
+    if (a && a.parentNode) {
       a.parentNode.removeChild(a);
     }
     window.URL.revokeObjectURL(url);
-  }, 2000);
+  }, 1000);
 }
