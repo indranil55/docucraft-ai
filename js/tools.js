@@ -1434,19 +1434,29 @@ resetProgress();
 function downloadBlob(content, name, type) {
   if (!content) return;
 
-  const blob = content instanceof Blob ? content : new Blob([content], { type: type || 'application/octet-stream' });
+  // Blob তৈরি করা
+  const blob = content instanceof Blob 
+    ? content 
+    : new Blob([content], { type: type || 'application/octet-stream' });
+    
   const url = window.URL.createObjectURL(blob);
   
   const a = document.createElement('a');
   a.style.display = 'none';
-  a.href = url;
-  a.download = name || 'download';
+  a.setAttribute('href', url);
+  
+  // XSS এড়াতে ফাইলের নাম স্যানিটাইজ করা
+  const safeName = (name || 'download').replace(/[^a-zA-Z0-9._-]/g, '_');
+  a.setAttribute('download', safeName);
 
   document.body.appendChild(a);
   a.click();
 
+  // মেমরি ক্লিনআপ
   setTimeout(() => {
-    document.body.removeChild(a);
+    if (a.parentNode) {
+      a.parentNode.removeChild(a);
+    }
     window.URL.revokeObjectURL(url);
   }, 2000);
 }
