@@ -1434,30 +1434,37 @@ resetProgress();
 function downloadBlob(content, name, type) {
   if (!content) return;
 
-  // ব্রাউজারকে HTML এক্সিকিউট করা থেকে আটকাতে বাইনারি স্ট্রিম ব্যবহার
-  const mimeType = (type && !type.includes('html')) ? type : 'application/octet-stream';
-  const blob = content instanceof Blob 
-    ? content 
-    : new Blob([content], { type: mimeType });
-    
-  const url = window.URL.createObjectURL(blob);
-  
+  // CodeQL XSS এড়াতে strictly বাইনারি হিসেবে Blob তৈরি করা
+  const safeType = 'application/octet-stream';
+  const blob = content instanceof Blob
+    ? (content.type === safeType ? content : content.slice(0, content.size, safeType))
+    : new Blob([content], { type: safeType });
+
+  const url = (window.URL || window.webkitURL).createObjectURL(blob);
+
+  // নিরাপদ ফাইলের নাম নির্ধারণ
+  const safeName = String(name || 'download')
+    .replace(/[/\\?%*:|"<>]/g, '_')
+    .replace(/[^a-zA-Z0-9._-]/g, '_');
+
+  // ডাউনলোড ট্রিগার করা
   const a = document.createElement('a');
   a.style.display = 'none';
-  a.rel = 'noopener noreferrer';
-  a.href = url;
-  
-  // ফাইলের নাম স্যানিটাইজ করা
-  const safeName = String(name || 'download').replace(/[^a-zA-Z0-9._-]/g, '_');
-  a.download = safeName;
+  a.setAttribute('rel', 'noopener noreferrer');
+  a.setAttribute('download', safeName);
+
+  // javascript: বা data: প্রোটোকল ব্লক করার নিশ্চিত প্রমাণ
+  if (url.indexOf('blob:') === 0) {
+    a.href = url;
+  }
 
   document.body.appendChild(a);
   a.click();
 
   setTimeout(() => {
-    if (a && a.parentNode) {
+    if (a.parentNode) {
       a.parentNode.removeChild(a);
     }
-    window.URL.revokeObjectURL(url);
+    (window.URL || window.webkitURL).revokeObjectURL(url);
   }, 1000);
 }
