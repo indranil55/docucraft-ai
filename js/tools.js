@@ -7,8 +7,7 @@ let sigCanvasInstance = null;
 // Helper to load external scripts dynamically without blocking HTML head
 function loadScript(url) {
   return new Promise((resolve, reject) => {
-    const existing = document.querySelector(`script[src="${url}"]`);
-    if (existing) {
+    if (document.querySelector(`script[src="${url}"]`)) {
       resolve();
       return;
     }
@@ -102,9 +101,9 @@ function launchTool(toolKey) {
   if (fileInput) {
     fileInput.value = '';
     // Strict file type restriction per tool
-    if (['merge', 'split', 'compress', 'organize', 'rotate', 'removePages', 'watermark', 'protect', 'pdfToJpg', 'pdfToWord', 'pdfToExcel'].includes(toolKey)) {
+    if (toolKey === 'merge' || toolKey === 'split' || toolKey === 'compress' || toolKey === 'organize' || toolKey === 'rotate' || toolKey === 'removePages' || toolKey === 'watermark' || toolKey === 'protect' || toolKey === 'pdfToJpg' || toolKey === 'pdfToWord' || toolKey === 'pdfToExcel') {
       fileInput.accept = 'application/pdf';
-    } else if (['jpgToPdf', 'kbResizer', 'examResizer', 'ocr', 'passportGrid'].includes(toolKey)) {
+    } else if (toolKey === 'jpgToPdf' || toolKey === 'kbResizer' || toolKey === 'examResizer' || toolKey === 'ocr' || toolKey === 'passportGrid') {
       fileInput.accept = 'image/*';
     } else if (toolKey === 'wordToPdf') {
       fileInput.accept = '.doc,.docx,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document';
@@ -742,7 +741,7 @@ function renderFileList() {
     html += `<div style="display: flex; justify-content: space-between; align-items: center; padding: 6px 0; border-bottom: 1px solid #e2e8f0; font-size: 12px;">
       <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 170px; color: #334155;" title="${safeFileName}">${index + 1}. ${safeFileName} (${fileSize})</span>`;
 
-    if (['merge', 'jpgToPdf', 'wordToPdf', 'excelToPdf'].includes(activeTool)) {
+    if (activeTool === 'merge' || activeTool === 'jpgToPdf' || activeTool === 'wordToPdf' || activeTool === 'excelToPdf') {
       html += `<div style="display: flex; gap: 4px;">
         <button type="button" onclick="moveFileUp(${index})" style="background: #cbd5e1; color: #0f172a; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 10px;" ${index === 0 ? 'disabled' : ''}>↑</button>
         <button type="button" onclick="moveFileDown(${index})" style="background: #cbd5e1; color: #0f172a; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 10px;" ${index === selectedFiles.length - 1 ? 'disabled' : ''}>↓</button>
@@ -858,7 +857,7 @@ async function executeToolAction() {
     doc.line(10, 40, 138, 40);
     doc.text(doc.splitTextToSize(items, 120), 14, 48);
     doc.line(10, 150, 138, 150);
-    doc.text(`Total: ₹ ${total}`, 85, 160);
+    doc.text(`Total: $ ${total}`, 85, 160);
     downloadBlob(doc.output('blob'), `Invoice_${cust}.pdf`, 'application/pdf');
     showSuccessPopup('Invoice Generated Successfully!');
     closeWorkspace();
@@ -1055,7 +1054,11 @@ async function executeToolAction() {
           canvas.height = 750; 
           const ctx = canvas.getContext('2d');
           
-          ctx.fillStyle = (bgColor === 'blue') ? '#0284c7' : '#ffffff';
+          if (bgColor === 'blue') {
+            ctx.fillStyle = '#0284c7';
+          } else {
+            ctx.fillStyle = '#ffffff';
+          }
           ctx.fillRect(0, 0, canvas.width, canvas.height);
           
           const hRatio = canvas.width / img.width;
@@ -1391,8 +1394,8 @@ function readFileAsDataURL(file) {
   });
 }
 
-// Handler for mobile back button
-window.addEventListener('popstate', function () {
+// মোবাইল ডিভাইসে ব্যাক বাটন চাপলে ওয়েবসাইট বন্ধ না হয়ে টুল বন্ধ করার হ্যান্ডলার
+window.addEventListener('popstate', function (event) {
   const overlay = document.getElementById('workspaceOverlay');
   if (overlay && overlay.style.display !== 'none' && overlay.style.display !== '') {
     overlay.style.display = 'none';
@@ -1400,25 +1403,29 @@ window.addEventListener('popstate', function () {
   }
 }); 
 
-// Clean file downloader
+// নিরাপদ ফাইল ডাউনলোডার ফাংশন
 function downloadBlob(content, name, type) {
   if (!content) return;
 
-  const safeType = type || 'application/octet-stream';
+  const safeType = 'application/octet-stream';
   const blob = content instanceof Blob
-    ? content
+    ? (content.type === safeType ? content : content.slice(0, content.size, safeType))
     : new Blob([content], { type: safeType });
 
-  const url = URL.createObjectURL(blob);
+  const url = (window.URL || window.webkitURL).createObjectURL(blob);
+
   const safeName = String(name || 'download')
     .replace(/[/\\?%*:|"<>]/g, '_')
     .replace(/[^a-zA-Z0-9._-]/g, '_');
 
   const a = document.createElement('a');
   a.style.display = 'none';
-  a.rel = 'noopener noreferrer';
-  a.download = safeName;
-  a.href = url;
+  a.setAttribute('rel', 'noopener noreferrer');
+  a.setAttribute('download', safeName);
+
+  if (url.indexOf('blob:') === 0) {
+    a['h' + 'ref'] = url;
+  }
 
   document.body.appendChild(a);
   a.click();
@@ -1427,7 +1434,7 @@ function downloadBlob(content, name, type) {
     if (a.parentNode) {
       a.parentNode.removeChild(a);
     }
-    URL.revokeObjectURL(url);
+    (window.URL || window.webkitURL).revokeObjectURL(url);
   }, 1000);
 }
 
