@@ -1,4 +1,4 @@
-// DocuCraft AI - Authentication & Gate Security Logic
+// DocuCraft AI - Authentication & Gate Security Logic (with 3-Use Limit Counter)
 
 let isSignUpMode = false;
 let isResetMode = false;
@@ -21,8 +21,39 @@ window.addEventListener('DOMContentLoaded', () => {
   }
 });
 
+// Gate Security: Check if user can use tool or reached the 3-use limit
+function checkGateAccess(toolName) {
+  const isLogged = localStorage.getItem('docucraft_logged_in') === 'true';
+  if (isLogged) {
+    return true; // If logged in, unlimited access
+  }
+
+  let usageCount = parseInt(localStorage.getItem('docucraft_free_uses') || '0', 10);
+  
+  if (usageCount >= 3) {
+    sessionStorage.setItem('pending_tool', toolName);
+    alert('You have reached your 3 free uses limit! Please Login or Sign Up to continue using DocuCraft AI tools.');
+    openAuthModal();
+    return false;
+  } else {
+    usageCount++;
+    localStorage.setItem('docucraft_free_uses', usageCount.toString());
+    console.log(`Free use count: ${usageCount}/3`);
+    return true;
+  }
+}
+
+// Hook into tool launching if launchTool exists globally
+if (typeof window.launchTool === 'function') {
+  const originalLaunchTool = window.launchTool;
+  window.launchTool = function(toolName) {
+    if (checkGateAccess(toolName)) {
+      originalLaunchTool(toolName);
+    }
+  };
+}
+
 function openAuthModal() {
-  // যদি ইতিমধ্যে লগইন করা থাকে, তবে ইউজার প্রোফাইল বা লগআউট অপশন দেখাবে
   const isLogged = localStorage.getItem('docucraft_logged_in') === 'true';
   if (isLogged) {
     handleLogout();
@@ -180,10 +211,12 @@ function handleAuthSubmit() {
     return;
   }
 
-  // পার্মানেন্ট লগইন স্টেট সেট করা
   localStorage.setItem('docuCraft_user_email', email);
   localStorage.setItem('docucraft_logged_in', 'true');
   sessionStorage.setItem('docuCraft_logged_in_user', email);
+  
+  // Reset free usage counter upon successful login
+  localStorage.setItem('docucraft_free_uses', '0');
 
   closeAuthModal();
   updateHeaderAuthUI();
@@ -261,11 +294,11 @@ function sendDataToGoogleSheet(email, actionType) {
 
 function handleLogout() {
   if (confirm('Are you sure you want to lock the gate and log out?')) {
-    // লগআউট করার সময় সম্পূর্ণ স্টোরেজ পরিষ্কার করা
     localStorage.removeItem('docucraft_logged_in');
     localStorage.removeItem('docuCraft_user_email');
     sessionStorage.removeItem('docuCraft_logged_in_user');
     sessionStorage.removeItem('pending_tool');
+    localStorage.setItem('docucraft_free_uses', '0');
     alert('Gate locked successfully.');
     location.reload();
   }
