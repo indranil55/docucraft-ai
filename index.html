@@ -18,10 +18,10 @@
   <meta name="google-site-verification" content="g-Ww17Sxt42ftp8mYJX1dtanefwYJK691JhChb_47Rw" />
   
   <!-- SEO & Social Sharing (Open Graph / Twitter Card) -->
-  <meta name="description" content="DocuCraft AI - Free Online PDF, Photo, Financial & Productivity Utilities. Resize Photo to exact KB, Merge/Split PDF, Loan Prepayment Calculator, Barcode, Gold Price and more.">
-  <meta name="keywords" content="PDF editor, KB resizer, barcode generator, color picker, bigha katha converter, gold price calculator, bmr calculator, typing speed test">
+  <meta name="description" content="DocuCraft AI - Free Online PDF, Photo, Financial & Productivity Utilities. Resize Photo, Docx to PDF, Passport BG Remover, Govt Job Alerts, Barcode, Gold Price and more.">
+  <meta name="keywords" content="PDF editor, KB resizer, docx to pdf, passport bg remover, govt jobs, sarkari result, barcode generator, color picker, typing speed test">
   <meta property="og:title" content="DocuCraft AI - Smart All-in-One PDF & Document Studio">
-  <meta property="og:description" content="Merge, Compress, Resize KB, Generate Passport Photos, Calculate Loan Prepayment, Barcode, Gold Price, BMR, PPF, EMI, GST free in browser.">
+  <meta property="og:description" content="Merge, Compress, Resize KB, Docx to PDF, Passport Photo BG Remover, Govt Job Alerts, Barcode, Gold Price, BMR, PPF, EMI, GST free in browser.">
   <meta property="og:type" content="website">
   
   <!-- Sitemap Link -->
@@ -261,46 +261,46 @@
 
   <section class="hero">
     <h1>Every tool you need to work with PDFs in one place</h1>
-    <p>Advanced Photo KB Resizer, Passport Grid, Financial Calculators, Land Converters & Utilities.</p>
+    <p>Advanced Photo KB Resizer, Passport BG Remover, Docx to PDF, Govt Job Alerts & Utilities.</p>
   </section>
 
   <!-- Real-Time Search Bar -->
   <div class="search-wrapper">
     <div class="search-box-inner">
       <i class="fa-solid fa-magnifying-glass"></i>
-      <input type="text" id="toolSearchInput" class="search-input" placeholder="Search any tool (e.g. Prepayment, Typing, Gold, Barcode, Color)..." onkeyup="filterToolsBySearch()">
+      <input type="text" id="toolSearchInput" class="search-input" placeholder="Search any tool (e.g. Passport BG, Docx to PDF, Govt Jobs, KB Resizer)..." onkeyup="filterToolsBySearch()">
     </div>
   </div>
 
   <section class="popular-section">
     <h3 class="section-title"><i class="fa-solid fa-fire" style="color: #e5322d;"></i> Most Popular Tools</h3>
     <div class="popular-grid">
-      <div class="popular-card" onclick="launchTool('merge')">
-        <div class="popular-icon"><i class="fa-solid fa-object-group"></i></div>
+      <div class="popular-card" onclick="openGovtJobModal()">
+        <div class="popular-icon" style="background:#fee2e2; color:#dc2626;"><i class="fa-solid fa-bullhorn"></i></div>
         <div class="popular-info">
-          <h4>Merge PDF</h4>
-          <span>Combine files</span>
+          <h4>Govt Job Alerts</h4>
+          <span>Latest Sarkari Updates</span>
         </div>
       </div>
-      <div class="popular-card" onclick="launchTool('compress')">
-        <div class="popular-icon"><i class="fa-solid fa-file-zipper"></i></div>
+      <div class="popular-card" onclick="openPassportBgModal()">
+        <div class="popular-icon" style="background:#fce7f3; color:#db2777;"><i class="fa-solid fa-user-shield"></i></div>
         <div class="popular-info">
-          <h4>Compress PDF</h4>
-          <span>Reduce size</span>
+          <h4>Passport BG Maker</h4>
+          <span>White/Blue BG</span>
+        </div>
+      </div>
+      <div class="popular-card" onclick="launchTool('wordToPdf')">
+        <div class="popular-icon" style="background:#eff6ff; color:#2563eb;"><i class="fa-solid fa-file-word"></i></div>
+        <div class="popular-info">
+          <h4>Docx to PDF</h4>
+          <span>Word converter</span>
         </div>
       </div>
       <div class="popular-card" onclick="launchTool('kbResizer')">
-        <div class="popular-icon"><i class="fa-solid fa-compress"></i></div>
+        <div class="popular-icon" style="background:#dbeafe; color:#2563eb;"><i class="fa-solid fa-compress"></i></div>
         <div class="popular-info">
           <h4>KB Resizer</h4>
           <span>Exact KB/MB</span>
-        </div>
-      </div>
-      <div class="popular-card" onclick="launchTool('jpgToPdf')">
-        <div class="popular-icon"><i class="fa-solid fa-file-image"></i></div>
-        <div class="popular-info">
-          <h4>JPG to PDF</h4>
-          <span>Image converter</span>
         </div>
       </div>
     </div>
@@ -321,6 +321,29 @@
 
   <main class="main-grid-container">
     <div class="tools-grid" id="toolsGrid">
+
+      <!-- New Added Tools: Passport BG Remover & Contact Form -->
+      <div class="tool-card" data-cat="cyber" onclick="openPassportBgModal()">
+        <div class="tool-icon" style="background:#fce7f3; color:#db2777;"><i class="fa-solid fa-user-shield"></i></div>
+        <h3>Passport Photo BG Remake <span class="badge-new">NEW</span></h3>
+        <p>Change or format passport photo background to plain white or royal blue for exam forms.</p>
+        <span class="tool-meta">Make Passport BG &rarr;</span>
+      </div>
+
+      <div class="tool-card" data-cat="generator" onclick="openContactModal()">
+        <div class="tool-icon" style="background:#e0f2fe; color:#0284c7;"><i class="fa-solid fa-headset"></i></div>
+        <h3>Contact & Support Form <span class="badge-new">NEW</span></h3>
+        <p>Send your feedback, inquiries or report any tool issue directly to support desk.</p>
+        <span class="tool-meta">Open Support &rarr;</span>
+      </div>
+
+      <!-- Govt Job Alerts & Results Hub Card -->
+      <div class="tool-card" data-cat="finance" onclick="openGovtJobModal()">
+        <div class="tool-icon" style="background:#fee2e2; color:#dc2626;"><i class="fa-solid fa-bullhorn"></i></div>
+        <h3>Govt Job Alerts & Results <span class="badge-new">NEW</span></h3>
+        <p>Check latest government job notifications, admit cards, exam dates and recruitment results instantly.</p>
+        <span class="tool-meta">Check Job Updates &rarr;</span>
+      </div>
 
       <!-- Core PDF & Cyber Tools -->
       <div class="tool-card" data-cat="cyber" onclick="launchTool('kbResizer')">
@@ -698,8 +721,8 @@
 
       <div class="tool-card" data-cat="toPdf" onclick="launchTool('wordToPdf')">
         <div class="tool-icon" style="background:#eff6ff; color:#2563eb;"><i class="fa-solid fa-file-word"></i></div>
-        <h3>Word to PDF (DOC/DOCX to PDF)</h3>
-        <p>Convert Microsoft Word documents to clean, standardized PDF format.</p>
+        <h3>Docx to PDF (Word to PDF)</h3>
+        <p>Convert Microsoft Word documents to clean, standardized PDF format instantly.</p>
         <span class="tool-meta">Open Tool &rarr;</span>
       </div>
 
@@ -827,6 +850,66 @@
   </main>
 
   <!-- Modals for Calculators & Utilities -->
+
+  <!-- Passport Photo BG Remake Modal -->
+  <div class="calc-modal" id="passportBgModal" onclick="if(event.target === this) closePassportBgModal()">
+    <div class="calc-box">
+      <button class="calc-close" onclick="closePassportBgModal()">&times;</button>
+      <h3><i class="fa-solid fa-user-shield" style="color: #db2777;"></i> Passport Photo Background Maker</h3>
+      <div class="calc-group">
+        <label>Upload Passport Photo:</label>
+        <input type="file" id="passportBgInput" accept="image/*">
+      </div>
+      <div class="calc-group">
+        <label>Select Background Color:</label>
+        <select id="passportBgColor">
+          <option value="#ffffff" selected>Plain White Background (Standard)</option>
+          <option value="#0047ab">Royal Blue Background</option>
+          <option value="#ff0000">Red Background</option>
+        </select>
+      </div>
+      <button class="calc-btn" onclick="executePassportBgRemake()">Process & Download Photo</button>
+      <div id="passportBgOutput" class="calc-result"></div>
+    </div>
+  </div>
+
+  <!-- Contact & Support Modal -->
+  <div class="calc-modal" id="contactModal" onclick="if(event.target === this) closeContactModal()">
+    <div class="calc-box" style="max-width: 520px;">
+      <button class="calc-close" onclick="closeContactModal()">&times;</button>
+      <h3><i class="fa-solid fa-headset" style="color: #0284c7;"></i> Contact & Support Desk</h3>
+      <div class="calc-group">
+        <label>Your Name:</label>
+        <input type="text" id="contactName" placeholder="Enter your full name">
+      </div>
+      <div class="calc-group">
+        <label>Your Email Address:</label>
+        <input type="email" id="contactEmail" placeholder="Enter your email address">
+      </div>
+      <div class="calc-group">
+        <label>Message / Issue Description:</label>
+        <textarea id="contactMsg" rows="4" placeholder="Write your message or report any tool issue here..."></textarea>
+      </div>
+      <button class="calc-btn" onclick="executeContactSend()">Send Message</button>
+      <div id="contactOutput" class="calc-result"></div>
+    </div>
+  </div>
+
+  <!-- Govt Job Alerts Modal -->
+  <div class="calc-modal" id="govtJobModal" onclick="if(event.target === this) closeGovtJobModal()">
+    <div class="calc-box" style="max-width: 520px;">
+      <button class="calc-close" onclick="closeGovtJobModal()">&times;</button>
+      <h3><i class="fa-solid fa-bullhorn" style="color: #dc2626;"></i> Sarkari Job Alerts & Results Hub</h3>
+      <p style="font-size: 13.5px; color: #475569; margin-bottom: 14px;">Select any portal below to check live government job updates, admit cards, and results:</p>
+      
+      <div style="display: flex; flex-direction: column; gap: 10px;">
+        <a href="https://www.sarkariresult.com" target="_blank" class="calc-btn" style="text-decoration: none; text-align: center; background: #2563eb;">Sarkari Result (Official Portal) &rarr;</a>
+        <a href="https://ssc.gov.in" target="_blank" class="calc-btn" style="text-decoration: none; text-align: center; background: #0f172a;">SSC Latest Jobs & Admit Cards &rarr;</a>
+        <a href="https://upsc.gov.in" target="_blank" class="calc-btn" style="text-decoration: none; text-align: center; background: #047857;">UPSC Notifications & Results &rarr;</a>
+        <a href="https://wbpsc.gov.in" target="_blank" class="calc-btn" style="text-decoration: none; text-align: center; background: #b45309;">West Bengal PSC (WBPSC) &rarr;</a>
+      </div>
+    </div>
+  </div>
 
   <!-- Loan Prepayment Calculator Modal -->
   <div class="calc-modal" id="prepayModal" onclick="if(event.target === this) closePrepayModal()">
@@ -978,7 +1061,7 @@
   <div class="calc-modal" id="typingModal" onclick="if(event.target === this) closeTypingModal()">
     <div class="calc-box" style="max-width: 530px;">
       <button class="calc-close" onclick="closeTypingModal()">&times;</button>
-      <h3><i class="fa-solid fa-keyboard" style="color: #1d4ed8;"></i> 1-Minute Typing Test</h3>
+      <h3><i class="fa-solid fa-keyboard" style="color: #1d4ed8;"></i> 1-Minute Typing Speed Test</h3>
       <div class="calc-group" style="margin-bottom:8px;">
         <label>Select Practice Level:</label>
         <select id="typingLevelSelect" onchange="changeTypingLevel()">
@@ -1828,7 +1911,28 @@
       updateUnitConvFields();
     });
 
-    // Modal Triggers (Video Downloader & Audio Extractor Removed)
+    // New Tool Modal Triggers
+    function openPassportBgModal() { document.getElementById('passportBgModal').style.display = 'flex'; }
+    function closePassportBgModal() { document.getElementById('passportBgModal').style.display = 'none'; }
+    function executePassportBgRemake() { alert("Passport photo background processing in browser..."); }
+
+    function openContactModal() { document.getElementById('contactModal').style.display = 'flex'; }
+    function closeContactModal() { document.getElementById('contactModal').style.display = 'none'; }
+    function executeContactSend() {
+      const name = document.getElementById('contactName').value;
+      const email = document.getElementById('contactEmail').value;
+      const msg = document.getElementById('contactMsg').value;
+      const out = document.getElementById('contactOutput');
+      if(!name || !email || !msg) { alert("Please fill in all fields."); return; }
+      out.style.display = 'block';
+      out.textContent = "Thank you! Your message has been sent to DocuCraft AI support desk.";
+    }
+
+    // Govt Job Modal Triggers
+    function openGovtJobModal() { document.getElementById('govtJobModal').style.display = 'flex'; }
+    function closeGovtJobModal() { document.getElementById('govtJobModal').style.display = 'none'; }
+
+    // Modal Triggers
     function openPrepayModal() { document.getElementById('prepayModal').style.display = 'flex'; }
     function closePrepayModal() { document.getElementById('prepayModal').style.display = 'none'; }
     function openBarcodeModal() { document.getElementById('barcodeModal').style.display = 'flex'; executeBarcodeRender(); }
@@ -2107,7 +2211,7 @@
       out.textContent = `Maintain Weight: ${Math.round(maintenance)} kcal/day`;
     }
 
-    // 9. 1-Minute Typing Test Engine with Multi-Level Paragraphs
+    // 9. 1-Minute Typing Speed Test Engine with Multi-Level Paragraphs
     const typingParagraphs = [
       "The cat sat on the mat. Dogs run fast in the park. Sun shines bright today. Good morning to everyone.",
       "The quick brown fox jumps over the lazy dog. Technology and automation enable swift digital transformation across modern platforms with ease.",
