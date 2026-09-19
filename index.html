@@ -878,20 +878,26 @@
     <div class="calc-box" style="max-width: 520px;">
       <button class="calc-close" onclick="closeContactModal()">&times;</button>
       <h3><i class="fa-solid fa-headset" style="color: #0284c7;"></i> Contact & Support Desk</h3>
-      <div class="calc-group">
-        <label>Your Name:</label>
-        <input type="text" id="contactName" placeholder="Enter your full name">
-      </div>
-      <div class="calc-group">
-        <label>Your Email Address:</label>
-        <input type="email" id="contactEmail" placeholder="Enter your email address">
-      </div>
-      <div class="calc-group">
-        <label>Message / Issue Description:</label>
-        <textarea id="contactMsg" rows="4" placeholder="Write your message or report any tool issue here..."></textarea>
-      </div>
-      <button class="calc-btn" onclick="executeContactSend()">Send Message</button>
-      <div id="contactOutput" class="calc-result"></div>
+      
+      <form action="https://api.web3forms.com/submit" method="POST" id="contactForm" onsubmit="handleContactSubmit(event)">
+        <input type="hidden" name="access_key" value="90d6a86d-968e-434c-bf20-7fefd9d0282e">
+        
+        <div class="calc-group">
+          <label>Your Name:</label>
+          <input type="text" name="name" id="contactName" placeholder="Enter your full name" required>
+        </div>
+        <div class="calc-group">
+          <label>Your Email Address:</label>
+          <input type="email" name="email" id="contactEmail" placeholder="Enter your email address" required>
+        </div>
+        <div class="calc-group">
+          <label>Message / Issue Description:</label>
+          <textarea name="message" id="contactMsg" rows="4" placeholder="Write your message or report any tool issue here..." required></textarea>
+        </div>
+        <button type="submit" class="calc-btn" id="contactSubmitBtn">Send Message</button>
+      </form>
+      
+      <div id="contactOutput" class="calc-result" style="display:none; margin-top: 10px;"></div>
     </div>
   </div>
 
@@ -1918,14 +1924,48 @@
 
     function openContactModal() { document.getElementById('contactModal').style.display = 'flex'; }
     function closeContactModal() { document.getElementById('contactModal').style.display = 'none'; }
-    function executeContactSend() {
-      const name = document.getElementById('contactName').value;
-      const email = document.getElementById('contactEmail').value;
-      const msg = document.getElementById('contactMsg').value;
+
+    // Contact form email submission handling via Web3Forms
+    async function handleContactSubmit(event) {
+      event.preventDefault();
+      const form = document.getElementById('contactForm');
+      const formData = new FormData(form);
       const out = document.getElementById('contactOutput');
-      if(!name || !email || !msg) { alert("Please fill in all fields."); return; }
-      out.style.display = 'block';
-      out.textContent = "Thank you! Your message has been sent to DocuCraft AI support desk.";
+      const submitBtn = document.getElementById('contactSubmitBtn');
+      
+      submitBtn.disabled = true;
+      submitBtn.textContent = "Sending message...";
+
+      try {
+        const response = await fetch("https://api.web3forms.com/submit", {
+          method: "POST",
+          body: formData
+        });
+        const data = await response.json();
+
+        out.style.display = 'block';
+        if (data.success) {
+          out.style.background = "#f0fdf4";
+          out.style.borderColor = "#bbf7d0";
+          out.style.color = "#166534";
+          out.textContent = "Thank you! Your message has been sent successfully.";
+          form.reset();
+        } else {
+          out.style.background = "#fef2f2";
+          out.style.borderColor = "#fecaca";
+          out.style.color = "#991b1b";
+          out.textContent = data.message || "Something went wrong. Please try again.";
+        }
+      } catch (error) {
+        out.style.display = 'block';
+        out.style.background = "#fef2f2";
+        out.style.borderColor = "#fecaca";
+        out.style.color = "#991b1b";
+        out.textContent = "Network error. Please check your internet connection.";
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = "Send Message";
+      }
     }
 
     // Govt Job Modal Triggers
