@@ -268,7 +268,7 @@
   <div class="search-wrapper">
     <div class="search-box-inner">
       <i class="fa-solid fa-magnifying-glass"></i>
-      <input type="text" id="toolSearchInput" class="search-input" placeholder="Search any tool (e.g. Video, MP3, Typing, Prepayment, Barcode, Gold)..." onkeyup="filterToolsBySearch()">
+      <input type="text" id="toolSearchInput" class="search-input" placeholder="Search any tool (e.g. KB Resizer, Merge, Video, Typing, Gold)..." onkeyup="filterToolsBySearch()">
     </div>
   </div>
 
@@ -322,7 +322,78 @@
   <main class="main-grid-container">
     <div class="tools-grid" id="toolsGrid">
 
-      <!-- Video & Media Downloader Tools -->
+      <!-- Core PDF & Cyber Tools (Placed First as Requested) -->
+      <div class="tool-card" data-cat="cyber" onclick="launchTool('kbResizer')">
+        <div class="tool-icon" style="background:#dbeafe; color:#2563eb;"><i class="fa-solid fa-compress"></i></div>
+        <h3>Photo & Sign KB / MB Resizer</h3>
+        <p>Compress image precisely to exact target KB or MB as per your requirement.</p>
+        <span class="tool-meta">Open Resizer &rarr;</span>
+      </div>
+
+      <div class="tool-card" data-cat="cyber" onclick="launchTool('passportGrid')">
+        <div class="tool-icon" style="background:#fef3c7; color:#d97706;"><i class="fa-solid fa-id-card-clip"></i></div>
+        <h3>Passport Photo Sheet (Custom / Grid)</h3>
+        <p>Generate print-ready sheets of custom passport photo copies on a single A4 page.</p>
+        <span class="tool-meta">Open Passport Grid &rarr;</span>
+      </div>
+
+      <div class="tool-card" data-cat="cyber" onclick="launchTool('sigPad')">
+        <div class="tool-icon" style="background:#fce7f3; color:#db2777;"><i class="fa-solid fa-signature"></i></div>
+        <h3>Digital Signature Maker (Sign Pad)</h3>
+        <p>Draw your signature on screen and download as transparent PNG for form uploads.</p>
+        <span class="tool-meta">Open Sign Pad &rarr;</span>
+      </div>
+
+      <div class="tool-card" data-cat="cyber" onclick="launchTool('qrGen')">
+        <div class="tool-icon" style="background:#e0f2fe; color:#0284c7;"><i class="fa-solid fa-qrcode"></i></div>
+        <h3>QR Code & UPI Generator</h3>
+        <p>Generate instant QR codes for payment links, UPI IDs, or website URLs.</p>
+        <span class="tool-meta">Open QR Generator &rarr;</span>
+      </div>
+
+      <div class="tool-card" data-cat="cyber" onclick="launchTool('examResizer')">
+        <div class="tool-icon" style="background:#fee2e2; color:#e5322d;"><i class="fa-solid fa-user-graduate"></i></div>
+        <h3>Exam Photo & Signature Resizer</h3>
+        <p>Resize photo and signature to exact size required for government exam forms (SSC, UPSC, NEET, etc.).</p>
+        <span class="tool-meta">Open Resizer &rarr;</span>
+      </div>
+
+      <div class="tool-card" data-cat="organize" onclick="launchTool('merge')">
+        <div class="tool-icon" style="background:#fee2e2; color:#e5322d;"><i class="fa-solid fa-object-group"></i></div>
+        <h3>Merge PDF</h3>
+        <p>Combine multiple PDF documents into a single organized file in seconds.</p>
+        <span class="tool-meta">Open Tool &rarr;</span>
+      </div>
+
+      <div class="tool-card" data-cat="organize" onclick="launchTool('split')">
+        <div class="tool-icon" style="background:#fee2e2; color:#e5322d;"><i class="fa-solid fa-scissors"></i></div>
+        <h3>Split PDF</h3>
+        <p>Separate one page or an entire set for easy conversion into independent PDF files.</p>
+        <span class="tool-meta">Open Tool &rarr;</span>
+      </div>
+
+      <div class="tool-card" data-cat="organize" onclick="launchTool('compress')">
+        <div class="tool-icon" style="background:#ecfdf5; color:#059669;"><i class="fa-solid fa-file-zipper"></i></div>
+        <h3>Compress PDF</h3>
+        <p>Reduce file size while optimizing for maximal visual and document quality.</p>
+        <span class="tool-meta">Open Tool &rarr;</span>
+      </div>
+
+      <div class="tool-card" data-cat="organize" onclick="launchTool('organize')">
+        <div class="tool-icon" style="background:#fee2e2; color:#e5322d;"><i class="fa-solid fa-arrow-down-up-across-line"></i></div>
+        <h3>Organize / Reorder Pages</h3>
+        <p>Rearrange, reverse, or reorder the page sequence of your PDF document.</p>
+        <span class="tool-meta">Open Tool &rarr;</span>
+      </div>
+
+      <!-- Newly Added High-Demand & Utility Tools with Multi-Level Typing Test -->
+      <div class="tool-card" data-cat="generator" onclick="openTypingModal()">
+        <div class="tool-icon" style="background:#dbeafe; color:#1d4ed8;"><i class="fa-solid fa-keyboard"></i></div>
+        <h3>1-Minute Typing Speed Test <span class="badge-new">NEW</span></h3>
+        <p>Test and measure your typing speed with multi-level paragraphs and real-time WPM.</p>
+        <span class="tool-meta">Start Typing Test &rarr;</span>
+      </div>
+
       <div class="tool-card" data-cat="cyber" onclick="openVideoDownloaderModal()">
         <div class="tool-icon" style="background:#fee2e2; color:#dc2626;"><i class="fa-solid fa-cloud-arrow-down"></i></div>
         <h3>Universal Video Downloader Hub <span class="badge-new">NEW</span></h3>
@@ -337,19 +408,11 @@
         <span class="tool-meta">Extract Audio &rarr;</span>
       </div>
 
-      <!-- Prepayment & Typing Speed Test -->
       <div class="tool-card" data-cat="finance" onclick="openPrepayModal()">
         <div class="tool-icon" style="background:#e0f2fe; color:#0284c7;"><i class="fa-solid fa-hand-holding-dollar"></i></div>
         <h3>Loan Prepayment & Interest Saver <span class="badge-new">NEW</span></h3>
         <p>Calculate how extra lump-sum or monthly prepayments save lakhs in loan interest & time.</p>
         <span class="tool-meta">Calculate Savings &rarr;</span>
-      </div>
-
-      <div class="tool-card" data-cat="generator" onclick="openTypingModal()">
-        <div class="tool-icon" style="background:#dbeafe; color:#1d4ed8;"><i class="fa-solid fa-keyboard"></i></div>
-        <h3>1-Minute Typing Speed Test <span class="badge-new">NEW</span></h3>
-        <p>Test and measure your typing speed (WPM - Words Per Minute) and accuracy in real-time.</p>
-        <span class="tool-meta">Start Typing Test &rarr;</span>
       </div>
 
       <div class="tool-card" data-cat="finance" onclick="openGoldModal()">
@@ -626,71 +689,7 @@
         <span class="tool-meta">Open Converter &rarr;</span>
       </div>
 
-      <!-- Core PDF Tools -->
-      <div class="tool-card" data-cat="cyber" onclick="launchTool('kbResizer')">
-        <div class="tool-icon" style="background:#dbeafe; color:#2563eb;"><i class="fa-solid fa-compress"></i></div>
-        <h3>Photo & Sign KB / MB Resizer</h3>
-        <p>Compress image precisely to exact target KB or MB as per your requirement.</p>
-        <span class="tool-meta">Open Resizer &rarr;</span>
-      </div>
-
-      <div class="tool-card" data-cat="cyber" onclick="launchTool('passportGrid')">
-        <div class="tool-icon" style="background:#fef3c7; color:#d97706;"><i class="fa-solid fa-id-card-clip"></i></div>
-        <h3>Passport Photo Sheet (Custom / Grid)</h3>
-        <p>Generate print-ready sheets of custom passport photo copies on a single A4 page.</p>
-        <span class="tool-meta">Open Passport Grid &rarr;</span>
-      </div>
-
-      <div class="tool-card" data-cat="cyber" onclick="launchTool('sigPad')">
-        <div class="tool-icon" style="background:#fce7f3; color:#db2777;"><i class="fa-solid fa-signature"></i></div>
-        <h3>Digital Signature Maker (Sign Pad)</h3>
-        <p>Draw your signature on screen and download as transparent PNG for form uploads.</p>
-        <span class="tool-meta">Open Sign Pad &rarr;</span>
-      </div>
-
-      <div class="tool-card" data-cat="cyber" onclick="launchTool('qrGen')">
-        <div class="tool-icon" style="background:#e0f2fe; color:#0284c7;"><i class="fa-solid fa-qrcode"></i></div>
-        <h3>QR Code & UPI Generator</h3>
-        <p>Generate instant QR codes for payment links, UPI IDs, or website URLs.</p>
-        <span class="tool-meta">Open QR Generator &rarr;</span>
-      </div>
-
-      <div class="tool-card" data-cat="cyber" onclick="launchTool('examResizer')">
-        <div class="tool-icon" style="background:#fee2e2; color:#e5322d;"><i class="fa-solid fa-user-graduate"></i></div>
-        <h3>Exam Photo & Signature Resizer</h3>
-        <p>Resize photo and signature to exact size required for government exam forms (SSC, UPSC, NEET, etc.).</p>
-        <span class="tool-meta">Open Resizer &rarr;</span>
-      </div>
-
-      <div class="tool-card" data-cat="organize" onclick="launchTool('merge')">
-        <div class="tool-icon" style="background:#fee2e2; color:#e5322d;"><i class="fa-solid fa-object-group"></i></div>
-        <h3>Merge PDF</h3>
-        <p>Combine multiple PDF documents into a single organized file in seconds.</p>
-        <span class="tool-meta">Open Tool &rarr;</span>
-      </div>
-
-      <div class="tool-card" data-cat="organize" onclick="launchTool('split')">
-        <div class="tool-icon" style="background:#fee2e2; color:#e5322d;"><i class="fa-solid fa-scissors"></i></div>
-        <h3>Split PDF</h3>
-        <p>Separate one page or an entire set for easy conversion into independent PDF files.</p>
-        <span class="tool-meta">Open Tool &rarr;</span>
-      </div>
-
-      <div class="tool-card" data-cat="organize" onclick="launchTool('compress')">
-        <div class="tool-icon" style="background:#ecfdf5; color:#059669;"><i class="fa-solid fa-file-zipper"></i></div>
-        <h3>Compress PDF</h3>
-        <p>Reduce file size while optimizing for maximal visual and document quality.</p>
-        <span class="tool-meta">Open Tool &rarr;</span>
-      </div>
-
-      <div class="tool-card" data-cat="organize" onclick="launchTool('organize')">
-        <div class="tool-icon" style="background:#fee2e2; color:#e5322d;"><i class="fa-solid fa-arrow-down-up-across-line"></i></div>
-        <h3>Organize / Reorder Pages</h3>
-        <p>Rearrange, reverse, or reorder the page sequence of your PDF document.</p>
-        <span class="tool-meta">Open Tool &rarr;</span>
-      </div>
-
-      <div class="tool-card" data-cat="rotate" onclick="launchTool('rotate')">
+      <div class="tool-card" data-cat="organize" onclick="launchTool('rot')">
         <div class="tool-icon" style="background:#fef3c7; color:#d97706;"><i class="fa-solid fa-rotate-right"></i></div>
         <h3>Rotate PDF</h3>
         <p>Rotate upside-down or sideways pages by 90, 180, or 270 degrees.</p>
@@ -1017,11 +1016,19 @@
     </div>
   </div>
 
-  <!-- 1-Minute Typing Speed Test Modal -->
+  <!-- 1-Minute Typing Speed Test Modal with Multi-Level Paragraphs -->
   <div class="calc-modal" id="typingModal" onclick="if(event.target === this) closeTypingModal()">
     <div class="calc-box" style="max-width: 530px;">
       <button class="calc-close" onclick="closeTypingModal()">&times;</button>
       <h3><i class="fa-solid fa-keyboard" style="color: #1d4ed8;"></i> 1-Minute Typing Test</h3>
+      <div class="calc-group" style="margin-bottom:8px;">
+        <label>Select Practice Level:</label>
+        <select id="typingLevelSelect" onchange="changeTypingLevel()">
+          <option value="0">Level 1: Easy & Common Words</option>
+          <option value="1" selected>Level 2: Standard Paragraph</option>
+          <option value="2">Level 3: Technical & Long Sentences</option>
+        </select>
+      </div>
       <div id="typingSnippet" style="background:#0f172a; border:2px solid #3b82f6; border-radius:10px; padding:16px; font-size:15px; color:#ffffff; font-weight:600; line-height:1.7; user-select:none; margin-bottom:14px; letter-spacing:0.3px;">
         The quick brown fox jumps over the lazy dog. Technology and automation enable swift digital transformation across modern platforms with ease.
       </div>
@@ -1840,7 +1847,7 @@
   <script src="js/tools.js"></script>
   <script src="js/main.js"></script>
 
-  <!-- Complete Script Engine (100% Secure & Optimized for Fast Instant Redirect) -->
+  <!-- Complete Script Engine (100% Secure & Optimized) -->
   <script>
     // Search Functionality
     function filterToolsBySearch() {
@@ -1966,11 +1973,7 @@
         return;
       }
       out.style.display = 'block';
-      out.innerHTML = `
-        <p><strong>Status:</strong> Link processed successfully.</p>
-        <a href="https://en.savefrom.net/#url=${encodeURIComponent(url)}" target="_blank" class="calc-btn" style="display:block; text-align:center; text-decoration:none; padding:12px; background:#16a34a; margin-top:8px;">Fast Download MP4 &rarr;</a>
-      `;
-      // Instant auto-redirect for maximum speed
+      out.textContent = "Redirecting to download server...";
       window.open(`https://en.savefrom.net/#url=${encodeURIComponent(url)}`, '_blank');
     }
 
@@ -2176,7 +2179,19 @@
       out.textContent = `Maintain Weight: ${Math.round(maintenance)} kcal/day`;
     }
 
-    // 9. 1-Minute Typing Test Engine
+    // 9. 1-Minute Typing Test Engine with Multi-Level Paragraphs
+    const typingParagraphs = [
+      "The cat sat on the mat. Dogs run fast in the park. Sun shines bright today. Good morning to everyone.",
+      "The quick brown fox jumps over the lazy dog. Technology and automation enable swift digital transformation across modern platforms with ease.",
+      "Artificial intelligence and machine learning algorithms process massive datasets securely, empowering developers to build scalable enterprise web applications efficiently."
+    ];
+
+    function changeTypingLevel() {
+      const idx = document.getElementById('typingLevelSelect').value;
+      document.getElementById('typingSnippet').innerText = typingParagraphs[idx];
+      resetTypingTest();
+    }
+
     let typingTimerSeconds = 60;
     let typingInterval = null;
     let typingStarted = false;
