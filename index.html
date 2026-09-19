@@ -38,6 +38,9 @@
   
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer">
   
+  <!-- JsBarcode CDN for standard Barcode rendering -->
+  <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
+  
   <link rel="stylesheet" href="style.css">
 
   <style>
@@ -212,6 +215,22 @@
       line-height: 1.6;
       color: #334155;
     }
+    .share-wa-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #22c55e;
+      color: #fff;
+      padding: 6px 12px;
+      border-radius: 6px;
+      text-decoration: none;
+      font-size: 12px;
+      font-weight: 700;
+      margin-top: 10px;
+    }
+    .share-wa-btn:hover {
+      background: #16a34a;
+    }
   </style>
 
   <script>
@@ -258,14 +277,14 @@
 
   <section class="hero">
     <h1>Every tool you need to work with PDFs in one place</h1>
-    <p>Advanced Photo KB Resizer, Passport Grid, Financial Calculators, Land Converters & Utilities.</p>
+    <p>Advanced Photo KB Resizer, Passport Grid, Barcodes, Financial Calculators, Land Converters & Utilities.</p>
   </section>
 
   <!-- Real-Time Search Bar -->
   <div class="search-wrapper">
     <div class="search-box-inner">
       <i class="fa-solid fa-magnifying-glass"></i>
-      <input type="text" id="toolSearchInput" class="search-input" placeholder="Search any tool (e.g. Gold, Calorie, Typing, Inflation, PPF, Salary)..." onkeyup="filterToolsBySearch()">
+      <input type="text" id="toolSearchInput" class="search-input" placeholder="Search any tool (e.g. Typing, Gold, Barcode, Color, PPF, Salary)..." onkeyup="filterToolsBySearch()">
     </div>
   </div>
 
@@ -320,6 +339,13 @@
     <div class="tools-grid" id="toolsGrid">
 
       <!-- Newly Added High-Demand Tools -->
+      <div class="tool-card" data-cat="generator" onclick="openTypingModal()">
+        <div class="tool-icon" style="background:#dbeafe; color:#1d4ed8;"><i class="fa-solid fa-keyboard"></i></div>
+        <h3>1-Minute Typing Speed Test <span class="badge-new">NEW</span></h3>
+        <p>Test and measure your typing speed (WPM - Words Per Minute) and accuracy in real-time.</p>
+        <span class="tool-meta">Start Typing Test &rarr;</span>
+      </div>
+
       <div class="tool-card" data-cat="finance" onclick="openGoldModal()">
         <div class="tool-icon" style="background:#fef3c7; color:#b45309;"><i class="fa-solid fa-gem"></i></div>
         <h3>Gold & Jewellery Price Calculator <span class="badge-new">NEW</span></h3>
@@ -334,18 +360,32 @@
         <span class="tool-meta">Calculate Calories &rarr;</span>
       </div>
 
-      <div class="tool-card" data-cat="generator" onclick="openTypingModal()">
-        <div class="tool-icon" style="background:#dbeafe; color:#1d4ed8;"><i class="fa-solid fa-keyboard"></i></div>
-        <h3>1-Minute Typing Speed Test <span class="badge-new">NEW</span></h3>
-        <p>Test and measure your typing speed (WPM - Words Per Minute) and accuracy in real-time.</p>
-        <span class="tool-meta">Start Typing Test &rarr;</span>
-      </div>
-
       <div class="tool-card" data-cat="finance" onclick="openInflationModal()">
         <div class="tool-icon" style="background:#ecfdf5; color:#059669;"><i class="fa-solid fa-arrow-trend-up"></i></div>
         <h3>Inflation & Future Value Calculator <span class="badge-new">NEW</span></h3>
         <p>Calculate how inflation decreases the buying power of money and forecast future product prices.</p>
         <span class="tool-meta">Forecast Inflation &rarr;</span>
+      </div>
+
+      <div class="tool-card" data-cat="generator" onclick="openBarcodeModal()">
+        <div class="tool-icon" style="background:#f1f5f9; color:#0f172a;"><i class="fa-solid fa-barcode"></i></div>
+        <h3>Barcode Generator (Code 128) <span class="badge-new">NEW</span></h3>
+        <p>Generate standard print-ready barcodes for product labels, packaging & invoices in 1-click.</p>
+        <span class="tool-meta">Generate Barcode &rarr;</span>
+      </div>
+
+      <div class="tool-card" data-cat="cyber" onclick="openColorPickerModal()">
+        <div class="tool-icon" style="background:#ecfdf5; color:#059669;"><i class="fa-solid fa-eye-dropper"></i></div>
+        <h3>Color Picker & HEX Extractor <span class="badge-new">NEW</span></h3>
+        <p>Upload any picture and click anywhere to instantly grab exact HEX, RGB, and HSL color codes.</p>
+        <span class="tool-meta">Pick Colors &rarr;</span>
+      </div>
+
+      <div class="tool-card" data-cat="generator" onclick="openBase64Modal()">
+        <div class="tool-icon" style="background:#e0f2fe; color:#0284c7;"><i class="fa-solid fa-code"></i></div>
+        <h3>Base64 Encoder & Decoder <span class="badge-new">NEW</span></h3>
+        <p>Encode plain text to Base64 format or decode Base64 strings directly in browser safely.</p>
+        <span class="tool-meta">Encode / Decode &rarr;</span>
       </div>
 
       <!-- Financial & Daily Utilities -->
@@ -796,6 +836,60 @@
   </main>
 
   <!-- Modals for Calculators & Utilities -->
+
+  <!-- Barcode Generator Modal -->
+  <div class="calc-modal" id="barcodeModal" onclick="if(event.target === this) closeBarcodeModal()">
+    <div class="calc-box" style="text-align: center;">
+      <button class="calc-close" onclick="closeBarcodeModal()">&times;</button>
+      <h3><i class="fa-solid fa-barcode" style="color: #0f172a;"></i> Barcode Generator</h3>
+      <div class="calc-group">
+        <label>Enter Text or Code (Numbers/Letters):</label>
+        <input type="text" id="barcodeInputVal" placeholder="e.g. DOCU9827341" oninput="executeBarcodeRender()">
+      </div>
+      <div style="margin: 15px 0; min-height: 80px; display: flex; justify-content: center; align-items: center; background:#f8fafc; border:1px solid #cbd5e1; border-radius:8px; padding:10px;">
+        <svg id="barcodeSvg"></svg>
+      </div>
+      <button class="calc-btn" onclick="downloadBarcodeImage()">Download Barcode (PNG)</button>
+    </div>
+  </div>
+
+  <!-- Color Picker Modal -->
+  <div class="calc-modal" id="colorPickerModal" onclick="if(event.target === this) closeColorPickerModal()">
+    <div class="calc-box">
+      <button class="calc-close" onclick="closeColorPickerModal()">&times;</button>
+      <h3><i class="fa-solid fa-eye-dropper" style="color: #059669;"></i> Color Picker & HEX Grabber</h3>
+      <div class="calc-group">
+        <label>Upload Image:</label>
+        <input type="file" id="pickerImgInput" accept="image/*" onchange="loadPickerImage(event)">
+      </div>
+      <div style="overflow:auto; max-height:200px; border:1px solid #cbd5e1; border-radius:8px; margin-bottom:10px; text-align:center;">
+        <canvas id="pickerCanvas" style="cursor:crosshair; max-width:100%;"></canvas>
+      </div>
+      <div id="pickerOutput" class="calc-result" style="display:block; background:#f8fafc; border-color:#cbd5e1; color:#0f172a;">
+        Click anywhere on the uploaded photo to pick color.
+      </div>
+    </div>
+  </div>
+
+  <!-- Base64 Encoder/Decoder Modal -->
+  <div class="calc-modal" id="base64Modal" onclick="if(event.target === this) closeBase64Modal()">
+    <div class="calc-box" style="max-width: 520px;">
+      <button class="calc-close" onclick="closeBase64Modal()">&times;</button>
+      <h3><i class="fa-solid fa-code" style="color: #0284c7;"></i> Base64 Encode & Decode</h3>
+      <div class="calc-group">
+        <label>Enter Text or Base64 String:</label>
+        <textarea id="base64InputText" rows="4" placeholder="Type text here..."></textarea>
+      </div>
+      <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+        <button class="calc-btn" onclick="executeBase64Process('encode')">Encode to Base64</button>
+        <button class="calc-btn" style="background:#0f172a;" onclick="executeBase64Process('decode')">Decode to Text</button>
+      </div>
+      <div id="base64OutputBox" style="display:none; margin-top:14px;">
+        <textarea id="base64ResultText" rows="4" readonly style="background:#f8fafc; font-family:monospace; font-size:12px;"></textarea>
+        <button type="button" onclick="copyBase64Result()" class="calc-btn" style="background:#16a34a; margin-top:6px;">Copy Output</button>
+      </div>
+    </div>
+  </div>
 
   <!-- Gold & Jewellery Price Modal -->
   <div class="calc-modal" id="goldModal" onclick="if(event.target === this) closeGoldModal()">
@@ -1708,6 +1802,13 @@
     });
 
     // Modal Triggers
+    function openBarcodeModal() { document.getElementById('barcodeModal').style.display = 'flex'; executeBarcodeRender(); }
+    function closeBarcodeModal() { document.getElementById('barcodeModal').style.display = 'none'; }
+    function openColorPickerModal() { document.getElementById('colorPickerModal').style.display = 'flex'; }
+    function closeColorPickerModal() { document.getElementById('colorPickerModal').style.display = 'none'; }
+    function openBase64Modal() { document.getElementById('base64Modal').style.display = 'flex'; }
+    function closeBase64Modal() { document.getElementById('base64Modal').style.display = 'none'; }
+
     function openGoldModal() { document.getElementById('goldModal').style.display = 'flex'; }
     function closeGoldModal() { document.getElementById('goldModal').style.display = 'none'; }
     function openCalorieModal() { document.getElementById('calorieModal').style.display = 'flex'; }
@@ -1777,7 +1878,7 @@
     function closeImgConvertModal() { document.getElementById('imgConvertModal').style.display = 'none'; }
     function openWordCountModal() { document.getElementById('wordCountModal').style.display = 'flex'; }
     function closeWordCountModal() { document.getElementById('wordCountModal').style.display = 'none'; }
-    function openEligibilityModal() { document.getElementById('eligibilityModal').style.display = 'none'; }
+    function closeEligibilityModal() { document.getElementById('eligibilityModal').style.display = 'none'; }
     function openEligibilityModal() { document.getElementById('eligibilityModal').style.display = 'flex'; }
     function closeMarksModal() { document.getElementById('marksModal').style.display = 'none'; }
     function openMarksModal() { document.getElementById('marksModal').style.display = 'flex'; }
@@ -1787,7 +1888,117 @@
     function openCircleDpModal() { document.getElementById('circleDpModal').style.display = 'flex'; }
     function closeInfoModal() { document.getElementById('infoModal').style.display = 'none'; }
 
-    // 1. Gold & Jewellery Price Calculator
+    // 1. Barcode Generator
+    function executeBarcodeRender() {
+      const val = document.getElementById('barcodeInputVal').value.trim() || 'DOCUCRAFT123';
+      try {
+        JsBarcode("#barcodeSvg", val, {
+          format: "CODE128",
+          lineColor: "#000",
+          width: 2,
+          height: 60,
+          displayValue: true
+        });
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    function downloadBarcodeImage() {
+      const svg = document.getElementById('barcodeSvg');
+      const xml = new XMLSerializer().serializeToString(svg);
+      const svg64 = btoa(xml);
+      const b64Start = 'data:image/svg+xml;base64,';
+      const image64 = b64Start + svg64;
+
+      const img = new Image();
+      img.onload = function() {
+        const canvas = document.createElement('canvas');
+        canvas.width = img.width;
+        canvas.height = img.height;
+        const ctx = canvas.getContext('2d');
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.drawImage(img, 0, 0);
+        canvas.toBlob(blob => {
+          const a = document.createElement('a');
+          a.href = URL.createObjectURL(blob);
+          a.download = 'Barcode.png';
+          a.click();
+        });
+      };
+      img.src = image64;
+    }
+
+    // 2. Color Picker & HEX Extractor
+    function loadPickerImage(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const img = new Image();
+        img.onload = function() {
+          const canvas = document.getElementById('pickerCanvas');
+          canvas.width = img.width;
+          canvas.height = img.height;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0);
+
+          canvas.onclick = function(ev) {
+            const rect = canvas.getBoundingClientRect();
+            const scaleX = canvas.width / rect.width;
+            const scaleY = canvas.height / rect.height;
+            const x = (ev.clientX - rect.left) * scaleX;
+            const y = (ev.clientY - rect.top) * scaleY;
+            const pixel = ctx.getImageData(x, y, 1, 1).data;
+            const hex = "#" + ((1 << 24) + (pixel[0] << 16) + (pixel[1] << 8) + pixel[2]).toString(16).slice(1).toUpperCase();
+            
+            const out = document.getElementById('pickerOutput');
+            out.innerHTML = `
+              <div style="display:flex; align-items:center; gap:12px; margin-bottom:8px;">
+                <div style="width:36px; height:36px; border-radius:6px; background:${hex}; border:1px solid #cbd5e1;"></div>
+                <div>
+                  <strong>HEX:</strong> <code style="font-size:15px; font-weight:700;">${hex}</code><br>
+                  <strong>RGB:</strong> rgb(${pixel[0]}, ${pixel[1]},${pixel[2]})
+                </div>
+              </div>
+              <button type="button" onclick="navigator.clipboard.writeText('${hex}'); alert('HEX copied!');" style="background:#2563eb; color:#fff; border:none; padding:4px 10px; border-radius:6px; font-size:12px; cursor:pointer;">Copy HEX</button>
+            `;
+          };
+        };
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    // 3. Base64 Encoder / Decoder
+    function executeBase64Process(action) {
+      const text = document.getElementById('base64InputText').value;
+      const box = document.getElementById('base64OutputBox');
+      const resultArea = document.getElementById('base64ResultText');
+      if (!text) { alert('Please enter some text.'); return; }
+
+      try {
+        if (action === 'encode') {
+          resultArea.value = btoa(unescape(encodeURIComponent(text)));
+        } else {
+          resultArea.value = decodeURIComponent(escape(atob(text.trim())));
+        }
+        box.style.display = 'block';
+      } catch (e) {
+        alert('Invalid string for Base64 operation.');
+      }
+    }
+
+    function copyBase64Result() {
+      const txt = document.getElementById('base64ResultText').value;
+      if (txt) {
+        navigator.clipboard.writeText(txt);
+        alert('Output copied to clipboard!');
+      }
+    }
+
+    // 4. Gold & Jewellery Price Calculator
     function executeGoldCalc() {
       const rate10g = parseFloat(document.getElementById('goldRate10g').value);
       const grams = parseFloat(document.getElementById('goldWeightGrams').value);
@@ -1815,7 +2026,7 @@
       `;
     }
 
-    // 2. Daily Calorie & BMR Calculator (Harris-Benedict Formula)
+    // 5. Daily Calorie & BMR Calculator (Harris-Benedict Formula)
     function executeCalorieCalc() {
       const gender = document.getElementById('bmrGender').value;
       const age = parseInt(document.getElementById('bmrAge').value);
@@ -1849,7 +2060,7 @@
       `;
     }
 
-    // 3. 1-Minute Typing Test Engine
+    // 6. 1-Minute Typing Test Engine
     let typingTimerSeconds = 60;
     let typingInterval = null;
     let typingStarted = false;
@@ -1903,7 +2114,7 @@
       `;
     }
 
-    // 4. Inflation Calculator (Compound Future Cost)
+    // 7. Inflation Calculator (Compound Future Cost)
     function executeInflationCalc() {
       const amount = parseFloat(document.getElementById('infAmount').value);
       const rate = parseFloat(document.getElementById('infRate').value) / 100;
@@ -1925,7 +2136,7 @@
       `;
     }
 
-    // 5. PPF Scheme Calculator
+    // 8. PPF Scheme Calculator
     function executePpfCalc() {
       const p = parseFloat(document.getElementById('ppfYearlyAmount').value);
       const r = parseFloat(document.getElementById('ppfRate').value) / 100;
@@ -1953,7 +2164,7 @@
       `;
     }
 
-    // 6. Electricity Bill & Power Calculator
+    // 9. Electricity Bill & Power Calculator
     function executeElectricityCalc() {
       const watts = parseFloat(document.getElementById('elecWattage').value);
       const hours = parseFloat(document.getElementById('elecDailyHours').value);
@@ -1977,7 +2188,7 @@
       `;
     }
 
-    // 7. Fuel Cost & Trip Mileage Calculator
+    // 10. Fuel Cost & Trip Mileage Calculator
     function executeFuelCalc() {
       const distance = parseFloat(document.getElementById('fuelDistance').value);
       const mileage = parseFloat(document.getElementById('fuelMileage').value);
@@ -2001,7 +2212,7 @@
       `;
     }
 
-    // 8. Hashtag Extractor & Counter
+    // 11. Hashtag Extractor & Counter
     function executeHashtagExtract() {
       const text = document.getElementById('hashtagInputText').value;
       if (!text.trim()) {
@@ -2034,7 +2245,7 @@
       }
     }
 
-    // 9. Number to Words
+    // 12. Number to Words
     function executeNumToWords() {
       const val = parseFloat(document.getElementById('numToWordsInput').value);
       const out = document.getElementById('numToWordsOutput');
@@ -2100,7 +2311,7 @@
       }
     }
 
-    // 10. Take-Home Salary & CTC Calculator
+    // 13. Take-Home Salary & CTC Calculator
     function executeSalaryCalc() {
       const ctc = parseFloat(document.getElementById('salaryCtc').value);
       const extraDeductions = parseFloat(document.getElementById('salaryDeductions').value) || 0;
@@ -2128,7 +2339,7 @@
       `;
     }
 
-    // 11. Friend Bill Split & Tip Calculator
+    // 14. Friend Bill Split & Tip Calculator
     function executeBillSplit() {
       const total = parseFloat(document.getElementById('splitBillTotal').value);
       const people = parseInt(document.getElementById('splitPeopleCount').value) || 1;
@@ -2152,7 +2363,7 @@
       `;
     }
 
-    // 12. Universal Unit Converter
+    // 15. Universal Unit Converter
     const unitOptions = {
       length: ['Meter', 'Kilometer', 'Centimeter', 'Millimeter', 'Foot', 'Inch', 'Yard'],
       weight: ['Kilogram', 'Gram', 'Milligram', 'Pound', 'Ounce'],
@@ -2209,7 +2420,7 @@
       out.innerHTML = `<strong>Result:</strong> ${val}${from} = <span style="font-weight:800; color:#6d28d9; font-size:16px;">${result.toFixed(4)}${to}</span>`;
     }
 
-    // 13. EMI
+    // 16. EMI
     function executeEmiCalc() {
       const p = parseFloat(document.getElementById('emiLoanAmount').value);
       const annualRate = parseFloat(document.getElementById('emiInterestRate').value);
@@ -2231,7 +2442,7 @@
       `;
     }
 
-    // 14. GST
+    // 17. GST
     function executeGstCalc() {
       const amount = parseFloat(document.getElementById('gstInputAmount').value);
       const rate = parseFloat(document.getElementById('gstRateSelect').value);
@@ -2253,7 +2464,7 @@
         : `<strong>Base Price:</strong> ₹${total.toFixed(2)}<br><strong>Included GST:</strong> ₹${gst.toFixed(2)}`;
     }
 
-    // 15. SIP
+    // 18. SIP
     function executeSipCalc() {
       const p = parseFloat(document.getElementById('sipMonthlyAmount').value);
       const rate = parseFloat(document.getElementById('sipReturnRate').value);
@@ -2273,7 +2484,7 @@
       `;
     }
 
-    // 16. Simple & Compound Interest
+    // 19. Simple & Compound Interest
     function executeInterestCalc() {
       const type = document.getElementById('interestTypeSelect').value;
       const p = parseFloat(document.getElementById('interestPrincipal').value);
@@ -2302,7 +2513,7 @@
       `;
     }
 
-    // 17. FD & RD
+    // 20. FD & RD
     function executeFdCalc() {
       const type = document.getElementById('fdTypeSelect').value;
       const p = parseFloat(document.getElementById('fdAmount').value);
@@ -2332,7 +2543,7 @@
       `;
     }
 
-    // 18. Land Area Converter
+    // 21. Land Area Converter
     function executeLandConvert() {
       const val = parseFloat(document.getElementById('landInputVal').value);
       const unit = document.getElementById('landUnitSelect').value;
@@ -2358,7 +2569,7 @@
       `;
     }
 
-    // 19. Life in Hours, Minutes & Seconds
+    // 22. Life in Hours, Minutes & Seconds
     function executeLifeStatsCalc() {
       const dobVal = document.getElementById('lifeDob').value;
       if (!dobVal) { alert("Please select your birth date."); return; }
@@ -2386,7 +2597,7 @@
       `;
     }
 
-    // 20. Multi-Subject Average & Grade
+    // 23. Multi-Subject Average & Grade
     function executeGradeCalc() {
       const input = document.getElementById('gradeMarksList').value.trim();
       const maxPerSub = parseFloat(document.getElementById('gradeMaxMarks').value) || 100;
@@ -2420,7 +2631,7 @@
       `;
     }
 
-    // 21. Fancy Bio Font Generator
+    // 24. Fancy Bio Font Generator
     function executeFontGeneration() {
       const text = document.getElementById('bioFontInput').value || 'DocuCraft AI';
       const container = document.getElementById('bioFontResults');
@@ -2443,7 +2654,7 @@
       });
     }
 
-    // 22. Water Intake Goal
+    // 25. Water Intake Goal
     function executeWaterCalc() {
       const w = parseFloat(document.getElementById('waterWeight').value);
       const activity = document.getElementById('waterActivity').value;
@@ -2463,7 +2674,7 @@
       `;
     }
 
-    // 23. Screen & Display Metrics
+    // 26. Screen & Display Metrics
     function executeScreenMetrics() {
       const w = window.screen.width;
       const h = window.screen.height;
@@ -2482,7 +2693,7 @@
       `;
     }
 
-    // 24. Date Difference & Days Counter
+    // 27. Date Difference & Days Counter
     function executeDateDiffCalc() {
       const d1Val = document.getElementById('dateDiffStart').value;
       const d2Val = document.getElementById('dateDiffEnd').value;
@@ -2504,7 +2715,7 @@
       `;
     }
 
-    // 25. Duplicate Line Remover
+    // 28. Duplicate Line Remover
     function executeDupRemover() {
       const input = document.getElementById('dupInputText').value;
       const isCase = document.getElementById('dupCaseSensitive').checked;
@@ -2541,7 +2752,7 @@
       }
     }
 
-    // 26. Exam Eligibility
+    // 29. Exam Eligibility
     function executeEligibilityCalc() {
       const dobVal = document.getElementById('elgDob').value;
       const cutVal = document.getElementById('elgCutoff').value;
@@ -2584,7 +2795,7 @@
         : `<span style="color:#dc2626; font-size:16px;"><strong>✖ Not Eligible!</strong></span><br><strong>Age as on Cut-off:</strong> ${y} yrs, ${m} mos,${d} days.<br><span style="font-size:12px; color:#64748b;">(Required: ${minAge} to${maxAge} years)</span>`;
     }
 
-    // 27. Marks & CGPA
+    // 30. Marks & CGPA
     function toggleMarksInputs() {
       const type = document.getElementById('marksCalcType').value;
       document.getElementById('marksInputFields').style.display = type === 'marks' ? 'block' : 'none';
@@ -2614,7 +2825,7 @@
       }
     }
 
-    // 28. YouTube Thumbnail Downloader
+    // 31. YouTube Thumbnail Downloader
     function executeYtThumbFetch() {
       const url = document.getElementById('ytVideoUrl').value.trim();
       let videoId = '';
@@ -2635,7 +2846,7 @@
       document.getElementById('ytThumbOutput').style.display = 'block';
     }
 
-    // 29. Round DP Maker
+    // 32. Round DP Maker
     function executeCircleDpCrop() {
       const fileInput = document.getElementById('circleDpInput');
       const borderColor = document.getElementById('circleBorderColor').value;
@@ -2680,7 +2891,7 @@
       reader.readAsDataURL(fileInput.files[0]);
     }
 
-    // 30. BMI Fitness
+    // 33. BMI Fitness
     function executeBmiCalc() {
       const h = parseFloat(document.getElementById('bmiHeight').value);
       const w = parseFloat(document.getElementById('bmiWeight').value);
@@ -2698,7 +2909,7 @@
       out.innerHTML = `<strong>Your BMI:</strong> ${bmi.toFixed(1)}<br><strong>Status:</strong>${status}`;
     }
 
-    // 31. Password Generator
+    // 34. Password Generator
     function executePassGen() {
       const len = parseInt(document.getElementById('passLength').value) || 14;
       const comp = document.getElementById('passComplexity').value;
@@ -2736,7 +2947,7 @@
       }
     }
 
-    // 32. Age Calculator
+    // 35. Age Calculator
     function executeAgeCalc() {
       const dobVal = document.getElementById('ageDob').value;
       const asOnVal = document.getElementById('ageAsOn').value;
@@ -2762,7 +2973,7 @@
       out.innerHTML = `<strong>Your Age:</strong> ${y} years, ${m} months, ${d} days`;
     }
 
-    // 33. Discount
+    // 36. Discount
     function executeDiscountCalc() {
       const price = parseFloat(document.getElementById('discOriginalPrice').value);
       const disc = parseFloat(document.getElementById('discPercentage').value);
@@ -2776,7 +2987,7 @@
       out.innerHTML = `<strong>Discounted Price:</strong> ₹${finalPrice.toFixed(2)}<br><strong>Savings:</strong> ₹${saved.toFixed(2)} (${disc}%)`;
     }
 
-    // 34. Percentage
+    // 37. Percentage
     function executePercentCalc() {
       const a = parseFloat(document.getElementById('pctValA').value);
       const b = parseFloat(document.getElementById('pctValB').value);
@@ -2787,7 +2998,7 @@
       out.innerHTML = `<strong>${a}% of ${b} = </strong> <span style="font-size:16px; font-weight:800;">${result.toFixed(2)}</span>`;
     }
 
-    // 35. DOP Generator
+    // 38. DOP Generator
     function executeDopGenerator() {
       const fileInput = document.getElementById('dopFileInput');
       const name = document.getElementById('dopName').value.trim();
@@ -2820,7 +3031,7 @@
       reader.readAsDataURL(fileInput.files[0]);
     }
 
-    // 36. Image Format Converter
+    // 39. Image Format Converter
     function executeImageConversion() {
       const fileInput = document.getElementById('convertImgInput');
       const format = document.getElementById('convertTargetFormat').value;
@@ -2831,7 +3042,7 @@
         img.onload = function() {
           const canvas = document.createElement('canvas');
           canvas.width = img.width; canvas.height = img.height;
-          ctx = canvas.getContext('2d');
+          const ctx = canvas.getContext('2d');
           ctx.drawImage(img, 0, 0);
           canvas.toBlob(blob => {
             const ext = format === 'image/png' ? 'png' : (format === 'image/webp' ? 'webp' : 'jpg');
@@ -2845,7 +3056,7 @@
       reader.readAsDataURL(fileInput.files[0]);
     }
 
-    // 37. Word, Case & Text Formatter
+    // 40. Word, Case & Text Formatter
     function updateWordCounts() {
       const val = document.getElementById('wordCounterText').value.trim();
       const words = val ? val.split(/\s+/).filter(Boolean).length : 0;
