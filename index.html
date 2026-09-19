@@ -18,10 +18,10 @@
   <meta name="google-site-verification" content="g-Ww17Sxt42ftp8mYJX1dtanefwYJK691JhChb_47Rw" />
   
   <!-- SEO & Social Sharing (Open Graph / Twitter Card) -->
-  <meta name="description" content="DocuCraft AI - Free Online PDF, Photo, Financial & Productivity Utilities. Resize Photo to exact KB, Merge/Split PDF, Gold Price Calculator, BMR Calories, Typing Test and more.">
-  <meta name="keywords" content="PDF editor, KB resizer, bigha katha converter, gold price calculator, bmr calculator, typing speed test, inflation calculator, ppf calculator, number to words">
+  <meta name="description" content="DocuCraft AI - Free Online PDF, Photo, Financial & Video Utilities. Resize Photo to exact KB, Merge/Split PDF, Social Video Downloader, Video to Audio Converter, Barcode and more.">
+  <meta name="keywords" content="PDF editor, KB resizer, video downloader, video to mp3, barcode generator, loan prepayment, gold price, typing speed test">
   <meta property="og:title" content="DocuCraft AI - Smart All-in-One PDF & Document Studio">
-  <meta property="og:description" content="Merge, Compress, Resize KB, Generate Passport Photos, Calculate Gold Price, BMR, Typing Speed, PPF, EMI, GST, Fuel, Cheque Words free in browser.">
+  <meta property="og:description" content="Merge, Compress, Resize KB, Generate Passport Photos, Download Videos, Extract MP3, Barcode, Gold Price, EMI, GST free in browser.">
   <meta property="og:type" content="website">
   
   <!-- Sitemap Link -->
@@ -120,7 +120,7 @@
       display: none;
       position: fixed;
       inset: 0;
-      background: rgba(15, 23, 42, 0.7);
+      background: rgba(15, 23, 42, 0.75);
       backdrop-filter: blur(4px);
       z-index: 9999;
       justify-content: center;
@@ -131,7 +131,7 @@
     .calc-box {
       background: #ffffff;
       width: 100%;
-      max-width: 480px;
+      max-width: 500px;
       border-radius: 16px;
       padding: 24px;
       box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2);
@@ -215,22 +215,6 @@
       line-height: 1.6;
       color: #334155;
     }
-    .share-wa-btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      background: #22c55e;
-      color: #fff;
-      padding: 6px 12px;
-      border-radius: 6px;
-      text-decoration: none;
-      font-size: 12px;
-      font-weight: 700;
-      margin-top: 10px;
-    }
-    .share-wa-btn:hover {
-      background: #16a34a;
-    }
   </style>
 
   <script>
@@ -277,14 +261,14 @@
 
   <section class="hero">
     <h1>Every tool you need to work with PDFs in one place</h1>
-    <p>Advanced Photo KB Resizer, Passport Grid, Barcodes, Financial Calculators, Land Converters & Utilities.</p>
+    <p>Advanced Photo KB Resizer, Video & Media Tools, Passport Grid, Financial Calculators & Utilities.</p>
   </section>
 
   <!-- Real-Time Search Bar -->
   <div class="search-wrapper">
     <div class="search-box-inner">
       <i class="fa-solid fa-magnifying-glass"></i>
-      <input type="text" id="toolSearchInput" class="search-input" placeholder="Search any tool (e.g. Typing, Gold, Barcode, Color, PPF, Salary)..." onkeyup="filterToolsBySearch()">
+      <input type="text" id="toolSearchInput" class="search-input" placeholder="Search any tool (e.g. Video, MP3, Typing, Prepayment, Barcode, Gold)..." onkeyup="filterToolsBySearch()">
     </div>
   </div>
 
@@ -338,7 +322,29 @@
   <main class="main-grid-container">
     <div class="tools-grid" id="toolsGrid">
 
-      <!-- Newly Added High-Demand Tools -->
+      <!-- Video & Media Downloader Tools (High Traffic) -->
+      <div class="tool-card" data-cat="cyber" onclick="openVideoDownloaderModal()">
+        <div class="tool-icon" style="background:#fee2e2; color:#dc2626;"><i class="fa-solid fa-cloud-arrow-down"></i></div>
+        <h3>Universal Video Downloader Hub <span class="badge-new">NEW</span></h3>
+        <p>Paste video link from Facebook, Instagram, Twitter/X or web to download MP4 video.</p>
+        <span class="tool-meta">Download Video &rarr;</span>
+      </div>
+
+      <div class="tool-card" data-cat="cyber" onclick="openVideoToAudioModal()">
+        <div class="tool-icon" style="background:#ede9fe; color:#7c3aed;"><i class="fa-solid fa-file-audio"></i></div>
+        <h3>Video to MP3 / Audio Extractor <span class="badge-new">NEW</span></h3>
+        <p>Upload any video file from phone or PC to extract and download high-quality audio (WAV/MP3).</p>
+        <span class="tool-meta">Extract Audio &rarr;</span>
+      </div>
+
+      <!-- Prepayment & Typing Speed Test -->
+      <div class="tool-card" data-cat="finance" onclick="openPrepayModal()">
+        <div class="tool-icon" style="background:#e0f2fe; color:#0284c7;"><i class="fa-solid fa-hand-holding-dollar"></i></div>
+        <h3>Loan Prepayment & Interest Saver <span class="badge-new">NEW</span></h3>
+        <p>Calculate how extra lump-sum or monthly prepayments save lakhs in loan interest & time.</p>
+        <span class="tool-meta">Calculate Savings &rarr;</span>
+      </div>
+
       <div class="tool-card" data-cat="generator" onclick="openTypingModal()">
         <div class="tool-icon" style="background:#dbeafe; color:#1d4ed8;"><i class="fa-solid fa-keyboard"></i></div>
         <h3>1-Minute Typing Speed Test <span class="badge-new">NEW</span></h3>
@@ -837,6 +843,62 @@
 
   <!-- Modals for Calculators & Utilities -->
 
+  <!-- Universal Video Downloader Modal -->
+  <div class="calc-modal" id="videoDownloaderModal" onclick="if(event.target === this) closeVideoDownloaderModal()">
+    <div class="calc-box">
+      <button class="calc-close" onclick="closeVideoDownloaderModal()">&times;</button>
+      <h3><i class="fa-solid fa-cloud-arrow-down" style="color: #dc2626;"></i> Social Video Downloader</h3>
+      <div class="calc-group">
+        <label>Paste Video Link (Facebook, Instagram, Web):</label>
+        <input type="text" id="videoUrlInput" placeholder="https://www.facebook.com/... or https://instagram.com/...">
+      </div>
+      <button class="calc-btn" onclick="executeVideoDownload()">Fetch & Download Video</button>
+      <div id="videoDlOutput" class="calc-result"></div>
+    </div>
+  </div>
+
+  <!-- Video to MP3 Audio Extractor Modal -->
+  <div class="calc-modal" id="videoToAudioModal" onclick="if(event.target === this) closeVideoToAudioModal()">
+    <div class="calc-box">
+      <button class="calc-close" onclick="closeVideoToAudioModal()">&times;</button>
+      <h3><i class="fa-solid fa-file-audio" style="color: #7c3aed;"></i> Video to Audio (MP3) Extractor</h3>
+      <div class="calc-group">
+        <label>Select Video File from Phone/PC:</label>
+        <input type="file" id="videoFileInput" accept="video/*">
+      </div>
+      <button class="calc-btn" onclick="executeVideoToAudio()">Extract & Download Audio</button>
+      <div id="audioExtractOutput" class="calc-result"></div>
+    </div>
+  </div>
+
+  <!-- Loan Prepayment Calculator Modal -->
+  <div class="calc-modal" id="prepayModal" onclick="if(event.target === this) closePrepayModal()">
+    <div class="calc-box">
+      <button class="calc-close" onclick="closePrepayModal()">&times;</button>
+      <h3><i class="fa-solid fa-hand-holding-dollar" style="color: #0284c7;"></i> Loan Prepayment & Interest Saver</h3>
+      <div class="calc-group">
+        <label>Outstanding Loan Principal (₹):</label>
+        <input type="number" id="prepayPrincipal" placeholder="e.g. 2000000">
+      </div>
+      <div class="calc-group">
+        <label>Annual Interest Rate (%):</label>
+        <input type="number" id="prepayRate" step="0.01" placeholder="e.g. 8.5">
+      </div>
+      <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+        <div class="calc-group">
+          <label>Remaining Tenure (Months):</label>
+          <input type="number" id="prepayMonths" placeholder="e.g. 180">
+        </div>
+        <div class="calc-group">
+          <label>Extra Prepayment (₹/Month):</label>
+          <input type="number" id="prepayExtra" placeholder="e.g. 5000">
+        </div>
+      </div>
+      <button class="calc-btn" onclick="executePrepayCalc()">Calculate Interest Saved</button>
+      <div id="prepayOutput" class="calc-result"></div>
+    </div>
+  </div>
+
   <!-- Barcode Generator Modal -->
   <div class="calc-modal" id="barcodeModal" onclick="if(event.target === this) closeBarcodeModal()">
     <div class="calc-box" style="text-align: center;">
@@ -955,20 +1017,20 @@
     </div>
   </div>
 
-  <!-- 1-Minute Typing Speed Test Modal -->
+  <!-- 1-Minute Typing Speed Test Modal (Crystal Clear Contrast) -->
   <div class="calc-modal" id="typingModal" onclick="if(event.target === this) closeTypingModal()">
     <div class="calc-box" style="max-width: 530px;">
       <button class="calc-close" onclick="closeTypingModal()">&times;</button>
       <h3><i class="fa-solid fa-keyboard" style="color: #1d4ed8;"></i> 1-Minute Typing Test</h3>
-      <div id="typingSnippet" style="background:#f8fafc; border:1px solid #cbd5e1; border-radius:8px; padding:10px; font-size:13px; line-height:1.6; user-select:none; margin-bottom:10px;">
+      <div id="typingSnippet" style="background:#0f172a; border:2px solid #3b82f6; border-radius:10px; padding:16px; font-size:15px; color:#ffffff; font-weight:600; line-height:1.7; user-select:none; margin-bottom:14px; letter-spacing:0.3px;">
         The quick brown fox jumps over the lazy dog. Technology and automation enable swift digital transformation across modern platforms with ease.
       </div>
       <div class="calc-group">
-        <textarea id="typingInputArea" rows="3" placeholder="Click here and start typing to begin the 60-second test..." oninput="handleTypingInput()"></textarea>
+        <textarea id="typingInputArea" rows="3" placeholder="Click here and start typing to begin the 60-second test..." oninput="handleTypingInput()" style="color:#0f172a; font-weight:700; font-size:15px; background:#ffffff; border:2px solid #cbd5e1;"></textarea>
       </div>
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-        <span style="font-weight:700; color:#dc2626;">Time Remaining: <span id="typingTimer">60</span>s</span>
-        <button type="button" onclick="resetTypingTest()" style="padding:4px 10px; font-size:12px; border-radius:6px; border:1px solid #cbd5e1; background:#fff; cursor:pointer;">Reset</button>
+        <span style="font-weight:800; font-size:15px; color:#dc2626;">Time Remaining: <span id="typingTimer">60</span>s</span>
+        <button type="button" onclick="resetTypingTest()" style="padding:6px 14px; font-size:13px; font-weight:700; border-radius:6px; border:1px solid #cbd5e1; background:#f1f5f9; cursor:pointer;">Reset</button>
       </div>
       <div id="typingOutput" class="calc-result"></div>
     </div>
@@ -1802,6 +1864,13 @@
     });
 
     // Modal Triggers
+    function openVideoDownloaderModal() { document.getElementById('videoDownloaderModal').style.display = 'flex'; }
+    function closeVideoDownloaderModal() { document.getElementById('videoDownloaderModal').style.display = 'none'; }
+    function openVideoToAudioModal() { document.getElementById('videoToAudioModal').style.display = 'flex'; }
+    function closeVideoToAudioModal() { document.getElementById('videoToAudioModal').style.display = 'none'; }
+
+    function openPrepayModal() { document.getElementById('prepayModal').style.display = 'flex'; }
+    function closePrepayModal() { document.getElementById('prepayModal').style.display = 'none'; }
     function openBarcodeModal() { document.getElementById('barcodeModal').style.display = 'flex'; executeBarcodeRender(); }
     function closeBarcodeModal() { document.getElementById('barcodeModal').style.display = 'none'; }
     function openColorPickerModal() { document.getElementById('colorPickerModal').style.display = 'flex'; }
@@ -1888,7 +1957,162 @@
     function openCircleDpModal() { document.getElementById('circleDpModal').style.display = 'flex'; }
     function closeInfoModal() { document.getElementById('infoModal').style.display = 'none'; }
 
-    // 1. Barcode Generator
+    // 1. Universal Video Downloader
+    function executeVideoDownload() {
+      const url = document.getElementById('videoUrlInput').value.trim();
+      const out = document.getElementById('videoDlOutput');
+      if (!url) {
+        alert("Please paste a valid video URL.");
+        return;
+      }
+      out.style.display = 'block';
+      out.innerHTML = `
+        <p><strong>Link Detected:</strong> <span style="font-size:12px; word-break:break-all;">${url}</span></p>
+        <p style="font-size:13px; color:#475569;">To comply with browser security & AdSense policies, click below to fetch your MP4 file safely:</p>
+        <a href="https://en.savefrom.net/#url=${encodeURIComponent(url)}" target="_blank" class="calc-btn" style="display:inline-block; text-decoration:none; text-align:center; padding:10px 16px; width:auto; background:#16a34a;">Download MP4 Video &rarr;</a>
+      `;
+    }
+
+    // 2. Video to Audio (MP3/WAV) Client-Side Extractor
+    function executeVideoToAudio() {
+      const fileInput = document.getElementById('videoFileInput');
+      const out = document.getElementById('audioExtractOutput');
+      if (!fileInput.files[0]) {
+        alert("Please choose a video file.");
+        return;
+      }
+
+      const file = fileInput.files[0];
+      out.style.display = 'block';
+      out.innerHTML = "Processing audio track from video in browser... Please wait.";
+
+      const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      const reader = new FileReader();
+
+      reader.onload = function(e) {
+        audioCtx.decodeAudioData(e.target.result).then(audioBuffer => {
+          // Convert AudioBuffer to downloadable WAV/Audio format
+          const numChannels = audioBuffer.numberOfChannels;
+          const sampleRate = audioBuffer.sampleRate;
+          const format = 1; // PCM
+          const bitDepth = 16;
+          
+          let resultBuffer;
+          if (numChannels === 2) {
+            resultBuffer = interleave(audioBuffer.getChannelData(0), audioBuffer.getChannelData(1));
+          } else {
+            resultBuffer = audioBuffer.getChannelData(0);
+          }
+
+          const wavBlob = createWavBlob(resultBuffer, numChannels, sampleRate, bitDepth);
+          const dlUrl = URL.createObjectURL(wavBlob);
+
+          out.innerHTML = `
+            <span style="color:#16a34a; font-weight:700;">✔ Audio Extracted Successfully!</span><br>
+            <a href="${dlUrl}" download="${file.name.replace(/\.[^/.]+$/, "")}_audio.wav" class="calc-btn" style="display:inline-block; text-decoration:none; text-align:center; padding:10px 16px; margin-top:8px; width:auto; background:#7c3aed;">Download Extracted Audio (WAV)</a>
+          `;
+        }).catch(err => {
+          out.innerHTML = "<span style='color:#dc2626;'>Could not extract audio track. Ensure the file has valid audio streams.</span>";
+        });
+      };
+      reader.readAsArrayBuffer(file);
+    }
+
+    function interleave(inputL, inputR) {
+      const length = inputL.length + inputR.length;
+      const result = new Float32Array(length);
+      let index = 0, inputIndex = 0;
+      while (index < length) {
+        result[index++] = inputL[inputIndex];
+        result[index++] = inputR[inputIndex];
+        inputIndex++;
+      }
+      return result;
+    }
+
+    function createWavBlob(samples, numChannels, sampleRate, bitDepth) {
+      const bytesPerSample = bitDepth / 8;
+      const blockAlign = numChannels * bytesPerSample;
+      const buffer = new ArrayBuffer(44 + samples.length * bytesPerSample);
+      const view = new DataView(buffer);
+
+      function writeString(view, offset, string) {
+        for (let i = 0; i < string.length; i++) view.setUint8(offset + i, string.charCodeAt(i));
+      }
+
+      writeString(view, 0, 'RIFF');
+      view.setUint32(4, 36 + samples.length * bytesPerSample, true);
+      writeString(view, 8, 'WAVE');
+      writeString(view, 12, 'fmt ');
+      view.setUint32(16, 16, true);
+      view.setUint16(20, 1, true);
+      view.setUint16(22, numChannels, true);
+      view.setUint32(24, sampleRate, true);
+      view.setUint32(28, sampleRate * blockAlign, true);
+      view.setUint16(32, blockAlign, true);
+      view.setUint16(34, bitDepth, true);
+      writeString(view, 36, 'data');
+      view.setUint32(40, samples.length * bytesPerSample, true);
+
+      let offset = 44;
+      for (let i = 0; i < samples.length; i++, offset += 2) {
+        let s = Math.max(-1, Math.min(1, samples[i]));
+        view.setInt16(offset, s < 0 ? s * 0x8000 : s * 0x7FFF, true);
+      }
+      return new Blob([view], { type: 'audio/wav' });
+    }
+
+    // 3. Loan Prepayment Calculator
+    function executePrepayCalc() {
+      const P = parseFloat(document.getElementById('prepayPrincipal').value);
+      const annualRate = parseFloat(document.getElementById('prepayRate').value);
+      const months = parseInt(document.getElementById('prepayMonths').value);
+      const extra = parseFloat(document.getElementById('prepayExtra').value) || 0;
+
+      if (!P || !annualRate || !months || P <= 0 || annualRate <= 0 || months <= 0) {
+        alert("Please enter valid loan principal, interest rate, and remaining months.");
+        return;
+      }
+
+      const r = (annualRate / 12) / 100;
+      const emi = (P * r * Math.pow(1 + r, months)) / (Math.pow(1 + r, months) - 1);
+      const originalTotalPayment = emi * months;
+      const originalInterest = originalTotalPayment - P;
+
+      let balance = P;
+      let totalPaidWithPrepay = 0;
+      let actualMonths = 0;
+      const newEmi = emi + extra;
+
+      while (balance > 0 && actualMonths < months * 2) {
+        let interestForMonth = balance * r;
+        let principalForMonth = newEmi - interestForMonth;
+        if (principalForMonth > balance) {
+          principalForMonth = balance;
+          totalPaidWithPrepay += (interestForMonth + principalForMonth);
+          balance = 0;
+        } else {
+          balance -= principalForMonth;
+          totalPaidWithPrepay += newEmi;
+        }
+        actualMonths++;
+      }
+
+      const newInterest = totalPaidWithPrepay - P;
+      const interestSaved = Math.max(0, originalInterest - newInterest);
+      const monthsSaved = Math.max(0, months - actualMonths);
+
+      const out = document.getElementById('prepayOutput');
+      out.style.display = 'block';
+      out.innerHTML = `
+        <strong>Original Interest Payable:</strong> ₹${originalInterest.toFixed(2)}<br>
+        <strong>New Interest with Prepayment:</strong> ₹${newInterest.toFixed(2)}<br>
+        <strong>Total Interest Saved:</strong> <span style="font-weight:800; color:#16a34a; font-size:15px;">₹${interestSaved.toFixed(2)}</span><br>
+        <strong>Time Saved:</strong> ${monthsSaved} months (~${(monthsSaved/12).toFixed(1)} years) earlier!
+      `;
+    }
+
+    // 4. Barcode Generator
     function executeBarcodeRender() {
       const val = document.getElementById('barcodeInputVal').value.trim() || 'DOCUCRAFT123';
       try {
@@ -1930,7 +2154,7 @@
       img.src = image64;
     }
 
-    // 2. Color Picker & HEX Extractor
+    // 5. Color Picker & HEX Extractor
     function loadPickerImage(event) {
       const file = event.target.files[0];
       if (!file) return;
@@ -1971,7 +2195,7 @@
       reader.readAsDataURL(file);
     }
 
-    // 3. Base64 Encoder / Decoder
+    // 6. Base64 Encoder / Decoder
     function executeBase64Process(action) {
       const text = document.getElementById('base64InputText').value;
       const box = document.getElementById('base64OutputBox');
@@ -1998,7 +2222,7 @@
       }
     }
 
-    // 4. Gold & Jewellery Price Calculator
+    // 7. Gold & Jewellery Price Calculator
     function executeGoldCalc() {
       const rate10g = parseFloat(document.getElementById('goldRate10g').value);
       const grams = parseFloat(document.getElementById('goldWeightGrams').value);
@@ -2026,7 +2250,7 @@
       `;
     }
 
-    // 5. Daily Calorie & BMR Calculator (Harris-Benedict Formula)
+    // 8. Daily Calorie & BMR Calculator
     function executeCalorieCalc() {
       const gender = document.getElementById('bmrGender').value;
       const age = parseInt(document.getElementById('bmrAge').value);
@@ -2060,7 +2284,7 @@
       `;
     }
 
-    // 6. 1-Minute Typing Test Engine
+    // 9. 1-Minute Typing Test Engine (High-Visibility Contrast)
     let typingTimerSeconds = 60;
     let typingInterval = null;
     let typingStarted = false;
@@ -2114,7 +2338,7 @@
       `;
     }
 
-    // 7. Inflation Calculator (Compound Future Cost)
+    // 10. Inflation Calculator
     function executeInflationCalc() {
       const amount = parseFloat(document.getElementById('infAmount').value);
       const rate = parseFloat(document.getElementById('infRate').value) / 100;
@@ -2136,7 +2360,7 @@
       `;
     }
 
-    // 8. PPF Scheme Calculator
+    // 11. PPF Scheme Calculator
     function executePpfCalc() {
       const p = parseFloat(document.getElementById('ppfYearlyAmount').value);
       const r = parseFloat(document.getElementById('ppfRate').value) / 100;
@@ -2164,7 +2388,7 @@
       `;
     }
 
-    // 9. Electricity Bill & Power Calculator
+    // 12. Electricity Bill & Power Calculator
     function executeElectricityCalc() {
       const watts = parseFloat(document.getElementById('elecWattage').value);
       const hours = parseFloat(document.getElementById('elecDailyHours').value);
@@ -2188,7 +2412,7 @@
       `;
     }
 
-    // 10. Fuel Cost & Trip Mileage Calculator
+    // 13. Fuel Cost & Trip Mileage Calculator
     function executeFuelCalc() {
       const distance = parseFloat(document.getElementById('fuelDistance').value);
       const mileage = parseFloat(document.getElementById('fuelMileage').value);
@@ -2212,7 +2436,7 @@
       `;
     }
 
-    // 11. Hashtag Extractor & Counter
+    // 14. Hashtag Extractor & Counter
     function executeHashtagExtract() {
       const text = document.getElementById('hashtagInputText').value;
       if (!text.trim()) {
@@ -2245,7 +2469,7 @@
       }
     }
 
-    // 12. Number to Words
+    // 15. Number to Words
     function executeNumToWords() {
       const val = parseFloat(document.getElementById('numToWordsInput').value);
       const out = document.getElementById('numToWordsOutput');
@@ -2311,7 +2535,7 @@
       }
     }
 
-    // 13. Take-Home Salary & CTC Calculator
+    // 16. Take-Home Salary & CTC Calculator
     function executeSalaryCalc() {
       const ctc = parseFloat(document.getElementById('salaryCtc').value);
       const extraDeductions = parseFloat(document.getElementById('salaryDeductions').value) || 0;
@@ -2339,7 +2563,7 @@
       `;
     }
 
-    // 14. Friend Bill Split & Tip Calculator
+    // 17. Friend Bill Split & Tip Calculator
     function executeBillSplit() {
       const total = parseFloat(document.getElementById('splitBillTotal').value);
       const people = parseInt(document.getElementById('splitPeopleCount').value) || 1;
@@ -2363,7 +2587,7 @@
       `;
     }
 
-    // 15. Universal Unit Converter
+    // 18. Universal Unit Converter
     const unitOptions = {
       length: ['Meter', 'Kilometer', 'Centimeter', 'Millimeter', 'Foot', 'Inch', 'Yard'],
       weight: ['Kilogram', 'Gram', 'Milligram', 'Pound', 'Ounce'],
@@ -2420,7 +2644,7 @@
       out.innerHTML = `<strong>Result:</strong> ${val}${from} = <span style="font-weight:800; color:#6d28d9; font-size:16px;">${result.toFixed(4)}${to}</span>`;
     }
 
-    // 16. EMI
+    // 19. EMI
     function executeEmiCalc() {
       const p = parseFloat(document.getElementById('emiLoanAmount').value);
       const annualRate = parseFloat(document.getElementById('emiInterestRate').value);
@@ -2442,7 +2666,7 @@
       `;
     }
 
-    // 17. GST
+    // 20. GST
     function executeGstCalc() {
       const amount = parseFloat(document.getElementById('gstInputAmount').value);
       const rate = parseFloat(document.getElementById('gstRateSelect').value);
@@ -2464,7 +2688,7 @@
         : `<strong>Base Price:</strong> ₹${total.toFixed(2)}<br><strong>Included GST:</strong> ₹${gst.toFixed(2)}`;
     }
 
-    // 18. SIP
+    // 21. SIP
     function executeSipCalc() {
       const p = parseFloat(document.getElementById('sipMonthlyAmount').value);
       const rate = parseFloat(document.getElementById('sipReturnRate').value);
@@ -2484,7 +2708,7 @@
       `;
     }
 
-    // 19. Simple & Compound Interest
+    // 22. Simple & Compound Interest
     function executeInterestCalc() {
       const type = document.getElementById('interestTypeSelect').value;
       const p = parseFloat(document.getElementById('interestPrincipal').value);
@@ -2513,7 +2737,7 @@
       `;
     }
 
-    // 20. FD & RD
+    // 23. FD & RD
     function executeFdCalc() {
       const type = document.getElementById('fdTypeSelect').value;
       const p = parseFloat(document.getElementById('fdAmount').value);
@@ -2543,7 +2767,7 @@
       `;
     }
 
-    // 21. Land Area Converter
+    // 24. Land Area Converter
     function executeLandConvert() {
       const val = parseFloat(document.getElementById('landInputVal').value);
       const unit = document.getElementById('landUnitSelect').value;
@@ -2569,7 +2793,7 @@
       `;
     }
 
-    // 22. Life in Hours, Minutes & Seconds
+    // 25. Life in Hours, Minutes & Seconds
     function executeLifeStatsCalc() {
       const dobVal = document.getElementById('lifeDob').value;
       if (!dobVal) { alert("Please select your birth date."); return; }
@@ -2597,7 +2821,7 @@
       `;
     }
 
-    // 23. Multi-Subject Average & Grade
+    // 26. Multi-Subject Average & Grade
     function executeGradeCalc() {
       const input = document.getElementById('gradeMarksList').value.trim();
       const maxPerSub = parseFloat(document.getElementById('gradeMaxMarks').value) || 100;
@@ -2631,7 +2855,7 @@
       `;
     }
 
-    // 24. Fancy Bio Font Generator
+    // 27. Fancy Bio Font Generator
     function executeFontGeneration() {
       const text = document.getElementById('bioFontInput').value || 'DocuCraft AI';
       const container = document.getElementById('bioFontResults');
@@ -2654,7 +2878,7 @@
       });
     }
 
-    // 25. Water Intake Goal
+    // 28. Water Intake Goal
     function executeWaterCalc() {
       const w = parseFloat(document.getElementById('waterWeight').value);
       const activity = document.getElementById('waterActivity').value;
@@ -2674,7 +2898,7 @@
       `;
     }
 
-    // 26. Screen & Display Metrics
+    // 29. Screen & Display Metrics
     function executeScreenMetrics() {
       const w = window.screen.width;
       const h = window.screen.height;
@@ -2693,7 +2917,7 @@
       `;
     }
 
-    // 27. Date Difference & Days Counter
+    // 30. Date Difference & Days Counter
     function executeDateDiffCalc() {
       const d1Val = document.getElementById('dateDiffStart').value;
       const d2Val = document.getElementById('dateDiffEnd').value;
@@ -2715,7 +2939,7 @@
       `;
     }
 
-    // 28. Duplicate Line Remover
+    // 31. Duplicate Line Remover
     function executeDupRemover() {
       const input = document.getElementById('dupInputText').value;
       const isCase = document.getElementById('dupCaseSensitive').checked;
@@ -2752,7 +2976,7 @@
       }
     }
 
-    // 29. Exam Eligibility
+    // 32. Exam Eligibility
     function executeEligibilityCalc() {
       const dobVal = document.getElementById('elgDob').value;
       const cutVal = document.getElementById('elgCutoff').value;
@@ -2795,7 +3019,7 @@
         : `<span style="color:#dc2626; font-size:16px;"><strong>✖ Not Eligible!</strong></span><br><strong>Age as on Cut-off:</strong> ${y} yrs, ${m} mos,${d} days.<br><span style="font-size:12px; color:#64748b;">(Required: ${minAge} to${maxAge} years)</span>`;
     }
 
-    // 30. Marks & CGPA
+    // 33. Marks & CGPA
     function toggleMarksInputs() {
       const type = document.getElementById('marksCalcType').value;
       document.getElementById('marksInputFields').style.display = type === 'marks' ? 'block' : 'none';
@@ -2825,7 +3049,7 @@
       }
     }
 
-    // 31. YouTube Thumbnail Downloader
+    // 34. YouTube Thumbnail Downloader
     function executeYtThumbFetch() {
       const url = document.getElementById('ytVideoUrl').value.trim();
       let videoId = '';
@@ -2846,7 +3070,7 @@
       document.getElementById('ytThumbOutput').style.display = 'block';
     }
 
-    // 32. Round DP Maker
+    // 35. Round DP Maker
     function executeCircleDpCrop() {
       const fileInput = document.getElementById('circleDpInput');
       const borderColor = document.getElementById('circleBorderColor').value;
@@ -2891,7 +3115,7 @@
       reader.readAsDataURL(fileInput.files[0]);
     }
 
-    // 33. BMI Fitness
+    // 36. BMI Fitness
     function executeBmiCalc() {
       const h = parseFloat(document.getElementById('bmiHeight').value);
       const w = parseFloat(document.getElementById('bmiWeight').value);
@@ -2909,7 +3133,7 @@
       out.innerHTML = `<strong>Your BMI:</strong> ${bmi.toFixed(1)}<br><strong>Status:</strong>${status}`;
     }
 
-    // 34. Password Generator
+    // 37. Password Generator
     function executePassGen() {
       const len = parseInt(document.getElementById('passLength').value) || 14;
       const comp = document.getElementById('passComplexity').value;
@@ -2947,7 +3171,7 @@
       }
     }
 
-    // 35. Age Calculator
+    // 38. Age Calculator
     function executeAgeCalc() {
       const dobVal = document.getElementById('ageDob').value;
       const asOnVal = document.getElementById('ageAsOn').value;
@@ -2973,7 +3197,7 @@
       out.innerHTML = `<strong>Your Age:</strong> ${y} years, ${m} months, ${d} days`;
     }
 
-    // 36. Discount
+    // 39. Discount
     function executeDiscountCalc() {
       const price = parseFloat(document.getElementById('discOriginalPrice').value);
       const disc = parseFloat(document.getElementById('discPercentage').value);
@@ -2987,7 +3211,7 @@
       out.innerHTML = `<strong>Discounted Price:</strong> ₹${finalPrice.toFixed(2)}<br><strong>Savings:</strong> ₹${saved.toFixed(2)} (${disc}%)`;
     }
 
-    // 37. Percentage
+    // 40. Percentage
     function executePercentCalc() {
       const a = parseFloat(document.getElementById('pctValA').value);
       const b = parseFloat(document.getElementById('pctValB').value);
@@ -2998,7 +3222,7 @@
       out.innerHTML = `<strong>${a}% of ${b} = </strong> <span style="font-size:16px; font-weight:800;">${result.toFixed(2)}</span>`;
     }
 
-    // 38. DOP Generator
+    // 41. DOP Generator
     function executeDopGenerator() {
       const fileInput = document.getElementById('dopFileInput');
       const name = document.getElementById('dopName').value.trim();
@@ -3031,7 +3255,7 @@
       reader.readAsDataURL(fileInput.files[0]);
     }
 
-    // 39. Image Format Converter
+    // 42. Image Format Converter
     function executeImageConversion() {
       const fileInput = document.getElementById('convertImgInput');
       const format = document.getElementById('convertTargetFormat').value;
@@ -3042,7 +3266,7 @@
         img.onload = function() {
           const canvas = document.createElement('canvas');
           canvas.width = img.width; canvas.height = img.height;
-          const ctx = canvas.getContext('2d');
+          ctx = canvas.getContext('2d');
           ctx.drawImage(img, 0, 0);
           canvas.toBlob(blob => {
             const ext = format === 'image/png' ? 'png' : (format === 'image/webp' ? 'webp' : 'jpg');
@@ -3056,7 +3280,7 @@
       reader.readAsDataURL(fileInput.files[0]);
     }
 
-    // 40. Word, Case & Text Formatter
+    // 43. Word, Case & Text Formatter
     function updateWordCounts() {
       const val = document.getElementById('wordCounterText').value.trim();
       const words = val ? val.split(/\s+/).filter(Boolean).length : 0;
