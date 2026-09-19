@@ -451,7 +451,7 @@
         <span class="tool-meta">Open Tool &rarr;</span>
       </div>
 
-      <div class="tool-card" data-cat="organize" onclick="launchTool('rotate')">
+      <div class="tool-card" data-cat="rotate" onclick="launchTool('rotate')">
         <div class="tool-icon" style="background:#fef3c7; color:#d97706;"><i class="fa-solid fa-rotate-right"></i></div>
         <h3>Rotate PDF</h3>
         <p>Rotate upside-down or sideways pages by 90, 180, or 270 degrees.</p>
@@ -719,12 +719,12 @@
       <div class="calc-group">
         <label>From Unit:</label>
         <select id="landUnitSelect">
-          <option value="katha" selected>Katha (কাঠা)</option>
-          <option value="bigha">Bigha (বিঘা)</option>
-          <option value="sqft">Square Feet (বর্গফুট)</option>
-          <option value="acre">Acre (একর)</option>
-          <option value="decimil">Decimil / শতক</option>
-          <option value="chhatak">Chhatak (ছটাক)</option>
+          <option value="katha" selected>Katha</option>
+          <option value="bigha">Bigha</option>
+          <option value="sqft">Square Feet</option>
+          <option value="acre">Acre</option>
+          <option value="decimil">Decimil / Cent</option>
+          <option value="chhatak">Chhatak</option>
         </select>
       </div>
       <button class="calc-btn" onclick="executeLandConvert()">Convert All Units</button>
@@ -957,7 +957,7 @@
   <script src="js/tools.js"></script>
   <script src="js/main.js"></script>
 
-  <!-- Complete Script Engine -->
+  <!-- Complete Script Engine (English Standard) -->
   <script>
     // Search Functionality
     function filterToolsBySearch() {
@@ -1010,14 +1010,14 @@
       const annualRate = parseFloat(document.getElementById('emiInterestRate').value);
       const tenureYears = parseFloat(document.getElementById('emiLoanTenure').value);
       if (!p || !annualRate || !tenureYears || p <= 0 || annualRate <= 0 || tenureYears <= 0) {
-        alert("দয়া করে সঠিক তথ্য দিন।"); return;
+        alert("Please enter valid loan details."); return;
       }
       const r = (annualRate / 12) / 100, n = tenureYears * 12;
       const emi = (p * r * Math.pow(1 + r, n)) / (Math.pow(1 + r, n) - 1);
       const totalPayment = emi * n, totalInterest = totalPayment - p;
       const out = document.getElementById('emiOutput');
       out.style.display = 'block';
-      out.innerHTML = `<strong>মাসিক কিস্তি (EMI):</strong> ₹${emi.toFixed(2)}<br><strong>মোট সুদ:</strong> ₹${totalInterest.toFixed(2)}<br><strong>মোট প্রদেয় টাকা:</strong> ₹${totalPayment.toFixed(2)}`;
+      out.innerHTML = `<strong>Monthly EMI:</strong> ₹${emi.toFixed(2)}<br><strong>Total Interest:</strong> ₹${totalInterest.toFixed(2)}<br><strong>Total Payment:</strong> ₹${totalPayment.toFixed(2)}`;
     }
 
     // 2. GST
@@ -1025,7 +1025,7 @@
       const amount = parseFloat(document.getElementById('gstInputAmount').value);
       const rate = parseFloat(document.getElementById('gstRateSelect').value);
       const type = document.getElementById('gstTypeSelect').value;
-      if (!amount || amount <= 0) { alert("দয়া করে টাকার পরিমাণ লিখুন।"); return; }
+      if (!amount || amount <= 0) { alert("Please enter a valid amount."); return; }
       let gst = 0, total = 0;
       if (type === 'add') {
         gst = (amount * rate) / 100; total = amount + gst;
@@ -1035,8 +1035,8 @@
       const out = document.getElementById('gstOutput');
       out.style.display = 'block';
       out.innerHTML = type === 'add' 
-        ? `<strong>GST পরিমাণ:</strong> ₹${gst.toFixed(2)}<br><strong>মোট বিল:</strong> ₹${total.toFixed(2)}`
-        : `<strong>আসল দাম:</strong> ₹${total.toFixed(2)}<br><strong>অন্তর্ভুক্ত GST:</strong> ₹${gst.toFixed(2)}`;
+        ? `<strong>GST Amount:</strong> ₹${gst.toFixed(2)}<br><strong>Total Bill:</strong> ₹${total.toFixed(2)}`
+        : `<strong>Base Price:</strong> ₹${total.toFixed(2)}<br><strong>Included GST:</strong> ₹${gst.toFixed(2)}`;
     }
 
     // 3. SIP
@@ -1044,13 +1044,13 @@
       const p = parseFloat(document.getElementById('sipMonthlyAmount').value);
       const rate = parseFloat(document.getElementById('sipReturnRate').value);
       const years = parseFloat(document.getElementById('sipTenure').value);
-      if (!p || !rate || !years || p <= 0 || rate <= 0 || years <= 0) { alert("দয়া করে সঠিক মান লিখুন।"); return; }
+      if (!p || !rate || !years || p <= 0 || rate <= 0 || years <= 0) { alert("Please enter valid parameters."); return; }
       const i = (rate / 12) / 100, n = years * 12;
       const maturity = p * ((Math.pow(1 + i, n) - 1) / i) * (1 + i);
       const invested = p * n, returns = maturity - invested;
       const out = document.getElementById('sipOutput');
       out.style.display = 'block';
-      out.innerHTML = `<strong>মোট জমা:</strong> ₹${invested.toFixed(2)}<br><strong>আনুমানিক রিটার্ন:</strong> ₹${returns.toFixed(2)}<br><strong>মোট প্রদেয় মূল্য:</strong> ₹${maturity.toFixed(2)}`;
+      out.innerHTML = `<strong>Total Invested:</strong> ₹${invested.toFixed(2)}<br><strong>Est. Returns:</strong> ₹${returns.toFixed(2)}<br><strong>Maturity Value:</strong> ₹${maturity.toFixed(2)}`;
     }
 
     // 4. FD & RD
@@ -1059,7 +1059,7 @@
       const p = parseFloat(document.getElementById('fdAmount').value);
       const r = parseFloat(document.getElementById('fdInterestRate').value);
       const t = parseFloat(document.getElementById('fdTenure').value);
-      if (!p || !r || !t || p <= 0 || r <= 0 || t <= 0) { alert("দয়া করে সঠিক মান লিখুন।"); return; }
+      if (!p || !r || !t || p <= 0 || r <= 0 || t <= 0) { alert("Please enter valid deposit values."); return; }
       let maturity = 0, invested = p;
       if (type === 'fd') {
         maturity = p * Math.pow((1 + (r / 400)), 4 * t);
@@ -1071,14 +1071,14 @@
       const interest = maturity - invested;
       const out = document.getElementById('fdOutput');
       out.style.display = 'block';
-      out.innerHTML = `<strong>মোট জমা:</strong> ₹${invested.toFixed(2)}<br><strong>অর্জিত সুদ:</strong> ₹${interest.toFixed(2)}<br><strong>ম্যাচিউরিটি মূল্য:</strong> ₹${maturity.toFixed(2)}`;
+      out.innerHTML = `<strong>Total Deposit:</strong> ₹${invested.toFixed(2)}<br><strong>Interest Earned:</strong> ₹${interest.toFixed(2)}<br><strong>Maturity Payout:</strong> ₹${maturity.toFixed(2)}`;
     }
 
-    // 5. Land Area Converter (Standard Bengal units: 1 Katha = 720 sq ft, 20 Katha = 1 Bigha)
+    // 5. Land Area Converter
     function executeLandConvert() {
       const val = parseFloat(document.getElementById('landInputVal').value);
       const unit = document.getElementById('landUnitSelect').value;
-      if (!val || val <= 0) { alert("দয়া করে সঠিক পরিমাণ লিখুন।"); return; }
+      if (!val || val <= 0) { alert("Please enter a valid area."); return; }
       let sqft = 0;
       if (unit === 'sqft') sqft = val;
       else if (unit === 'katha') sqft = val * 720;
@@ -1092,10 +1092,10 @@
       out.style.display = 'block';
       out.innerHTML = `
         <strong>Square Feet:</strong> ${sqft.toFixed(2)} sq ft<br>
-        <strong>Katha (কাঠা):</strong> ${katha.toFixed(3)} Katha<br>
-        <strong>Bigha (বিঘা):</strong> ${bigha.toFixed(3)} Bigha<br>
-        <strong>Decimil (শতক):</strong> ${decimil.toFixed(3)} শতক<br>
-        <strong>Chhatak (ছটাক):</strong> ${chhatak.toFixed(2)} ছটাক<br>
+        <strong>Katha:</strong> ${katha.toFixed(3)} Katha<br>
+        <strong>Bigha:</strong> ${bigha.toFixed(3)} Bigha<br>
+        <strong>Decimil:</strong> ${decimil.toFixed(3)} Decimil<br>
+        <strong>Chhatak:</strong> ${chhatak.toFixed(2)} Chhatak<br>
         <strong>Acre:</strong> ${acre.toFixed(4)} Acre
       `;
     }
@@ -1104,18 +1104,18 @@
     function executeBmiCalc() {
       const h = parseFloat(document.getElementById('bmiHeight').value);
       const w = parseFloat(document.getElementById('bmiWeight').value);
-      if (!h || !w || h <= 0 || w <= 0) { alert("উচ্চতা ও ওজন দিন।"); return; }
+      if (!h || !w || h <= 0 || w <= 0) { alert("Please enter valid height and weight."); return; }
       const hm = h / 100;
       const bmi = w / (hm * hm);
       let status = '';
-      if (bmi < 18.5) status = '<span style="color:#d97706;">Underweight (ওজন কম)</span>';
-      else if (bmi < 24.9) status = '<span style="color:#16a34a;">Normal Weight (ফিট)</span>';
-      else if (bmi < 29.9) status = '<span style="color:#ea580c;">Overweight (বাড়তি ওজন)</span>';
-      else status = '<span style="color:#dc2626;">Obese (স্থূলতা)</span>';
+      if (bmi < 18.5) status = '<span style="color:#d97706;">Underweight</span>';
+      else if (bmi < 24.9) status = '<span style="color:#16a34a;">Normal Weight</span>';
+      else if (bmi < 29.9) status = '<span style="color:#ea580c;">Overweight</span>';
+      else status = '<span style="color:#dc2626;">Obese</span>';
 
       const out = document.getElementById('bmiOutput');
       out.style.display = 'block';
-      out.innerHTML = `<strong>আপনার BMI:</strong> ${bmi.toFixed(1)}<br><strong>অবস্থা:</strong> ${status}`;
+      out.innerHTML = `<strong>Your BMI:</strong> ${bmi.toFixed(1)}<br><strong>Status:</strong>${status}`;
     }
 
     // 7. Password Generator
@@ -1148,33 +1148,33 @@
     function executeAgeCalc() {
       const dobVal = document.getElementById('ageDob').value;
       const asOnVal = document.getElementById('ageAsOn').value;
-      if (!dobVal || !asOnVal) { alert("দয়া করে তারিখ পূরণ করুন।"); return; }
+      if (!dobVal || !asOnVal) { alert("Please select dates."); return; }
       const dob = new Date(dobVal), asOn = new Date(asOnVal);
-      if (dob > asOn) { alert("জন্মতারিখ বড় হতে পারে না।"); return; }
+      if (dob > asOn) { alert("Date of Birth cannot be greater than target date."); return; }
       let y = asOn.getFullYear() - dob.getFullYear(), m = asOn.getMonth() - dob.getMonth(), d = asOn.getDate() - dob.getDate();
       if (d < 0) { m--; d += new Date(asOn.getFullYear(), asOn.getMonth(), 0).getDate(); }
       if (m < 0) { y--; m += 12; }
       const out = document.getElementById('ageOutput');
       out.style.display = 'block';
-      out.innerHTML = `<strong>আপনার বয়স:</strong> ${y} বছর, ${m} মাস, ${d} দিন`;
+      out.innerHTML = `<strong>Your Age:</strong> ${y} years, ${m} months, ${d} days`;
     }
 
     // 9. Discount
     function executeDiscountCalc() {
       const price = parseFloat(document.getElementById('discOriginalPrice').value);
       const disc = parseFloat(document.getElementById('discPercentage').value);
-      if (!price || disc === '' || price <= 0 || disc < 0) { alert("দয়া করে সঠিক তথ্য দিন।"); return; }
+      if (!price || disc === '' || price <= 0 || disc < 0) { alert("Please enter valid price and discount percentage."); return; }
       const saved = (price * disc) / 100;
       const out = document.getElementById('discOutput');
       out.style.display = 'block';
-      out.innerHTML = `<strong>ডিসকাউন্টের পর দাম:</strong> ₹${(price - saved).toFixed(2)}<br><strong>সাশ্রয়:</strong> ₹${saved.toFixed(2)} (${disc}%)`;
+      out.innerHTML = `<strong>Discounted Price:</strong> ₹${(price - saved).toFixed(2)}<br><strong>Savings:</strong> ₹${saved.toFixed(2)} (${disc}%)`;
     }
 
     // 10. Percentage
     function executePercentCalc() {
       const a = parseFloat(document.getElementById('pctValA').value);
       const b = parseFloat(document.getElementById('pctValB').value);
-      if (isNaN(a) || isNaN(b)) { alert("দয়া করে উভয় সংখ্যা লিখুন।"); return; }
+      if (isNaN(a) || isNaN(b)) { alert("Please enter both numerical values."); return; }
       const result = (a / 100) * b;
       const out = document.getElementById('pctOutput');
       out.style.display = 'block';
@@ -1186,7 +1186,7 @@
       const fileInput = document.getElementById('dopFileInput');
       const name = document.getElementById('dopName').value.trim();
       const date = document.getElementById('dopDate').value;
-      if (!fileInput.files[0] || !name || !date) { alert("দয়া করে ফটো, নাম এবং তারিখ দিন।"); return; }
+      if (!fileInput.files[0] || !name || !date) { alert("Please upload a photo, enter name and date."); return; }
       const reader = new FileReader();
       reader.onload = function(e) {
         const img = new Image();
@@ -1218,7 +1218,7 @@
     function executeImageConversion() {
       const fileInput = document.getElementById('convertImgInput');
       const format = document.getElementById('convertTargetFormat').value;
-      if (!fileInput.files[0]) { alert("দয়া করে ছবি নির্বাচন করুন।"); return; }
+      if (!fileInput.files[0]) { alert("Please select an image."); return; }
       const reader = new FileReader();
       reader.onload = function(e) {
         const img = new Image();
@@ -1300,3 +1300,4 @@
 
 </body>
 </html>
+ Ata sob theek ache to
