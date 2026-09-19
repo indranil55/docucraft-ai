@@ -18,10 +18,10 @@
   <meta name="google-site-verification" content="g-Ww17Sxt42ftp8mYJX1dtanefwYJK691JhChb_47Rw" />
   
   <!-- SEO & Social Sharing (Open Graph / Twitter Card) -->
-  <meta name="description" content="DocuCraft AI - Free Online PDF, Photo, Financial & Productivity Utilities. Resize Photo to exact KB, Merge/Split PDF, Social Video Downloader, Video to Audio Converter, Barcode and more.">
-  <meta name="keywords" content="PDF editor, KB resizer, video downloader, video to mp3, barcode generator, loan prepayment, gold price, typing speed test">
+  <meta name="description" content="DocuCraft AI - Free Online PDF, Photo, Financial & Productivity Utilities. Resize Photo to exact KB, Merge/Split PDF, Loan Prepayment Calculator, Barcode, Gold Price and more.">
+  <meta name="keywords" content="PDF editor, KB resizer, barcode generator, color picker, bigha katha converter, gold price calculator, bmr calculator, typing speed test">
   <meta property="og:title" content="DocuCraft AI - Smart All-in-One PDF & Document Studio">
-  <meta property="og:description" content="Merge, Compress, Resize KB, Generate Passport Photos, Download Videos, Extract MP3, Barcode, Gold Price, EMI, GST free in browser.">
+  <meta property="og:description" content="Merge, Compress, Resize KB, Generate Passport Photos, Calculate Loan Prepayment, Barcode, Gold Price, BMR, PPF, EMI, GST free in browser.">
   <meta property="og:type" content="website">
   
   <!-- Sitemap Link -->
@@ -261,14 +261,14 @@
 
   <section class="hero">
     <h1>Every tool you need to work with PDFs in one place</h1>
-    <p>Advanced Photo KB Resizer, Video & Media Tools, Passport Grid, Financial Calculators & Utilities.</p>
+    <p>Advanced Photo KB Resizer, Passport Grid, Financial Calculators, Land Converters & Utilities.</p>
   </section>
 
   <!-- Real-Time Search Bar -->
   <div class="search-wrapper">
     <div class="search-box-inner">
       <i class="fa-solid fa-magnifying-glass"></i>
-      <input type="text" id="toolSearchInput" class="search-input" placeholder="Search any tool (e.g. KB Resizer, Merge, Video, Typing, Gold)..." onkeyup="filterToolsBySearch()">
+      <input type="text" id="toolSearchInput" class="search-input" placeholder="Search any tool (e.g. Prepayment, Typing, Gold, Barcode, Color)..." onkeyup="filterToolsBySearch()">
     </div>
   </div>
 
@@ -322,7 +322,7 @@
   <main class="main-grid-container">
     <div class="tools-grid" id="toolsGrid">
 
-      <!-- Core PDF & Cyber Tools (Placed First as Requested) -->
+      <!-- Core PDF & Cyber Tools -->
       <div class="tool-card" data-cat="cyber" onclick="launchTool('kbResizer')">
         <div class="tool-icon" style="background:#dbeafe; color:#2563eb;"><i class="fa-solid fa-compress"></i></div>
         <h3>Photo & Sign KB / MB Resizer</h3>
@@ -386,33 +386,19 @@
         <span class="tool-meta">Open Tool &rarr;</span>
       </div>
 
-      <!-- Newly Added High-Demand & Utility Tools with Multi-Level Typing Test -->
-      <div class="tool-card" data-cat="generator" onclick="openTypingModal()">
-        <div class="tool-icon" style="background:#dbeafe; color:#1d4ed8;"><i class="fa-solid fa-keyboard"></i></div>
-        <h3>1-Minute Typing Speed Test <span class="badge-new">NEW</span></h3>
-        <p>Test and measure your typing speed with multi-level paragraphs and real-time WPM.</p>
-        <span class="tool-meta">Start Typing Test &rarr;</span>
-      </div>
-
-      <div class="tool-card" data-cat="cyber" onclick="openVideoDownloaderModal()">
-        <div class="tool-icon" style="background:#fee2e2; color:#dc2626;"><i class="fa-solid fa-cloud-arrow-down"></i></div>
-        <h3>Universal Video Downloader Hub <span class="badge-new">NEW</span></h3>
-        <p>Paste video link from Facebook, Instagram, Twitter/X or web to download MP4 video.</p>
-        <span class="tool-meta">Download Video &rarr;</span>
-      </div>
-
-      <div class="tool-card" data-cat="cyber" onclick="openVideoToAudioModal()">
-        <div class="tool-icon" style="background:#ede9fe; color:#7c3aed;"><i class="fa-solid fa-file-audio"></i></div>
-        <h3>Video to MP3 / Audio Extractor <span class="badge-new">NEW</span></h3>
-        <p>Upload any video file from phone or PC to extract and download high-quality audio (WAV/MP3).</p>
-        <span class="tool-meta">Extract Audio &rarr;</span>
-      </div>
-
+      <!-- Financial, Generators & Utility Tools -->
       <div class="tool-card" data-cat="finance" onclick="openPrepayModal()">
         <div class="tool-icon" style="background:#e0f2fe; color:#0284c7;"><i class="fa-solid fa-hand-holding-dollar"></i></div>
         <h3>Loan Prepayment & Interest Saver <span class="badge-new">NEW</span></h3>
         <p>Calculate how extra lump-sum or monthly prepayments save lakhs in loan interest & time.</p>
         <span class="tool-meta">Calculate Savings &rarr;</span>
+      </div>
+
+      <div class="tool-card" data-cat="generator" onclick="openTypingModal()">
+        <div class="tool-icon" style="background:#dbeafe; color:#1d4ed8;"><i class="fa-solid fa-keyboard"></i></div>
+        <h3>1-Minute Typing Speed Test <span class="badge-new">NEW</span></h3>
+        <p>Test and measure your typing speed with multi-level paragraphs and real-time WPM.</p>
+        <span class="tool-meta">Start Typing Test &rarr;</span>
       </div>
 
       <div class="tool-card" data-cat="finance" onclick="openGoldModal()">
@@ -842,34 +828,6 @@
 
   <!-- Modals for Calculators & Utilities -->
 
-  <!-- Universal Video Downloader Modal -->
-  <div class="calc-modal" id="videoDownloaderModal" onclick="if(event.target === this) closeVideoDownloaderModal()">
-    <div class="calc-box">
-      <button class="calc-close" onclick="closeVideoDownloaderModal()">&times;</button>
-      <h3><i class="fa-solid fa-cloud-arrow-down" style="color: #dc2626;"></i> Social Video Downloader</h3>
-      <div class="calc-group">
-        <label>Paste Video Link (Facebook, Instagram, Web):</label>
-        <input type="text" id="videoUrlInput" placeholder="https://www.facebook.com/... or https://instagram.com/...">
-      </div>
-      <button class="calc-btn" onclick="executeVideoDownload()">Fetch & Download Video</button>
-      <div id="videoDlOutput" class="calc-result"></div>
-    </div>
-  </div>
-
-  <!-- Video to MP3 Audio Extractor Modal -->
-  <div class="calc-modal" id="videoToAudioModal" onclick="if(event.target === this) closeVideoToAudioModal()">
-    <div class="calc-box">
-      <button class="calc-close" onclick="closeVideoToAudioModal()">&times;</button>
-      <h3><i class="fa-solid fa-file-audio" style="color: #7c3aed;"></i> Video to Audio (MP3) Extractor</h3>
-      <div class="calc-group">
-        <label>Select Video File from Phone/PC:</label>
-        <input type="file" id="videoFileInput" accept="video/*">
-      </div>
-      <button class="calc-btn" onclick="executeVideoToAudio()">Extract & Download Audio</button>
-      <div id="audioExtractOutput" class="calc-result"></div>
-    </div>
-  </div>
-
   <!-- Loan Prepayment Calculator Modal -->
   <div class="calc-modal" id="prepayModal" onclick="if(event.target === this) closePrepayModal()">
     <div class="calc-box">
@@ -1016,7 +974,7 @@
     </div>
   </div>
 
-  <!-- 1-Minute Typing Speed Test Modal with Multi-Level Paragraphs -->
+  <!-- 1-Minute Typing Speed Test Modal -->
   <div class="calc-modal" id="typingModal" onclick="if(event.target === this) closeTypingModal()">
     <div class="calc-box" style="max-width: 530px;">
       <button class="calc-close" onclick="closeTypingModal()">&times;</button>
@@ -1870,12 +1828,7 @@
       updateUnitConvFields();
     });
 
-    // Modal Triggers
-    function openVideoDownloaderModal() { document.getElementById('videoDownloaderModal').style.display = 'flex'; }
-    function closeVideoDownloaderModal() { document.getElementById('videoDownloaderModal').style.display = 'none'; }
-    function openVideoToAudioModal() { document.getElementById('videoToAudioModal').style.display = 'flex'; }
-    function closeVideoToAudioModal() { document.getElementById('videoToAudioModal').style.display = 'none'; }
-
+    // Modal Triggers (Video Downloader & Audio Extractor Removed)
     function openPrepayModal() { document.getElementById('prepayModal').style.display = 'flex'; }
     function closePrepayModal() { document.getElementById('prepayModal').style.display = 'none'; }
     function openBarcodeModal() { document.getElementById('barcodeModal').style.display = 'flex'; executeBarcodeRender(); }
@@ -1963,31 +1916,6 @@
     function closeCircleDpModal() { document.getElementById('circleDpModal').style.display = 'none'; }
     function openCircleDpModal() { document.getElementById('circleDpModal').style.display = 'flex'; }
     function closeInfoModal() { document.getElementById('infoModal').style.display = 'none'; }
-
-    // 1. Universal Video Downloader (Optimized for Fast Instant Redirect)
-    function executeVideoDownload() {
-      const url = document.getElementById('videoUrlInput').value.trim();
-      const out = document.getElementById('videoDlOutput');
-      if (!url) {
-        alert("Please paste a valid video URL.");
-        return;
-      }
-      out.style.display = 'block';
-      out.textContent = "Redirecting to download server...";
-      window.open(`https://en.savefrom.net/#url=${encodeURIComponent(url)}`, '_blank');
-    }
-
-    // 2. Video to Audio Extractor
-    function executeVideoToAudio() {
-      const fileInput = document.getElementById('videoFileInput');
-      const out = document.getElementById('audioExtractOutput');
-      if (!fileInput.files[0]) {
-        alert("Please choose a video file.");
-        return;
-      }
-      out.style.display = 'block';
-      out.textContent = "Processing audio track from video in browser... Please wait.";
-    }
 
     // 3. Loan Prepayment Calculator
     function executePrepayCalc() {
