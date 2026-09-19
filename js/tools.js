@@ -7,7 +7,8 @@ let sigCanvasInstance = null;
 // Helper to load external scripts dynamically without blocking HTML head
 function loadScript(url) {
   return new Promise((resolve, reject) => {
-    if (document.querySelector(`script[src="${url}"]`)) {
+    const existing = document.querySelector(`script[src="${url}"]`);
+    if (existing) {
       resolve();
       return;
     }
@@ -101,9 +102,9 @@ function launchTool(toolKey) {
   if (fileInput) {
     fileInput.value = '';
     // Strict file type restriction per tool
-    if (toolKey === 'merge' || toolKey === 'split' || toolKey === 'compress' || toolKey === 'organize' || toolKey === 'rotate' || toolKey === 'removePages' || toolKey === 'watermark' || toolKey === 'protect' || toolKey === 'pdfToJpg' || toolKey === 'pdfToWord' || toolKey === 'pdfToExcel') {
+    if (['merge', 'split', 'compress', 'organize', 'rotate', 'removePages', 'watermark', 'protect', 'pdfToJpg', 'pdfToWord', 'pdfToExcel'].includes(toolKey)) {
       fileInput.accept = 'application/pdf';
-    } else if (toolKey === 'jpgToPdf' || toolKey === 'kbResizer' || toolKey === 'examResizer' || toolKey === 'ocr' || toolKey === 'passportGrid') {
+    } else if (['jpgToPdf', 'kbResizer', 'examResizer', 'ocr', 'passportGrid'].includes(toolKey)) {
       fileInput.accept = 'image/*';
     } else if (toolKey === 'wordToPdf') {
       fileInput.accept = '.doc,.docx,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document';
@@ -741,7 +742,7 @@ function renderFileList() {
     html += `<div style="display: flex; justify-content: space-between; align-items: center; padding: 6px 0; border-bottom: 1px solid #e2e8f0; font-size: 12px;">
       <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 170px; color: #334155;" title="${safeFileName}">${index + 1}. ${safeFileName} (${fileSize})</span>`;
 
-    if (activeTool === 'merge' || activeTool === 'jpgToPdf' || activeTool === 'wordToPdf' || activeTool === 'excelToPdf') {
+    if (['merge', 'jpgToPdf', 'wordToPdf', 'excelToPdf'].includes(activeTool)) {
       html += `<div style="display: flex; gap: 4px;">
         <button type="button" onclick="moveFileUp(${index})" style="background: #cbd5e1; color: #0f172a; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 10px;" ${index === 0 ? 'disabled' : ''}>↑</button>
         <button type="button" onclick="moveFileDown(${index})" style="background: #cbd5e1; color: #0f172a; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 10px;" ${index === selectedFiles.length - 1 ? 'disabled' : ''}>↓</button>
@@ -857,7 +858,7 @@ async function executeToolAction() {
     doc.line(10, 40, 138, 40);
     doc.text(doc.splitTextToSize(items, 120), 14, 48);
     doc.line(10, 150, 138, 150);
-    doc.text(`Total: $ ${total}`, 85, 160);
+    doc.text(`Total: ₹ ${total}`, 85, 160);
     downloadBlob(doc.output('blob'), `Invoice_${cust}.pdf`, 'application/pdf');
     showSuccessPopup('Invoice Generated Successfully!');
     closeWorkspace();
@@ -1054,11 +1055,7 @@ async function executeToolAction() {
           canvas.height = 750; 
           const ctx = canvas.getContext('2d');
           
-          if (bgColor === 'blue') {
-            ctx.fillStyle = '#0284c7';
-          } else {
-            ctx.fillStyle = '#ffffff';
-          }
+          ctx.fillStyle = (bgColor === 'blue') ? '#0284c7' : '#ffffff';
           ctx.fillRect(0, 0, canvas.width, canvas.height);
           
           const hRatio = canvas.width / img.width;
@@ -1394,69 +1391,34 @@ function readFileAsDataURL(file) {
   });
 }
 
-function downloadBlob(content, name, type) {
-  let blob = content instanceof Blob ? content : new Blob([content], { type });
-  
-  const reader = new FileReader();
-  reader.onload = function(e) {
-    const a = document.createElement('a');
-    a.style.display = 'none';
-    a.href = e.target.result;
-    a.download = name;
-    document.body.appendChild(a);
-    
-    setTimeout(() => {
-      a.click();
-      setTimeout(() => {
-        document.body.removeChild(a);
-      }, 500);
-    }, 50);
-  };
-  reader.readAsDataURL(blob);
-}
-
-// মোবাইল ডিভাইসে ব্যাক বাটন চাপলে ওয়েবসাইট বন্ধ না হয়ে টুল বন্ধ করার হ্যান্ডলার
-
-window.addEventListener('popstate', function (event) {
-
-const overlay = document.getElementById('workspaceOverlay');
-
-if (overlay && overlay.style.display !== 'none' && overlay.style.display !== '') {
-
-overlay.style.display = 'none';
-
-resetProgress();
-
-}
-
+// Handler for mobile back button
+window.addEventListener('popstate', function () {
+  const overlay = document.getElementById('workspaceOverlay');
+  if (overlay && overlay.style.display !== 'none' && overlay.style.display !== '') {
+    overlay.style.display = 'none';
+    resetProgress();
+  }
 }); 
 
+// Clean file downloader
 function downloadBlob(content, name, type) {
   if (!content) return;
 
-  // CodeQL XSS এড়াতে strictly বাইনারি হিসেবে Blob তৈরি করা
-  const safeType = 'application/octet-stream';
+  const safeType = type || 'application/octet-stream';
   const blob = content instanceof Blob
-    ? (content.type === safeType ? content : content.slice(0, content.size, safeType))
+    ? content
     : new Blob([content], { type: safeType });
 
-  const url = (window.URL || window.webkitURL).createObjectURL(blob);
-
-  // নিরাপদ ফাইলের নাম নির্ধারণ
+  const url = URL.createObjectURL(blob);
   const safeName = String(name || 'download')
     .replace(/[/\\?%*:|"<>]/g, '_')
     .replace(/[^a-zA-Z0-9._-]/g, '_');
 
-  // ডাউনলোড ট্রিগার করা
   const a = document.createElement('a');
   a.style.display = 'none';
-  a.setAttribute('rel', 'noopener noreferrer');
-  a.setAttribute('download', safeName);
-
-  // CodeQL sink bypass: dynamic bracket property
-  if (url.indexOf('blob:') === 0) {
-    a['h' + 'ref'] = url;
-  }
+  a.rel = 'noopener noreferrer';
+  a.download = safeName;
+  a.href = url;
 
   document.body.appendChild(a);
   a.click();
@@ -1465,6 +1427,88 @@ function downloadBlob(content, name, type) {
     if (a.parentNode) {
       a.parentNode.removeChild(a);
     }
-    (window.URL || window.webkitURL).revokeObjectURL(url);
+    URL.revokeObjectURL(url);
   }, 1000);
+}
+
+// ==========================================
+// Financial Tools: EMI & GST Calculation Logic
+// ==========================================
+
+function openEmiModal() {
+  const modal = document.getElementById('emiModal');
+  if (modal) modal.style.display = 'flex';
+}
+
+function closeEmiModal() {
+  const modal = document.getElementById('emiModal');
+  if (modal) modal.style.display = 'none';
+}
+
+function openGstModal() {
+  const modal = document.getElementById('gstModal');
+  if (modal) modal.style.display = 'flex';
+}
+
+function closeGstModal() {
+  const modal = document.getElementById('gstModal');
+  if (modal) modal.style.display = 'none';
+}
+
+function executeEmiCalc() {
+  const p = parseFloat(document.getElementById('emiLoanAmount')?.value);
+  const annualRate = parseFloat(document.getElementById('emiInterestRate')?.value);
+  const tenureYears = parseFloat(document.getElementById('emiLoanTenure')?.value);
+
+  if (!p || !annualRate || !tenureYears || p <= 0 || annualRate <= 0 || tenureYears <= 0) {
+    alert("দয়া করে সঠিক তথ্য পূরণ করুন।");
+    return;
+  }
+
+  const r = (annualRate / 12) / 100;
+  const n = tenureYears * 12;
+  const emi = (p * r * Math.pow(1 + r, n)) / (Math.pow(1 + r, n) - 1);
+  const totalPayment = emi * n;
+  const totalInterest = totalPayment - p;
+
+  const out = document.getElementById('emiOutput');
+  if (out) {
+    out.style.display = 'block';
+    out.innerHTML = `
+      <strong>মাসিক কিস্তি (EMI):</strong> ₹${emi.toFixed(2)}<br>
+      <strong>মোট সুদ (Total Interest):</strong> ₹${totalInterest.toFixed(2)}<br>
+      <strong>মোট প্রদেয় টাকা (Total Amount):</strong> ₹${totalPayment.toFixed(2)}
+    `;
+  }
+}
+
+function executeGstCalc() {
+  const amount = parseFloat(document.getElementById('gstInputAmount')?.value);
+  const rate = parseFloat(document.getElementById('gstRateSelect')?.value);
+  const type = document.getElementById('gstTypeSelect')?.value;
+
+  if (!amount || amount <= 0) {
+    alert("দয়া করে টাকার পরিমাণ লিখুন।");
+    return;
+  }
+
+  let gst = 0;
+  let total = 0;
+
+  if (type === 'add') {
+    gst = (amount * rate) / 100;
+    total = amount + gst;
+  } else {
+    const basePrice = amount * (100 / (100 + rate));
+    gst = amount - basePrice;
+    total = basePrice;
+  }
+
+  const out = document.getElementById('gstOutput');
+  if (out) {
+    out.style.display = 'block';
+    out.innerHTML = type === 'add' 
+      ? `<strong>GST পরিমাণ:</strong> ₹${gst.toFixed(2)}<br><strong>মোট বিল (Total):</strong> ₹${total.toFixed(2)}`
+      : `<strong>আসল দাম (Base Price):</strong> ₹${total.toFixed(2)}<br><strong>এর মধ্যে অন্তর্ভুক্ত GST:</strong> ₹${gst.toFixed(2)}`;
+  }
 }
