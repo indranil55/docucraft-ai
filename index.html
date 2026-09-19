@@ -18,10 +18,10 @@
   <meta name="google-site-verification" content="g-Ww17Sxt42ftp8mYJX1dtanefwYJK691JhChb_47Rw" />
   
   <!-- SEO & Social Sharing (Open Graph / Twitter Card) -->
-  <meta name="description" content="DocuCraft AI - Free Online PDF & Image Tools. Resize Photo to exact KB, Merge/Split PDF, Create Passport Photos, Land Converter, Financial EMI, GST & FD Calculators.">
-  <meta name="keywords" content="PDF editor, KB resizer, bigha katha converter, EMI calculator, GST calculator, FD RD calculator, BMI calculator, password generator">
+  <meta name="description" content="DocuCraft AI - Free Online PDF, Photo, Financial & Productivity Utilities. Resize Photo to exact KB, Merge/Split PDF, Gold Price Calculator, BMR Calories, Typing Test and more.">
+  <meta name="keywords" content="PDF editor, KB resizer, bigha katha converter, gold price calculator, bmr calculator, typing speed test, inflation calculator, ppf calculator, number to words">
   <meta property="og:title" content="DocuCraft AI - Smart All-in-One PDF & Document Studio">
-  <meta property="og:description" content="Merge, Compress, Resize KB, Generate Passport Photos, Calculate Land Area, EMI, GST, SIP, BMI and more free in browser.">
+  <meta property="og:description" content="Merge, Compress, Resize KB, Generate Passport Photos, Calculate Gold Price, BMR, Typing Speed, PPF, EMI, GST, Fuel, Cheque Words free in browser.">
   <meta property="og:type" content="website">
   
   <!-- Sitemap Link -->
@@ -51,6 +51,29 @@
       display: flex;
       align-items: center;
       text-decoration: none;
+    }
+
+    /* Modern NEW Tag Pill */
+    .badge-new {
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      background: linear-gradient(135deg, #ef4444, #dc2626);
+      color: #ffffff;
+      font-size: 10px;
+      font-weight: 800;
+      padding: 2px 7px;
+      border-radius: 9999px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-left: 6px;
+      vertical-align: middle;
+      box-shadow: 0 2px 5px rgba(239, 68, 68, 0.4);
+      animation: pulseBadge 2s infinite ease-in-out;
+    }
+    @keyframes pulseBadge {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.06); opacity: 0.92; }
     }
 
     /* Search Bar Styling */
@@ -105,7 +128,7 @@
     .calc-box {
       background: #ffffff;
       width: 100%;
-      max-width: 470px;
+      max-width: 480px;
       border-radius: 16px;
       padding: 24px;
       box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2);
@@ -242,7 +265,7 @@
   <div class="search-wrapper">
     <div class="search-box-inner">
       <i class="fa-solid fa-magnifying-glass"></i>
-      <input type="text" id="toolSearchInput" class="search-input" placeholder="Search any tool (e.g. EMI, GST, Land, Password, BMI, Resizer)..." onkeyup="filterToolsBySearch()">
+      <input type="text" id="toolSearchInput" class="search-input" placeholder="Search any tool (e.g. Gold, Calorie, Typing, Inflation, PPF, Salary)..." onkeyup="filterToolsBySearch()">
     </div>
   </div>
 
@@ -296,98 +319,268 @@
   <main class="main-grid-container">
     <div class="tools-grid" id="toolsGrid">
 
-      <!-- Financial & Daily Utility Tools -->
+      <!-- Newly Added High-Demand Tools -->
+      <div class="tool-card" data-cat="finance" onclick="openGoldModal()">
+        <div class="tool-icon" style="background:#fef3c7; color:#b45309;"><i class="fa-solid fa-gem"></i></div>
+        <h3>Gold & Jewellery Price Calculator <span class="badge-new">NEW</span></h3>
+        <p>Calculate exact jewelry price including making charges and 3% GST on gold weight.</p>
+        <span class="tool-meta">Calculate Gold Price &rarr;</span>
+      </div>
+
+      <div class="tool-card" data-cat="finance" onclick="openCalorieModal()">
+        <div class="tool-icon" style="background:#fee2e2; color:#ef4444;"><i class="fa-solid fa-fire-flame-curved"></i></div>
+        <h3>Daily Calorie & BMR Calculator <span class="badge-new">NEW</span></h3>
+        <p>Calculate daily basal metabolic rate (BMR) and target calories to maintain, lose, or gain weight.</p>
+        <span class="tool-meta">Calculate Calories &rarr;</span>
+      </div>
+
+      <div class="tool-card" data-cat="generator" onclick="openTypingModal()">
+        <div class="tool-icon" style="background:#dbeafe; color:#1d4ed8;"><i class="fa-solid fa-keyboard"></i></div>
+        <h3>1-Minute Typing Speed Test <span class="badge-new">NEW</span></h3>
+        <p>Test and measure your typing speed (WPM - Words Per Minute) and accuracy in real-time.</p>
+        <span class="tool-meta">Start Typing Test &rarr;</span>
+      </div>
+
+      <div class="tool-card" data-cat="finance" onclick="openInflationModal()">
+        <div class="tool-icon" style="background:#ecfdf5; color:#059669;"><i class="fa-solid fa-arrow-trend-up"></i></div>
+        <h3>Inflation & Future Value Calculator <span class="badge-new">NEW</span></h3>
+        <p>Calculate how inflation decreases the buying power of money and forecast future product prices.</p>
+        <span class="tool-meta">Forecast Inflation &rarr;</span>
+      </div>
+
+      <!-- Financial & Daily Utilities -->
+      <div class="tool-card" data-cat="finance" onclick="openPpfModal()">
+        <div class="tool-icon" style="background:#ecfdf5; color:#047857;"><i class="fa-solid fa-shield-heart"></i></div>
+        <h3>PPF Calculator (15-Year Scheme) <span class="badge-new">NEW</span></h3>
+        <p>Calculate 15-year Public Provident Fund returns, interest earned, and tax-free maturity.</p>
+        <span class="tool-meta">Calculate PPF &rarr;</span>
+      </div>
+
+      <div class="tool-card" data-cat="finance" onclick="openElectricityModal()">
+        <div class="tool-icon" style="background:#fef9c3; color:#ca8a04;"><i class="fa-solid fa-bolt"></i></div>
+        <h3>Electricity Bill & Power Calculator <span class="badge-new">NEW</span></h3>
+        <p>Calculate appliance monthly power consumption, electric units (kWh) and bill cost.</p>
+        <span class="tool-meta">Calculate Bill &rarr;</span>
+      </div>
+
+      <div class="tool-card" data-cat="finance" onclick="openFuelModal()">
+        <div class="tool-icon" style="background:#fee2e2; color:#dc2626;"><i class="fa-solid fa-gas-pump"></i></div>
+        <h3>Fuel Cost & Trip Mileage Calculator <span class="badge-new">NEW</span></h3>
+        <p>Calculate total fuel needed, overall trip petrol/diesel expense and cost per kilometer.</p>
+        <span class="tool-meta">Calculate Trip Cost &rarr;</span>
+      </div>
+
+      <div class="tool-card" data-cat="generator" onclick="openHashtagModal()">
+        <div class="tool-icon" style="background:#f3e8ff; color:#7e22ce;"><i class="fa-solid fa-hashtag"></i></div>
+        <h3>Hashtag Extractor & Counter <span class="badge-new">NEW</span></h3>
+        <p>Extract all hashtags from social media posts and caption descriptions in 1-click.</p>
+        <span class="tool-meta">Extract Hashtags &rarr;</span>
+      </div>
+
+      <div class="tool-card" data-cat="finance" onclick="openNumToWordsModal()">
+        <div class="tool-icon" style="background:#e0f2fe; color:#0369a1;"><i class="fa-solid fa-money-check"></i></div>
+        <h3>Number to Words (Cheque Amount) <span class="badge-new">NEW</span></h3>
+        <p>Convert any numeric amount to bank cheque format words (Rupees / Only) with 1-click copy.</p>
+        <span class="tool-meta">Convert Amount &rarr;</span>
+      </div>
+
+      <div class="tool-card" data-cat="finance" onclick="openSalaryModal()">
+        <div class="tool-icon" style="background:#fef3c7; color:#b45309;"><i class="fa-solid fa-wallet"></i></div>
+        <h3>Take-Home Salary & CTC Calculator <span class="badge-new">NEW</span></h3>
+        <p>Calculate in-hand monthly salary breakdown deducting EPF, Professional Tax, and TDS.</p>
+        <span class="tool-meta">Calculate Salary &rarr;</span>
+      </div>
+
+      <div class="tool-card" data-cat="finance" onclick="openBillSplitModal()">
+        <div class="tool-icon" style="background:#ccfbf1; color:#0f766e;"><i class="fa-solid fa-users-viewfinder"></i></div>
+        <h3>Friend Bill Split & Tip Calculator <span class="badge-new">NEW</span></h3>
+        <p>Split group restaurant or trip bills equally with custom tip and person-by-person share.</p>
+        <span class="tool-meta">Split Bill &rarr;</span>
+      </div>
+
+      <div class="tool-card" data-cat="generator" onclick="openUnitConvModal()">
+        <div class="tool-icon" style="background:#ede9fe; color:#6d28d9;"><i class="fa-solid fa-ruler-combined"></i></div>
+        <h3>Universal Unit Converter <span class="badge-new">NEW</span></h3>
+        <p>Convert Length (meter, feet, inch), Weight (kg, gram, pound) and Temperature instantly.</p>
+        <span class="tool-meta">Convert Units &rarr;</span>
+      </div>
+
       <div class="tool-card" data-cat="finance" onclick="openEmiModal()">
         <div class="tool-icon" style="background:#dcfce7; color:#16a34a;"><i class="fa-solid fa-calculator"></i></div>
-        <h3>Loan EMI Calculator</h3>
+        <h3>Loan EMI Calculator <span class="badge-new">NEW</span></h3>
         <p>Calculate monthly EMI, interest payable, and total loan payment breakdown.</p>
         <span class="tool-meta">Open EMI Calculator &rarr;</span>
       </div>
 
       <div class="tool-card" data-cat="finance" onclick="openGstModal()">
         <div class="tool-icon" style="background:#fef9c3; color:#ca8a04;"><i class="fa-solid fa-percent"></i></div>
-        <h3>GST Calculator</h3>
+        <h3>GST Calculator <span class="badge-new">NEW</span></h3>
         <p>Calculate GST inclusive and exclusive prices with 5%, 12%, 18%, and 28% rates.</p>
         <span class="tool-meta">Open GST Calculator &rarr;</span>
       </div>
 
       <div class="tool-card" data-cat="finance" onclick="openSipModal()">
         <div class="tool-icon" style="background:#e0e7ff; color:#4338ca;"><i class="fa-solid fa-chart-line"></i></div>
-        <h3>SIP Calculator</h3>
+        <h3>SIP Calculator <span class="badge-new">NEW</span></h3>
         <p>Calculate expected wealth growth and returns on mutual funds monthly SIP investments.</p>
         <span class="tool-meta">Open SIP Calculator &rarr;</span>
       </div>
 
+      <div class="tool-card" data-cat="finance" onclick="openInterestModal()">
+        <div class="tool-icon" style="background:#ecfdf5; color:#059669;"><i class="fa-solid fa-coins"></i></div>
+        <h3>Simple & Compound Interest <span class="badge-new">NEW</span></h3>
+        <p>Accurate interest calculator for savings, personal lending, and compounding cycles.</p>
+        <span class="tool-meta">Open Interest Calc &rarr;</span>
+      </div>
+
       <div class="tool-card" data-cat="finance" onclick="openFdModal()">
         <div class="tool-icon" style="background:#fef3c7; color:#d97706;"><i class="fa-solid fa-piggy-bank"></i></div>
-        <h3>FD & RD Maturity Calculator</h3>
-        <p>Calculate interest earnings and final payout on Bank Fixed and Recurring Deposits.</p>
+        <h3>FD & RD Maturity Calculator <span class="badge-new">NEW</span></h3>
+        <p>Calculate quarterly compounded payouts on Bank Fixed and Recurring Deposits.</p>
         <span class="tool-meta">Open Deposit Calc &rarr;</span>
       </div>
 
       <div class="tool-card" data-cat="finance" onclick="openLandModal()">
         <div class="tool-icon" style="background:#ecfdf5; color:#047857;"><i class="fa-solid fa-vector-square"></i></div>
-        <h3>Land Area (Bigha-Katha) Converter</h3>
+        <h3>Land Area (Bigha-Katha) Converter <span class="badge-new">NEW</span></h3>
         <p>Convert land measurement between Bigha, Katha, Chhatak, Acre, Decimil & Sq Ft.</p>
         <span class="tool-meta">Open Land Converter &rarr;</span>
       </div>
 
       <div class="tool-card" data-cat="finance" onclick="openAgeModal()">
         <div class="tool-icon" style="background:#fce7f3; color:#db2777;"><i class="fa-solid fa-calendar-check"></i></div>
-        <h3>Age Calculator (Exam DOB)</h3>
+        <h3>Age Calculator (Exam DOB) <span class="badge-new">NEW</span></h3>
         <p>Calculate exact age in years, months, and days for job forms and exam eligibility.</p>
         <span class="tool-meta">Open Age Calculator &rarr;</span>
       </div>
 
+      <div class="tool-card" data-cat="finance" onclick="openAgeDetailedModal()">
+        <div class="tool-icon" style="background:#fdf2f8; color:#be185d;"><i class="fa-solid fa-clock"></i></div>
+        <h3>Life in Hours, Mins & Secs <span class="badge-new">NEW</span></h3>
+        <p>Discover your exact age breakdown in total months, weeks, days, hours and seconds lived.</p>
+        <span class="tool-meta">Explore Life Stats &rarr;</span>
+      </div>
+
+      <div class="tool-card" data-cat="finance" onclick="openDateDiffModal()">
+        <div class="tool-icon" style="background:#eff6ff; color:#2563eb;"><i class="fa-solid fa-calendar-days"></i></div>
+        <h3>Date Difference & Days Counter <span class="badge-new">NEW</span></h3>
+        <p>Calculate exact days, weeks, and months between two dates with one click.</p>
+        <span class="tool-meta">Open Days Counter &rarr;</span>
+      </div>
+
+      <div class="tool-card" data-cat="finance" onclick="openEligibilityModal()">
+        <div class="tool-icon" style="background:#dbeafe; color:#2563eb;"><i class="fa-solid fa-user-check"></i></div>
+        <h3>Exam Age Eligibility Checker <span class="badge-new">NEW</span></h3>
+        <p>Check if your age qualifies within Min-Max limits as per official job notification date.</p>
+        <span class="tool-meta">Check Eligibility &rarr;</span>
+      </div>
+
+      <div class="tool-card" data-cat="finance" onclick="openMarksModal()">
+        <div class="tool-icon" style="background:#ede9fe; color:#6d28d9;"><i class="fa-solid fa-graduation-cap"></i></div>
+        <h3>Marks to Percentage & CGPA <span class="badge-new">NEW</span></h3>
+        <p>Calculate percentage from marks obtained, total marks, or convert CGPA to percentage.</p>
+        <span class="tool-meta">Calculate Percentage &rarr;</span>
+      </div>
+
+      <div class="tool-card" data-cat="finance" onclick="openGradeModal()">
+        <div class="tool-icon" style="background:#e0e7ff; color:#3730a3;"><i class="fa-solid fa-award"></i></div>
+        <h3>Average & Grade Calculator <span class="badge-new">NEW</span></h3>
+        <p>Enter multi-subject marks to get overall average, percentage, and letter grade.</p>
+        <span class="tool-meta">Calculate Grades &rarr;</span>
+      </div>
+
+      <div class="tool-card" data-cat="cyber" onclick="openYtThumbModal()">
+        <div class="tool-icon" style="background:#fee2e2; color:#dc2626;"><i class="fa-brands fa-youtube"></i></div>
+        <h3>YouTube Thumbnail Downloader <span class="badge-new">NEW</span></h3>
+        <p>Download full resolution HD, HQ, and 4K thumbnails from any YouTube video link.</p>
+        <span class="tool-meta">Get Thumbnail &rarr;</span>
+      </div>
+
+      <div class="tool-card" data-cat="cyber" onclick="openCircleDpModal()">
+        <div class="tool-icon" style="background:#fdf2f8; color:#db2777;"><i class="fa-solid fa-circle-user"></i></div>
+        <h3>Round DP & Circle Crop Maker <span class="badge-new">NEW</span></h3>
+        <p>Crop any image into a round circular profile picture with optional colored borders.</p>
+        <span class="tool-meta">Create Round DP &rarr;</span>
+      </div>
+
+      <div class="tool-card" data-cat="generator" onclick="openBioFontModal()">
+        <div class="tool-icon" style="background:#f5f3ff; color:#7c3aed;"><i class="fa-solid fa-font"></i></div>
+        <h3>Fancy Bio Font Generator <span class="badge-new">NEW</span></h3>
+        <p>Transform standard text into stylish bio fonts for Instagram, WhatsApp & Twitter.</p>
+        <span class="tool-meta">Generate Fonts &rarr;</span>
+      </div>
+
+      <div class="tool-card" data-cat="finance" onclick="openWaterModal()">
+        <div class="tool-icon" style="background:#e0f2fe; color:#0284c7;"><i class="fa-solid fa-glass-water"></i></div>
+        <h3>Daily Water Intake Goal <span class="badge-new">NEW</span></h3>
+        <p>Calculate your healthy recommended daily water drinking requirement in liters and glasses.</p>
+        <span class="tool-meta">Check Water Goal &rarr;</span>
+      </div>
+
+      <div class="tool-card" data-cat="generator" onclick="openScreenDpiModal()">
+        <div class="tool-icon" style="background:#f1f5f9; color:#475569;"><i class="fa-solid fa-display"></i></div>
+        <h3>Screen & Display DPI Tester <span class="badge-new">NEW</span></h3>
+        <p>Inspect device screen resolution, device pixel ratio, color depth & screen size in real-time.</p>
+        <span class="tool-meta">Inspect Display &rarr;</span>
+      </div>
+
+      <div class="tool-card" data-cat="generator" onclick="openDupRemoverModal()">
+        <div class="tool-icon" style="background:#fef2f2; color:#991b1b;"><i class="fa-solid fa-filter"></i></div>
+        <h3>Duplicate Line & Text Remover <span class="badge-new">NEW</span></h3>
+        <p>Clean repetitive lists, emails, phone numbers, or lines instantly with case sensitivity.</p>
+        <span class="tool-meta">Clean Duplicate Lines &rarr;</span>
+      </div>
+
+      <div class="tool-card" data-cat="generator" onclick="openWordCountModal()">
+        <div class="tool-icon" style="background:#e0f2fe; color:#0369a1;"><i class="fa-solid fa-spell-check"></i></div>
+        <h3>Word, Case & Text Formatter <span class="badge-new">NEW</span></h3>
+        <p>Count words, letters, and convert case (Title Case, Sentence case, UPPER, lower).</p>
+        <span class="tool-meta">Open Text Formatter &rarr;</span>
+      </div>
+
       <div class="tool-card" data-cat="finance" onclick="openDiscountModal()">
         <div class="tool-icon" style="background:#ccfbf1; color:#0f766e;"><i class="fa-solid fa-tags"></i></div>
-        <h3>Discount & Sale Calculator</h3>
+        <h3>Discount & Sale Calculator <span class="badge-new">NEW</span></h3>
         <p>Calculate exact final price after shopping discounts and see how much money you save.</p>
         <span class="tool-meta">Open Discount Calculator &rarr;</span>
       </div>
 
       <div class="tool-card" data-cat="finance" onclick="openBmiModal()">
         <div class="tool-icon" style="background:#fef2f2; color:#ef4444;"><i class="fa-solid fa-heart-pulse"></i></div>
-        <h3>BMI Fitness Calculator</h3>
+        <h3>BMI Fitness Calculator <span class="badge-new">NEW</span></h3>
         <p>Calculate Body Mass Index (BMI) and check ideal body weight category instantly.</p>
         <span class="tool-meta">Open BMI Tool &rarr;</span>
       </div>
 
       <div class="tool-card" data-cat="generator" onclick="openPassGenModal()">
         <div class="tool-icon" style="background:#f1f5f9; color:#334155;"><i class="fa-solid fa-key"></i></div>
-        <h3>Password Generator</h3>
+        <h3>Password Generator <span class="badge-new">NEW</span></h3>
         <p>Create super strong, randomized, and secure passwords with customizable symbols.</p>
         <span class="tool-meta">Open Password Tool &rarr;</span>
       </div>
 
       <div class="tool-card" data-cat="finance" onclick="openPercentModal()">
         <div class="tool-icon" style="background:#fef3c7; color:#b45309;"><i class="fa-solid fa-calculator"></i></div>
-        <h3>Percentage Calculator</h3>
+        <h3>Percentage Calculator <span class="badge-new">NEW</span></h3>
         <p>Quickly find percentage value, marks percentages, and calculate increase or decrease.</p>
         <span class="tool-meta">Open Percentage Tool &rarr;</span>
       </div>
 
       <div class="tool-card" data-cat="cyber" onclick="openDopModal()">
         <div class="tool-icon" style="background:#ffedd5; color:#ea580c;"><i class="fa-solid fa-id-badge"></i></div>
-        <h3>Photo Name & Date Stamper (DOP)</h3>
+        <h3>Photo Name & Date Stamper (DOP) <span class="badge-new">NEW</span></h3>
         <p>Add Candidate Name and Date of Photo (DOP) onto exam pictures (SSC, Police, UPSC).</p>
         <span class="tool-meta">Open DOP Maker &rarr;</span>
       </div>
 
       <div class="tool-card" data-cat="cyber" onclick="openImgConvertModal()">
         <div class="tool-icon" style="background:#ede9fe; color:#7c3aed;"><i class="fa-solid fa-image"></i></div>
-        <h3>Image Format Converter</h3>
+        <h3>Image Format Converter <span class="badge-new">NEW</span></h3>
         <p>Convert photos instantly between JPG, PNG, and WebP format directly in browser.</p>
         <span class="tool-meta">Open Converter &rarr;</span>
       </div>
 
-      <div class="tool-card" data-cat="generator" onclick="openWordCountModal()">
-        <div class="tool-icon" style="background:#e0f2fe; color:#0369a1;"><i class="fa-solid fa-spell-check"></i></div>
-        <h3>Word & Character Counter</h3>
-        <p>Count words, letters, sentences, reading time, and change text case dynamically.</p>
-        <span class="tool-meta">Open Word Counter &rarr;</span>
-      </div>
-
+      <!-- Core PDF Tools -->
       <div class="tool-card" data-cat="cyber" onclick="launchTool('kbResizer')">
         <div class="tool-icon" style="background:#dbeafe; color:#2563eb;"><i class="fa-solid fa-compress"></i></div>
         <h3>Photo & Sign KB / MB Resizer</h3>
@@ -604,18 +797,297 @@
 
   <!-- Modals for Calculators & Utilities -->
 
+  <!-- Gold & Jewellery Price Modal -->
+  <div class="calc-modal" id="goldModal" onclick="if(event.target === this) closeGoldModal()">
+    <div class="calc-box">
+      <button class="calc-close" onclick="closeGoldModal()">&times;</button>
+      <h3><i class="fa-solid fa-gem" style="color: #b45309;"></i> Gold & Jewellery Calculator</h3>
+      <div class="calc-group">
+        <label>Gold Rate per 10 Grams (₹):</label>
+        <input type="number" id="goldRate10g" placeholder="e.g. 72000">
+      </div>
+      <div class="calc-group">
+        <label>Jewelry Weight (in Grams):</label>
+        <input type="number" id="goldWeightGrams" step="0.01" placeholder="e.g. 8.5">
+      </div>
+      <div class="calc-group">
+        <label>Making Charges (%):</label>
+        <input type="number" id="goldMakingPct" value="12" step="0.1">
+      </div>
+      <button class="calc-btn" onclick="executeGoldCalc()">Calculate Jewelry Price</button>
+      <div id="goldOutput" class="calc-result"></div>
+    </div>
+  </div>
+
+  <!-- Daily Calorie & BMR Modal -->
+  <div class="calc-modal" id="calorieModal" onclick="if(event.target === this) closeCalorieModal()">
+    <div class="calc-box">
+      <button class="calc-close" onclick="closeCalorieModal()">&times;</button>
+      <h3><i class="fa-solid fa-fire-flame-curved" style="color: #ef4444;"></i> Daily Calorie & BMR</h3>
+      <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+        <div class="calc-group">
+          <label>Gender:</label>
+          <select id="bmrGender">
+            <option value="male" selected>Male</option>
+            <option value="female">Female</option>
+          </select>
+        </div>
+        <div class="calc-group">
+          <label>Age (Years):</label>
+          <input type="number" id="bmrAge" placeholder="e.g. 25">
+        </div>
+      </div>
+      <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+        <div class="calc-group">
+          <label>Height (cm):</label>
+          <input type="number" id="bmrHeight" placeholder="e.g. 172">
+        </div>
+        <div class="calc-group">
+          <label>Weight (kg):</label>
+          <input type="number" id="bmrWeight" placeholder="e.g. 68">
+        </div>
+      </div>
+      <div class="calc-group">
+        <label>Activity Level:</label>
+        <select id="bmrActivity">
+          <option value="1.2">Sedentary (Little/No exercise)</option>
+          <option value="1.375" selected>Lightly Active (1-3 days/week)</option>
+          <option value="1.55">Moderately Active (3-5 days/week)</option>
+          <option value="1.725">Very Active (6-7 days/week)</option>
+        </select>
+      </div>
+      <button class="calc-btn" onclick="executeCalorieCalc()">Calculate Daily Calories</button>
+      <div id="calorieOutput" class="calc-result"></div>
+    </div>
+  </div>
+
+  <!-- 1-Minute Typing Speed Test Modal -->
+  <div class="calc-modal" id="typingModal" onclick="if(event.target === this) closeTypingModal()">
+    <div class="calc-box" style="max-width: 530px;">
+      <button class="calc-close" onclick="closeTypingModal()">&times;</button>
+      <h3><i class="fa-solid fa-keyboard" style="color: #1d4ed8;"></i> 1-Minute Typing Test</h3>
+      <div id="typingSnippet" style="background:#f8fafc; border:1px solid #cbd5e1; border-radius:8px; padding:10px; font-size:13px; line-height:1.6; user-select:none; margin-bottom:10px;">
+        The quick brown fox jumps over the lazy dog. Technology and automation enable swift digital transformation across modern platforms with ease.
+      </div>
+      <div class="calc-group">
+        <textarea id="typingInputArea" rows="3" placeholder="Click here and start typing to begin the 60-second test..." oninput="handleTypingInput()"></textarea>
+      </div>
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+        <span style="font-weight:700; color:#dc2626;">Time Remaining: <span id="typingTimer">60</span>s</span>
+        <button type="button" onclick="resetTypingTest()" style="padding:4px 10px; font-size:12px; border-radius:6px; border:1px solid #cbd5e1; background:#fff; cursor:pointer;">Reset</button>
+      </div>
+      <div id="typingOutput" class="calc-result"></div>
+    </div>
+  </div>
+
+  <!-- Inflation Calculator Modal -->
+  <div class="calc-modal" id="inflationModal" onclick="if(event.target === this) closeInflationModal()">
+    <div class="calc-box">
+      <button class="calc-close" onclick="closeInflationModal()">&times;</button>
+      <h3><i class="fa-solid fa-arrow-trend-up" style="color: #059669;"></i> Inflation & Value Calculator</h3>
+      <div class="calc-group">
+        <label>Current Amount / Cost (₹):</label>
+        <input type="number" id="infAmount" placeholder="e.g. 50000">
+      </div>
+      <div class="calc-group">
+        <label>Annual Inflation Rate (%):</label>
+        <input type="number" id="infRate" value="6.0" step="0.1">
+      </div>
+      <div class="calc-group">
+        <label>Time Period (Years):</label>
+        <input type="number" id="infYears" value="10">
+      </div>
+      <button class="calc-btn" onclick="executeInflationCalc()">Calculate Future Value</button>
+      <div id="inflationOutput" class="calc-result"></div>
+    </div>
+  </div>
+
+  <!-- PPF Calculator Modal -->
+  <div class="calc-modal" id="ppfModal" onclick="if(event.target === this) closePpfModal()">
+    <div class="calc-box">
+      <button class="calc-close" onclick="closePpfModal()">&times;</button>
+      <h3><i class="fa-solid fa-shield-heart" style="color: #047857;"></i> PPF Scheme Calculator</h3>
+      <div class="calc-group">
+        <label>Yearly Investment Amount (₹) (Max ₹1.5L):</label>
+        <input type="number" id="ppfYearlyAmount" placeholder="e.g. 50000" max="150000">
+      </div>
+      <div class="calc-group">
+        <label>Current Annual Interest Rate (%):</label>
+        <input type="number" id="ppfRate" value="7.1" step="0.1">
+      </div>
+      <div class="calc-group">
+        <label>Tenure (Years):</label>
+        <input type="number" id="ppfTenure" value="15" min="15" max="30">
+      </div>
+      <button class="calc-btn" onclick="executePpfCalc()">Calculate PPF Maturity</button>
+      <div id="ppfOutput" class="calc-result"></div>
+    </div>
+  </div>
+
+  <!-- Electricity Bill & Power Modal -->
+  <div class="calc-modal" id="electricityModal" onclick="if(event.target === this) closeElectricityModal()">
+    <div class="calc-box">
+      <button class="calc-close" onclick="closeElectricityModal()">&times;</button>
+      <h3><i class="fa-solid fa-bolt" style="color: #ca8a04;"></i> Electricity Bill Calculator</h3>
+      <div class="calc-group">
+        <label>Appliance Wattage (Watts):</label>
+        <input type="number" id="elecWattage" placeholder="e.g. 1500 (1.5 kW)">
+      </div>
+      <div class="calc-group">
+        <label>Daily Usage Hours:</label>
+        <input type="number" id="elecDailyHours" placeholder="e.g. 6" min="1" max="24">
+      </div>
+      <div class="calc-group">
+        <label>Cost per Electric Unit / kWh (₹):</label>
+        <input type="number" id="elecUnitCost" placeholder="e.g. 7.5" step="0.1">
+      </div>
+      <button class="calc-btn" onclick="executeElectricityCalc()">Calculate Monthly Bill</button>
+      <div id="elecOutput" class="calc-result"></div>
+    </div>
+  </div>
+
+  <!-- Fuel Cost & Trip Mileage Modal -->
+  <div class="calc-modal" id="fuelModal" onclick="if(event.target === this) closeFuelModal()">
+    <div class="calc-box">
+      <button class="calc-close" onclick="closeFuelModal()">&times;</button>
+      <h3><i class="fa-solid fa-gas-pump" style="color: #dc2626;"></i> Fuel & Mileage Cost</h3>
+      <div class="calc-group">
+        <label>Trip Distance (in Kilometers):</label>
+        <input type="number" id="fuelDistance" placeholder="e.g. 320">
+      </div>
+      <div class="calc-group">
+        <label>Vehicle Mileage (km per Liter):</label>
+        <input type="number" id="fuelMileage" placeholder="e.g. 18" step="0.1">
+      </div>
+      <div class="calc-group">
+        <label>Fuel Price per Liter (₹):</label>
+        <input type="number" id="fuelPrice" placeholder="e.g. 106.5" step="0.1">
+      </div>
+      <button class="calc-btn" onclick="executeFuelCalc()">Calculate Trip Expense</button>
+      <div id="fuelOutput" class="calc-result"></div>
+    </div>
+  </div>
+
+  <!-- Hashtag Extractor Modal -->
+  <div class="calc-modal" id="hashtagModal" onclick="if(event.target === this) closeHashtagModal()">
+    <div class="calc-box" style="max-width: 520px;">
+      <button class="calc-close" onclick="closeHashtagModal()">&times;</button>
+      <h3><i class="fa-solid fa-hashtag" style="color: #7e22ce;"></i> Hashtag Extractor</h3>
+      <div class="calc-group">
+        <label>Paste text or social caption:</label>
+        <textarea id="hashtagInputText" rows="6" placeholder="Great day at #nature photography! #sunset #travel #vlog..."></textarea>
+      </div>
+      <button class="calc-btn" onclick="executeHashtagExtract()">Extract Hashtags</button>
+      <div id="hashtagOutputBox" style="display:none; margin-top:14px;">
+        <div class="calc-result" id="hashtagSummary" style="display:block; margin-bottom:10px;"></div>
+        <textarea id="hashtagResultText" rows="4" readonly style="background:#f8fafc; font-family:inherit; font-size:13px;"></textarea>
+        <button type="button" onclick="copyHashtagsResult()" class="calc-btn" style="background:#0f172a; margin-top:8px;">Copy All Hashtags</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Number to Words Modal (Cheque Words) -->
+  <div class="calc-modal" id="numToWordsModal" onclick="if(event.target === this) closeNumToWordsModal()">
+    <div class="calc-box">
+      <button class="calc-close" onclick="closeNumToWordsModal()">&times;</button>
+      <h3><i class="fa-solid fa-money-check" style="color: #0369a1;"></i> Number to Words (Cheque)</h3>
+      <div class="calc-group">
+        <label>Enter Amount in Figures (₹):</label>
+        <input type="number" id="numToWordsInput" placeholder="e.g. 45250" oninput="executeNumToWords()">
+      </div>
+      <div id="numToWordsOutput" class="calc-result" style="display:block; background:#f8fafc; border-color:#cbd5e1; color:#0f172a; font-weight:600; font-size:15px; margin-top:10px;">
+        Rupees Zero Only
+      </div>
+      <button type="button" onclick="copyNumToWordsResult()" class="calc-btn" style="margin-top:12px;">Copy Words</button>
+    </div>
+  </div>
+
+  <!-- Take-Home Salary & CTC Modal -->
+  <div class="calc-modal" id="salaryModal" onclick="if(event.target === this) closeSalaryModal()">
+    <div class="calc-box">
+      <button class="calc-close" onclick="closeSalaryModal()">&times;</button>
+      <h3><i class="fa-solid fa-wallet" style="color: #b45309;"></i> In-Hand Salary Calculator</h3>
+      <div class="calc-group">
+        <label>Annual CTC / Gross Salary (₹):</label>
+        <input type="number" id="salaryCtc" placeholder="e.g. 600000">
+      </div>
+      <div class="calc-group">
+        <label>Monthly Deductions (PF, PT & TDS) (₹):</label>
+        <input type="number" id="salaryDeductions" placeholder="e.g. 3500 (Optional)">
+      </div>
+      <button class="calc-btn" onclick="executeSalaryCalc()">Calculate In-Hand</button>
+      <div id="salaryOutput" class="calc-result"></div>
+    </div>
+  </div>
+
+  <!-- Friend Bill Split Modal -->
+  <div class="calc-modal" id="billSplitModal" onclick="if(event.target === this) closeBillSplitModal()">
+    <div class="calc-box">
+      <button class="calc-close" onclick="closeBillSplitModal()">&times;</button>
+      <h3><i class="fa-solid fa-users-viewfinder" style="color: #0f766e;"></i> Bill & Tip Splitter</h3>
+      <div class="calc-group">
+        <label>Total Bill Amount (₹):</label>
+        <input type="number" id="splitBillTotal" placeholder="e.g. 2400">
+      </div>
+      <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+        <div class="calc-group">
+          <label>Number of People:</label>
+          <input type="number" id="splitPeopleCount" value="4" min="1">
+        </div>
+        <div class="calc-group">
+          <label>Tip Percentage (%):</label>
+          <input type="number" id="splitTipPercent" value="5" min="0">
+        </div>
+      </div>
+      <button class="calc-btn" onclick="executeBillSplit()">Split Bill</button>
+      <div id="billSplitOutput" class="calc-result"></div>
+    </div>
+  </div>
+
+  <!-- Universal Unit Converter Modal -->
+  <div class="calc-modal" id="unitConvModal" onclick="if(event.target === this) closeUnitConvModal()">
+    <div class="calc-box">
+      <button class="calc-close" onclick="closeUnitConvModal()">&times;</button>
+      <h3><i class="fa-solid fa-ruler-combined" style="color: #6d28d9;"></i> Universal Unit Converter</h3>
+      <div class="calc-group">
+        <label>Category:</label>
+        <select id="unitConvCat" onchange="updateUnitConvFields()">
+          <option value="length" selected>Length (Meters, Feet, Inches)</option>
+          <option value="weight">Weight (Kilograms, Grams, Pounds)</option>
+          <option value="temp">Temperature (Celsius, Fahrenheit)</option>
+        </select>
+      </div>
+      <div class="calc-group">
+        <label>Enter Value:</label>
+        <input type="number" id="unitConvVal" placeholder="e.g. 10">
+      </div>
+      <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+        <div class="calc-group">
+          <label>From:</label>
+          <select id="unitConvFrom"></select>
+        </div>
+        <div class="calc-group">
+          <label>To:</label>
+          <select id="unitConvTo"></select>
+        </div>
+      </div>
+      <button class="calc-btn" onclick="executeUnitConversion()">Convert Unit</button>
+      <div id="unitConvOutput" class="calc-result"></div>
+    </div>
+  </div>
+
   <!-- EMI Modal -->
   <div class="calc-modal" id="emiModal" onclick="if(event.target === this) closeEmiModal()">
     <div class="calc-box">
       <button class="calc-close" onclick="closeEmiModal()">&times;</button>
-      <h3><i class="fa-solid fa-calculator" style="color: #16a34a;"></i> EMI Calculator</h3>
+      <h3><i class="fa-solid fa-calculator" style="color: #16a34a;"></i> Loan EMI Calculator</h3>
       <div class="calc-group">
         <label>Loan Amount (₹):</label>
         <input type="number" id="emiLoanAmount" placeholder="e.g. 500000">
       </div>
       <div class="calc-group">
         <label>Annual Interest Rate (%):</label>
-        <input type="number" id="emiInterestRate" step="0.1" placeholder="e.g. 8.5">
+        <input type="number" id="emiInterestRate" step="0.01" placeholder="e.g. 8.5">
       </div>
       <div class="calc-group">
         <label>Loan Tenure (Years):</label>
@@ -667,7 +1139,7 @@
       </div>
       <div class="calc-group">
         <label>Expected Return Rate (% p.a):</label>
-        <input type="number" id="sipReturnRate" step="0.1" placeholder="e.g. 12">
+        <input type="number" id="sipReturnRate" step="0.01" placeholder="e.g. 12">
       </div>
       <div class="calc-group">
         <label>Time Period (Years):</label>
@@ -675,6 +1147,35 @@
       </div>
       <button class="calc-btn" onclick="executeSipCalc()">Calculate SIP</button>
       <div id="sipOutput" class="calc-result"></div>
+    </div>
+  </div>
+
+  <!-- Simple & Compound Interest Modal -->
+  <div class="calc-modal" id="interestModal" onclick="if(event.target === this) closeInterestModal()">
+    <div class="calc-box">
+      <button class="calc-close" onclick="closeInterestModal()">&times;</button>
+      <h3><i class="fa-solid fa-coins" style="color: #059669;"></i> Interest Calculator</h3>
+      <div class="calc-group">
+        <label>Calculation Method:</label>
+        <select id="interestTypeSelect">
+          <option value="ci" selected>Compound Interest (Quarterly Compounded)</option>
+          <option value="si">Simple Interest (Standard PNR/100)</option>
+        </select>
+      </div>
+      <div class="calc-group">
+        <label>Principal Amount (₹):</label>
+        <input type="number" id="interestPrincipal" placeholder="e.g. 25000">
+      </div>
+      <div class="calc-group">
+        <label>Annual Interest Rate (% p.a):</label>
+        <input type="number" id="interestRate" step="0.01" placeholder="e.g. 9">
+      </div>
+      <div class="calc-group">
+        <label>Time Period (Years):</label>
+        <input type="number" id="interestTenure" placeholder="e.g. 2">
+      </div>
+      <button class="calc-btn" onclick="executeInterestCalc()">Calculate Interest</button>
+      <div id="interestOutput" class="calc-result"></div>
     </div>
   </div>
 
@@ -686,8 +1187,8 @@
       <div class="calc-group">
         <label>Deposit Type:</label>
         <select id="fdTypeSelect">
-          <option value="fd" selected>Fixed Deposit (One-time)</option>
-          <option value="rd">Recurring Deposit (Monthly)</option>
+          <option value="fd" selected>Fixed Deposit (One-time, Quarterly Compounding)</option>
+          <option value="rd">Recurring Deposit (Monthly, Bank Standard Compounding)</option>
         </select>
       </div>
       <div class="calc-group">
@@ -696,7 +1197,7 @@
       </div>
       <div class="calc-group">
         <label>Interest Rate (% p.a):</label>
-        <input type="number" id="fdInterestRate" step="0.1" placeholder="e.g. 7.1">
+        <input type="number" id="fdInterestRate" step="0.01" placeholder="e.g. 7.1">
       </div>
       <div class="calc-group">
         <label>Tenure (Years):</label>
@@ -729,6 +1230,230 @@
       </div>
       <button class="calc-btn" onclick="executeLandConvert()">Convert All Units</button>
       <div id="landOutput" class="calc-result"></div>
+    </div>
+  </div>
+
+  <!-- Date Difference Modal -->
+  <div class="calc-modal" id="dateDiffModal" onclick="if(event.target === this) closeDateDiffModal()">
+    <div class="calc-box">
+      <button class="calc-close" onclick="closeDateDiffModal()">&times;</button>
+      <h3><i class="fa-solid fa-calendar-days" style="color: #2563eb;"></i> Date Difference & Days Counter</h3>
+      <div class="calc-group">
+        <label>Start Date:</label>
+        <input type="date" id="dateDiffStart">
+      </div>
+      <div class="calc-group">
+        <label>End Date:</label>
+        <input type="date" id="dateDiffEnd">
+      </div>
+      <button class="calc-btn" onclick="executeDateDiffCalc()">Calculate Days</button>
+      <div id="dateDiffOutput" class="calc-result"></div>
+    </div>
+  </div>
+
+  <!-- Detailed Age in Hours, Minutes & Seconds Modal -->
+  <div class="calc-modal" id="ageDetailedModal" onclick="if(event.target === this) closeAgeDetailedModal()">
+    <div class="calc-box">
+      <button class="calc-close" onclick="closeAgeDetailedModal()">&times;</button>
+      <h3><i class="fa-solid fa-clock" style="color: #be185d;"></i> Life in Hours, Mins & Secs</h3>
+      <div class="calc-group">
+        <label>Your Birth Date:</label>
+        <input type="date" id="lifeDob">
+      </div>
+      <button class="calc-btn" onclick="executeLifeStatsCalc()">Calculate Life Stats</button>
+      <div id="lifeStatsOutput" class="calc-result"></div>
+    </div>
+  </div>
+
+  <!-- Average & Multi-Subject Grade Modal -->
+  <div class="calc-modal" id="gradeModal" onclick="if(event.target === this) closeGradeModal()">
+    <div class="calc-box">
+      <button class="calc-close" onclick="closeGradeModal()">&times;</button>
+      <h3><i class="fa-solid fa-award" style="color: #3730a3;"></i> Average & Grade Calculator</h3>
+      <div class="calc-group">
+        <label>Enter Subject Marks (separated by commas):</label>
+        <input type="text" id="gradeMarksList" placeholder="e.g. 78, 85, 92, 69, 88">
+      </div>
+      <div class="calc-group">
+        <label>Total Marks per Subject:</label>
+        <input type="number" id="gradeMaxMarks" value="100">
+      </div>
+      <button class="calc-btn" onclick="executeGradeCalc()">Calculate Grade & Average</button>
+      <div id="gradeOutput" class="calc-result"></div>
+    </div>
+  </div>
+
+  <!-- Fancy Bio Font Generator Modal -->
+  <div class="calc-modal" id="bioFontModal" onclick="if(event.target === this) closeBioFontModal()">
+    <div class="calc-box" style="max-width: 530px;">
+      <button class="calc-close" onclick="closeBioFontModal()">&times;</button>
+      <h3><i class="fa-solid fa-font" style="color: #7c3aed;"></i> Fancy Bio Font Generator</h3>
+      <div class="calc-group">
+        <label>Type text here:</label>
+        <input type="text" id="bioFontInput" placeholder="Enter text (e.g. DocuCraft AI)" oninput="executeFontGeneration()">
+      </div>
+      <div id="bioFontResults" style="display: flex; flex-direction: column; gap: 8px; max-height: 240px; overflow-y: auto; margin-top: 10px;"></div>
+    </div>
+  </div>
+
+  <!-- Daily Water Intake Modal -->
+  <div class="calc-modal" id="waterModal" onclick="if(event.target === this) closeWaterModal()">
+    <div class="calc-box">
+      <button class="calc-close" onclick="closeWaterModal()">&times;</button>
+      <h3><i class="fa-solid fa-glass-water" style="color: #0284c7;"></i> Daily Water Intake Goal</h3>
+      <div class="calc-group">
+        <label>Your Body Weight (in kg):</label>
+        <input type="number" id="waterWeight" placeholder="e.g. 68">
+      </div>
+      <div class="calc-group">
+        <label>Daily Physical Activity:</label>
+        <select id="waterActivity">
+          <option value="low">Sedentary / Desk Work (Normal)</option>
+          <option value="moderate" selected>Moderate Exercise (30-45 mins)</option>
+          <option value="high">Heavy Workout / Outdoor Labor</option>
+        </select>
+      </div>
+      <button class="calc-btn" onclick="executeWaterCalc()">Calculate Water Intake</button>
+      <div id="waterOutput" class="calc-result"></div>
+    </div>
+  </div>
+
+  <!-- Screen & Display DPI Tester Modal -->
+  <div class="calc-modal" id="screenDpiModal" onclick="if(event.target === this) closeScreenDpiModal()">
+    <div class="calc-box">
+      <button class="calc-close" onclick="closeScreenDpiModal()">&times;</button>
+      <h3><i class="fa-solid fa-display" style="color: #475569;"></i> Screen & Display Info</h3>
+      <div id="screenDpiContent" class="calc-result" style="display: block; background: #f8fafc; border-color: #cbd5e1; color: #1e293b; font-size: 13.5px; line-height: 1.8;">
+        Fetching display metrics...
+      </div>
+      <button class="calc-btn" onclick="executeScreenMetrics()" style="margin-top:12px;">Refresh Metrics</button>
+    </div>
+  </div>
+
+  <!-- Duplicate Line Remover Modal -->
+  <div class="calc-modal" id="dupRemoverModal" onclick="if(event.target === this) closeDupRemoverModal()">
+    <div class="calc-box" style="max-width: 520px;">
+      <button class="calc-close" onclick="closeDupRemoverModal()">&times;</button>
+      <h3><i class="fa-solid fa-filter" style="color: #991b1b;"></i> Duplicate Line Remover</h3>
+      <div class="calc-group">
+        <label>Paste text or items (each on new line):</label>
+        <textarea id="dupInputText" rows="6" placeholder="Item 1&#10;Item 2&#10;Item 1&#10;Item 3..."></textarea>
+      </div>
+      <div style="display: flex; gap: 10px; margin-bottom: 12px;">
+        <label style="font-size:12px; font-weight:600; cursor:pointer;">
+          <input type="checkbox" id="dupCaseSensitive"> Case Sensitive
+        </label>
+        <label style="font-size:12px; font-weight:600; cursor:pointer;">
+          <input type="checkbox" id="dupTrimSpaces" checked> Trim Spaces
+        </label>
+      </div>
+      <button class="calc-btn" onclick="executeDupRemover()">Remove Duplicates</button>
+      <div id="dupOutputBox" style="display:none; margin-top:14px;">
+        <div class="calc-result" id="dupSummary" style="display:block; margin-bottom:10px;"></div>
+        <textarea id="dupResultText" rows="5" readonly style="background:#f8fafc; font-family:monospace; font-size:12px;"></textarea>
+        <button type="button" onclick="copyDupResult()" class="calc-btn" style="background:#0f172a; margin-top:8px;">Copy Cleaned Text</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Exam Eligibility Modal -->
+  <div class="calc-modal" id="eligibilityModal" onclick="if(event.target === this) closeEligibilityModal()">
+    <div class="calc-box">
+      <button class="calc-close" onclick="closeEligibilityModal()">&times;</button>
+      <h3><i class="fa-solid fa-user-check" style="color: #2563eb;"></i> Exam Age Eligibility</h3>
+      <div class="calc-group">
+        <label>Your Date of Birth (DOB):</label>
+        <input type="date" id="elgDob">
+      </div>
+      <div class="calc-group">
+        <label>Cut-Off / Notification Date:</label>
+        <input type="date" id="elgCutoff">
+      </div>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+        <div class="calc-group">
+          <label>Min Age Limit:</label>
+          <input type="number" id="elgMinAge" value="18">
+        </div>
+        <div class="calc-group">
+          <label>Max Age Limit:</label>
+          <input type="number" id="elgMaxAge" value="27">
+        </div>
+      </div>
+      <button class="calc-btn" onclick="executeEligibilityCalc()">Check Eligibility</button>
+      <div id="elgOutput" class="calc-result"></div>
+    </div>
+  </div>
+
+  <!-- Marks to Percentage & CGPA Modal -->
+  <div class="calc-modal" id="marksModal" onclick="if(event.target === this) closeMarksModal()">
+    <div class="calc-box">
+      <button class="calc-close" onclick="closeMarksModal()">&times;</button>
+      <h3><i class="fa-solid fa-graduation-cap" style="color: #6d28d9;"></i> Marks & CGPA Converter</h3>
+      <div class="calc-group">
+        <label>Conversion Type:</label>
+        <select id="marksCalcType" onchange="toggleMarksInputs()">
+          <option value="marks" selected>Marks to Percentage</option>
+          <option value="cgpa">CGPA to Percentage (9.5 Scale)</option>
+        </select>
+      </div>
+      <div id="marksInputFields">
+        <div class="calc-group">
+          <label>Marks Obtained:</label>
+          <input type="number" id="marksObtained" placeholder="e.g. 485">
+        </div>
+        <div class="calc-group">
+          <label>Total Maximum Marks:</label>
+          <input type="number" id="marksTotal" placeholder="e.g. 600">
+        </div>
+      </div>
+      <div id="cgpaInputFields" style="display:none;">
+        <div class="calc-group">
+          <label>Enter CGPA (e.g. 8.4):</label>
+          <input type="number" id="cgpaValue" step="0.01" placeholder="e.g. 8.5">
+        </div>
+      </div>
+      <button class="calc-btn" onclick="executeMarksCalc()">Calculate Percentage</button>
+      <div id="marksOutput" class="calc-result"></div>
+    </div>
+  </div>
+
+  <!-- YouTube Thumbnail Downloader Modal -->
+  <div class="calc-modal" id="ytThumbModal" onclick="if(event.target === this) closeYtThumbModal()">
+    <div class="calc-box">
+      <button class="calc-close" onclick="closeYtThumbModal()">&times;</button>
+      <h3><i class="fa-brands fa-youtube" style="color: #dc2626;"></i> YouTube Thumbnail</h3>
+      <div class="calc-group">
+        <label>Paste YouTube Video URL:</label>
+        <input type="text" id="ytVideoUrl" placeholder="https://youtu.be/... or https://youtube.com/watch?v=...">
+      </div>
+      <button class="calc-btn" onclick="executeYtThumbFetch()">Fetch Thumbnail</button>
+      <div id="ytThumbOutput" style="margin-top: 15px; display: none; text-align: center;">
+        <img id="ytThumbImg" src="" style="width: 100%; border-radius: 8px; border: 1px solid #cbd5e1; margin-bottom: 10px;">
+        <a id="ytThumbDownloadBtn" href="#" target="_blank" download="thumbnail.jpg" class="calc-btn" style="display: inline-block; text-decoration: none; padding: 10px 18px; width: auto;">Download HD Thumbnail</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Round DP / Circle Profile Maker Modal -->
+  <div class="calc-modal" id="circleDpModal" onclick="if(event.target === this) closeCircleDpModal()">
+    <div class="calc-box">
+      <button class="calc-close" onclick="closeCircleDpModal()">&times;</button>
+      <h3><i class="fa-solid fa-circle-user" style="color: #db2777;"></i> Round DP Maker</h3>
+      <div class="calc-group">
+        <label>Upload Photo:</label>
+        <input type="file" id="circleDpInput" accept="image/*">
+      </div>
+      <div class="calc-group">
+        <label>Border Color:</label>
+        <select id="circleBorderColor">
+          <option value="none">No Border (Transparent BG)</option>
+          <option value="#2563eb" selected>Royal Blue Border</option>
+          <option value="#dc2626">Red Border</option>
+          <option value="#16a34a">Green Border</option>
+          <option value="#ffffff">White Border</option>
+        </select>
+      </div>
+      <button class="calc-btn" onclick="executeCircleDpCrop()">Create Round Profile Picture</button>
     </div>
   </div>
 
@@ -801,7 +1526,7 @@
       </div>
       <div class="calc-group">
         <label>Discount (%):</label>
-        <input type="number" id="discPercentage" step="0.1" placeholder="e.g. 20">
+        <input type="number" id="discPercentage" step="0.01" placeholder="e.g. 20">
       </div>
       <button class="calc-btn" onclick="executeDiscountCalc()">Calculate Discount</button>
       <div id="discOutput" class="calc-result"></div>
@@ -868,19 +1593,21 @@
     </div>
   </div>
 
-  <!-- Word Counter Modal -->
+  <!-- Word, Case & Text Formatter Modal -->
   <div class="calc-modal" id="wordCountModal" onclick="if(event.target === this) closeWordCountModal()">
-    <div class="calc-box" style="max-width: 520px;">
+    <div class="calc-box" style="max-width: 530px;">
       <button class="calc-close" onclick="closeWordCountModal()">&times;</button>
-      <h3><i class="fa-solid fa-spell-check" style="color: #0369a1;"></i> Word & Text Counter</h3>
+      <h3><i class="fa-solid fa-spell-check" style="color: #0369a1;"></i> Word & Text Formatter</h3>
       <div class="calc-group">
         <label>Paste or Type Text:</label>
         <textarea id="wordCounterText" rows="6" placeholder="Write or paste your text here..." oninput="updateWordCounts()"></textarea>
       </div>
-      <div style="display: flex; gap: 8px; margin-bottom: 12px;">
-        <button type="button" onclick="transformText('upper')" style="padding: 6px 10px; font-size: 12px; border-radius: 6px; border: 1px solid #cbd5e1; background: #fff; cursor: pointer;">UPPERCASE</button>
-        <button type="button" onclick="transformText('lower')" style="padding: 6px 10px; font-size: 12px; border-radius: 6px; border: 1px solid #cbd5e1; background: #fff; cursor: pointer;">lowercase</button>
-        <button type="button" onclick="transformText('clear')" style="padding: 6px 10px; font-size: 12px; border-radius: 6px; border: 1px solid #fee2e2; background: #fee2e2; color:#991b1b; cursor: pointer;">Clear</button>
+      <div style="display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px;">
+        <button type="button" onclick="transformText('title')" style="padding: 6px 9px; font-size: 11px; border-radius: 6px; border: 1px solid #cbd5e1; background: #fff; cursor: pointer;">Title Case</button>
+        <button type="button" onclick="transformText('sentence')" style="padding: 6px 9px; font-size: 11px; border-radius: 6px; border: 1px solid #cbd5e1; background: #fff; cursor: pointer;">Sentence case</button>
+        <button type="button" onclick="transformText('upper')" style="padding: 6px 9px; font-size: 11px; border-radius: 6px; border: 1px solid #cbd5e1; background: #fff; cursor: pointer;">UPPERCASE</button>
+        <button type="button" onclick="transformText('lower')" style="padding: 6px 9px; font-size: 11px; border-radius: 6px; border: 1px solid #cbd5e1; background: #fff; cursor: pointer;">lowercase</button>
+        <button type="button" onclick="transformText('clear')" style="padding: 6px 9px; font-size: 11px; border-radius: 6px; border: 1px solid #fee2e2; background: #fee2e2; color:#991b1b; cursor: pointer;">Clear</button>
       </div>
       <div id="wordCountOutput" class="calc-result" style="display:block; background:#f8fafc; border-color:#e2e8f0; color:#334155;">
         <strong>Words:</strong> <span id="cntWords">0</span> | <strong>Characters:</strong> <span id="cntChars">0</span> | <strong>Reading Time:</strong> <span id="cntTime">0 min</span>
@@ -957,7 +1684,7 @@
   <script src="js/tools.js"></script>
   <script src="js/main.js"></script>
 
-  <!-- Complete Script Engine (English Standard) -->
+  <!-- Complete Script Engine (100% Accurate English Calculations) -->
   <script>
     // Search Functionality
     function filterToolsBySearch() {
@@ -972,16 +1699,50 @@
     document.addEventListener('DOMContentLoaded', () => {
       const today = new Date().toISOString().split('T')[0];
       if (document.getElementById('ageAsOn')) document.getElementById('ageAsOn').value = today;
+      if (document.getElementById('elgCutoff')) document.getElementById('elgCutoff').value = today;
       if (document.getElementById('dopDate')) document.getElementById('dopDate').value = today;
+      if (document.getElementById('dateDiffStart')) document.getElementById('dateDiffStart').value = today;
+      if (document.getElementById('dateDiffEnd')) document.getElementById('dateDiffEnd').value = today;
+      if (document.getElementById('lifeDob')) document.getElementById('lifeDob').value = '2000-01-01';
+      updateUnitConvFields();
     });
 
     // Modal Triggers
+    function openGoldModal() { document.getElementById('goldModal').style.display = 'flex'; }
+    function closeGoldModal() { document.getElementById('goldModal').style.display = 'none'; }
+    function openCalorieModal() { document.getElementById('calorieModal').style.display = 'flex'; }
+    function closeCalorieModal() { document.getElementById('calorieModal').style.display = 'none'; }
+    function openTypingModal() { document.getElementById('typingModal').style.display = 'flex'; resetTypingTest(); }
+    function closeTypingModal() { document.getElementById('typingModal').style.display = 'none'; clearInterval(typingInterval); }
+    function openInflationModal() { document.getElementById('inflationModal').style.display = 'flex'; }
+    function closeInflationModal() { document.getElementById('inflationModal').style.display = 'none'; }
+
+    function openPpfModal() { document.getElementById('ppfModal').style.display = 'flex'; }
+    function closePpfModal() { document.getElementById('ppfModal').style.display = 'none'; }
+    function openElectricityModal() { document.getElementById('electricityModal').style.display = 'flex'; }
+    function closeElectricityModal() { document.getElementById('electricityModal').style.display = 'none'; }
+    function openFuelModal() { document.getElementById('fuelModal').style.display = 'flex'; }
+    function closeFuelModal() { document.getElementById('fuelModal').style.display = 'none'; }
+    function openHashtagModal() { document.getElementById('hashtagModal').style.display = 'flex'; }
+    function closeHashtagModal() { document.getElementById('hashtagModal').style.display = 'none'; }
+
+    function openNumToWordsModal() { document.getElementById('numToWordsModal').style.display = 'flex'; }
+    function closeNumToWordsModal() { document.getElementById('numToWordsModal').style.display = 'none'; }
+    function openSalaryModal() { document.getElementById('salaryModal').style.display = 'flex'; }
+    function closeSalaryModal() { document.getElementById('salaryModal').style.display = 'none'; }
+    function openBillSplitModal() { document.getElementById('billSplitModal').style.display = 'flex'; }
+    function closeBillSplitModal() { document.getElementById('billSplitModal').style.display = 'none'; }
+    function openUnitConvModal() { document.getElementById('unitConvModal').style.display = 'flex'; }
+    function closeUnitConvModal() { document.getElementById('unitConvModal').style.display = 'none'; }
+
     function openEmiModal() { document.getElementById('emiModal').style.display = 'flex'; }
     function closeEmiModal() { document.getElementById('emiModal').style.display = 'none'; }
     function openGstModal() { document.getElementById('gstModal').style.display = 'flex'; }
     function closeGstModal() { document.getElementById('gstModal').style.display = 'none'; }
     function openSipModal() { document.getElementById('sipModal').style.display = 'flex'; }
     function closeSipModal() { document.getElementById('sipModal').style.display = 'none'; }
+    function openInterestModal() { document.getElementById('interestModal').style.display = 'flex'; }
+    function closeInterestModal() { document.getElementById('interestModal').style.display = 'none'; }
     function openFdModal() { document.getElementById('fdModal').style.display = 'flex'; }
     function closeFdModal() { document.getElementById('fdModal').style.display = 'none'; }
     function openLandModal() { document.getElementById('landModal').style.display = 'flex'; }
@@ -992,6 +1753,20 @@
     function closePassGenModal() { document.getElementById('passGenModal').style.display = 'none'; }
     function openAgeModal() { document.getElementById('ageModal').style.display = 'flex'; }
     function closeAgeModal() { document.getElementById('ageModal').style.display = 'none'; }
+    function openAgeDetailedModal() { document.getElementById('ageDetailedModal').style.display = 'flex'; }
+    function closeAgeDetailedModal() { document.getElementById('ageDetailedModal').style.display = 'none'; }
+    function openGradeModal() { document.getElementById('gradeModal').style.display = 'flex'; }
+    function closeGradeModal() { document.getElementById('gradeModal').style.display = 'none'; }
+    function openBioFontModal() { document.getElementById('bioFontModal').style.display = 'flex'; executeFontGeneration(); }
+    function closeBioFontModal() { document.getElementById('bioFontModal').style.display = 'none'; }
+    function openWaterModal() { document.getElementById('waterModal').style.display = 'flex'; }
+    function closeWaterModal() { document.getElementById('waterModal').style.display = 'none'; }
+    function openScreenDpiModal() { document.getElementById('screenDpiModal').style.display = 'flex'; executeScreenMetrics(); }
+    function closeScreenDpiModal() { document.getElementById('screenDpiModal').style.display = 'none'; }
+    function openDateDiffModal() { document.getElementById('dateDiffModal').style.display = 'flex'; }
+    function closeDateDiffModal() { document.getElementById('dateDiffModal').style.display = 'none'; }
+    function openDupRemoverModal() { document.getElementById('dupRemoverModal').style.display = 'flex'; }
+    function closeDupRemoverModal() { document.getElementById('dupRemoverModal').style.display = 'none'; }
     function openDiscountModal() { document.getElementById('discountModal').style.display = 'flex'; }
     function closeDiscountModal() { document.getElementById('discountModal').style.display = 'none'; }
     function openPercentModal() { document.getElementById('percentModal').style.display = 'flex'; }
@@ -1002,9 +1777,439 @@
     function closeImgConvertModal() { document.getElementById('imgConvertModal').style.display = 'none'; }
     function openWordCountModal() { document.getElementById('wordCountModal').style.display = 'flex'; }
     function closeWordCountModal() { document.getElementById('wordCountModal').style.display = 'none'; }
+    function openEligibilityModal() { document.getElementById('eligibilityModal').style.display = 'none'; }
+    function openEligibilityModal() { document.getElementById('eligibilityModal').style.display = 'flex'; }
+    function closeMarksModal() { document.getElementById('marksModal').style.display = 'none'; }
+    function openMarksModal() { document.getElementById('marksModal').style.display = 'flex'; }
+    function closeYtThumbModal() { document.getElementById('ytThumbModal').style.display = 'none'; }
+    function openYtThumbModal() { document.getElementById('ytThumbModal').style.display = 'flex'; }
+    function closeCircleDpModal() { document.getElementById('circleDpModal').style.display = 'none'; }
+    function openCircleDpModal() { document.getElementById('circleDpModal').style.display = 'flex'; }
     function closeInfoModal() { document.getElementById('infoModal').style.display = 'none'; }
 
-    // 1. EMI
+    // 1. Gold & Jewellery Price Calculator
+    function executeGoldCalc() {
+      const rate10g = parseFloat(document.getElementById('goldRate10g').value);
+      const grams = parseFloat(document.getElementById('goldWeightGrams').value);
+      const makingPct = parseFloat(document.getElementById('goldMakingPct').value) || 0;
+
+      if (!rate10g || !grams || rate10g <= 0 || grams <= 0) {
+        alert("Please enter valid gold rate and weight in grams.");
+        return;
+      }
+
+      const ratePerGram = rate10g / 10;
+      const baseGoldPrice = ratePerGram * grams;
+      const makingCharges = (baseGoldPrice * makingPct) / 100;
+      const subtotal = baseGoldPrice + makingCharges;
+      const gst3Percent = (subtotal * 3) / 100;
+      const grandTotal = subtotal + gst3Percent;
+
+      const out = document.getElementById('goldOutput');
+      out.style.display = 'block';
+      out.innerHTML = `
+        <strong>Pure Gold Value:</strong> ₹${baseGoldPrice.toFixed(2)}<br>
+        <strong>Making Charges (${makingPct}\%):</strong> ₹${makingCharges.toFixed(2)}<br>
+        <strong>GST (3% on Gold & Making):</strong> ₹${gst3Percent.toFixed(2)}<br>
+        <strong>Final Bill Amount:</strong> <span style="font-weight:800; color:#b45309; font-size:16px;">₹${grandTotal.toFixed(2)}</span>
+      `;
+    }
+
+    // 2. Daily Calorie & BMR Calculator (Harris-Benedict Formula)
+    function executeCalorieCalc() {
+      const gender = document.getElementById('bmrGender').value;
+      const age = parseInt(document.getElementById('bmrAge').value);
+      const h = parseFloat(document.getElementById('bmrHeight').value);
+      const w = parseFloat(document.getElementById('bmrWeight').value);
+      const mult = parseFloat(document.getElementById('bmrActivity').value);
+
+      if (!age || !h || !w || age <= 0 || h <= 0 || w <= 0) {
+        alert("Please fill in valid age, height and weight.");
+        return;
+      }
+
+      let bmr = 0;
+      if (gender === 'male') {
+        bmr = 88.362 + (13.397 * w) + (4.799 * h) - (5.677 * age);
+      } else {
+        bmr = 447.593 + (9.247 * w) + (3.098 * h) - (4.330 * age);
+      }
+
+      const maintenance = bmr * mult;
+      const weightLoss = maintenance - 500;
+      const weightGain = maintenance + 500;
+
+      const out = document.getElementById('calorieOutput');
+      out.style.display = 'block';
+      out.innerHTML = `
+        <strong>Basal Metabolic Rate (BMR):</strong> ${Math.round(bmr)} kcal/day<br>
+        <strong>Maintain Weight:</strong> <span style="font-weight:800; color:#2563eb;">${Math.round(maintenance)} kcal/day</span><br>
+        <strong>Weight Loss Goal (-0.5kg/wk):</strong> ${Math.round(weightLoss)} kcal/day<br>
+        <strong>Weight Gain Goal (+0.5kg/wk):</strong> ${Math.round(weightGain)} kcal/day
+      `;
+    }
+
+    // 3. 1-Minute Typing Test Engine
+    let typingTimerSeconds = 60;
+    let typingInterval = null;
+    let typingStarted = false;
+
+    function resetTypingTest() {
+      clearInterval(typingInterval);
+      typingTimerSeconds = 60;
+      typingStarted = false;
+      document.getElementById('typingTimer').innerText = '60';
+      document.getElementById('typingInputArea').value = '';
+      document.getElementById('typingInputArea').disabled = false;
+      document.getElementById('typingOutput').style.display = 'none';
+    }
+
+    function handleTypingInput() {
+      if (!typingStarted) {
+        typingStarted = true;
+        typingInterval = setInterval(() => {
+          typingTimerSeconds--;
+          document.getElementById('typingTimer').innerText = typingTimerSeconds;
+          if (typingTimerSeconds <= 0) {
+            clearInterval(typingInterval);
+            finishTypingTest();
+          }
+        }, 1000);
+      }
+    }
+
+    function finishTypingTest() {
+      document.getElementById('typingInputArea').disabled = true;
+      const originalText = document.getElementById('typingSnippet').innerText.trim();
+      const userText = document.getElementById('typingInputArea').value.trim();
+
+      const userWords = userText ? userText.split(/\s+/) : [];
+      const origWords = originalText.split(/\s+/);
+
+      let correctCount = 0;
+      userWords.forEach((word, i) => {
+        if (origWords[i] && word === origWords[i]) correctCount++;
+      });
+
+      const wpm = correctCount;
+      const accuracy = userWords.length > 0 ? Math.round((correctCount / userWords.length) * 100) : 0;
+
+      const out = document.getElementById('typingOutput');
+      out.style.display = 'block';
+      out.innerHTML = `
+        <strong>Test Completed!</strong><br>
+        <strong>Typing Speed:</strong> <span style="font-weight:800; color:#1d4ed8; font-size:16px;">${wpm} WPM</span> (Words Per Minute)<br>
+        <strong>Accuracy:</strong> ${accuracy}\% (${correctCount} correct words)
+      `;
+    }
+
+    // 4. Inflation Calculator (Compound Future Cost)
+    function executeInflationCalc() {
+      const amount = parseFloat(document.getElementById('infAmount').value);
+      const rate = parseFloat(document.getElementById('infRate').value) / 100;
+      const years = parseFloat(document.getElementById('infYears').value);
+
+      if (!amount || isNaN(rate) || !years || amount <= 0 || years <= 0) {
+        alert("Please enter valid amount, inflation rate and time period.");
+        return;
+      }
+
+      const futureCost = amount * Math.pow(1 + rate, years);
+      const purchasingPower = amount / Math.pow(1 + rate, years);
+
+      const out = document.getElementById('inflationOutput');
+      out.style.display = 'block';
+      out.innerHTML = `
+        <strong>Future Cost of ₹${amount.toLocaleString()}:</strong> <span style="font-weight:800; color:#059669; font-size:16px;">₹${futureCost.toLocaleString('en-IN', {maximumFractionDigits:2})}</span><br>
+        <strong>Purchasing Power Value:</strong> Today's ₹${amount.toLocaleString()} will feel like ₹${purchasingPower.toLocaleString('en-IN', {maximumFractionDigits:2})} in${years} years.
+      `;
+    }
+
+    // 5. PPF Scheme Calculator
+    function executePpfCalc() {
+      const p = parseFloat(document.getElementById('ppfYearlyAmount').value);
+      const r = parseFloat(document.getElementById('ppfRate').value) / 100;
+      const t = parseInt(document.getElementById('ppfTenure').value) || 15;
+
+      if (!p || p <= 0 || p > 150000) {
+        alert("Please enter a valid yearly deposit between ₹500 and ₹1,50,000.");
+        return;
+      }
+
+      let balance = 0;
+      let totalInvested = p * t;
+      for (let i = 0; i < t; i++) {
+        balance = (balance + p) * (1 + r);
+      }
+      const totalInterest = balance - totalInvested;
+
+      const out = document.getElementById('ppfOutput');
+      out.style.display = 'block';
+      out.innerHTML = `
+        <strong>Total Investment:</strong> ₹${totalInvested.toLocaleString('en-IN', {maximumFractionDigits:2})}<br>
+        <strong>Total Interest Earned:</strong> ₹${totalInterest.toLocaleString('en-IN', {maximumFractionDigits:2})}<br>
+        <strong>Maturity Value:</strong> <span style="font-weight:800; color:#047857; font-size:16px;">₹${balance.toLocaleString('en-IN', {maximumFractionDigits:2})}</span><br>
+        <span style="font-size:12px; color:#64748b;">(Exempt-Exempt-Exempt Tax Free Maturity)</span>
+      `;
+    }
+
+    // 6. Electricity Bill & Power Calculator
+    function executeElectricityCalc() {
+      const watts = parseFloat(document.getElementById('elecWattage').value);
+      const hours = parseFloat(document.getElementById('elecDailyHours').value);
+      const unitRate = parseFloat(document.getElementById('elecUnitCost').value);
+
+      if (!watts || !hours || !unitRate || watts <= 0 || hours <= 0 || unitRate <= 0) {
+        alert("Please enter valid wattage, hours (1-24), and electric unit rate.");
+        return;
+      }
+
+      const dailyKwh = (watts * hours) / 1000;
+      const monthlyKwh = dailyKwh * 30;
+      const monthlyCost = monthlyKwh * unitRate;
+
+      const out = document.getElementById('elecOutput');
+      out.style.display = 'block';
+      out.innerHTML = `
+        <strong>Daily Power Consumption:</strong> ${dailyKwh.toFixed(2)} kWh (Units)<br>
+        <strong>Monthly Power Consumption:</strong> ${monthlyKwh.toFixed(2)} kWh (Units)<br>
+        <strong>Estimated Monthly Bill:</strong> <span style="font-weight:800; color:#ca8a04; font-size:16px;">₹${monthlyCost.toFixed(2)}</span>
+      `;
+    }
+
+    // 7. Fuel Cost & Trip Mileage Calculator
+    function executeFuelCalc() {
+      const distance = parseFloat(document.getElementById('fuelDistance').value);
+      const mileage = parseFloat(document.getElementById('fuelMileage').value);
+      const price = parseFloat(document.getElementById('fuelPrice').value);
+
+      if (!distance || !mileage || !price || distance <= 0 || mileage <= 0 || price <= 0) {
+        alert("Please enter valid distance, mileage, and fuel price.");
+        return;
+      }
+
+      const fuelNeeded = distance / mileage;
+      const totalExpense = fuelNeeded * price;
+      const costPerKm = totalExpense / distance;
+
+      const out = document.getElementById('fuelOutput');
+      out.style.display = 'block';
+      out.innerHTML = `
+        <strong>Total Fuel Required:</strong> ${fuelNeeded.toFixed(2)} Liters<br>
+        <strong>Total Trip Fuel Expense:</strong> <span style="font-weight:800; color:#dc2626; font-size:16px;">₹${totalExpense.toFixed(2)}</span><br>
+        <strong>Cost per Kilometer:</strong> ₹${costPerKm.toFixed(2)} / km
+      `;
+    }
+
+    // 8. Hashtag Extractor & Counter
+    function executeHashtagExtract() {
+      const text = document.getElementById('hashtagInputText').value;
+      if (!text.trim()) {
+        alert("Please paste text containing hashtags.");
+        return;
+      }
+
+      const matches = text.match(/#[a-zA-Z0-9_\u0980-\u09FF]+/g) || [];
+      const uniqueTags = [...new Set(matches)];
+
+      const box = document.getElementById('hashtagOutputBox');
+      const summary = document.getElementById('hashtagSummary');
+      const resultText = document.getElementById('hashtagResultText');
+
+      if (uniqueTags.length === 0) {
+        summary.innerHTML = "<strong>No hashtags found in the text.</strong>";
+        resultText.value = "";
+      } else {
+        summary.innerHTML = `<strong>Found:</strong> ${matches.length} hashtags \vert{} <strong>Unique:</strong>${uniqueTags.length}`;
+        resultText.value = uniqueTags.join(' ');
+      }
+      box.style.display = 'block';
+    }
+
+    function copyHashtagsResult() {
+      const txt = document.getElementById('hashtagResultText').value;
+      if (txt) {
+        navigator.clipboard.writeText(txt);
+        alert("Hashtags copied to clipboard!");
+      }
+    }
+
+    // 9. Number to Words
+    function executeNumToWords() {
+      const val = parseFloat(document.getElementById('numToWordsInput').value);
+      const out = document.getElementById('numToWordsOutput');
+      if (isNaN(val) || val < 0) {
+        out.innerText = 'Please enter a valid amount.';
+        return;
+      }
+      if (val === 0) {
+        out.innerText = 'Rupees Zero Only';
+        return;
+      }
+
+      const ones = ['', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine', 'Ten', 
+                    'Eleven', 'Twelve', 'Thirteen', 'Fourteen', 'Fifteen', 'Sixteen', 'Seventeen', 'Eighteen', 'Nineteen'];
+      const tens = ['', '', 'Twenty', 'Thirty', 'Forty', 'Fifty', 'Sixty', 'Seventy', 'Eighty', 'Ninety'];
+
+      function convertHundred(n) {
+        let str = '';
+        if (n >= 100) {
+          str += ones[Math.floor(n / 100)] + ' Hundred ';
+          n %= 100;
+        }
+        if (n >= 20) {
+          str += tens[Math.floor(n / 10)] + ' ';
+          n %= 10;
+        }
+        if (n > 0) {
+          str += ones[n] + ' ';
+        }
+        return str.trim();
+      }
+
+      let num = Math.floor(val);
+      let paise = Math.round((val - num) * 100);
+
+      let crore = Math.floor(num / 10000000);
+      num %= 10000000;
+      let lakh = Math.floor(num / 100000);
+      num %= 100000;
+      let thousand = Math.floor(num / 1000);
+      num %= 1000;
+      let remaining = num;
+
+      let result = 'Rupees ';
+      if (crore > 0) result += convertHundred(crore) + ' Crore ';
+      if (lakh > 0) result += convertHundred(lakh) + ' Lakh ';
+      if (thousand > 0) result += convertHundred(thousand) + ' Thousand ';
+      if (remaining > 0) result += convertHundred(remaining) + ' ';
+
+      if (paise > 0) {
+        result += 'and ' + convertHundred(paise) + ' Paise ';
+      }
+
+      result += 'Only';
+      out.innerText = result.replace(/\s+/g, ' ');
+    }
+
+    function copyNumToWordsResult() {
+      const text = document.getElementById('numToWordsOutput').innerText;
+      if (text) {
+        navigator.clipboard.writeText(text);
+        alert('Cheque words copied to clipboard!');
+      }
+    }
+
+    // 10. Take-Home Salary & CTC Calculator
+    function executeSalaryCalc() {
+      const ctc = parseFloat(document.getElementById('salaryCtc').value);
+      const extraDeductions = parseFloat(document.getElementById('salaryDeductions').value) || 0;
+
+      if (!ctc || ctc <= 0) {
+        alert('Please enter valid annual CTC.');
+        return;
+      }
+
+      const grossMonthly = ctc / 12;
+      const epf = Math.min(1800, (grossMonthly * 0.5) * 0.12);
+      const pt = grossMonthly > 15000 ? 200 : 0;
+      
+      const totalMonthlyDeductions = epf + pt + extraDeductions;
+      const netTakeHome = Math.max(0, grossMonthly - totalMonthlyDeductions);
+
+      const out = document.getElementById('salaryOutput');
+      out.style.display = 'block';
+      out.innerHTML = `
+        <strong>Monthly Gross:</strong> ₹${grossMonthly.toFixed(2)}<br>
+        <strong>EPF (PF):</strong> -₹${epf.toFixed(2)} / month<br>
+        <strong>Professional Tax:</strong> -₹${pt.toFixed(2)} / month<br>
+        <strong>Estimated In-Hand Salary:</strong> <span style="font-weight:800; color:#16a34a; font-size:16px;">₹${netTakeHome.toFixed(2)} / month</span><br>
+        <span style="font-size:12px; color:#64748b;">(Excluding annual bonuses and variable pay)</span>
+      `;
+    }
+
+    // 11. Friend Bill Split & Tip Calculator
+    function executeBillSplit() {
+      const total = parseFloat(document.getElementById('splitBillTotal').value);
+      const people = parseInt(document.getElementById('splitPeopleCount').value) || 1;
+      const tipPct = parseFloat(document.getElementById('splitTipPercent').value) || 0;
+
+      if (!total || total <= 0 || people <= 0) {
+        alert('Please enter a valid bill amount and number of people.');
+        return;
+      }
+
+      const tipAmount = (total * tipPct) / 100;
+      const grandTotal = total + tipAmount;
+      const perPerson = grandTotal / people;
+
+      const out = document.getElementById('billSplitOutput');
+      out.style.display = 'block';
+      out.innerHTML = `
+        <strong>Tip Amount:</strong> ₹${tipAmount.toFixed(2)} (${tipPct}%)<br>
+        <strong>Grand Total:</strong> ₹${grandTotal.toFixed(2)}<br>
+        <strong>Each Person Pays:</strong> <span style="font-weight:800; color:#0f766e; font-size:16px;">₹${perPerson.toFixed(2)}</span>
+      `;
+    }
+
+    // 12. Universal Unit Converter
+    const unitOptions = {
+      length: ['Meter', 'Kilometer', 'Centimeter', 'Millimeter', 'Foot', 'Inch', 'Yard'],
+      weight: ['Kilogram', 'Gram', 'Milligram', 'Pound', 'Ounce'],
+      temp: ['Celsius', 'Fahrenheit', 'Kelvin']
+    };
+
+    function updateUnitConvFields() {
+      const cat = document.getElementById('unitConvCat').value;
+      const fromSel = document.getElementById('unitConvFrom');
+      const toSel = document.getElementById('unitConvTo');
+      if (!fromSel || !toSel) return;
+
+      fromSel.innerHTML = '';
+      toSel.innerHTML = '';
+
+      unitOptions[cat].forEach((u, i) => {
+        fromSel.innerHTML += `<option value="${u}" ${i===0?'selected':''}>${u}</option>`;
+        toSel.innerHTML += `<option value="${u}" ${i===1?'selected':''}>${u}</option>`;
+      });
+    }
+
+    function executeUnitConversion() {
+      const cat = document.getElementById('unitConvCat').value;
+      const val = parseFloat(document.getElementById('unitConvVal').value);
+      const from = document.getElementById('unitConvFrom').value;
+      const to = document.getElementById('unitConvTo').value;
+
+      if (isNaN(val)) { alert('Please enter a numerical value.'); return; }
+
+      let result = 0;
+      if (cat === 'temp') {
+        let inCelsius = val;
+        if (from === 'Fahrenheit') inCelsius = (val - 32) * 5/9;
+        if (from === 'Kelvin') inCelsius = val - 273.15;
+
+        if (to === 'Celsius') result = inCelsius;
+        if (to === 'Fahrenheit') result = (inCelsius * 9/5) + 32;
+        if (to === 'Kelvin') result = inCelsius + 273.15;
+      } else {
+        const lengthToMeter = { Meter: 1, Kilometer: 1000, Centimeter: 0.01, Millimeter: 0.001, Foot: 0.3048, Inch: 0.0254, Yard: 0.9144 };
+        const weightToKg = { Kilogram: 1, Gram: 0.001, Milligram: 0.000001, Pound: 0.453592, Ounce: 0.0283495 };
+
+        if (cat === 'length') {
+          const inMeters = val * lengthToMeter[from];
+          result = inMeters / lengthToMeter[to];
+        } else {
+          const inKg = val * weightToKg[from];
+          result = inKg / weightToKg[to];
+        }
+      }
+
+      const out = document.getElementById('unitConvOutput');
+      out.style.display = 'block';
+      out.innerHTML = `<strong>Result:</strong> ${val}${from} = <span style="font-weight:800; color:#6d28d9; font-size:16px;">${result.toFixed(4)}${to}</span>`;
+    }
+
+    // 13. EMI
     function executeEmiCalc() {
       const p = parseFloat(document.getElementById('emiLoanAmount').value);
       const annualRate = parseFloat(document.getElementById('emiInterestRate').value);
@@ -1012,15 +2217,21 @@
       if (!p || !annualRate || !tenureYears || p <= 0 || annualRate <= 0 || tenureYears <= 0) {
         alert("Please enter valid loan details."); return;
       }
-      const r = (annualRate / 12) / 100, n = tenureYears * 12;
+      const r = (annualRate / 12) / 100;
+      const n = tenureYears * 12;
       const emi = (p * r * Math.pow(1 + r, n)) / (Math.pow(1 + r, n) - 1);
-      const totalPayment = emi * n, totalInterest = totalPayment - p;
+      const totalPayment = emi * n;
+      const totalInterest = totalPayment - p;
       const out = document.getElementById('emiOutput');
       out.style.display = 'block';
-      out.innerHTML = `<strong>Monthly EMI:</strong> ₹${emi.toFixed(2)}<br><strong>Total Interest:</strong> ₹${totalInterest.toFixed(2)}<br><strong>Total Payment:</strong> ₹${totalPayment.toFixed(2)}`;
+      out.innerHTML = `
+        <strong>Monthly EMI:</strong> ₹${emi.toFixed(2)}<br>
+        <strong>Total Interest:</strong> ₹${totalInterest.toFixed(2)}<br>
+        <strong>Total Payment:</strong> ₹${totalPayment.toFixed(2)}
+      `;
     }
 
-    // 2. GST
+    // 14. GST
     function executeGstCalc() {
       const amount = parseFloat(document.getElementById('gstInputAmount').value);
       const rate = parseFloat(document.getElementById('gstRateSelect').value);
@@ -1028,9 +2239,12 @@
       if (!amount || amount <= 0) { alert("Please enter a valid amount."); return; }
       let gst = 0, total = 0;
       if (type === 'add') {
-        gst = (amount * rate) / 100; total = amount + gst;
+        gst = (amount * rate) / 100; 
+        total = amount + gst;
       } else {
-        const base = amount * (100 / (100 + rate)); gst = amount - base; total = base;
+        const base = amount * (100 / (100 + rate)); 
+        gst = amount - base; 
+        total = base;
       }
       const out = document.getElementById('gstOutput');
       out.style.display = 'block';
@@ -1039,42 +2253,86 @@
         : `<strong>Base Price:</strong> ₹${total.toFixed(2)}<br><strong>Included GST:</strong> ₹${gst.toFixed(2)}`;
     }
 
-    // 3. SIP
+    // 15. SIP
     function executeSipCalc() {
       const p = parseFloat(document.getElementById('sipMonthlyAmount').value);
       const rate = parseFloat(document.getElementById('sipReturnRate').value);
       const years = parseFloat(document.getElementById('sipTenure').value);
       if (!p || !rate || !years || p <= 0 || rate <= 0 || years <= 0) { alert("Please enter valid parameters."); return; }
-      const i = (rate / 12) / 100, n = years * 12;
+      const i = (rate / 12) / 100;
+      const n = years * 12;
       const maturity = p * ((Math.pow(1 + i, n) - 1) / i) * (1 + i);
-      const invested = p * n, returns = maturity - invested;
+      const invested = p * n;
+      const returns = maturity - invested;
       const out = document.getElementById('sipOutput');
       out.style.display = 'block';
-      out.innerHTML = `<strong>Total Invested:</strong> ₹${invested.toFixed(2)}<br><strong>Est. Returns:</strong> ₹${returns.toFixed(2)}<br><strong>Maturity Value:</strong> ₹${maturity.toFixed(2)}`;
+      out.innerHTML = `
+        <strong>Total Invested:</strong> ₹${invested.toFixed(2)}<br>
+        <strong>Est. Returns:</strong> ₹${returns.toFixed(2)}<br>
+        <strong>Maturity Value:</strong> ₹${maturity.toFixed(2)}
+      `;
     }
 
-    // 4. FD & RD
+    // 16. Simple & Compound Interest
+    function executeInterestCalc() {
+      const type = document.getElementById('interestTypeSelect').value;
+      const p = parseFloat(document.getElementById('interestPrincipal').value);
+      const r = parseFloat(document.getElementById('interestRate').value);
+      const t = parseFloat(document.getElementById('interestTenure').value);
+
+      if (!p || !r || !t || p <= 0 || r <= 0 || t <= 0) {
+        alert("Please enter valid principal, rate, and tenure."); return;
+      }
+
+      let totalInterest = 0, totalAmount = 0;
+      if (type === 'si') {
+        totalInterest = (p * r * t) / 100;
+        totalAmount = p + totalInterest;
+      } else {
+        totalAmount = p * Math.pow(1 + (r / 400), 4 * t);
+        totalInterest = totalAmount - p;
+      }
+
+      const out = document.getElementById('interestOutput');
+      out.style.display = 'block';
+      out.innerHTML = `
+        <strong>Principal Amount:</strong> ₹${p.toFixed(2)}<br>
+        <strong>${type === 'si' ? 'Simple Interest' : 'Compound Interest'}:</strong> ₹${totalInterest.toFixed(2)}<br>
+        <strong>Total Maturity Value:</strong> ₹${totalAmount.toFixed(2)}
+      `;
+    }
+
+    // 17. FD & RD
     function executeFdCalc() {
       const type = document.getElementById('fdTypeSelect').value;
       const p = parseFloat(document.getElementById('fdAmount').value);
       const r = parseFloat(document.getElementById('fdInterestRate').value);
       const t = parseFloat(document.getElementById('fdTenure').value);
       if (!p || !r || !t || p <= 0 || r <= 0 || t <= 0) { alert("Please enter valid deposit values."); return; }
+      
       let maturity = 0, invested = p;
       if (type === 'fd') {
-        maturity = p * Math.pow((1 + (r / 400)), 4 * t);
+        maturity = p * Math.pow(1 + (r / 400), 4 * t);
       } else {
-        const n = t * 12; invested = p * n;
-        const i = (r / 100) / 4;
-        maturity = p * (Math.pow(1 + i, 4 * t) - 1) / (1 - Math.pow(1 + i, -1/3));
+        const n = Math.round(t * 12);
+        invested = p * n;
+        let sum = 0;
+        for (let k = 1; k <= n; k++) {
+          sum += p * Math.pow(1 + (r / 400), 4 * (k / 12));
+        }
+        maturity = sum;
       }
       const interest = maturity - invested;
       const out = document.getElementById('fdOutput');
       out.style.display = 'block';
-      out.innerHTML = `<strong>Total Deposit:</strong> ₹${invested.toFixed(2)}<br><strong>Interest Earned:</strong> ₹${interest.toFixed(2)}<br><strong>Maturity Payout:</strong> ₹${maturity.toFixed(2)}`;
+      out.innerHTML = `
+        <strong>Total Deposit:</strong> ₹${invested.toFixed(2)}<br>
+        <strong>Interest Earned:</strong> ₹${interest.toFixed(2)}<br>
+        <strong>Maturity Payout:</strong> ₹${maturity.toFixed(2)}
+      `;
     }
 
-    // 5. Land Area Converter
+    // 18. Land Area Converter
     function executeLandConvert() {
       const val = parseFloat(document.getElementById('landInputVal').value);
       const unit = document.getElementById('landUnitSelect').value;
@@ -1094,13 +2352,335 @@
         <strong>Square Feet:</strong> ${sqft.toFixed(2)} sq ft<br>
         <strong>Katha:</strong> ${katha.toFixed(3)} Katha<br>
         <strong>Bigha:</strong> ${bigha.toFixed(3)} Bigha<br>
-        <strong>Decimil:</strong> ${decimil.toFixed(3)} Decimil<br>
+        <strong>Decimil / Cent:</strong> ${decimil.toFixed(3)} Decimil<br>
         <strong>Chhatak:</strong> ${chhatak.toFixed(2)} Chhatak<br>
         <strong>Acre:</strong> ${acre.toFixed(4)} Acre
       `;
     }
 
-    // 6. BMI Fitness
+    // 19. Life in Hours, Minutes & Seconds
+    function executeLifeStatsCalc() {
+      const dobVal = document.getElementById('lifeDob').value;
+      if (!dobVal) { alert("Please select your birth date."); return; }
+      const birth = new Date(dobVal);
+      const now = new Date();
+      if (birth > now) { alert("Birth date cannot be in the future."); return; }
+
+      const diffMs = now - birth;
+      const totalSecs = Math.floor(diffMs / 1000);
+      const totalMins = Math.floor(totalSecs / 60);
+      const totalHours = Math.floor(totalMins / 60);
+      const totalDays = Math.floor(totalHours / 24);
+      const totalWeeks = Math.floor(totalDays / 7);
+      const totalMonths = (totalDays / 30.4375).toFixed(1);
+
+      const out = document.getElementById('lifeStatsOutput');
+      out.style.display = 'block';
+      out.innerHTML = `
+        <strong>Total Months:</strong> ~${totalMonths} months<br>
+        <strong>Total Weeks:</strong> ${totalWeeks.toLocaleString()} weeks<br>
+        <strong>Total Days:</strong> ${totalDays.toLocaleString()} days<br>
+        <strong>Total Hours:</strong> ${totalHours.toLocaleString()} hours<br>
+        <strong>Total Minutes:</strong> ${totalMins.toLocaleString()} minutes<br>
+        <strong>Total Seconds:</strong> ${totalSecs.toLocaleString()} seconds
+      `;
+    }
+
+    // 20. Multi-Subject Average & Grade
+    function executeGradeCalc() {
+      const input = document.getElementById('gradeMarksList').value.trim();
+      const maxPerSub = parseFloat(document.getElementById('gradeMaxMarks').value) || 100;
+      if (!input) { alert("Please enter marks separated by commas."); return; }
+
+      const marksArr = input.split(',').map(m => parseFloat(m.trim())).filter(n => !isNaN(n));
+      if (marksArr.length === 0) { alert("Please enter valid numerical marks."); return; }
+
+      const totalMarks = marksArr.reduce((acc, val) => acc + val, 0);
+      const maxPossible = marksArr.length * maxPerSub;
+      const avg = totalMarks / marksArr.length;
+      const pct = (totalMarks / maxPossible) * 100;
+
+      let grade = 'F';
+      if (pct >= 90) grade = 'A+ (Outstanding)';
+      else if (pct >= 80) grade = 'A (Excellent)';
+      else if (pct >= 70) grade = 'B+ (Very Good)';
+      else if (pct >= 60) grade = 'B (Good)';
+      else if (pct >= 50) grade = 'C (Average)';
+      else if (pct >= 40) grade = 'D (Pass)';
+      else grade = 'F (Needs Improvement)';
+
+      const out = document.getElementById('gradeOutput');
+      out.style.display = 'block';
+      out.innerHTML = `
+        <strong>Subjects Counted:</strong> ${marksArr.length}<br>
+        <strong>Total Marks:</strong> ${totalMarks.toFixed(1)} /${maxPossible}<br>
+        <strong>Average Marks:</strong> ${avg.toFixed(2)}<br>
+        <strong>Percentage:</strong> <span style="font-weight:800; color:#2563eb;">${pct.toFixed(2)}%</span><br>
+        <strong>Overall Grade:</strong> <span style="font-weight:800; color:#16a34a;">${grade}</span>
+      `;
+    }
+
+    // 21. Fancy Bio Font Generator
+    function executeFontGeneration() {
+      const text = document.getElementById('bioFontInput').value || 'DocuCraft AI';
+      const container = document.getElementById('bioFontResults');
+      
+      const styles = [
+        { name: 'Monospace', fn: t => t.split('').map(c => { const code = c.charCodeAt(0); return (code>=65&&code<=90)?String.fromCodePoint(code+120367):(code>=97&&code<=122)?String.fromCodePoint(code+120361):c; }).join('') },
+        { name: 'Bold Serif', fn: t => t.split('').map(c => { const code = c.charCodeAt(0); return (code>=65&&code<=90)?String.fromCodePoint(code+119743):(code>=97&&code<=122)?String.fromCodePoint(code+119737):c; }).join('') },
+        { name: 'Double Struck', fn: t => t.split('').map(c => { const code = c.charCodeAt(0); return (code>=65&&code<=90)?String.fromCodePoint(code+120055):(code>=97&&code<=122)?String.fromCodePoint(code+120049):c; }).join('') },
+        { name: 'Circled Letters', fn: t => t.split('').map(c => { const code = c.charCodeAt(0); return (code>=65&&code<=90)?String.fromCodePoint(code+9333):(code>=97&&code<=122)?String.fromCodePoint(code+9327):c; }).join('') }
+      ];
+
+      container.innerHTML = '';
+      styles.forEach(s => {
+        const transformed = s.fn(text);
+        const card = document.createElement('div');
+        card.style = 'display:flex; justify-content:space-between; align-items:center; background:#f8fafc; padding:8px 12px; border-radius:8px; border:1px solid #e2e8f0; font-size:14px;';
+        card.innerHTML = `<span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:320px;">${transformed}</span>
+          <button type="button" onclick="navigator.clipboard.writeText('${transformed}'); alert('Copied!');" style="background:#2563eb; color:#fff; border:none; padding:4px 9px; border-radius:6px; font-size:11px; cursor:pointer;">Copy</button>`;
+        container.appendChild(card);
+      });
+    }
+
+    // 22. Water Intake Goal
+    function executeWaterCalc() {
+      const w = parseFloat(document.getElementById('waterWeight').value);
+      const activity = document.getElementById('waterActivity').value;
+      if (!w || w <= 0) { alert("Please enter valid weight in kg."); return; }
+
+      let baseWaterLiters = w * 0.033;
+      if (activity === 'moderate') baseWaterLiters += 0.5;
+      if (activity === 'high') baseWaterLiters += 1.0;
+
+      const glasses = Math.round(baseWaterLiters / 0.25);
+      const out = document.getElementById('waterOutput');
+      out.style.display = 'block';
+      out.innerHTML = `
+        <strong>Daily Water Target:</strong> <span style="font-weight:800; color:#0284c7; font-size:16px;">${baseWaterLiters.toFixed(2)} Liters</span><br>
+        <strong>Equivalent to:</strong> ~${glasses} glasses (250 ml each)<br>
+        <span style="font-size:12px; color:#64748b;">(Stay hydrated throughout the day!)</span>
+      `;
+    }
+
+    // 23. Screen & Display Metrics
+    function executeScreenMetrics() {
+      const w = window.screen.width;
+      const h = window.screen.height;
+      const availW = window.screen.availWidth;
+      const availH = window.screen.availHeight;
+      const dpr = window.devicePixelRatio || 1;
+      const depth = window.screen.colorDepth || 24;
+
+      const container = document.getElementById('screenDpiContent');
+      container.innerHTML = `
+        <strong>Screen Resolution:</strong> ${w} ×${h} px<br>
+        <strong>Available Workplace:</strong> ${availW} ×${availH} px<br>
+        <strong>Device Pixel Ratio (DPR):</strong> ${dpr.toFixed(2)}x<br>
+        <strong>Color Depth:</strong> ${depth}-bit<br>
+        <strong>Display Mode:</strong> ${w >= 1024 ? 'Desktop / Laptop' : (w >= 768 ? 'Tablet' : 'Mobile Phone')}
+      `;
+    }
+
+    // 24. Date Difference & Days Counter
+    function executeDateDiffCalc() {
+      const d1Val = document.getElementById('dateDiffStart').value;
+      const d2Val = document.getElementById('dateDiffEnd').value;
+      if (!d1Val || !d2Val) { alert("Please select both dates."); return; }
+
+      const d1 = new Date(d1Val);
+      const d2 = new Date(d2Val);
+      const diffMs = Math.abs(d2 - d1);
+      const totalDays = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
+      const totalWeeks = (totalDays / 7).toFixed(1);
+      const totalMonths = (totalDays / 30.4375).toFixed(1);
+
+      const out = document.getElementById('dateDiffOutput');
+      out.style.display = 'block';
+      out.innerHTML = `
+        <strong>Total Days:</strong> ${totalDays} days<br>
+        <strong>Weeks:</strong> ~${totalWeeks} weeks<br>
+        <strong>Months:</strong> ~${totalMonths} months
+      `;
+    }
+
+    // 25. Duplicate Line Remover
+    function executeDupRemover() {
+      const input = document.getElementById('dupInputText').value;
+      const isCase = document.getElementById('dupCaseSensitive').checked;
+      const isTrim = document.getElementById('dupTrimSpaces').checked;
+
+      if (!input.trim()) { alert("Please paste text with duplicate lines."); return; }
+
+      const rawLines = input.split(/\r?\n/);
+      const seen = new Set();
+      const uniqueLines = [];
+
+      rawLines.forEach(line => {
+        let processed = isTrim ? line.trim() : line;
+        let key = isCase ? processed : processed.toLowerCase();
+        if (processed !== '' && !seen.has(key)) {
+          seen.add(key);
+          uniqueLines.push(processed);
+        }
+      });
+
+      const removedCount = rawLines.length - uniqueLines.length;
+      document.getElementById('dupSummary').innerHTML = `
+        <strong>Total Lines:</strong> ${rawLines.length} | <strong>Unique:</strong> ${uniqueLines.length} \vert{} <strong>Duplicates Removed:</strong>${removedCount}
+      `;
+      document.getElementById('dupResultText').value = uniqueLines.join('\n');
+      document.getElementById('dupOutputBox').style.display = 'block';
+    }
+
+    function copyDupResult() {
+      const txt = document.getElementById('dupResultText').value;
+      if (txt) {
+        navigator.clipboard.writeText(txt);
+        alert("Cleaned lines copied to clipboard!");
+      }
+    }
+
+    // 26. Exam Eligibility
+    function executeEligibilityCalc() {
+      const dobVal = document.getElementById('elgDob').value;
+      const cutVal = document.getElementById('elgCutoff').value;
+      const minAge = parseFloat(document.getElementById('elgMinAge').value);
+      const maxAge = parseFloat(document.getElementById('elgMaxAge').value);
+
+      if (!dobVal || !cutVal || isNaN(minAge) || isNaN(maxAge)) {
+        alert("Please fill all eligibility fields."); return;
+      }
+
+      const dob = new Date(dobVal), cut = new Date(cutVal);
+      if (dob > cut) { alert("Date of Birth cannot be greater than cut-off date."); return; }
+
+      let y = cut.getFullYear() - dob.getFullYear();
+      let m = cut.getMonth() - dob.getMonth();
+      let d = cut.getDate() - dob.getDate();
+
+      if (d < 0) {
+        m--;
+        const prevMonth = new Date(cut.getFullYear(), cut.getMonth(), 0);
+        d += prevMonth.getDate();
+      }
+      if (m < 0) {
+        y--;
+        m += 12;
+      }
+
+      const minDate = new Date(dob);
+      minDate.setFullYear(dob.getFullYear() + minAge);
+
+      const maxDate = new Date(dob);
+      maxDate.setFullYear(dob.getFullYear() + maxAge);
+
+      const isEligible = (cut >= minDate) && (cut <= maxDate);
+
+      const out = document.getElementById('elgOutput');
+      out.style.display = 'block';
+      out.innerHTML = isEligible 
+        ? `<span style="color:#16a34a; font-size:16px;"><strong>✔ Eligible!</strong></span><br><strong>Age as on Cut-off:</strong> ${y} yrs, ${m} mos,${d} days.`
+        : `<span style="color:#dc2626; font-size:16px;"><strong>✖ Not Eligible!</strong></span><br><strong>Age as on Cut-off:</strong> ${y} yrs, ${m} mos,${d} days.<br><span style="font-size:12px; color:#64748b;">(Required: ${minAge} to${maxAge} years)</span>`;
+    }
+
+    // 27. Marks & CGPA
+    function toggleMarksInputs() {
+      const type = document.getElementById('marksCalcType').value;
+      document.getElementById('marksInputFields').style.display = type === 'marks' ? 'block' : 'none';
+      document.getElementById('cgpaInputFields').style.display = type === 'cgpa' ? 'block' : 'none';
+    }
+
+    function executeMarksCalc() {
+      const type = document.getElementById('marksCalcType').value;
+      const out = document.getElementById('marksOutput');
+      out.style.display = 'block';
+
+      if (type === 'marks') {
+        const obtained = parseFloat(document.getElementById('marksObtained').value);
+        const total = parseFloat(document.getElementById('marksTotal').value);
+        if (isNaN(obtained) || !total || obtained < 0 || total <= 0 || obtained > total) {
+          alert("Please enter valid marks (Obtained <= Total)."); return;
+        }
+        const pct = (obtained / total) * 100;
+        out.innerHTML = `<strong>Percentage:</strong> <span style="font-size:16px; font-weight:800; color:#2563eb;">${pct.toFixed(2)}%</span><br>Marks: ${obtained} /${total}`;
+      } else {
+        const cgpa = parseFloat(document.getElementById('cgpaValue').value);
+        if (isNaN(cgpa) || cgpa < 0 || cgpa > 10) {
+          alert("Please enter a valid CGPA between 0 and 10."); return;
+        }
+        const pct = cgpa * 9.5;
+        out.innerHTML = `<strong>Equivalent Percentage:</strong> <span style="font-size:16px; font-weight:800; color:#2563eb;">${pct.toFixed(2)}%</span><br><span style="font-size:12px; color:#64748b;">(Standard Formula: CGPA × 9.5)</span>`;
+      }
+    }
+
+    // 28. YouTube Thumbnail Downloader
+    function executeYtThumbFetch() {
+      const url = document.getElementById('ytVideoUrl').value.trim();
+      let videoId = '';
+      const regExp = /^.*(youtu\.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+      const match = url.match(regExp);
+
+      if (match && match[2].length === 11) {
+        videoId = match[2];
+      } else {
+        alert("Please enter a valid YouTube URL."); return;
+      }
+
+      const maxResUrl = `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`;
+      const img = document.getElementById('ytThumbImg');
+      const dlBtn = document.getElementById('ytThumbDownloadBtn');
+      img.src = maxResUrl;
+      dlBtn.href = maxResUrl;
+      document.getElementById('ytThumbOutput').style.display = 'block';
+    }
+
+    // 29. Round DP Maker
+    function executeCircleDpCrop() {
+      const fileInput = document.getElementById('circleDpInput');
+      const borderColor = document.getElementById('circleBorderColor').value;
+      if (!fileInput.files[0]) { alert("Please select a photo."); return; }
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const img = new Image();
+        img.onload = function() {
+          const canvas = document.createElement('canvas');
+          const size = Math.min(img.width, img.height);
+          canvas.width = size;
+          canvas.height = size;
+          const ctx = canvas.getContext('2d');
+
+          const sx = (img.width - size) / 2;
+          const sy = (img.height - size) / 2;
+
+          ctx.beginPath();
+          ctx.arc(size / 2, size / 2, size / 2, 0, Math.PI * 2);
+          ctx.closePath();
+          ctx.clip();
+
+          ctx.drawImage(img, sx, sy, size, size, 0, 0, size, size);
+
+          if (borderColor !== 'none') {
+            ctx.lineWidth = size * 0.04;
+            ctx.strokeStyle = borderColor;
+            ctx.stroke();
+          }
+
+          canvas.toBlob(blob => {
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = 'Round_Profile_Picture.png';
+            a.click();
+            closeCircleDpModal();
+          }, 'image/png');
+        };
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(fileInput.files[0]);
+    }
+
+    // 30. BMI Fitness
     function executeBmiCalc() {
       const h = parseFloat(document.getElementById('bmiHeight').value);
       const w = parseFloat(document.getElementById('bmiWeight').value);
@@ -1118,7 +2698,7 @@
       out.innerHTML = `<strong>Your BMI:</strong> ${bmi.toFixed(1)}<br><strong>Status:</strong>${status}`;
     }
 
-    // 7. Password Generator
+    // 31. Password Generator
     function executePassGen() {
       const len = parseInt(document.getElementById('passLength').value) || 14;
       const comp = document.getElementById('passComplexity').value;
@@ -1128,7 +2708,19 @@
       else if (comp === 'pin') chars = '0123456789';
 
       let pass = '';
-      for (let i = 0; i < len; i++) pass += chars.charAt(Math.floor(Math.random() * chars.length));
+      const cryptoObj = window.crypto || window.msCrypto;
+      if (cryptoObj && cryptoObj.getRandomValues) {
+        const values = new Uint32Array(len);
+        cryptoObj.getRandomValues(values);
+        for (let i = 0; i < len; i++) {
+          pass += chars[values[i] % chars.length];
+        }
+      } else {
+        for (let i = 0; i < len; i++) {
+          pass += chars.charAt(Math.floor(Math.random() * chars.length));
+        }
+      }
+
       const out = document.getElementById('passOutput');
       out.style.display = 'block';
       out.innerHTML = `<strong>Generated Password:</strong> <code style="font-size:16px; background:#fff; padding:2px 6px; border-radius:4px; border:1px solid #cbd5e1;">${pass}</code> <br><span style="font-size:11px; color:#2563eb;">(Click to copy)</span>`;
@@ -1144,33 +2736,47 @@
       }
     }
 
-    // 8. Age
+    // 32. Age Calculator
     function executeAgeCalc() {
       const dobVal = document.getElementById('ageDob').value;
       const asOnVal = document.getElementById('ageAsOn').value;
       if (!dobVal || !asOnVal) { alert("Please select dates."); return; }
       const dob = new Date(dobVal), asOn = new Date(asOnVal);
       if (dob > asOn) { alert("Date of Birth cannot be greater than target date."); return; }
-      let y = asOn.getFullYear() - dob.getFullYear(), m = asOn.getMonth() - dob.getMonth(), d = asOn.getDate() - dob.getDate();
-      if (d < 0) { m--; d += new Date(asOn.getFullYear(), asOn.getMonth(), 0).getDate(); }
-      if (m < 0) { y--; m += 12; }
+
+      let y = asOn.getFullYear() - dob.getFullYear();
+      let m = asOn.getMonth() - dob.getMonth();
+      let d = asOn.getDate() - dob.getDate();
+
+      if (d < 0) {
+        m--;
+        const prevMonth = new Date(asOn.getFullYear(), asOn.getMonth(), 0);
+        d += prevMonth.getDate();
+      }
+      if (m < 0) {
+        y--;
+        m += 12;
+      }
       const out = document.getElementById('ageOutput');
       out.style.display = 'block';
       out.innerHTML = `<strong>Your Age:</strong> ${y} years, ${m} months, ${d} days`;
     }
 
-    // 9. Discount
+    // 33. Discount
     function executeDiscountCalc() {
       const price = parseFloat(document.getElementById('discOriginalPrice').value);
       const disc = parseFloat(document.getElementById('discPercentage').value);
-      if (!price || disc === '' || price <= 0 || disc < 0) { alert("Please enter valid price and discount percentage."); return; }
+      if (isNaN(price) || isNaN(disc) || price <= 0 || disc < 0 || disc > 100) {
+        alert("Please enter valid price and discount percentage (0 to 100)."); return;
+      }
       const saved = (price * disc) / 100;
+      const finalPrice = price - saved;
       const out = document.getElementById('discOutput');
       out.style.display = 'block';
-      out.innerHTML = `<strong>Discounted Price:</strong> ₹${(price - saved).toFixed(2)}<br><strong>Savings:</strong> ₹${saved.toFixed(2)} (${disc}%)`;
+      out.innerHTML = `<strong>Discounted Price:</strong> ₹${finalPrice.toFixed(2)}<br><strong>Savings:</strong> ₹${saved.toFixed(2)} (${disc}%)`;
     }
 
-    // 10. Percentage
+    // 34. Percentage
     function executePercentCalc() {
       const a = parseFloat(document.getElementById('pctValA').value);
       const b = parseFloat(document.getElementById('pctValB').value);
@@ -1181,7 +2787,7 @@
       out.innerHTML = `<strong>${a}% of ${b} = </strong> <span style="font-size:16px; font-weight:800;">${result.toFixed(2)}</span>`;
     }
 
-    // 11. DOP Generator
+    // 35. DOP Generator
     function executeDopGenerator() {
       const fileInput = document.getElementById('dopFileInput');
       const name = document.getElementById('dopName').value.trim();
@@ -1214,7 +2820,7 @@
       reader.readAsDataURL(fileInput.files[0]);
     }
 
-    // 12. Image Format Converter
+    // 36. Image Format Converter
     function executeImageConversion() {
       const fileInput = document.getElementById('convertImgInput');
       const format = document.getElementById('convertTargetFormat').value;
@@ -1225,7 +2831,7 @@
         img.onload = function() {
           const canvas = document.createElement('canvas');
           canvas.width = img.width; canvas.height = img.height;
-          const ctx = canvas.getContext('2d');
+          ctx = canvas.getContext('2d');
           ctx.drawImage(img, 0, 0);
           canvas.toBlob(blob => {
             const ext = format === 'image/png' ? 'png' : (format === 'image/webp' ? 'webp' : 'jpg');
@@ -1239,7 +2845,7 @@
       reader.readAsDataURL(fileInput.files[0]);
     }
 
-    // 13. Word Counter
+    // 37. Word, Case & Text Formatter
     function updateWordCounts() {
       const val = document.getElementById('wordCounterText').value.trim();
       const words = val ? val.split(/\s+/).filter(Boolean).length : 0;
@@ -1252,8 +2858,16 @@
 
     function transformText(action) {
       const el = document.getElementById('wordCounterText');
+      if (!el.value) return;
+
       if (action === 'upper') el.value = el.value.toUpperCase();
       if (action === 'lower') el.value = el.value.toLowerCase();
+      if (action === 'title') {
+        el.value = el.value.toLowerCase().replace(/\b\w/g, c => c.toUpperCase());
+      }
+      if (action === 'sentence') {
+        el.value = el.value.toLowerCase().replace(/(^\s*\w|[.!?]\s*\w)/g, c => c.toUpperCase());
+      }
       if (action === 'clear') el.value = '';
       updateWordCounts();
     }
@@ -1300,4 +2914,3 @@
 
 </body>
 </html>
- Ata sob theek ache to
