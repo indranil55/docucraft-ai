@@ -1601,6 +1601,24 @@
     </div>
   </div>
 
+  <!-- Age Calculator Modal (Explicitly bound and fixed) -->
+  <div class="calc-modal" id="ageModal" onclick="if(event.target === this) closeAgeModal()">
+    <div class="calc-box">
+      <button class="calc-close" onclick="closeAgeModal()">&times;</button>
+      <h3><i class="fa-solid fa-calendar-check" style="color: #db2777;"></i> Age Calculator</h3>
+      <div class="calc-group">
+        <label>Date of Birth (DOB):</label>
+        <input type="date" id="ageDob">
+      </div>
+      <div class="calc-group">
+        <label>Calculate Age As On:</label>
+        <input type="date" id="ageAsOn">
+      </div>
+      <button class="calc-btn" onclick="executeAgeCalc()">Calculate Age</button>
+      <div id="ageOutput" class="calc-result"></div>
+    </div>
+  </div>
+
   <!-- Discount Modal -->
   <div class="calc-modal" id="discountModal" onclick="if(event.target === this) closeDiscountModal()">
     <div class="calc-box">
@@ -1727,7 +1745,7 @@
       <div id="wsFileList" style="margin-bottom: 8px;"></div>
       <div class="processing-progress" id="processingProgress">
         <div class="processing-label"><span id="progressText">Preparing...</span><span id="progressPercent">0%</span></div>
-        <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+        <div class="processing-track"><div class="progress-fill" id="progressFill"></div></div>
       </div>
       <div id="wsCustomUI"></div>
 
