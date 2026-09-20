@@ -195,12 +195,12 @@
   </section>
 
   <!-- ==========================================================================
-       Category Filtering Tabs
+       Category Filtering Tabs (Default active tab set to Photo & Cyber Tools)
        ========================================================================== -->
   <div class="filter-wrapper">
     <div class="filter-tabs" id="tools">
-      <button class="filter-btn active" onclick="filterCategory('all', this)">All</button>
-      <button class="filter-btn" onclick="filterCategory('cyber', this)">Photo & Cyber Tools</button>
+      <button class="filter-btn" onclick="filterCategory('all', this)">All</button>
+      <button class="filter-btn active" onclick="filterCategory('cyber', this)">Photo & Cyber Tools</button>
       <button class="filter-btn" onclick="filterCategory('finance', this)">Finance & Utility Tools</button>
       <button class="filter-btn" onclick="filterCategory('organize', this)">File Organizer</button>
       <button class="filter-btn" onclick="filterCategory('toPdf', this)">Convert to PDF</button>
@@ -1311,7 +1311,7 @@
     </div>
   </div>
 
-  <!-- Land Converter Modal -->
+  <!-- Land Converter Modal (Fixed Output) -->
   <div class="calc-modal" id="landModal" onclick="if(event.target === this) closeLandModal()">
     <div class="calc-box">
       <button class="calc-close" onclick="closeLandModal()">&times;</button>
@@ -1726,7 +1726,7 @@
       <div id="wsFileList" style="margin-bottom: 8px;"></div>
       <div class="processing-progress" id="processingProgress">
         <div class="processing-label"><span id="progressText">Preparing...</span><span id="progressPercent">0%</span></div>
-        <div class="processing-track"><div class="processing-fill" id="progressFill"></div></div>
+        <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
       </div>
       <div id="wsCustomUI"></div>
 
