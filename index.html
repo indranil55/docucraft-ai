@@ -153,7 +153,7 @@
   <div class="search-wrapper">
     <div class="search-box-inner">
       <i class="fa-solid fa-magnifying-glass"></i>
-      <input type="text" id="toolSearchInput" class="search-input" placeholder="Search any tool (e.g. Notepad, Docx to PDF, Govt Jobs, KB Resizer)..." onkeyup="filterToolsBySearch()">
+      <input type="text" id="toolSearchInput" class="search-input" placeholder="Search any tool (e.g. Age Calculator, Notepad, Govt Jobs, KB Resizer)..." onkeyup="filterToolsBySearch()">
     </div>
   </div>
 
@@ -163,6 +163,13 @@
   <section class="popular-section">
     <h3 class="section-title"><i class="fa-solid fa-fire" style="color: #e5322d;"></i> Most Popular Tools</h3>
     <div class="popular-grid">
+      <div class="popular-card" onclick="openAgeModal()">
+        <div class="popular-icon" style="background:#fce7f3; color:#db2777;"><i class="fa-solid fa-calendar-check"></i></div>
+        <div class="popular-info">
+          <h4>Age Calculator</h4>
+          <span>Exam DOB check</span>
+        </div>
+      </div>
       <div class="popular-card" onclick="openGovtJobModal()">
         <div class="popular-icon" style="background:#fee2e2; color:#dc2626;"><i class="fa-solid fa-bullhorn"></i></div>
         <div class="popular-info">
@@ -175,13 +182,6 @@
         <div class="popular-info">
           <h4>Unlimited Notepad</h4>
           <span>Write & Download</span>
-        </div>
-      </div>
-      <div class="popular-card" onclick="launchTool('wordToPdf')">
-        <div class="popular-icon" style="background:#eff6ff; color:#2563eb;"><i class="fa-solid fa-file-word"></i></div>
-        <div class="popular-info">
-          <h4>Docx to PDF</h4>
-          <span>Word converter</span>
         </div>
       </div>
       <div class="popular-card" onclick="launchTool('kbResizer')">
@@ -215,6 +215,14 @@
        ========================================================================== -->
   <main class="main-grid-container">
     <div class="tools-grid" id="toolsGrid">
+
+      <!-- 1. Age Calculator Card (Placed right at the top) -->
+      <div class="tool-card" data-cat="finance" onclick="openAgeModal()">
+        <div class="tool-icon" style="background:#fce7f3; color:#db2777;"><i class="fa-solid fa-calendar-check"></i></div>
+        <h3>Age Calculator (Exam DOB) <span class="badge-new">NEW</span></h3>
+        <p>Calculate exact age in years, months, and days for job forms and exam eligibility.</p>
+        <span class="tool-meta">Open Age Calculator &rarr;</span>
+      </div>
 
       <!-- Unlimited Notepad Tool Card -->
       <div class="tool-card" data-cat="generator" onclick="openNotepadModal()">
@@ -458,14 +466,6 @@
         <h3>Land Area (Bigha-Katha) Converter <span class="badge-new">NEW</span></h3>
         <p>Convert land measurement between Bigha, Katha, Chhatak, Acre, Decimil & Sq Ft.</p>
         <span class="tool-meta">Open Land Converter &rarr;</span>
-      </div>
-
-      <!-- Age Calculator Card with explicitly bound onclick event -->
-      <div class="tool-card" data-cat="finance" onclick="openAgeModal()">
-        <div class="tool-icon" style="background:#fce7f3; color:#db2777;"><i class="fa-solid fa-calendar-check"></i></div>
-        <h3>Age Calculator (Exam DOB) <span class="badge-new">NEW</span></h3>
-        <p>Calculate exact age in years, months, and days for job forms and exam eligibility.</p>
-        <span class="tool-meta">Open Age Calculator &rarr;</span>
       </div>
 
       <div class="tool-card" data-cat="finance" onclick="openAgeDetailedModal()">
@@ -1745,7 +1745,7 @@
       <div id="wsFileList" style="margin-bottom: 8px;"></div>
       <div class="processing-progress" id="processingProgress">
         <div class="processing-label"><span id="progressText">Preparing...</span><span id="progressPercent">0%</span></div>
-        <div class="processing-track"><div class="progress-fill" id="progressFill"></div></div>
+        <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
       </div>
       <div id="wsCustomUI"></div>
 
