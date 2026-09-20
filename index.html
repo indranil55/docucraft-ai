@@ -195,7 +195,7 @@
   </section>
 
   <!-- ==========================================================================
-       Category Filtering Tabs (Default active tab set to Photo & Cyber Tools)
+       Category Filtering Tabs
        ========================================================================== -->
   <div class="filter-wrapper">
     <div class="filter-tabs" id="tools">
@@ -216,7 +216,7 @@
   <main class="main-grid-container">
     <div class="tools-grid" id="toolsGrid">
 
-      <!-- 1. Age Calculator Card (Placed right at the top) -->
+      <!-- 1. Age Calculator Card -->
       <div class="tool-card" data-cat="finance" onclick="openAgeModal()">
         <div class="tool-icon" style="background:#fce7f3; color:#db2777;"><i class="fa-solid fa-calendar-check"></i></div>
         <h3>Age Calculator (Exam DOB) <span class="badge-new">NEW</span></h3>
@@ -746,10 +746,10 @@
   </main>
 
   <!-- ==========================================================================
-       All Modals Section (Popups for Calculators, Notepad & Tools)
+       All Modals Section
        ========================================================================== -->
 
-  <!-- Unlimited Notepad Modal (100,000+ Lines Support) -->
+  <!-- Unlimited Notepad Modal -->
   <div class="calc-modal" id="notepadModal" onclick="if(event.target === this) closeNotepadModal()">
     <div class="calc-box" style="max-width: 650px;">
       <button class="calc-close" onclick="closeNotepadModal()">&times;</button>
@@ -1312,7 +1312,7 @@
     </div>
   </div>
 
-  <!-- Land Converter Modal (Fixed Output) -->
+  <!-- Land Converter Modal -->
   <div class="calc-modal" id="landModal" onclick="if(event.target === this) closeLandModal()">
     <div class="calc-box">
       <button class="calc-close" onclick="closeLandModal()">&times;</button>
@@ -1355,7 +1355,7 @@
     </div>
   </div>
 
-  <!-- Detailed Age in Hours, Minutes & Seconds Modal -->
+  <!-- Detailed Age Modal -->
   <div class="calc-modal" id="ageDetailedModal" onclick="if(event.target === this) closeAgeDetailedModal()">
     <div class="calc-box">
       <button class="calc-close" onclick="closeAgeDetailedModal()">&times;</button>
@@ -1369,7 +1369,7 @@
     </div>
   </div>
 
-  <!-- Average & Multi-Subject Grade Modal -->
+  <!-- Average & Grade Modal -->
   <div class="calc-modal" id="gradeModal" onclick="if(event.target === this) closeGradeModal()">
     <div class="calc-box">
       <button class="calc-close" onclick="closeGradeModal()">&times;</button>
@@ -1601,7 +1601,7 @@
     </div>
   </div>
 
-  <!-- Age Calculator Modal (Explicitly bound and fixed) -->
+  <!-- Age Calculator Modal -->
   <div class="calc-modal" id="ageModal" onclick="if(event.target === this) closeAgeModal()">
     <div class="calc-box">
       <button class="calc-close" onclick="closeAgeModal()">&times;</button>
@@ -1745,7 +1745,7 @@
       <div id="wsFileList" style="margin-bottom: 8px;"></div>
       <div class="processing-progress" id="processingProgress">
         <div class="processing-label"><span id="progressText">Preparing...</span><span id="progressPercent">0%</span></div>
-        <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+        <div class="processing-track"><div class="progress-fill" id="progressFill"></div></div>
       </div>
       <div id="wsCustomUI"></div>
 
@@ -1818,6 +1818,17 @@
       updateUnitConvFields();
     });
 
+    // Universal File Download Helper
+    function triggerDownload(blobUrl, filename) {
+      const a = document.createElement('a');
+      a.href = blobUrl;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(blobUrl);
+    }
+
     // 1. Unlimited Notepad Management Functions
     function openNotepadModal() { document.getElementById('notepadModal').style.display = 'flex'; updateNotepadStats(); }
     function closeNotepadModal() { document.getElementById('notepadModal').style.display = 'none'; }
@@ -1847,10 +1858,7 @@
       const val = document.getElementById('notepadTextarea').value;
       if (!val) { alert("Please write some notes before downloading."); return; }
       const blob = new Blob([val], { type: 'text/plain;charset=utf-8' });
-      const a = document.createElement('a');
-      a.href = URL.createObjectURL(blob);
-      a.download = 'DocuCraft_Notepad_Document.txt';
-      a.click();
+      triggerDownload(URL.createObjectURL(blob), 'DocuCraft_Notepad_Document.txt');
     }
 
     // 2. Contact & Support Form Submission Handler via Web3Forms API
@@ -2065,7 +2073,7 @@
         ctx.fillStyle = '#ffffff'; ctx.fillRect(0, 0, canvas.width, canvas.height);
         ctx.drawImage(img, 0, 0);
         canvas.toBlob(blob => {
-          const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'Barcode.png'; a.click();
+          triggerDownload(URL.createObjectURL(blob), 'Barcode.png');
         });
       };
       img.src = 'data:image/svg+xml;base64,' + btoa(xml);
@@ -2374,8 +2382,83 @@
       const a = parseFloat(document.getElementById('pctValA').value), b = parseFloat(document.getElementById('pctValB').value);
       const out = document.getElementById('pctOutput'); out.style.display = 'block'; out.textContent = `Result: ${((a / 100) * b).toFixed(2)}`;
     }
-    function executeDopGenerator() { alert("Photo generated with date & name."); }
-    function executeImageConversion() { alert("Image converted successfully."); }
+    
+    // Updated DOP Generator with direct file download
+    function executeDopGenerator() {
+      const fileInput = document.getElementById('dopFileInput');
+      if (!fileInput.files || !fileInput.files[0]) {
+        alert("Please upload a photo first.");
+        return;
+      }
+      const file = fileInput.files[0];
+      const name = document.getElementById('dopName').value.trim() || 'CANDIDATE';
+      const date = document.getElementById('dopDate').value || new Date().toISOString().split('T')[0];
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const img = new Image();
+        img.onload = function() {
+          const canvas = document.createElement('canvas');
+          canvas.width = img.width;
+          canvas.height = img.height + 40; // extra space for text banner
+          const ctx = canvas.getContext('2d');
+          
+          // Draw white background for text banner
+          ctx.fillStyle = '#ffffff';
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
+          
+          // Draw image
+          ctx.drawImage(img, 0, 0);
+
+          // Draw Text banner
+          ctx.fillStyle = 'rgba(0, 0, 0, 0.85)';
+          ctx.fillRect(0, canvas.height - 40, canvas.width, 40);
+
+          ctx.fillStyle = '#ffffff';
+          ctx.font = 'bold 16px Arial';
+          ctx.textAlign = 'center';
+          ctx.fillText(`Name: ${name} | DOP: ${date}`, canvas.width / 2, canvas.height - 15);
+
+          canvas.toBlob(function(blob) {
+            triggerDownload(URL.createObjectURL(blob), 'Stamped_Photo.png');
+            alert("Photo generated & downloaded successfully!");
+          }, 'image/png');
+        };
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    // Updated Image Converter with direct file download
+    function executeImageConversion() {
+      const fileInput = document.getElementById('convertImgInput');
+      if (!fileInput.files || !fileInput.files[0]) {
+        alert("Please select an image first.");
+        return;
+      }
+      const file = fileInput.files[0];
+      const format = document.getElementById('convertTargetFormat').value;
+      const ext = format.split('/')[1];
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const img = new Image();
+        img.onload = function() {
+          const canvas = document.createElement('canvas');
+          canvas.width = img.width;
+          canvas.height = img.height;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0);
+
+          canvas.toBlob(function(blob) {
+            triggerDownload(URL.createObjectURL(blob), `Converted_Image.${ext}`);
+            alert("Image converted & downloaded successfully!");
+          }, format, 0.95);
+        };
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
 
     function updateWordCounts() {
       const val = document.getElementById('wordCounterText').value.trim();
@@ -2399,3 +2482,4 @@
 
 </body>
 </html>
+Atar sathe koro
