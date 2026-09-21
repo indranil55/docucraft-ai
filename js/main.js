@@ -52,10 +52,12 @@ function initDropzoneHandlers() {
     });
 
     dropzone.addEventListener('drop', (e) => {
+      if (!checkUserAccess(typeof activeTool !== 'undefined' ? activeTool : '')) return;
       const dt = e.dataTransfer;
       const files = dt.files;
       if (files.length > 0) {
         if (fileInput.hasAttribute('multiple')) {
+          // FIX: Prevent duplicate or accidental accumulation of files on drop
           const newFiles = Array.from(files);
           const uniqueFiles = newFiles.filter(nf => !selectedFiles.some(sf => sf.name === nf.name && sf.size === nf.size));
           selectedFiles = [...selectedFiles, ...uniqueFiles];
@@ -68,8 +70,10 @@ function initDropzoneHandlers() {
     });
 
     fileInput.addEventListener('change', (e) => {
+      if (!checkUserAccess(typeof activeTool !== 'undefined' ? activeTool : '')) return;
       if (e.target.files.length > 0) {
         if (fileInput.hasAttribute('multiple')) {
+          // FIX: Prevent duplicate file addition on file input change
           const newFiles = Array.from(e.target.files);
           const uniqueFiles = newFiles.filter(nf => !selectedFiles.some(sf => sf.name === nf.name && sf.size === nf.size));
           selectedFiles = [...selectedFiles, ...uniqueFiles];
@@ -96,44 +100,14 @@ function triggerFileSuccessAnimation(msg) {
   }
 }
 
-// ৩ বার ফ্রি কাজ করার পর ৪র্থ বারে লগইন পপআপ দেখানোর মূল ফাংশন
+// লক সিস্টেম রিমুভ করে সব টুল সবার জন্য উন্মুক্ত করা হলো
 function checkUserAccess(toolKey) {
-  // ইউজার যদি ইতিমধ্যে লগইন করা থাকে, তবে কোনো লিমিট থাকবে না
-  const currentUser = localStorage.getItem('currentUser') || sessionStorage.getItem('currentUser');
-  if (currentUser) {
-    return true;
-  }
-
-  // লোকাল স্টোরেজ থেকে ব্যবহারের কাউন্ট চেক করা
-  let usageCount = parseInt(localStorage.getItem('toolUsageCount')) || 0;
-
-  if (usageCount >= 3) {
-    // ৩ বার ব্যবহার করা হয়ে গেলে লগইন মোডাল ওপেন করবে
-    if (typeof openAuthModal === 'function') {
-      openAuthModal();
-    } else {
-      alert("ফ্রি ব্যবহারের লিমিট শেষ! আরও কাজ করতে অনুগ্রহ করে লগইন বা সাইন-ইন করুন।");
-    }
-    return false; // প্রসেসিং আটকে দেবে
-  }
-
-  // এখানে সরাসরি কাউন্ট বাড়াবে না, টুল প্রসেস বা ডাউনলোড সফল হলে তবেই বাড়াতে চাইলে নিচের লাইনটি টুলের প্রসেসিং ফাংশনে রাখতে পারেন। 
-  // তবে সহজ রাখার জন্য ৪র্থ বার কাজ করতে গেলেই যেন ধরে, সেজন্য এটি এখানে রাখা হয়েছে।
   return true;
 }
 
-// টুল প্রসেস বা ডাউনলোড শেষ করার সময় এই ফাংশনটি কল করে কাউন্ট ১ বাড়িয়ে দেবেন (যেমন executeToolAction এর ভেতর)
-function recordSuccessfulToolUse() {
-  const currentUser = localStorage.getItem('currentUser') || sessionStorage.getItem('currentUser');
-  if (currentUser) return; // লগইন থাকলে কাউন্ট বাড়ার দরকার নেই
-
-  let usageCount = parseInt(localStorage.getItem('toolUsageCount')) || 0;
-  usageCount++;
-  localStorage.setItem('toolUsageCount', usageCount);
-}
-
-// আসল launchTool ফাংশনটি tools.js-এ আছে
+// আসল launchTool ফাংশনটি tools.js-এ আছে, তাই এখানে শুধু এক্সেস চেক রেখে বাকিটা গাইড করা হলো
 const originalLaunchTool = window.launchTool;
+// Note: launchTool is fully handled inside tools.js, secured via checkUserAccess check.
 
 function handleBackdropClick(event) {
   if (event.target.id === 'workspaceOverlay') {
@@ -144,14 +118,9 @@ function handleBackdropClick(event) {
 }
 
 function openSmartAiChat() {
-  const currentUser = localStorage.getItem('currentUser') || sessionStorage.getItem('currentUser');
-  let usageCount = parseInt(localStorage.getItem('toolUsageCount')) || 0;
-
-  if (!currentUser && usageCount >= 3) {
-    if (typeof openAuthModal === 'function') openAuthModal();
+  if (!checkUserAccess('aiChat')) {
     return;
   }
-
   const modal = document.getElementById('smartAiChatModal');
   if (modal) {
     modal.style.display = 'flex';
