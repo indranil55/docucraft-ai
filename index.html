@@ -37,7 +37,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer">
   
   <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
-  <link rel="stylesheet" href="style.css?v=2.2">
+  <link rel="stylesheet" href="style.css?v=2.3">
 
   <style>
     .nav-container { display: flex; align-items: center; justify-content: space-between; padding: 12px 20px; }
@@ -85,7 +85,6 @@
       margin-top: 16px; padding: 14px; background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 8px; font-size: 14px; color: #166534; line-height: 1.6; display: none;
     }
 
-    /* শুধুমাত্র ইনফো পপআপ (About Us, Terms ইত্যাদি) এর লেখা স্পষ্ট করার জন্য ফিক্স */
     .info-modal-body {
       color: #0f172a !important;
       font-size: 14px;
@@ -489,32 +488,11 @@
         <span class="tool-meta">Get Thumbnail &rarr;</span>
       </div>
 
-      <div class="tool-card" data-cat="cyber" onclick="openCircleDpModal()">
-        <div class="tool-icon" style="background:#fdf2f8; color:#db2777;"><i class="fa-solid fa-circle-user"></i></div>
-        <h3>Round DP & Circle Crop Maker <span class="badge-new">NEW</span></h3>
-        <p>Crop any image into a round circular profile picture with optional colored borders.</p>
-        <span class="tool-meta">Create Round DP &rarr;</span>
-      </div>
-
-      <div class="tool-card" data-cat="generator" onclick="openBioFontModal()">
-        <div class="tool-icon" style="background:#f5f3ff; color:#7c3aed;"><i class="fa-solid fa-font"></i></div>
-        <h3>Fancy Bio Font Generator <span class="badge-new">NEW</span></h3>
-        <p>Transform standard text into stylish bio fonts for Instagram, WhatsApp & Twitter.</p>
-        <span class="tool-meta">Generate Fonts &rarr;</span>
-      </div>
-
       <div class="tool-card" data-cat="finance" onclick="openWaterModal()">
         <div class="tool-icon" style="background:#e0f2fe; color:#0284c7;"><i class="fa-solid fa-glass-water"></i></div>
         <h3>Daily Water Intake Goal <span class="badge-new">NEW</span></h3>
         <p>Calculate your healthy recommended daily water drinking requirement in liters and glasses.</p>
         <span class="tool-meta">Check Water Goal &rarr;</span>
-      </div>
-
-      <div class="tool-card" data-cat="generator" onclick="openScreenDpiModal()">
-        <div class="tool-icon" style="background:#f1f5f9; color:#475569;"><i class="fa-solid fa-display"></i></div>
-        <h3>Screen & Display DPI Tester <span class="badge-new">NEW</span></h3>
-        <p>Inspect device screen resolution, device pixel ratio, color depth & screen size in real-time.</p>
-        <span class="tool-meta">Inspect Display &rarr;</span>
       </div>
 
       <div class="tool-card" data-cat="generator" onclick="openDupRemoverModal()">
@@ -1314,18 +1292,6 @@
     </div>
   </div>
 
-  <div class="calc-modal" id="bioFontModal" onclick="if(event.target === this) closeBioFontModal()">
-    <div class="calc-box" style="max-width: 530px;">
-      <button class="calc-close" onclick="closeBioFontModal()">&times;</button>
-      <h3><i class="fa-solid fa-font" style="color: #7c3aed;"></i> Fancy Bio Font Generator</h3>
-      <div class="calc-group">
-        <label>Type text here:</label>
-        <input type="text" id="bioFontInput" placeholder="Enter text (e.g. DocuCraft AI)" oninput="executeFontGeneration()">
-      </div>
-      <div id="bioFontResults" style="display: flex; flex-direction: column; gap: 8px; max-height: 240px; overflow-y: auto; margin-top: 10px;"></div>
-    </div>
-  </div>
-
   <div class="calc-modal" id="waterModal" onclick="if(event.target === this) closeWaterModal()">
     <div class="calc-box">
       <button class="calc-close" onclick="closeWaterModal()">&times;</button>
@@ -1344,17 +1310,6 @@
       </div>
       <button class="calc-btn" onclick="executeWaterCalc()">Calculate Water Intake</button>
       <div id="waterOutput" class="calc-result"></div>
-    </div>
-  </div>
-
-  <div class="calc-modal" id="screenDpiModal" onclick="if(event.target === this) closeScreenDpiModal()">
-    <div class="calc-box">
-      <button class="calc-close" onclick="closeScreenDpiModal()">&times;</button>
-      <h3><i class="fa-solid fa-display" style="color: #475569;"></i> Screen & Display Info</h3>
-      <div id="screenDpiContent" class="calc-result" style="display: block; background: #f8fafc; border-color: #cbd5e1; color: #1e293b; font-size: 13.5px; line-height: 1.8;">
-        Fetching display metrics...
-      </div>
-      <button class="calc-btn" onclick="executeScreenMetrics()" style="margin-top:12px;">Refresh Metrics</button>
     </div>
   </div>
 
@@ -1455,28 +1410,6 @@
         <img id="ytThumbImg" src="" style="width: 100%; border-radius: 8px; border: 1px solid #cbd5e1; margin-bottom: 10px;">
         <a id="ytThumbDownloadBtn" href="#" target="_blank" download="thumbnail.jpg" class="calc-btn" style="display: inline-block; text-decoration: none; padding: 10px 18px; width: auto;">Download HD Thumbnail</a>
       </div>
-    </div>
-  </div>
-
-  <div class="calc-modal" id="circleDpModal" onclick="if(event.target === this) closeCircleDpModal()">
-    <div class="calc-box">
-      <button class="calc-close" onclick="closeCircleDpModal()">&times;</button>
-      <h3><i class="fa-solid fa-circle-user" style="color: #db2777;"></i> Round DP Maker</h3>
-      <div class="calc-group">
-        <label>Upload Photo:</label>
-        <input type="file" id="circleDpInput" accept="image/*">
-      </div>
-      <div class="calc-group">
-        <label>Border Color:</label>
-        <select id="circleBorderColor">
-          <option value="none">No Border (Transparent BG)</option>
-          <option value="#2563eb" selected>Royal Blue Border</option>
-          <option value="#dc2626">Red Border</option>
-          <option value="#16a34a">Green Border</option>
-          <option value="#ffffff">White Border</option>
-        </select>
-      </div>
-      <button class="calc-btn" onclick="executeCircleDpCrop()">Create Round Profile Picture</button>
     </div>
   </div>
 
@@ -1839,12 +1772,8 @@
     function closeAgeDetailedModal() { document.getElementById('ageDetailedModal').style.display = 'none'; }
     function openGradeModal() { document.getElementById('gradeModal').style.display = 'flex'; }
     function closeGradeModal() { document.getElementById('gradeModal').style.display = 'none'; }
-    function openBioFontModal() { document.getElementById('bioFontModal').style.display = 'flex'; executeFontGeneration(); }
-    function closeBioFontModal() { document.getElementById('bioFontModal').style.display = 'none'; }
     function openWaterModal() { document.getElementById('waterModal').style.display = 'flex'; }
     function closeWaterModal() { document.getElementById('waterModal').style.display = 'none'; }
-    function openScreenDpiModal() { document.getElementById('screenDpiModal').style.display = 'flex'; executeScreenMetrics(); }
-    function closeScreenDpiModal() { document.getElementById('screenDpiModal').style.display = 'none'; }
     function openDateDiffModal() { document.getElementById('dateDiffModal').style.display = 'flex'; }
     function closeDateDiffModal() { document.getElementById('dateDiffModal').style.display = 'none'; }
     function openDupRemoverModal() { document.getElementById('dupRemoverModal').style.display = 'flex'; }
@@ -1859,8 +1788,6 @@
     function openMarksModal() { document.getElementById('marksModal').style.display = 'flex'; }
     function closeYtThumbModal() { document.getElementById('ytThumbModal').style.display = 'none'; }
     function openYtThumbModal() { document.getElementById('ytThumbModal').style.display = 'flex'; }
-    function closeCircleDpModal() { document.getElementById('circleDpModal').style.display = 'none'; }
-    function openCircleDpModal() { document.getElementById('circleDpModal').style.display = 'flex'; }
     function closeInfoModal() { document.getElementById('infoModal').style.display = 'none'; }
 
     function executePrepayCalc() {
@@ -2177,9 +2104,7 @@
       out.textContent = `Average Marks: ${avg.toFixed(2)}`;
     }
 
-    function executeFontGeneration() { document.getElementById('bioFontResults').textContent = `Generated: ${document.getElementById('bioFontInput').value || 'DocuCraft AI'}`; }
     function executeWaterCalc() { document.getElementById('waterOutput').style.display = 'block'; document.getElementById('waterOutput').textContent = `Daily Target: ${(parseFloat(document.getElementById('waterWeight').value || 60) * 0.033).toFixed(2)} Liters`; }
-    function executeScreenMetrics() { document.getElementById('screenDpiContent').textContent = `Resolution: ${window.screen.width} × ${window.screen.height} px`; }
     
     function executeDateDiffCalc() {
       const d1 = new Date(document.getElementById('dateDiffStart').value);
@@ -2203,7 +2128,6 @@
       const out = document.getElementById('marksOutput'); out.style.display = 'block'; out.textContent = `Percentage: ${((ob / tot) * 100).toFixed(2)}%`;
     }
     function executeYtThumbFetch() { document.getElementById('ytThumbOutput').style.display = 'block'; }
-    function executeCircleDpCrop() { alert("Processing profile picture..."); }
     function executeBmiCalc() {
       const h = parseFloat(document.getElementById('bmiHeight').value) / 100, w = parseFloat(document.getElementById('bmiWeight').value);
       const out = document.getElementById('bmiOutput'); out.style.display = 'block'; out.textContent = `BMI: ${(w / (h * h)).toFixed(1)}`;
