@@ -37,7 +37,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer">
   
   <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
-  <link rel="stylesheet" href="style.css?v=2.3">
+  <link rel="stylesheet" href="style.css?v=2.4">
 
   <style>
     .nav-container { display: flex; align-items: center; justify-content: space-between; padding: 12px 20px; }
@@ -145,33 +145,19 @@
   <div class="search-wrapper">
     <div class="search-box-inner">
       <i class="fa-solid fa-magnifying-glass"></i>
-      <input type="text" id="toolSearchInput" class="search-input" placeholder="Search any tool (e.g. Age Calculator, Notepad, Govt Jobs, KB Resizer)..." onkeyup="filterToolsBySearch()">
+      <input type="text" id="toolSearchInput" class="search-input" placeholder="Search any tool (e.g. Merge PDF, KB Resizer, Govt Jobs)..." onkeyup="filterToolsBySearch()">
     </div>
   </div>
 
-  <!-- Popular Section -->
+  <!-- Popular Section (Updated with requested tools) -->
   <section class="popular-section">
     <h3 class="section-title"><i class="fa-solid fa-fire" style="color: #e5322d;"></i> Most Popular Tools</h3>
     <div class="popular-grid">
-      <div class="popular-card" onclick="openAgeModal()">
-        <div class="popular-icon" style="background:#fce7f3; color:#db2777;"><i class="fa-solid fa-calendar-check"></i></div>
+      <div class="popular-card" onclick="launchTool('merge')">
+        <div class="popular-icon" style="background:#fee2e2; color:#e5322d;"><i class="fa-solid fa-object-group"></i></div>
         <div class="popular-info">
-          <h4>Age Calculator</h4>
-          <span>Exam DOB check</span>
-        </div>
-      </div>
-      <div class="popular-card" onclick="openGovtJobModal()">
-        <div class="popular-icon" style="background:#fee2e2; color:#dc2626;"><i class="fa-solid fa-bullhorn"></i></div>
-        <div class="popular-info">
-          <h4>Govt Job Alerts</h4>
-          <span>Latest Sarkari Updates</span>
-        </div>
-      </div>
-      <div class="popular-card" onclick="openNotepadModal()">
-        <div class="popular-icon" style="background:#e0f2fe; color:#0284c7;"><i class="fa-solid fa-note-sticky"></i></div>
-        <div class="popular-info">
-          <h4>Unlimited Notepad</h4>
-          <span>Write & Download</span>
+          <h4>Merge PDF</h4>
+          <span>Combine files</span>
         </div>
       </div>
       <div class="popular-card" onclick="launchTool('kbResizer')">
@@ -179,6 +165,20 @@
         <div class="popular-info">
           <h4>KB Resizer</h4>
           <span>Exact KB/MB</span>
+        </div>
+      </div>
+      <div class="popular-card" onclick="launchTool('compress')">
+        <div class="popular-icon" style="background:#ecfdf5; color:#059669;"><i class="fa-solid fa-file-zipper"></i></div>
+        <div class="popular-info">
+          <h4>Compress PDF</h4>
+          <span>Reduce file size</span>
+        </div>
+      </div>
+      <div class="popular-card" onclick="openGovtJobModal()">
+        <div class="popular-icon" style="background:#fee2e2; color:#dc2626;"><i class="fa-solid fa-bullhorn"></i></div>
+        <div class="popular-info">
+          <h4>Govt Job Alerts</h4>
+          <span>Latest updates</span>
         </div>
       </div>
     </div>
