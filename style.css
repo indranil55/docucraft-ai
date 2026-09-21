@@ -660,7 +660,6 @@ header {
   box-shadow: 0 3px 10px rgba(244, 63, 94, 0.4);
 }
 
-/* Footer & Text Visibility Fix */
 footer {
   background-color: #0f172a !important;
   color: #f1f5f9 !important;
@@ -731,23 +730,16 @@ footer ul li a:hover {
   color: #cbd5e1 !important;
 }
 
-@media (min-width: 640px) {
-  .workspace-overlay { align-items: center; padding: 20px; }
-  .workspace-box { border-radius: 24px; padding: 28px; }
-  #smartAiChatModal { align-items: center; }
-  .ai-chat-card { border-radius: 24px; }
+/* ==========================================================
+   ADDED FIX: Modal Content Text Clarity & Visibility Fix
+   ========================================================== */
+.info-modal-body,
+.calc-box {
+  color: #0f172a !important; /* গাঢ় রঙ যাতে সাদা ব্যাকগ্রাউন্ডে পরিষ্কার দেখা যায় */
 }
 
-@media (min-width: 768px) {
-  .tools-grid { grid-template-columns: repeat(2, 1fr); gap: 18px; }
-  .footer-container { grid-template-columns: repeat(4, 1fr); }
-  .nav-container { padding: 0 24px; }
-}
-
-@media (min-width: 1024px) {
-  .hero { padding: 64px 16px 32px; }
-  .tools-grid { grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 22px; }
-  .nav-container { height: 72px; }
+.calc-box h3 {
+  color: #0f172a !important;
 }
 
 .workspace-box, 
