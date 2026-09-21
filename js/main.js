@@ -100,8 +100,30 @@ function triggerFileSuccessAnimation(msg) {
   }
 }
 
-// লক সিস্টেম রিমুভ করে সব টুল সবার জন্য উন্মুক্ত করা হলো
+// ৩ বার ফ্রি ব্যবহারের পর ৪র্থ বারে লগইন/সাইন-ইন পপআপ দেখানোর লজিক
 function checkUserAccess(toolKey) {
+  // যদি ইউজার ইতিমধ্যে লগইন করা থাকে, তবে কোনো লিমিট থাকবে না
+  const currentUser = localStorage.getItem('currentUser') || sessionStorage.getItem('currentUser');
+  if (currentUser) {
+    return true;
+  }
+
+  // লোকাল স্টোরেজ থেকে ব্যবহারের কাউন্ট চেক করা
+  let usageCount = parseInt(localStorage.getItem('toolUsageCount')) || 0;
+
+  if (usageCount >= 3) {
+    // ৩ বার ব্যবহার করা হয়ে গেলে লগইন মোডাল ওপেন করবে
+    if (typeof openAuthModal === 'function') {
+      openAuthModal();
+    } else {
+      alert("ফ্রি ব্যবহারের লিমিট শেষ! আরও কাজ করতে অনুগ্রহ করে লগইন বা সাইন-ইন করুন।");
+    }
+    return false; // কাজ আটকে দেবে যাতে লগইন ছাড়া আর প্রসেস না হয়
+  }
+
+  // প্রতিবার সফলভাবে কাজ করার সময় কাউন্ট ১ বাড়িয়ে দেওয়া
+  usageCount++;
+  localStorage.setItem('toolUsageCount', usageCount);
   return true;
 }
 
