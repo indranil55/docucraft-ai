@@ -59,7 +59,6 @@ header {
   justify-content: space-between;
 }
 
-/* লোগো টেক্সট সাদা ও স্পষ্ট করার জন্য */
 .brand-logo-svg text[fill="#0F172A"] {
   fill: #ffffff !important;
 }
@@ -149,7 +148,6 @@ header {
   padding: 0 8px;
 }
 
-/* পপুলার টুলস সেকশন স্টাইল */
 .popular-section {
   width: 100%;
   max-width: 1320px;
@@ -337,7 +335,6 @@ header {
   gap: 10px;
 }
 
-/* ব্যাকগ্রাউন্ড ওভারলে লেআউট ফিক্স (পেছনের সাইট যাতে নিচে থেকে ভেসে না ওঠে) */
 .workspace-overlay {
   position: fixed !important;
   inset: 0 !important;
@@ -407,7 +404,6 @@ header {
   color: var(--primary);
 }
 
-/* ড্র্যাগ অ্যান্ড ড্রপ গ্রিন চেকমার্ক অ্যানিমেশন ও স্টাইল */
 .dropzone {
   border: 2px dashed rgba(255, 255, 255, 0.2);
   border-radius: 16px;
@@ -664,10 +660,11 @@ header {
   box-shadow: 0 3px 10px rgba(244, 63, 94, 0.4);
 }
 
+/* Footer & Text Visibility Fix */
 footer {
-  background: #0f172a;
-  color: #94a3b8;
-  padding: 40px 16px 24px;
+  background-color: #0f172a !important;
+  color: #f1f5f9 !important;
+  padding: 40px 20px 20px 20px;
   margin-top: auto;
   width: 100%;
   border-top: 1px solid rgba(255, 255, 255, 0.1);
@@ -682,29 +679,41 @@ footer {
   margin-bottom: 32px;
 }
 
-.footer-col h4 {
-  color: #ffffff;
+footer h4 {
+  color: #ffffff !important;
   font-size: 14.5px;
   font-weight: 750;
-  margin-bottom: 14px;
+  margin-bottom: 15px;
 }
 
-.footer-col ul { list-style: none; }
-.footer-col ul li { margin-bottom: 10px; }
-.footer-col ul li a {
-  color: #94a3b8;
+footer ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+footer ul li {
+  margin-bottom: 10px;
+}
+
+footer ul li a {
+  color: #94a3b8 !important;
   text-decoration: none;
   font-size: 13px;
   transition: color 0.2s;
 }
-.footer-col ul li a:hover { color: #ffffff; }
+
+footer ul li a:hover {
+  color: #ffffff !important;
+}
 
 .footer-bottom {
+  margin-top: 30px;
   border-top: 1px solid rgba(255, 255, 255, 0.1);
-  padding-top: 18px;
+  padding-top: 20px;
   text-align: center;
-  font-size: 12.5px;
-  color: #94a3b8;
+  color: #94a3b8 !important;
+  font-size: 13px;
 }
 
 .trust-badges {
@@ -715,7 +724,12 @@ footer {
   margin-top: 14px;
   font-size: 12.5px;
 }
+
 .trust-badges i { color: #10b981; margin-right: 6px; }
+
+.trust-badges span {
+  color: #cbd5e1 !important;
+}
 
 @media (min-width: 640px) {
   .workspace-overlay { align-items: center; padding: 20px; }
@@ -736,9 +750,6 @@ footer {
   .nav-container { height: 72px; }
 }
 
-/* ==========================================================
-   ADDED FIX: Prevent Long-press text selection & bottom popup overlay
-   ========================================================== */
 .workspace-box, 
 .dropzone, 
 .dropzone * {
