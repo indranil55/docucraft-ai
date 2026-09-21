@@ -37,7 +37,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer">
   
   <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
-  <link rel="stylesheet" href="style.css?v=2.1">
+  <link rel="stylesheet" href="style.css?v=2.2">
 
   <style>
     .nav-container { display: flex; align-items: center; justify-content: space-between; padding: 12px 20px; }
@@ -189,7 +189,7 @@
   <div class="filter-wrapper">
     <div class="filter-tabs" id="tools">
       <button class="filter-btn" onclick="filterCategory('all', this)">All</button>
-      <button class="filter-btn active" onclick="filterCategory('cyber', this)">Photo & Cyber Tools</button>
+      <button class="filter-btn active" onclick="filterCategory('cyber', this)" id="defaultCyberTab">Photo & Cyber Tools</button>
       <button class="filter-btn" onclick="filterCategory('finance', this)">Finance & Utility Tools</button>
       <button class="filter-btn" onclick="filterCategory('organize', this)">File Organizer</button>
       <button class="filter-btn" onclick="filterCategory('toPdf', this)">Convert to PDF</button>
@@ -1658,6 +1658,12 @@
       if (document.getElementById('dateDiffEnd')) document.getElementById('dateDiffEnd').value = today;
       if (document.getElementById('lifeDob')) document.getElementById('lifeDob').value = '2000-01-01';
       updateUnitConvFields();
+
+      // সাইট ওপেন হওয়ার সাথেই ডিফল্টভাবে Photo & Cyber Tools (cyber) ক্যাটাগরি ফিল্টার করবে
+      const cyberTab = document.getElementById('defaultCyberTab');
+      if (cyberTab && typeof filterCategory === 'function') {
+        filterCategory('cyber', cyberTab);
+      }
     });
 
     function triggerDownload(blobUrl, filename) {
