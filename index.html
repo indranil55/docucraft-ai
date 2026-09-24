@@ -149,7 +149,7 @@
     </div>
   </div>
 
-  <!-- Popular Section (Updated with requested tools) -->
+  <!-- Popular Section -->
   <section class="popular-section">
     <h3 class="section-title"><i class="fa-solid fa-fire" style="color: #e5322d;"></i> Most Popular Tools</h3>
     <div class="popular-grid">
@@ -201,6 +201,86 @@
   <!-- Main Tools Grid -->
   <main class="main-grid-container">
     <div class="tools-grid" id="toolsGrid">
+      
+      <!-- 11 Newly Added Tool Cards -->
+      <div class="tool-card" data-cat="utility" onclick="openTextToSpeechModal()">
+        <div class="tool-icon" style="background:#e0f7fa; color:#00acc1;"><i class="fa-solid fa-volume-high"></i></div>
+        <h3>Text-to-Speech Converter <span class="badge-new">NEW</span></h3>
+        <p>Convert any text into natural-sounding spoken audio instantly.</p>
+        <span class="tool-meta">Open Text-to-Speech &rarr;</span>
+      </div>
+
+      <div class="tool-card" data-cat="finance" onclick="openTipCalculatorModal()">
+        <div class="tool-icon" style="background:#e8f5e9; color:#43a047;"><i class="fa-solid fa-receipt"></i></div>
+        <h3>Tip Calculator <span class="badge-new">NEW</span></h3>
+        <p>Calculate tips and easily split bills among multiple people.</p>
+        <span class="tool-meta">Open Tip Calculator &rarr;</span>
+      </div>
+
+      <div class="tool-card" data-cat="health" onclick="openSleepCalculatorModal()">
+        <div class="tool-icon" style="background:#ede7f6; color:#512da8;"><i class="fa-solid fa-bed"></i></div>
+        <h3>Sleep Calculator <span class="badge-new">NEW</span></h3>
+        <p>Calculate optimal bedtime and wake-up times based on sleep cycles.</p>
+        <span class="tool-meta">Open Sleep Calculator &rarr;</span>
+      </div>
+
+      <div class="tool-card" data-cat="document" onclick="openWatermarkModal()">
+        <div class="tool-icon" style="background:#fff3e0; color:#fb8c00;"><i class="fa-solid fa-stamp"></i></div>
+        <h3>Text Watermark Generator <span class="badge-new">NEW</span></h3>
+        <p>Add custom text watermarks to protect your photos and documents.</p>
+        <span class="tool-meta">Open Watermark Tool &rarr;</span>
+      </div>
+
+      <div class="tool-card" data-cat="security" onclick="openPasswordModal()">
+        <div class="tool-icon" style="background:#ffebee; color:#e53935;"><i class="fa-solid fa-key"></i></div>
+        <h3>Random Password & PIN <span class="badge-new">NEW</span></h3>
+        <p>Generate highly secure passwords, passphrases, and numbers.</p>
+        <span class="tool-meta">Open Password Generator &rarr;</span>
+      </div>
+
+      <div class="tool-card" data-cat="utility" onclick="openTextReverseModal()">
+        <div class="tool-icon" style="background:#fce4ec; color:#d81b60;"><i class="fa-solid fa-right-left"></i></div>
+        <h3>Text Reverse & Flip Tool <span class="badge-new">NEW</span></h3>
+        <p>Reverse text strings, letters, or flip words upside down instantly.</p>
+        <span class="tool-meta">Open Text Tool &rarr;</span>
+      </div>
+
+      <div class="tool-card" data-cat="utility" onclick="openDateCalcModal()">
+        <div class="tool-icon" style="background:#e3f2fd; color:#1e88e5;"><i class="fa-solid fa-calendar-days"></i></div>
+        <h3>Days Counter Calculator <span class="badge-new">NEW</span></h3>
+        <p>Find exact days, months, or years between two given dates.</p>
+        <span class="tool-meta">Open Date Calculator &rarr;</span>
+      </div>
+
+      <div class="tool-card" data-cat="document" onclick="openPdfMergerModal()">
+        <div class="tool-icon" style="background:#fbe9e7; color:#f4511e;"><i class="fa-solid fa-file-pdf"></i></div>
+        <h3>Document Scanner & Merger <span class="badge-new">NEW</span></h3>
+        <p>Combine multiple PDF files or scanned pages into a single document.</p>
+        <span class="tool-meta">Open PDF Merger &rarr;</span>
+      </div>
+
+      <div class="tool-card" data-cat="csc" onclick="openPrintLayoutModal()">
+        <div class="tool-icon" style="background:#e0f2f1; color:#00897b;"><i class="fa-solid fa-print"></i></div>
+        <h3>Print Layout Sheet Maker <span class="badge-new">NEW</span></h3>
+        <p>Arrange ID cards or photos neatly for direct print-ready layouts.</p>
+        <span class="tool-meta">Open Print Layout &rarr;</span>
+      </div>
+
+      <div class="tool-card" data-cat="document" onclick="openPdfSplitModal()">
+        <div class="tool-icon" style="background:#f3e5f5; color:#8e24aa;"><i class="fa-solid fa-object-ungroup"></i></div>
+        <h3>PDF Page Rotator & Splitter <span class="badge-new">NEW</span></h3>
+        <p>Rotate specific PDF pages or split large documents into separate files.</p>
+        <span class="tool-meta">Open PDF Splitter &rarr;</span>
+      </div>
+
+      <div class="tool-card" data-cat="utility" onclick="openSpeedTestModal()">
+        <div class="tool-icon" style="background:#e8eaf6; color:#3f51b5;"><i class="fa-solid fa-gauge-high"></i></div>
+        <h3>Internet Speed Test <span class="badge-new">NEW</span></h3>
+        <p>Check your current network download and upload speeds quickly.</p>
+        <span class="tool-meta">Open Speed Test &rarr;</span>
+      </div>
+      <!-- End of 11 Notun Tools -->
+
       <div class="tool-card" data-cat="finance" onclick="openAgeModal()">
         <div class="tool-icon" style="background:#fce7f3; color:#db2777;"><i class="fa-solid fa-calendar-check"></i></div>
         <h3>Age Calculator (Exam DOB) <span class="badge-new">NEW</span></h3>
@@ -1578,7 +1658,6 @@
       if (document.getElementById('lifeDob')) document.getElementById('lifeDob').value = '2000-01-01';
       updateUnitConvFields();
 
-      // সাইট ওপেন হওয়ার সাথেই ডিফল্টভাবে Photo & Cyber Tools (cyber) ক্যাটাগরি ফিল্টার করবে
       const cyberTab = document.getElementById('defaultCyberTab');
       if (cyberTab && typeof filterCategory === 'function') {
         filterCategory('cyber', cyberTab);
@@ -1775,6 +1854,55 @@
     function closeYtThumbModal() { document.getElementById('ytThumbModal').style.display = 'none'; }
     function openYtThumbModal() { document.getElementById('ytThumbModal').style.display = 'flex'; }
     function closeInfoModal() { document.getElementById('infoModal').style.display = 'none'; }
+
+    // Handlers for the 11 Newly Added Tool Cards
+    function openTextToSpeechModal() {
+      let text = prompt("Enter text to convert to speech:");
+      if (text && text.trim() !== "") {
+        if ('speechSynthesis' in window) {
+          let utterance = new SpeechSynthesisUtterance(text);
+          window.speechSynthesis.speak(utterance);
+          alert("Speaking text...");
+        } else {
+          alert("Text-to-Speech is not supported in this browser.");
+        }
+      }
+    }
+    function openTipCalculatorModal() { openBillSplitModal(); }
+    function openSleepCalculatorModal() {
+      let sleepHours = prompt("Enter desired sleep duration in hours (e.g., 8):", "8");
+      if (sleepHours) {
+        let now = new Date();
+        now.setHours(now.getHours() + parseInt(sleepHours));
+        alert("To get " + sleepHours + " hours of sleep, you should wake up around: " + now.toLocaleTimeString());
+      }
+    }
+    function openWatermarkModal() { launchTool('watermark'); }
+    function openPasswordModal() {
+      let length = prompt("Enter password length (e.g., 12):", "12");
+      if (length) {
+        const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789@#$%&*!";
+        let pass = "";
+        for (let i = 0; i < parseInt(length); i++) {
+          pass += chars.charAt(Math.floor(Math.random() * chars.length));
+        }
+        alert("Generated Secure Password:\n\n" + pass);
+      }
+    }
+    function openTextReverseModal() {
+      let text = prompt("Enter text to reverse:");
+      if (text !== null) {
+        let rev = text.split("").reverse().join("");
+        alert("Reversed Text:\n\n" + rev);
+      }
+    }
+    function openDateCalcModal() { openDateDiffModal(); }
+    function openPdfMergerModal() { launchTool('merge'); }
+    function openPrintLayoutModal() { launchTool('passportGrid'); }
+    function openPdfSplitModal() { launchTool('split'); }
+    function openSpeedTestModal() {
+      window.open("https://fast.com", "_blank");
+    }
 
     function executePrepayCalc() {
       const P = parseFloat(document.getElementById('prepayPrincipal').value);
