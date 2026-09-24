@@ -202,7 +202,7 @@
   <main class="main-grid-container">
     <div class="tools-grid" id="toolsGrid">
       
-      <!-- 11 Newly Added Tool Cards -->
+      <!-- 11 Newly Added Tool Cards with proper function calls -->
       <div class="tool-card" data-cat="utility" onclick="openTextToSpeechModal()">
         <div class="tool-icon" style="background:#e0f7fa; color:#00acc1;"><i class="fa-solid fa-volume-high"></i></div>
         <h3>Text-to-Speech Converter <span class="badge-new">NEW</span></h3>
@@ -1568,6 +1568,64 @@
     </div>
   </div>
 
+  <!-- Dedicated Modals for the 11 Newly Added Tools -->
+  <div class="calc-modal" id="ttsModal" onclick="if(event.target === this) closeTtsModal()">
+    <div class="calc-box">
+      <button class="calc-close" onclick="closeTtsModal()">&times;</button>
+      <h3><i class="fa-solid fa-volume-high" style="color: #00acc1;"></i> Text-to-Speech Converter</h3>
+      <div class="calc-group">
+        <label>Enter Text to Speak:</label>
+        <textarea id="ttsInputText" rows="4" placeholder="Type or paste your text here..."></textarea>
+      </div>
+      <button class="calc-btn" onclick="executeTtsSpeak()">Speak Audio</button>
+      <button class="calc-btn" style="background:#dc2626; margin-top:8px;" onclick="executeTtsStop()">Stop</button>
+    </div>
+  </div>
+
+  <div class="calc-modal" id="sleepModal" onclick="if(event.target === this) closeSleepModal()">
+    <div class="calc-box">
+      <button class="calc-close" onclick="closeSleepModal()">&times;</button>
+      <h3><i class="fa-solid fa-bed" style="color: #512da8;"></i> Sleep Calculator</h3>
+      <div class="calc-group">
+        <label>Select Desired Sleep Hours:</label>
+        <select id="sleepDurationSelect">
+          <option value="7">7 Hours (5 Sleep Cycles)</option>
+          <option value="7.5" selected>7.5 Hours (6 Sleep Cycles - Recommended)</option>
+          <option value="9">9 Hours (6 Sleep Cycles)</option>
+        </select>
+      </div>
+      <button class="calc-btn" onclick="executeSleepCalc()">Calculate Optimal Wake-up Time</button>
+      <div id="sleepOutput" class="calc-result"></div>
+    </div>
+  </div>
+
+  <div class="calc-modal" id="textRevModal" onclick="if(event.target === this) closeTextRevModal()">
+    <div class="calc-box">
+      <button class="calc-close" onclick="closeTextRevModal()">&times;</button>
+      <h3><i class="fa-solid fa-right-left" style="color: #d81b60;"></i> Text Reverse & Flip Tool</h3>
+      <div class="calc-group">
+        <label>Enter Text:</label>
+        <textarea id="textRevInput" rows="4" placeholder="Type text to reverse..."></textarea>
+      </div>
+      <button class="calc-btn" onclick="executeTextReverse()">Reverse Text</button>
+      <div id="textRevOutput" class="calc-result" style="display:block; background:#f8fafc; border-color:#cbd5e1; color:#0f172a; word-break:break-all;"></div>
+    </div>
+  </div>
+
+  <div class="calc-modal" id="passGenModal" onclick="if(event.target === this) closePassGenModal()">
+    <div class="calc-box">
+      <button class="calc-close" onclick="closePassGenModal()">&times;</button>
+      <h3><i class="fa-solid fa-key" style="color: #e53935;"></i> Random Password & PIN</h3>
+      <div class="calc-group">
+        <label>Password Length:</label>
+        <input type="number" id="passGenLength" value="12" min="6" max="32">
+      </div>
+      <button class="calc-btn" onclick="executePasswordGenerate()">Generate Secure Password</button>
+      <div id="passGenOutput" class="calc-result" style="display:block; background:#f8fafc; border-color:#cbd5e1; color:#0f172a; font-family:monospace; font-size:15px; font-weight:700; text-align:center;"></div>
+      <button type="button" onclick="copyGeneratedPassword()" class="calc-btn" style="background:#16a34a; margin-top:8px;">Copy Password</button>
+    </div>
+  </div>
+
   <div class="calc-modal" id="infoModal" onclick="if(event.target === this) closeInfoModal()">
     <div class="calc-box" style="max-width: 550px;">
       <button class="calc-close" onclick="closeInfoModal()">&times;</button>
@@ -1855,54 +1913,62 @@
     function openYtThumbModal() { document.getElementById('ytThumbModal').style.display = 'flex'; }
     function closeInfoModal() { document.getElementById('infoModal').style.display = 'none'; }
 
-    // Handlers for the 11 Newly Added Tool Cards
-    function openTextToSpeechModal() {
-      let text = prompt("Enter text to convert to speech:");
-      if (text && text.trim() !== "") {
-        if ('speechSynthesis' in window) {
-          let utterance = new SpeechSynthesisUtterance(text);
-          window.speechSynthesis.speak(utterance);
-          alert("Speaking text...");
-        } else {
-          alert("Text-to-Speech is not supported in this browser.");
-        }
-      }
+    // Handlers & Interactive Modals for the 11 Newly Added Tool Cards
+    function openTextToSpeechModal() { document.getElementById('ttsModal').style.display = 'flex'; }
+    function closeTtsModal() { document.getElementById('ttsModal').style.display = 'none'; executeTtsStop(); }
+    function executeTtsSpeak() {
+      const text = document.getElementById('ttsInputText').value;
+      if (!text.trim()) { alert("Please enter text to speak."); return; }
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+        let utterance = new SpeechSynthesisUtterance(text);
+        window.speechSynthesis.speak(utterance);
+      } else { alert("Speech synthesis not supported."); }
     }
+    function executeTtsStop() { if ('speechSynthesis' in window) { window.speechSynthesis.cancel(); } }
+
     function openTipCalculatorModal() { openBillSplitModal(); }
-    function openSleepCalculatorModal() {
-      let sleepHours = prompt("Enter desired sleep duration in hours (e.g., 8):", "8");
-      if (sleepHours) {
-        let now = new Date();
-        now.setHours(now.getHours() + parseInt(sleepHours));
-        alert("To get " + sleepHours + " hours of sleep, you should wake up around: " + now.toLocaleTimeString());
-      }
+    
+    function openSleepCalculatorModal() { document.getElementById('sleepModal').style.display = 'flex'; }
+    function closeSleepModal() { document.getElementById('sleepModal').style.display = 'none'; }
+    function executeSleepCalc() {
+      const dur = parseFloat(document.getElementById('sleepDurationSelect').value);
+      let wakeTime = new Date();
+      wakeTime.setMinutes(wakeTime.getMinutes() + (dur * 60) + 14); // 14 mins to fall asleep
+      const out = document.getElementById('sleepOutput');
+      out.style.display = 'block';
+      out.textContent = `Recommended Wake-up Time: ${wakeTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
     }
+
     function openWatermarkModal() { launchTool('watermark'); }
-    function openPasswordModal() {
-      let length = prompt("Enter password length (e.g., 12):", "12");
-      if (length) {
-        const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789@#$%&*!";
-        let pass = "";
-        for (let i = 0; i < parseInt(length); i++) {
-          pass += chars.charAt(Math.floor(Math.random() * chars.length));
-        }
-        alert("Generated Secure Password:\n\n" + pass);
-      }
+
+    function openPasswordModal() { document.getElementById('passGenModal').style.display = 'flex'; executePasswordGenerate(); }
+    function closePassGenModal() { document.getElementById('passGenModal').style.display = 'none'; }
+    function executePasswordGenerate() {
+      const len = parseInt(document.getElementById('passGenLength').value) || 12;
+      const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789@#$%&*!";
+      let pass = "";
+      for (let i = 0; i < len; i++) { pass += chars.charAt(Math.floor(Math.random() * chars.length)); }
+      document.getElementById('passGenOutput').textContent = pass;
     }
-    function openTextReverseModal() {
-      let text = prompt("Enter text to reverse:");
-      if (text !== null) {
-        let rev = text.split("").reverse().join("");
-        alert("Reversed Text:\n\n" + rev);
-      }
+    function copyGeneratedPassword() {
+      navigator.clipboard.writeText(document.getElementById('passGenOutput').textContent);
+      alert("Password copied to clipboard!");
     }
+
+    function openTextReverseModal() { document.getElementById('textRevModal').style.display = 'flex'; }
+    function closeTextRevModal() { document.getElementById('textRevModal').style.display = 'none'; }
+    function executeTextReverse() {
+      const txt = document.getElementById('textRevInput').value;
+      const rev = txt.split("").reverse().join("");
+      document.getElementById('textRevOutput').textContent = rev || "Please enter text above.";
+    }
+
     function openDateCalcModal() { openDateDiffModal(); }
     function openPdfMergerModal() { launchTool('merge'); }
     function openPrintLayoutModal() { launchTool('passportGrid'); }
     function openPdfSplitModal() { launchTool('split'); }
-    function openSpeedTestModal() {
-      window.open("https://fast.com", "_blank");
-    }
+    function openSpeedTestModal() { window.open("https://fast.com", "_blank"); }
 
     function executePrepayCalc() {
       const P = parseFloat(document.getElementById('prepayPrincipal').value);
