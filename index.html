@@ -61,7 +61,7 @@
     .search-box-inner i { color: #94a3b8; font-size: 16px; margin-right: 12px; }
     .search-input { width: 100%; border: none; outline: none; font-size: 15px; font-family: inherit; color: #1e293b; background: transparent; }
     
-    /* ব্যাকগ্রাউন্ড লক এবং নিখুঁত মডাল ফিক্স */
+    /* মডাল ওপেন থাকা অবস্থায় পেছনের পেজ সম্পূর্ণ ফিক্সড রাখার জন্য */
     .calc-modal {
       display: none; position: fixed !important; inset: 0 !important; background: rgba(15, 23, 42, 0.9) !important;
       backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); z-index: 99999 !important;
@@ -110,7 +110,7 @@
     })();
   </script>
 </head>
-<body>
+<body id="pageBody">
 
   <!-- Header Section -->
   <header>
@@ -201,11 +201,10 @@
     </div>
   </div>
 
-  <!-- Main Tools Grid (Unique Non-Duplicate Clean List) -->
+  <!-- Main Tools Grid (Unique Single List without duplicates) -->
   <main class="main-grid-container">
     <div class="tools-grid" id="toolsGrid">
       
-      <!-- 1. Pitch to Text -->
       <div class="tool-card" data-cat="utility" onclick="openPitchToTextModal()">
         <div class="tool-icon" style="background:#e0f7fa; color:#00796b;"><i class="fa-solid fa-microphone"></i></div>
         <h3>Pitch to Text (Voice Typing) <span class="badge-new">NEW</span></h3>
@@ -213,7 +212,6 @@
         <span class="tool-meta">Open Pitch to Text &rarr;</span>
       </div>
 
-      <!-- 2. Text-to-Speech Converter -->
       <div class="tool-card" data-cat="utility" onclick="openTextToSpeechModal()">
         <div class="tool-icon" style="background:#e0f7fa; color:#00acc1;"><i class="fa-solid fa-volume-high"></i></div>
         <h3>Text-to-Speech Converter <span class="badge-new">NEW</span></h3>
@@ -221,7 +219,6 @@
         <span class="tool-meta">Open Text-to-Speech &rarr;</span>
       </div>
 
-      <!-- 3. Tip Calculator -->
       <div class="tool-card" data-cat="finance" onclick="openTipCalculatorModal()">
         <div class="tool-icon" style="background:#e8f5e9; color:#43a047;"><i class="fa-solid fa-receipt"></i></div>
         <h3>Tip Calculator <span class="badge-new">NEW</span></h3>
@@ -229,7 +226,6 @@
         <span class="tool-meta">Open Tip Calculator &rarr;</span>
       </div>
 
-      <!-- 4. Sleep Calculator -->
       <div class="tool-card" data-cat="health" onclick="openSleepCalculatorModal()">
         <div class="tool-icon" style="background:#ede7f6; color:#512da8;"><i class="fa-solid fa-bed"></i></div>
         <h3>Sleep Calculator <span class="badge-new">NEW</span></h3>
@@ -237,7 +233,6 @@
         <span class="tool-meta">Open Sleep Calculator &rarr;</span>
       </div>
 
-      <!-- 5. Text Watermark Generator -->
       <div class="tool-card" data-cat="document" onclick="openWatermarkModal()">
         <div class="tool-icon" style="background:#fff3e0; color:#fb8c00;"><i class="fa-solid fa-stamp"></i></div>
         <h3>Text Watermark Generator <span class="badge-new">NEW</span></h3>
@@ -245,7 +240,6 @@
         <span class="tool-meta">Open Watermark Tool &rarr;</span>
       </div>
 
-      <!-- 6. Random Password & PIN -->
       <div class="tool-card" data-cat="security" onclick="openPasswordModal()">
         <div class="tool-icon" style="background:#ffebee; color:#e53935;"><i class="fa-solid fa-key"></i></div>
         <h3>Random Password & PIN <span class="badge-new">NEW</span></h3>
@@ -253,7 +247,6 @@
         <span class="tool-meta">Open Password Generator &rarr;</span>
       </div>
 
-      <!-- 7. Text Reverse & Flip Tool -->
       <div class="tool-card" data-cat="utility" onclick="openTextReverseModal()">
         <div class="tool-icon" style="background:#fce4ec; color:#d81b60;"><i class="fa-solid fa-right-left"></i></div>
         <h3>Text Reverse & Flip Tool <span class="badge-new">NEW</span></h3>
@@ -261,7 +254,6 @@
         <span class="tool-meta">Open Text Tool &rarr;</span>
       </div>
 
-      <!-- 8. Days Counter Calculator -->
       <div class="tool-card" data-cat="utility" onclick="openDateCalcModal()">
         <div class="tool-icon" style="background:#e3f2fd; color:#1e88e5;"><i class="fa-solid fa-calendar-days"></i></div>
         <h3>Days Counter Calculator <span class="badge-new">NEW</span></h3>
@@ -269,7 +261,6 @@
         <span class="tool-meta">Open Date Calculator &rarr;</span>
       </div>
 
-      <!-- 9. Document Scanner & Merger -->
       <div class="tool-card" data-cat="document" onclick="openPdfMergerModal()">
         <div class="tool-icon" style="background:#fbe9e7; color:#f4511e;"><i class="fa-solid fa-file-pdf"></i></div>
         <h3>Document Scanner & Merger <span class="badge-new">NEW</span></h3>
@@ -277,7 +268,6 @@
         <span class="tool-meta">Open PDF Merger &rarr;</span>
       </div>
 
-      <!-- 10. Print Layout Sheet Maker -->
       <div class="tool-card" data-cat="csc" onclick="openPrintLayoutModal()">
         <div class="tool-icon" style="background:#e0f2f1; color:#00897b;"><i class="fa-solid fa-print"></i></div>
         <h3>Print Layout Sheet Maker <span class="badge-new">NEW</span></h3>
@@ -285,7 +275,6 @@
         <span class="tool-meta">Open Print Layout &rarr;</span>
       </div>
 
-      <!-- 11. PDF Page Rotator & Splitter -->
       <div class="tool-card" data-cat="document" onclick="openPdfSplitModal()">
         <div class="tool-icon" style="background:#f3e5f5; color:#8e24aa;"><i class="fa-solid fa-object-ungroup"></i></div>
         <h3>PDF Page Rotator & Splitter <span class="badge-new">NEW</span></h3>
@@ -293,7 +282,6 @@
         <span class="tool-meta">Open PDF Splitter &rarr;</span>
       </div>
 
-      <!-- 12. Internet Speed Test -->
       <div class="tool-card" data-cat="utility" onclick="openSpeedTestModal()">
         <div class="tool-icon" style="background:#e8eaf6; color:#3f51b5;"><i class="fa-solid fa-gauge-high"></i></div>
         <h3>Internet Speed Test <span class="badge-new">NEW</span></h3>
@@ -301,7 +289,6 @@
         <span class="tool-meta">Open Speed Test &rarr;</span>
       </div>
 
-      <!-- Other Core Tools -->
       <div class="tool-card" data-cat="finance" onclick="openAgeModal()">
         <div class="tool-icon" style="background:#fce7f3; color:#db2777;"><i class="fa-solid fa-calendar-check"></i></div>
         <h3>Age Calculator (Exam DOB) <span class="badge-new">NEW</span></h3>
@@ -1722,10 +1709,10 @@
       </div>
     </div>
     <div class="footer-bottom">
-      &copy; 2026 DocuCraft AI Studio. Files are processed securely in your browser.
+      &copy; 2026 DocuCraft AI Studio. Files are processed securely in your browser.[span_0](start_span)[span_0](end_span)
       <div class="trust-badges">
-        <span><i class="fa-solid fa-shield-halved"></i> Client-Side Privacy Guaranteed</span>
-        <span><i class="fa-solid fa-lock"></i> SSL Secured</span>
+        <span><i class="fa-solid fa-shield-halved"></i> Client-Side Privacy Guaranteed[span_1](start_span)[span_1](end_span)</span>
+        <span><i class="fa-solid fa-lock"></i> SSL Secured[span_2](start_span)[span_2](end_span)</span>
       </div>
     </div>
   </footer>
@@ -1736,8 +1723,20 @@
   <script src="js/tools.js"></script>
   <script src="js/main.js"></script>
 
-  <!-- Master JavaScript Application Logic -->
+  <!-- Master JavaScript Application Logic with Background Lock on Modals -->
   <script>
+    function lockPageScroll() {
+      document.body.style.overflow = 'hidden';
+      document.body.style.position = 'fixed';
+      document.body.style.width = '100%';
+    }
+
+    function unlockPageScroll() {
+      document.body.style.overflow = '';
+      document.body.style.position = '';
+      document.body.style.width = '';
+    }
+
     function filterToolsBySearch() {
       const q = document.getElementById('toolSearchInput').value.toLowerCase();
       const cards = document.querySelectorAll('.tool-card');
@@ -1772,8 +1771,8 @@
       URL.revokeObjectURL(blobUrl);
     }
 
-    function openNotepadModal() { document.getElementById('notepadModal').style.display = 'flex'; updateNotepadStats(); }
-    function closeNotepadModal() { document.getElementById('notepadModal').style.display = 'none'; }
+    function openNotepadModal() { lockPageScroll(); document.getElementById('notepadModal').style.display = 'flex'; updateNotepadStats(); }
+    function closeNotepadModal() { unlockPageScroll(); document.getElementById('notepadModal').style.display = 'none'; }
     
     function updateNotepadStats() {
       const val = document.getElementById('notepadTextarea').value;
@@ -1803,8 +1802,8 @@
       triggerDownload(URL.createObjectURL(blob), 'DocuCraft_Notepad_Document.txt');
     }
 
-    function openContactModal() { document.getElementById('contactModal').style.display = 'flex'; }
-    function closeContactModal() { document.getElementById('contactModal').style.display = 'none'; }
+    function openContactModal() { lockPageScroll(); document.getElementById('contactModal').style.display = 'flex'; }
+    function closeContactModal() { unlockPageScroll(); document.getElementById('contactModal').style.display = 'none'; }
     
     async function handleContactSubmit(event) {
       event.preventDefault();
@@ -1838,8 +1837,8 @@
       }
     }
 
-    function openAgeModal() { document.getElementById('ageModal').style.display = 'flex'; }
-    function closeAgeModal() { document.getElementById('ageModal').style.display = 'none'; }
+    function openAgeModal() { lockPageScroll(); document.getElementById('ageModal').style.display = 'flex'; }
+    function closeAgeModal() { unlockPageScroll(); document.getElementById('ageModal').style.display = 'none'; }
 
     function executeAgeCalc() {
       const dobVal = document.getElementById('ageDob').value;
@@ -1880,83 +1879,83 @@
       out.innerHTML = `<strong>Exact Age:</strong> ${years} Years, ${months} Months, ${days} Days<br><small style="color: #475569;">(Total approximately ${totalDays.toLocaleString()} days)</small>`;
     }
 
-    function openGovtJobModal() { document.getElementById('govtJobModal').style.display = 'flex'; }
-    function closeGovtJobModal() { document.getElementById('govtJobModal').style.display = 'none'; }
+    function openGovtJobModal() { lockPageScroll(); document.getElementById('govtJobModal').style.display = 'flex'; }
+    function closeGovtJobModal() { unlockPageScroll(); document.getElementById('govtJobModal').style.display = 'none'; }
 
-    function openPrepayModal() { document.getElementById('prepayModal').style.display = 'flex'; }
-    function closePrepayModal() { document.getElementById('prepayModal').style.display = 'none'; }
-    function openBarcodeModal() { document.getElementById('barcodeModal').style.display = 'flex'; executeBarcodeRender(); }
-    function closeBarcodeModal() { document.getElementById('barcodeModal').style.display = 'none'; }
-    function openColorPickerModal() { document.getElementById('colorPickerModal').style.display = 'flex'; }
-    function closeColorPickerModal() { document.getElementById('colorPickerModal').style.display = 'none'; }
-    function openBase64Modal() { document.getElementById('base64Modal').style.display = 'flex'; }
-    function closeBase64Modal() { document.getElementById('base64Modal').style.display = 'none'; }
+    function openPrepayModal() { lockPageScroll(); document.getElementById('prepayModal').style.display = 'flex'; }
+    function closePrepayModal() { unlockPageScroll(); document.getElementById('prepayModal').style.display = 'none'; }
+    function openBarcodeModal() { lockPageScroll(); document.getElementById('barcodeModal').style.display = 'flex'; executeBarcodeRender(); }
+    function closeBarcodeModal() { unlockPageScroll(); document.getElementById('barcodeModal').style.display = 'none'; }
+    function openColorPickerModal() { lockPageScroll(); document.getElementById('colorPickerModal').style.display = 'flex'; }
+    function closeColorPickerModal() { unlockPageScroll(); document.getElementById('colorPickerModal').style.display = 'none'; }
+    function openBase64Modal() { lockPageScroll(); document.getElementById('base64Modal').style.display = 'flex'; }
+    function closeBase64Modal() { unlockPageScroll(); document.getElementById('base64Modal').style.display = 'none'; }
 
-    function openGoldModal() { document.getElementById('goldModal').style.display = 'flex'; }
-    function closeGoldModal() { document.getElementById('goldModal').style.display = 'none'; }
-    function openCalorieModal() { document.getElementById('calorieModal').style.display = 'flex'; }
-    function closeCalorieModal() { document.getElementById('calorieModal').style.display = 'none'; }
-    function openTypingModal() { document.getElementById('typingModal').style.display = 'flex'; resetTypingTest(); }
-    function closeTypingModal() { document.getElementById('typingModal').style.display = 'none'; clearInterval(typingInterval); }
-    function openInflationModal() { document.getElementById('inflationModal').style.display = 'flex'; }
-    function closeInflationModal() { document.getElementById('inflationModal').style.display = 'none'; }
+    function openGoldModal() { lockPageScroll(); document.getElementById('goldModal').style.display = 'flex'; }
+    function closeGoldModal() { unlockPageScroll(); document.getElementById('goldModal').style.display = 'none'; }
+    function openCalorieModal() { lockPageScroll(); document.getElementById('calorieModal').style.display = 'flex'; }
+    function closeCalorieModal() { unlockPageScroll(); document.getElementById('calorieModal').style.display = 'none'; }
+    function openTypingModal() { lockPageScroll(); document.getElementById('typingModal').style.display = 'flex'; resetTypingTest(); }
+    function closeTypingModal() { unlockPageScroll(); document.getElementById('typingModal').style.display = 'none'; clearInterval(typingInterval); }
+    function openInflationModal() { lockPageScroll(); document.getElementById('inflationModal').style.display = 'flex'; }
+    function closeInflationModal() { unlockPageScroll(); document.getElementById('inflationModal').style.display = 'none'; }
 
-    function openPpfModal() { document.getElementById('ppfModal').style.display = 'flex'; }
-    function closePpfModal() { document.getElementById('ppfModal').style.display = 'none'; }
-    function openElectricityModal() { document.getElementById('electricityModal').style.display = 'flex'; }
-    function closeElectricityModal() { document.getElementById('electricityModal').style.display = 'none'; }
-    function openFuelModal() { document.getElementById('fuelModal').style.display = 'flex'; }
-    function closeFuelModal() { document.getElementById('fuelModal').style.display = 'none'; }
-    function openHashtagModal() { document.getElementById('hashtagModal').style.display = 'flex'; }
-    function closeHashtagModal() { document.getElementById('hashtagModal').style.display = 'none'; }
+    function openPpfModal() { lockPageScroll(); document.getElementById('ppfModal').style.display = 'flex'; }
+    function closePpfModal() { unlockPageScroll(); document.getElementById('ppfModal').style.display = 'none'; }
+    function openElectricityModal() { lockPageScroll(); document.getElementById('electricityModal').style.display = 'flex'; }
+    function closeElectricityModal() { unlockPageScroll(); document.getElementById('electricityModal').style.display = 'none'; }
+    function openFuelModal() { lockPageScroll(); document.getElementById('fuelModal').style.display = 'flex'; }
+    function closeFuelModal() { unlockPageScroll(); document.getElementById('fuelModal').style.display = 'none'; }
+    function openHashtagModal() { lockPageScroll(); document.getElementById('hashtagModal').style.display = 'flex'; }
+    function closeHashtagModal() { unlockPageScroll(); document.getElementById('hashtagModal').style.display = 'none'; }
 
-    function openNumToWordsModal() { document.getElementById('numToWordsModal').style.display = 'flex'; }
-    function closeNumToWordsModal() { document.getElementById('numToWordsModal').style.display = 'none'; }
-    function openSalaryModal() { document.getElementById('salaryModal').style.display = 'flex'; }
-    function closeSalaryModal() { document.getElementById('salaryModal').style.display = 'none'; }
-    function openBillSplitModal() { document.getElementById('billSplitModal').style.display = 'flex'; }
-    function closeBillSplitModal() { document.getElementById('billSplitModal').style.display = 'none'; }
-    function openUnitConvModal() { document.getElementById('unitConvModal').style.display = 'flex'; }
-    function closeUnitConvModal() { document.getElementById('unitConvModal').style.display = 'none'; }
+    function openNumToWordsModal() { lockPageScroll(); document.getElementById('numToWordsModal').style.display = 'flex'; }
+    function closeNumToWordsModal() { unlockPageScroll(); document.getElementById('numToWordsModal').style.display = 'none'; }
+    function openSalaryModal() { lockPageScroll(); document.getElementById('salaryModal').style.display = 'flex'; }
+    function closeSalaryModal() { unlockPageScroll(); document.getElementById('salaryModal').style.display = 'none'; }
+    function openBillSplitModal() { lockPageScroll(); document.getElementById('billSplitModal').style.display = 'flex'; }
+    function closeBillSplitModal() { unlockPageScroll(); document.getElementById('billSplitModal').style.display = 'none'; }
+    function openUnitConvModal() { lockPageScroll(); document.getElementById('unitConvModal').style.display = 'flex'; }
+    function closeUnitConvModal() { unlockPageScroll(); document.getElementById('unitConvModal').style.display = 'none'; }
 
-    function openEmiModal() { document.getElementById('emiModal').style.display = 'flex'; }
-    function closeEmiModal() { document.getElementById('emiModal').style.display = 'none'; }
-    function openGstModal() { document.getElementById('gstModal').style.display = 'flex'; }
-    function closeGstModal() { document.getElementById('gstModal').style.display = 'none'; }
-    function openSipModal() { document.getElementById('sipModal').style.display = 'flex'; }
-    function closeSipModal() { document.getElementById('sipModal').style.display = 'none'; }
-    function openInterestModal() { document.getElementById('interestModal').style.display = 'flex'; }
-    function closeInterestModal() { document.getElementById('interestModal').style.display = 'none'; }
-    function openFdModal() { document.getElementById('fdModal').style.display = 'flex'; }
-    function closeFdModal() { document.getElementById('fdModal').style.display = 'none'; }
-    function openLandModal() { document.getElementById('landModal').style.display = 'flex'; }
-    function closeLandModal() { document.getElementById('landModal').style.display = 'none'; }
-    function openAgeDetailedModal() { document.getElementById('ageDetailedModal').style.display = 'flex'; }
-    function closeAgeDetailedModal() { document.getElementById('ageDetailedModal').style.display = 'none'; }
-    function openGradeModal() { document.getElementById('gradeModal').style.display = 'flex'; }
-    function closeGradeModal() { document.getElementById('gradeModal').style.display = 'none'; }
-    function openWaterModal() { document.getElementById('waterModal').style.display = 'flex'; }
-    function closeWaterModal() { document.getElementById('waterModal').style.display = 'none'; }
-    function openDateDiffModal() { document.getElementById('dateDiffModal').style.display = 'flex'; }
-    function closeDateDiffModal() { document.getElementById('dateDiffModal').style.display = 'none'; }
-    function openDupRemoverModal() { document.getElementById('dupRemoverModal').style.display = 'flex'; }
-    function closeDupRemoverModal() { document.getElementById('dupRemoverModal').style.display = 'none'; }
-    function openDiscountModal() { document.getElementById('discountModal').style.display = 'flex'; }
-    function closeDiscountModal() { document.getElementById('discountModal').style.display = 'none'; }
-    function openPercentModal() { document.getElementById('percentModal').style.display = 'flex'; }
-    function closePercentModal() { document.getElementById('percentModal').style.display = 'none'; }
-    function closeEligibilityModal() { document.getElementById('eligibilityModal').style.display = 'none'; }
-    function openEligibilityModal() { document.getElementById('eligibilityModal').style.display = 'flex'; }
-    function closeMarksModal() { document.getElementById('marksModal').style.display = 'none'; }
-    function openMarksModal() { document.getElementById('marksModal').style.display = 'flex'; }
-    function closeYtThumbModal() { document.getElementById('ytThumbModal').style.display = 'none'; }
-    function openYtThumbModal() { document.getElementById('ytThumbModal').style.display = 'flex'; }
-    function closeInfoModal() { document.getElementById('infoModal').style.display = 'none'; }
+    function openEmiModal() { lockPageScroll(); document.getElementById('emiModal').style.display = 'flex'; }
+    function closeEmiModal() { unlockPageScroll(); document.getElementById('emiModal').style.display = 'none'; }
+    function openGstModal() { lockPageScroll(); document.getElementById('gstModal').style.display = 'flex'; }
+    function closeGstModal() { unlockPageScroll(); document.getElementById('gstModal').style.display = 'none'; }
+    function openSipModal() { lockPageScroll(); document.getElementById('sipModal').style.display = 'flex'; }
+    function closeSipModal() { unlockPageScroll(); document.getElementById('sipModal').style.display = 'none'; }
+    function openInterestModal() { lockPageScroll(); document.getElementById('interestModal').style.display = 'flex'; }
+    function closeInterestModal() { unlockPageScroll(); document.getElementById('interestModal').style.display = 'none'; }
+    function openFdModal() { lockPageScroll(); document.getElementById('fdModal').style.display = 'flex'; }
+    function closeFdModal() { unlockPageScroll(); document.getElementById('fdModal').style.display = 'none'; }
+    function openLandModal() { lockPageScroll(); document.getElementById('landModal').style.display = 'flex'; }
+    function closeLandModal() { unlockPageScroll(); document.getElementById('landModal').style.display = 'none'; }
+    function openAgeDetailedModal() { lockPageScroll(); document.getElementById('ageDetailedModal').style.display = 'flex'; }
+    function closeAgeDetailedModal() { unlockPageScroll(); document.getElementById('ageDetailedModal').style.display = 'none'; }
+    function openGradeModal() { lockPageScroll(); document.getElementById('gradeModal').style.display = 'flex'; }
+    function closeGradeModal() { unlockPageScroll(); document.getElementById('gradeModal').style.display = 'none'; }
+    function openWaterModal() { lockPageScroll(); document.getElementById('waterModal').style.display = 'flex'; }
+    function closeWaterModal() { unlockPageScroll(); document.getElementById('waterModal').style.display = 'none'; }
+    function openDateDiffModal() { lockPageScroll(); document.getElementById('dateDiffModal').style.display = 'flex'; }
+    function closeDateDiffModal() { unlockPageScroll(); document.getElementById('dateDiffModal').style.display = 'none'; }
+    function openDupRemoverModal() { lockPageScroll(); document.getElementById('dupRemoverModal').style.display = 'flex'; }
+    function closeDupRemoverModal() { unlockPageScroll(); document.getElementById('dupRemoverModal').style.display = 'none'; }
+    function openDiscountModal() { lockPageScroll(); document.getElementById('discountModal').style.display = 'flex'; }
+    function closeDiscountModal() { unlockPageScroll(); document.getElementById('discountModal').style.display = 'none'; }
+    function openPercentModal() { lockPageScroll(); document.getElementById('percentModal').style.display = 'flex'; }
+    function closePercentModal() { unlockPageScroll(); document.getElementById('percentModal').style.display = 'none'; }
+    function closeEligibilityModal() { unlockPageScroll(); document.getElementById('eligibilityModal').style.display = 'none'; }
+    function openEligibilityModal() { lockPageScroll(); document.getElementById('eligibilityModal').style.display = 'flex'; }
+    function closeMarksModal() { unlockPageScroll(); document.getElementById('marksModal').style.display = 'none'; }
+    function openMarksModal() { lockPageScroll(); document.getElementById('marksModal').style.display = 'flex'; }
+    function closeYtThumbModal() { unlockPageScroll(); document.getElementById('ytThumbModal').style.display = 'none'; }
+    function openYtThumbModal() { lockPageScroll(); document.getElementById('ytThumbModal').style.display = 'flex'; }
+    function closeInfoModal() { unlockPageScroll(); document.getElementById('infoModal').style.display = 'none'; }
 
     // Pitch to Text (Speech Recognition Logic)
     let recognition = null;
-    function openPitchToTextModal() { document.getElementById('pitchToTextModal').style.display = 'flex'; }
-    function closePitchToTextModal() { document.getElementById('pitchToTextModal').style.display = 'none'; stopSpeechRecognition(); }
+    function openPitchToTextModal() { lockPageScroll(); document.getElementById('pitchToTextModal').style.display = 'flex'; }
+    function closePitchToTextModal() { unlockPageScroll(); document.getElementById('pitchToTextModal').style.display = 'none'; stopSpeechRecognition(); }
     function startSpeechRecognition() {
       const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
       if (!SpeechRecognition) {
@@ -1990,8 +1989,8 @@
     }
 
     // Text to Speech with Audio Download Logic
-    function openTextToSpeechModal() { document.getElementById('ttsModal').style.display = 'flex'; }
-    function closeTtsModal() { document.getElementById('ttsModal').style.display = 'none'; executeTtsStop(); }
+    function openTextToSpeechModal() { lockPageScroll(); document.getElementById('ttsModal').style.display = 'flex'; }
+    function closeTtsModal() { unlockPageScroll(); document.getElementById('ttsModal').style.display = 'none'; executeTtsStop(); }
     function executeTtsSpeak() {
       const text = document.getElementById('ttsInputText').value;
       if (!text.trim()) { alert("Please enter text to speak."); return; }
@@ -2018,8 +2017,8 @@
 
     function openTipCalculatorModal() { openBillSplitModal(); }
     
-    function openSleepCalculatorModal() { document.getElementById('sleepModal').style.display = 'flex'; }
-    function closeSleepModal() { document.getElementById('sleepModal').style.display = 'none'; }
+    function openSleepCalculatorModal() { lockPageScroll(); document.getElementById('sleepModal').style.display = 'flex'; }
+    function closeSleepModal() { unlockPageScroll(); document.getElementById('sleepModal').style.display = 'none'; }
     function executeSleepCalc() {
       const dur = parseFloat(document.getElementById('sleepDurationSelect').value);
       let wakeTime = new Date();
@@ -2031,8 +2030,8 @@
 
     function openWatermarkModal() { launchTool('watermark'); }
 
-    function openPasswordModal() { document.getElementById('passGenModal').style.display = 'flex'; executePasswordGenerate(); }
-    function closePassGenModal() { document.getElementById('passGenModal').style.display = 'none'; }
+    function openPasswordModal() { lockPageScroll(); document.getElementById('passGenModal').style.display = 'flex'; executePasswordGenerate(); }
+    function closePassGenModal() { unlockPageScroll(); document.getElementById('passGenModal').style.display = 'none'; }
     function executePasswordGenerate() {
       const len = parseInt(document.getElementById('passGenLength').value) || 12;
       const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789@#$%&*!";
@@ -2045,8 +2044,8 @@
       alert("Password copied to clipboard!");
     }
 
-    function openTextReverseModal() { document.getElementById('textRevModal').style.display = 'flex'; }
-    function closeTextRevModal() { document.getElementById('textRevModal').style.display = 'none'; }
+    function openTextReverseModal() { lockPageScroll(); document.getElementById('textRevModal').style.display = 'flex'; }
+    function closeTextRevModal() { unlockPageScroll(); document.getElementById('textRevModal').style.display = 'none'; }
     function executeTextReverse() {
       const txt = document.getElementById('textRevInput').value;
       const rev = txt.split("").reverse().join("");
@@ -2423,10 +2422,10 @@
       updateWordCounts();
     }
 
-    function showAboutModal() { document.getElementById('infoModalTitle').textContent = 'About DocuCraft AI'; document.getElementById('infoModalContent').textContent = 'DocuCraft AI is an all-in-one productivity suite built to provide fast, privacy-focused online utilities.'; document.getElementById('infoModal').style.display = 'flex'; }
-    function showContactModal() { document.getElementById('infoModalTitle').textContent = 'Contact Support'; document.getElementById('infoModalContent').textContent = 'Email: support@docucraftai.website'; document.getElementById('infoModal').style.display = 'flex'; }
-    function showTermsModal() { document.getElementById('infoModalTitle').textContent = 'Terms & Conditions'; document.getElementById('infoModalContent').textContent = 'Provided as is for informational purposes.'; document.getElementById('infoModal').style.display = 'flex'; }
-    function showDisclaimerModal() { document.getElementById('infoModalTitle').textContent = 'Disclaimer'; document.getElementById('infoModalContent').textContent = 'Calculators provide estimates for general guidance only.'; document.getElementById('infoModal').style.display = 'flex'; }
+    function showAboutModal() { lockPageScroll(); document.getElementById('infoModalTitle').textContent = 'About DocuCraft AI'; document.getElementById('infoModalContent').textContent = 'DocuCraft AI is an all-in-one productivity suite built to provide fast, privacy-focused online utilities.'; document.getElementById('infoModal').style.display = 'flex'; }
+    function showContactModal() { lockPageScroll(); document.getElementById('infoModalTitle').textContent = 'Contact Support'; document.getElementById('infoModalContent').textContent = 'Email: support@docucraftai.website'; document.getElementById('infoModal').style.display = 'flex'; }
+    function showTermsModal() { lockPageScroll(); document.getElementById('infoModalTitle').textContent = 'Terms & Conditions'; document.getElementById('infoModalContent').textContent = 'Provided as is for informational purposes.'; document.getElementById('infoModal').style.display = 'flex'; }
+    function showDisclaimerModal() { lockPageScroll(); document.getElementById('infoModalTitle').textContent = 'Disclaimer'; document.getElementById('infoModalContent').textContent = 'Calculators provide estimates for general guidance only.'; document.getElementById('infoModal').style.display = 'flex'; }
   </script>
 
 </body>
