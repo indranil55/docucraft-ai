@@ -30,12 +30,11 @@ body {
   -webkit-overflow-scrolling: touch;
 }
 
-body.modal-open, html.modal-open {
+body.modal-open {
   overflow: hidden !important;
   position: fixed !important;
   width: 100% !important;
   height: 100% !important;
-  touch-action: none;
 }
 
 header {
@@ -59,6 +58,7 @@ header {
   justify-content: space-between;
 }
 
+/* লোগো টেক্সট সাদা ও স্পষ্ট করার জন্য */
 .brand-logo-svg text[fill="#0F172A"] {
   fill: #ffffff !important;
 }
@@ -148,6 +148,7 @@ header {
   padding: 0 8px;
 }
 
+/* পপুলার টুলস সেকশন স্টাইল */
 .popular-section {
   width: 100%;
   max-width: 1320px;
@@ -335,29 +336,11 @@ header {
   gap: 10px;
 }
 
-/* মডাল এবং ওভারলে ফিক্স */
-.calc-modal {
-  position: fixed !important;
-  inset: 0 !important;
-  background: rgba(15, 23, 42, 0.85) !important;
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  z-index: 99999 !important;
-  overflow-y: auto !important;
-  -webkit-overflow-scrolling: touch;
-  overscroll-behavior: contain;
-}
-
-.calc-box {
-  background: #ffffff !important;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.45) !important;
-  transform: translateZ(0);
-}
-
+/* ব্যাকগ্রাউন্ড হেভি ব্লার এবং ডার্ক ওভারলে ফিক্স (ফাঁকা জায়গায় ক্লিক বা স্ক্রল করলে পপআপ যাতে না কাটে) */
 .workspace-overlay {
   position: fixed !important;
   inset: 0 !important;
-  background: rgba(15, 23, 42, 0.85) !important;
+  background: rgba(15, 23, 42, 0.95);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   z-index: 99999 !important;
@@ -365,9 +348,8 @@ header {
   align-items: flex-end;
   justify-content: center;
   padding: 0;
-  overflow: hidden !important;
+  overflow-y: auto;
   pointer-events: auto !important;
-  overscroll-behavior: none;
 }
 
 .workspace-box {
@@ -377,15 +359,12 @@ header {
   max-width: 580px;
   border-radius: 26px 26px 0 0;
   padding: 24px 20px 40px;
-  box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.9);
+  box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.5);
   max-height: 90vh;
   max-height: 90dvh;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
-  position: relative;
-  z-index: 100000;
   pointer-events: auto !important;
-  overscroll-behavior: contain;
 }
 
 .workspace-header {
@@ -423,6 +402,7 @@ header {
   color: var(--primary);
 }
 
+/* ড্র্যাগ অ্যান্ড ড্রপ গ্রিন চেকমার্ক অ্যানিমেশন ও স্টাইল */
 .dropzone {
   border: 2px dashed rgba(255, 255, 255, 0.2);
   border-radius: 16px;
@@ -537,7 +517,6 @@ header {
   display: none;
   align-items: flex-end;
   justify-content: center;
-  overscroll-behavior: none;
 }
 
 .ai-chat-card {
@@ -680,9 +659,9 @@ header {
 }
 
 footer {
-  background-color: #0f172a !important;
-  color: #f1f5f9 !important;
-  padding: 40px 20px 20px 20px;
+  background: #0f172a;
+  color: #94a3b8;
+  padding: 40px 16px 24px;
   margin-top: auto;
   width: 100%;
   border-top: 1px solid rgba(255, 255, 255, 0.1);
@@ -697,41 +676,29 @@ footer {
   margin-bottom: 32px;
 }
 
-footer h4 {
-  color: #ffffff !important;
+.footer-col h4 {
+  color: #ffffff;
   font-size: 14.5px;
   font-weight: 750;
-  margin-bottom: 15px;
+  margin-bottom: 14px;
 }
 
-footer ul {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-footer ul li {
-  margin-bottom: 10px;
-}
-
-footer ul li a {
-  color: #94a3b8 !important;
+.footer-col ul { list-style: none; }
+.footer-col ul li { margin-bottom: 10px; }
+.footer-col ul li a {
+  color: #94a3b8;
   text-decoration: none;
   font-size: 13px;
   transition: color 0.2s;
 }
-
-footer ul li a:hover {
-  color: #ffffff !important;
-}
+.footer-col ul li a:hover { color: #ffffff; }
 
 .footer-bottom {
-  margin-top: 30px;
   border-top: 1px solid rgba(255, 255, 255, 0.1);
-  padding-top: 20px;
+  padding-top: 18px;
   text-align: center;
-  color: #94a3b8 !important;
-  font-size: 13px;
+  font-size: 12.5px;
+  color: #94a3b8;
 }
 
 .trust-badges {
@@ -742,27 +709,7 @@ footer ul li a:hover {
   margin-top: 14px;
   font-size: 12.5px;
 }
-
 .trust-badges i { color: #10b981; margin-right: 6px; }
-
-.trust-badges span {
-  color: #cbd5e1 !important;
-}
-
-/* মোবাইল ভিউর জন্য পারফেক্ট রেসপন্সিভ গ্রিড ফিক্স */
-@media (max-width: 767px) {
-  .tools-grid {
-    display: grid;
-    grid-template-columns: 1fr !important;
-    gap: 14px !important;
-    padding: 0 4px;
-  }
-  
-  .tool-card {
-    width: 100% !important;
-    box-sizing: border-box;
-  }
-}
 
 @media (min-width: 640px) {
   .workspace-overlay { align-items: center; padding: 20px; }
@@ -781,22 +728,4 @@ footer ul li a:hover {
   .hero { padding: 64px 16px 32px; }
   .tools-grid { grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 22px; }
   .nav-container { height: 72px; }
-}
-
-.info-modal-body {
-  color: #0f172a !important;
-  font-size: 14px;
-  line-height: 1.6;
-}
-
-#infoModalTitle {
-  color: #0f172a !important;
-}
-
-.workspace-box, 
-.dropzone, 
-.dropzone * {
-  -webkit-user-select: none;
-  user-select: none;
-  -webkit-touch-callout: none;
 }
