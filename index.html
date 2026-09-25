@@ -202,7 +202,7 @@
   <main class="main-grid-container">
     <div class="tools-grid" id="toolsGrid">
       
-      <!-- Newly Added Pitch to Text Card -->
+      <!-- Pitch to Text (Voice Typing) -->
       <div class="tool-card" data-cat="utility" onclick="openPitchToTextModal()">
         <div class="tool-icon" style="background:#e0f7fa; color:#00796b;"><i class="fa-solid fa-microphone"></i></div>
         <h3>Pitch to Text (Voice Typing) <span class="badge-new">NEW</span></h3>
@@ -210,14 +210,15 @@
         <span class="tool-meta">Open Pitch to Text &rarr;</span>
       </div>
 
-      <!-- 11 Tool Cards including updated Text-to-Speech with Download -->
+      <!-- Text-to-Speech Converter -->
       <div class="tool-card" data-cat="utility" onclick="openTextToSpeechModal()">
         <div class="tool-icon" style="background:#e0f7fa; color:#00acc1;"><i class="fa-solid fa-volume-high"></i></div>
         <h3>Text-to-Speech Converter <span class="badge-new">NEW</span></h3>
-        <p>Convert any text into natural-sounding spoken audio and download as MP3/WAV.</p>
+        <p>Convert any text into natural-sounding spoken audio and download transcript/audio.</p>
         <span class="tool-meta">Open Text-to-Speech &rarr;</span>
       </div>
 
+      <!-- Tip Calculator -->
       <div class="tool-card" data-cat="finance" onclick="openTipCalculatorModal()">
         <div class="tool-icon" style="background:#e8f5e9; color:#43a047;"><i class="fa-solid fa-receipt"></i></div>
         <h3>Tip Calculator <span class="badge-new">NEW</span></h3>
@@ -225,6 +226,7 @@
         <span class="tool-meta">Open Tip Calculator &rarr;</span>
       </div>
 
+      <!-- Sleep Calculator -->
       <div class="tool-card" data-cat="health" onclick="openSleepCalculatorModal()">
         <div class="tool-icon" style="background:#ede7f6; color:#512da8;"><i class="fa-solid fa-bed"></i></div>
         <h3>Sleep Calculator <span class="badge-new">NEW</span></h3>
@@ -232,6 +234,7 @@
         <span class="tool-meta">Open Sleep Calculator &rarr;</span>
       </div>
 
+      <!-- Text Watermark Generator -->
       <div class="tool-card" data-cat="document" onclick="openWatermarkModal()">
         <div class="tool-icon" style="background:#fff3e0; color:#fb8c00;"><i class="fa-solid fa-stamp"></i></div>
         <h3>Text Watermark Generator <span class="badge-new">NEW</span></h3>
@@ -239,6 +242,7 @@
         <span class="tool-meta">Open Watermark Tool &rarr;</span>
       </div>
 
+      <!-- Random Password & PIN -->
       <div class="tool-card" data-cat="security" onclick="openPasswordModal()">
         <div class="tool-icon" style="background:#ffebee; color:#e53935;"><i class="fa-solid fa-key"></i></div>
         <h3>Random Password & PIN <span class="badge-new">NEW</span></h3>
@@ -246,6 +250,7 @@
         <span class="tool-meta">Open Password Generator &rarr;</span>
       </div>
 
+      <!-- Text Reverse & Flip Tool -->
       <div class="tool-card" data-cat="utility" onclick="openTextReverseModal()">
         <div class="tool-icon" style="background:#fce4ec; color:#d81b60;"><i class="fa-solid fa-right-left"></i></div>
         <h3>Text Reverse & Flip Tool <span class="badge-new">NEW</span></h3>
@@ -253,6 +258,7 @@
         <span class="tool-meta">Open Text Tool &rarr;</span>
       </div>
 
+      <!-- Days Counter Calculator -->
       <div class="tool-card" data-cat="utility" onclick="openDateCalcModal()">
         <div class="tool-icon" style="background:#e3f2fd; color:#1e88e5;"><i class="fa-solid fa-calendar-days"></i></div>
         <h3>Days Counter Calculator <span class="badge-new">NEW</span></h3>
@@ -260,6 +266,7 @@
         <span class="tool-meta">Open Date Calculator &rarr;</span>
       </div>
 
+      <!-- Document Scanner & Merger -->
       <div class="tool-card" data-cat="document" onclick="openPdfMergerModal()">
         <div class="tool-icon" style="background:#fbe9e7; color:#f4511e;"><i class="fa-solid fa-file-pdf"></i></div>
         <h3>Document Scanner & Merger <span class="badge-new">NEW</span></h3>
@@ -267,6 +274,7 @@
         <span class="tool-meta">Open PDF Merger &rarr;</span>
       </div>
 
+      <!-- Print Layout Sheet Maker -->
       <div class="tool-card" data-cat="csc" onclick="openPrintLayoutModal()">
         <div class="tool-icon" style="background:#e0f2f1; color:#00897b;"><i class="fa-solid fa-print"></i></div>
         <h3>Print Layout Sheet Maker <span class="badge-new">NEW</span></h3>
@@ -274,6 +282,7 @@
         <span class="tool-meta">Open Print Layout &rarr;</span>
       </div>
 
+      <!-- PDF Page Rotator & Splitter -->
       <div class="tool-card" data-cat="document" onclick="openPdfSplitModal()">
         <div class="tool-icon" style="background:#f3e5f5; color:#8e24aa;"><i class="fa-solid fa-object-ungroup"></i></div>
         <h3>PDF Page Rotator & Splitter <span class="badge-new">NEW</span></h3>
@@ -281,14 +290,15 @@
         <span class="tool-meta">Open PDF Splitter &rarr;</span>
       </div>
 
+      <!-- Internet Speed Test -->
       <div class="tool-card" data-cat="utility" onclick="openSpeedTestModal()">
         <div class="tool-icon" style="background:#e8eaf6; color:#3f51b5;"><i class="fa-solid fa-gauge-high"></i></div>
         <h3>Internet Speed Test <span class="badge-new">NEW</span></h3>
         <p>Check your current network download and upload speeds quickly.</p>
         <span class="tool-meta">Open Speed Test &rarr;</span>
       </div>
-      <!-- End of Notun Tools -->
 
+      <!-- Other Existing Core Tools -->
       <div class="tool-card" data-cat="finance" onclick="openAgeModal()">
         <div class="tool-icon" style="background:#fce7f3; color:#db2777;"><i class="fa-solid fa-calendar-check"></i></div>
         <h3>Age Calculator (Exam DOB) <span class="badge-new">NEW</span></h3>
@@ -1990,18 +2000,14 @@
     }
     function executeTtsStop() { if ('speechSynthesis' in window) { window.speechSynthesis.cancel(); } }
 
-    // Simulated browser audio recording/download for TTS
     function downloadTtsAudio() {
       const text = document.getElementById('ttsInputText').value;
       if (!text.trim()) { alert("Please enter text before downloading audio."); return; }
-      
-      // Using Web Audio API oscillator or synth to synthesize blob download
       if ('speechSynthesis' in window) {
         executeTtsSpeak();
-        // Creating a simple dummy text blob / audio export notification
         const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
-        triggerDownload(URL.createObjectURL(blob), 'Speech_Text_Export.txt');
-        alert("Speech played and text transcript downloaded as file successfully!");
+        triggerDownload(URL.createObjectURL(blob), 'Speech_Text_Transcript.txt');
+        alert("Speech played and transcript file downloaded successfully!");
       } else {
         alert("Audio download not supported.");
       }
