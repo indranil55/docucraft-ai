@@ -100,8 +100,39 @@ function triggerFileSuccessAnimation(msg) {
   }
 }
 
-// লক সিস্টেম রিমুভ করে সব টুল সবার জন্য উন্মুক্ত করা হলো
+// ৩ বার ফ্রিতে ব্যবহারের পর সাইন-ইন করার লিমিট কন্ট্রোল সিস্টেম
 function checkUserAccess(toolKey) {
+  // যদি ইউজার ইতিমধ্যে লগইন বা সাইন-ইন করা থাকে, তবে কোনো বাধা ছাড়াই ব্যবহার করতে পারবে
+  if (typeof isUserLoggedIn === 'function' && isUserLoggedIn()) {
+    return true;
+  }
+  // অথবা লোকাল স্টোরেজে লগইন স্ট্যাটাস চেক করা
+  if (localStorage.getItem('isLoggedIn') === 'true') {
+    return true;
+  }
+
+  // ব্রাউজারের লোকালস্টোরেজ থেকে ব্যবহারের কাউন্ট নেওয়া
+  let usageCount = parseInt(localStorage.getItem('freeUsageCount') || '0');
+
+  if (usageCount >= 3) {
+    // ৩ বার শেষ হলে ওয়ার্নিং দিয়ে সাইন-ইন মডাল ওপেন করা
+    alert("আপনি বিনামূল্যে ৩ বার টুলগুলো ব্যবহার করেছেন। পরবর্তী টুল ব্যবহার করতে দয়া করে সাইন-ইন করুন।");
+    
+    // উইন্ডোতে যদি সাইন-ইন মডাল খোলার ফাংশন থাকে তা কল করা
+    if (typeof openAuthModal === 'function') {
+      openAuthModal();
+    }
+    
+    // কাজের স্পেস বা ওভারলে বন্ধ করে দেওয়া যাতে টুল ব্যবহার করতে না পারে
+    if (typeof closeWorkspace === 'function') {
+      closeWorkspace();
+    }
+    
+    return false; // টুল এক্সেস ব্লক করা
+  }
+
+  // সফলভাবে ব্যবহারের পর কাউন্ট ১ বাড়িয়ে সেভ করা
+  localStorage.setItem('freeUsageCount', usageCount + 1);
   return true;
 }
 
