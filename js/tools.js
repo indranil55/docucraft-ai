@@ -298,13 +298,13 @@ function launchTool(toolKey) {
     }
   } else if (toolKey === 'split') {
     if (title) title.innerText = 'Split PDF';
-    if (desc) desc.innerText = 'Extract specific pages or page ranges from a PDF.';
+    if (desc) desc.innerText = 'Extract specific pages or page ranges from a PDF[span_1](start_span)[span_1](end_span).';
     if (fileInput) { fileInput.accept = 'application/pdf'; fileInput.removeAttribute('multiple'); }
-    if (dropText) dropText.innerText = 'Tap to select a PDF';
+    if (dropText) dropText.innerText = 'Tap to select a PDF[span_2](start_span)[span_2](end_span)';
     if (customUI) {
       customUI.innerHTML = `
         <div class="form-group">
-          <label style="font-weight:600; font-size:13px; display:block; margin-bottom:6px;">Page Range to Extract (e.g., 1-2, 4):</label>
+          <label style="font-weight:600; font-size:13px; display:block; margin-bottom:6px;">Page Range to Extract (e.g., 1-2, 4)[span_3](start_span)[span_3](end_span):</label>
           <input type="text" id="optRange" class="form-control" placeholder="1-3, 5" style="width:100%; padding:10px; border:1px solid #d1d5db; border-radius:8px;">
         </div>`;
     }
@@ -1127,7 +1127,7 @@ async function executeToolAction() {
 
     } else if (activeTool === 'split' && PDFLibObj) {
       const range = document.getElementById('optRange')?.value.trim();
-      const doc = await PDFLibObj.PDFDocument.load(await selectedFiles[0].arrayBuffer());
+      const doc = await PDFLibObj.PDFDocument.load(await selectedFiles[0].arrayBuffer(), { ignoreEncryption: true });
       const indices = parseRange(range, doc.getPageCount());
       const newDoc = await PDFLibObj.PDFDocument.create();
       const pages = await newDoc.copyPages(doc, indices);
@@ -1186,7 +1186,7 @@ async function executeToolAction() {
 
     } else if (activeTool === 'organize' && PDFLibObj) {
       const order = document.getElementById('optReorder')?.value.trim();
-      const doc = await PDFLibObj.PDFDocument.load(await selectedFiles[0].arrayBuffer());
+      const doc = await PDFLibObj.PDFDocument.load(await selectedFiles[0].arrayBuffer(), { ignoreEncryption: true });
       const indices = parseRange(order, doc.getPageCount());
       const newDoc = await PDFLibObj.PDFDocument.create();
       const pages = await newDoc.copyPages(doc, indices);
@@ -1196,14 +1196,14 @@ async function executeToolAction() {
 
     } else if (activeTool === 'rotate' && PDFLibObj) {
       const angle = parseInt(document.getElementById('optAngle')?.value) || 90;
-      const doc = await PDFLibObj.PDFDocument.load(await selectedFiles[0].arrayBuffer());
+      const doc = await PDFLibObj.PDFDocument.load(await selectedFiles[0].arrayBuffer(), { ignoreEncryption: true });
       doc.getPages().forEach(p => p.setRotation(PDFLibObj.degrees(p.getRotation().angle + angle)));
       downloadBlob(await doc.save(), 'Rotated_Document.pdf', 'application/pdf');
       showSuccessPopup('PDF Rotated Successfully!');
 
     } else if (activeTool === 'removePages' && PDFLibObj) {
       const delRange = document.getElementById('optDeleteRange')?.value.trim();
-      const doc = await PDFLibObj.PDFDocument.load(await selectedFiles[0].arrayBuffer());
+      const doc = await PDFLibObj.PDFDocument.load(await selectedFiles[0].arrayBuffer(), { ignoreEncryption: true });
       const totalPages = doc.getPageCount();
       const delIndices = new Set(parseRange(delRange, totalPages));
       const keepIndices = [];
@@ -1218,7 +1218,7 @@ async function executeToolAction() {
 
     } else if (activeTool === 'watermark' && PDFLibObj) {
       const wmText = document.getElementById('optWatermark')?.value.trim() || 'CONFIDENTIAL';
-      const doc = await PDFLibObj.PDFDocument.load(await selectedFiles[0].arrayBuffer());
+      const doc = await PDFLibObj.PDFDocument.load(await selectedFiles[0].arrayBuffer(), { ignoreEncryption: true });
       const pages = doc.getPages();
       pages.forEach(page => {
         const { width, height } = page.getSize();
@@ -1236,7 +1236,7 @@ async function executeToolAction() {
     } else if (activeTool === 'protect' && PDFLibObj) {
       const password = document.getElementById('optPdfPassword')?.value;
       if (!password) { alert('Please enter a password.'); return; }
-      const doc = await PDFLibObj.PDFDocument.load(await selectedFiles[0].arrayBuffer());
+      const doc = await PDFLibObj.PDFDocument.load(await selectedFiles[0].arrayBuffer(), { ignoreEncryption: true });
       const encryptedBytes = await doc.save({ userPassword: password, ownerPassword: password });
       downloadBlob(encryptedBytes, 'Protected_Document.pdf', 'application/pdf');
       showSuccessPopup('PDF Protected Successfully!');
