@@ -866,7 +866,7 @@
     </div>
   </div>
 
-  <!-- Document Translator Modal -->
+  <!-- Document Translator Modal with Global Languages -->
   <div class="calc-modal" id="docTranslatorModal" onclick="if(event.target === this) closeDocTranslatorModal()">
     <div class="calc-box" style="max-width: 550px;">
       <button class="calc-close" onclick="closeDocTranslatorModal()">&times;</button>
@@ -874,11 +874,19 @@
       <div class="calc-group">
         <label>Select Target Language:</label>
         <select id="translatorLang">
-          <option value="bn" selected>Bengali (বাংলা)</option>
+          <option value="en" selected>English (English)</option>
+          <option value="bn">Bengali (বাংলা)</option>
           <option value="hi">Hindi (हिन्दी)</option>
           <option value="es">Spanish (Español)</option>
           <option value="fr">French (Français)</option>
           <option value="de">German (Deutsch)</option>
+          <option value="ar">Arabic (العربية)</option>
+          <option value="zh">Chinese (中文)</option>
+          <option value="ru">Russian (Русский)</option>
+          <option value="pt">Portuguese (Português)</option>
+          <option value="ja">Japanese (日本語)</option>
+          <option value="it">Italian (Italiano)</option>
+          <option value="ko">Korean (한국어)</option>
         </select>
       </div>
       <div class="calc-group">
@@ -1941,7 +1949,6 @@
       document.getElementById('ocrFileInfo').textContent = `Extracting text from image... Please wait.`;
       
       setTimeout(() => {
-        // Simulated extracted text preview which users can edit directly
         document.getElementById('ocrExtractedOutput').value = `Extracted sample text from image: ${file.name}\nYou can edit this text here to correct any errors before saving.`;
         document.getElementById('ocrFileInfo').textContent = `Text successfully extracted and ready for editing!`;
       }, 1000);
@@ -2660,7 +2667,7 @@
       out.textContent = `Average Marks: ${avg.toFixed(2)}`;
     }
 
-    function executeWaterCalc() { document.getElementById('waterOutput').style.display = 'block'; document.getElementById('waterOutput').textContent = `Daily Target: ${(parseFloat(document.getElementById('waterWeight').value || 60) * 0.033).Footer} Liters`; }
+    function executeWaterCalc() { document.getElementById('waterOutput').style.display = 'block'; document.getElementById('waterOutput').textContent = `Daily Target: ${(parseFloat(document.getElementById('waterWeight').value || 60) * 0.033).toFixed(2)} Liters`; }
     
     function executeDateDiffCalc() {
       const d1 = new Date(document.getElementById('dateDiffStart').value);
