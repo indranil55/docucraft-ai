@@ -51,6 +51,27 @@
     }
     @keyframes pulseBadge { 0%, 100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.06); opacity: 0.92; } }
 
+    /* Custom Stylish Blue-Red Login/Auth Icon Button */
+    .auth-icon-btn {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #2563eb, #dc2626) !important;
+      color: #ffffff !important;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      cursor: pointer;
+      box-shadow: 0 4px 15px rgba(37, 99, 235, 0.4);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .auth-icon-btn:hover {
+      transform: scale(1.08);
+      box-shadow: 0 6px 20px rgba(220, 38, 38, 0.5);
+    }
+
     .search-wrapper { max-width: 580px; margin: -10px auto 25px auto; padding: 0 15px; position: relative; }
     .search-box-inner {
       display: flex; align-items: center; background: #ffffff; border: 2px solid #e2e8f0;
@@ -818,7 +839,7 @@
       <div class="tool-card" data-cat="toPdf" onclick="launchTool('jpgToPdf')">
         <div class="tool-icon" style="background:#eff6ff; color:#2563eb;"><i class="fa-solid fa-file-image"></i></div>
         <h3>Image to PDF (JPG/PNG to PDF)</h3>
-        <p>Convert gallery pictures, screenshots, or document scans into a standard A4 PDF (1 KB - 500 MB).</p>
+        <p>Convert gallery pictures, screenshots, or document scans into exact image-sized PDF (1 KB - 500 MB).</p>
         <span class="tool-meta">Open Tool &rarr;</span>
       </div>
 
@@ -2063,10 +2084,10 @@
       </div>
     </div>
     <div class="footer-bottom">
-      &copy; 2026 DocuCraft AI Studio. Files are processed securely in your browser[span_3](start_span)[span_3](end_span).
+      &copy; 2026 DocuCraft AI Studio. Files are processed securely in your browser[span_1](start_span)[span_1](end_span).
       <div class="trust-badges">
-        <span><i class="fa-solid fa-shield-halved"></i> Client-Side Privacy Guaranteed[span_4](start_span)[span_4](end_span)</span>
-        <span><i class="fa-solid fa-lock"></i> SSL Secured[span_5](start_span)[span_5](end_span)</span>
+        <span><i class="fa-solid fa-shield-halved"></i> Client-Side Privacy Guaranteed[span_2](start_span)[span_2](end_span)</span>
+        <span><i class="fa-solid fa-lock"></i> SSL Secured[span_3](start_span)[span_3](end_span)</span>
       </div>
     </div>
   </footer>
@@ -2930,7 +2951,7 @@
       "The quick brown fox jumps over the lazy dog. Technology and automation enable swift digital transformation.",
       "Artificial intelligence and machine learning algorithms process massive datasets securely, empowering developers."
     ];
-    function changeTypingLevel() { document.getElementById('typingSnippet').innerText = typingParagraphs[document.getElementById('typingLevelSelect').value]; resetTypingTest(); }
+    function changeTypingLevel() { document.getElementById('typingSnippet').innerText = typingParagraphs[document.getElementById('typingLevelSelect'].value]; resetTypingTest(); }
     let typingTimerSeconds = 60, typingInterval = null, typingStarted = false;
     function resetTypingTest() { clearInterval(typingInterval); typingTimerSeconds = 60; typingStarted = false; document.getElementById('typingTimer').innerText = '60'; document.getElementById('typingInputArea').value = ''; document.getElementById('typingInputArea').disabled = false; document.getElementById('typingOutput').style.display = 'none'; }
     function handleTypingInput() {
