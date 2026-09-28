@@ -111,6 +111,72 @@
     #infoModalTitle {
       color: #0f172a !important;
     }
+
+    /* Custom Translator UI inside Modal */
+    .translator-card-wrap {
+      width: 100%;
+      background: #fff;
+      border-radius: 20px;
+      padding: 5px;
+    }
+    .translator-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 18px;
+    }
+    .translator-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 22px;
+      font-weight: 700;
+      color: #111827;
+    }
+    .translator-logo {
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      background: #9333ea;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      font-size: 16px;
+    }
+    .translator-row {
+      display: grid;
+      grid-template-columns: 1fr 45px 1fr;
+      gap: 10px;
+      align-items: end;
+    }
+    .translator-swap {
+      width: 42px;
+      height: 42px;
+      border: 0;
+      border-radius: 50%;
+      background: #eef2ff;
+      color: #475569;
+      font-size: 20px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 2px;
+    }
+    .translator-output {
+      min-height: 120px;
+      white-space: pre-wrap;
+      word-break: break-word;
+      background: #f8fafc;
+      border: 1px solid #d1d5db;
+      border-radius: 13px;
+      padding: 12px;
+      font-size: 15px;
+      line-height: 1.55;
+      color: #111827;
+    }
   </style>
 
   <script>
@@ -223,7 +289,7 @@
   <main class="main-grid-container">
     <div class="tools-grid" id="toolsGrid">
       
-      <!-- New Added Tools: PDF Scanner, Zip to PDF, Document Translator -->
+      <!-- New Added Tools: PDF Scanner, Zip to PDF, DocuCraft AI Translator -->
       <div class="tool-card" data-cat="document" onclick="openPdfScannerModal()">
         <div class="tool-icon" style="background:#e0f2fe; color:#0284c7;"><i class="fa-solid fa-scanner"></i></div>
         <h3>PDF Scanner & Enhancer <span class="badge-new">NEW</span></h3>
@@ -891,102 +957,51 @@
     </div>
   </div>
 
-  <!-- DocuCraft AI Translator Modal (Advanced Multilingual Engine) -->
+  <!-- DocuCraft AI Translator Modal -->
   <div class="calc-modal" id="docTranslatorModal" onclick="if(event.target === this) closeDocTranslatorModal()">
-    <div class="calc-box" style="max-width: 560px;">
+    <div class="calc-box" style="max-width: 650px;">
       <button class="calc-close" onclick="closeDocTranslatorModal()">&times;</button>
-      <h3><i class="fa-solid fa-language" style="color: #9333ea;"></i> DocuCraft AI Translator</h3>
       
-      <div style="display: grid; grid-template-columns: 1fr auto 1fr; gap: 8px; align-items: center; margin-bottom: 12px;">
-        <div class="calc-group" style="margin-bottom:0;">
-          <label>From Language:</label>
-          <select id="translatorSourceLang">
-            <option value="auto" selected>Detect Language</option>
-            <option value="en">English (English)</option>
-            <option value="bn">Bengali (বাংলা)</option>
-            <option value="hi">Hindi (हिन्दी)</option>
-            <option value="es">Spanish (Español)</option>
-            <option value="fr">French (Français)</option>
-            <option value="de">German (Deutsch)</option>
-            <option value="ar">Arabic (العربية)</option>
-            <option value="zh">Chinese (中文)</option>
-            <option value="ru">Russian (Русский)</option>
-            <option value="pt">Portuguese (Português)</option>
-            <option value="ja">Japanese (日本語)</option>
-            <option value="it">Italian (Italiano)</option>
-            <option value="ko">Korean (한국어)</option>
-            <option value="ur">Urdu (اردو)</option>
-            <option value="fa">Persian (فارسی)</option>
-            <option value="tr">Turkish (Türkçe)</option>
-            <option value="vi">Vietnamese (Tiếng Việt)</option>
-            <option value="id">Indonesian (Bahasa)</option>
-            <option value="nl">Dutch (Nederlands)</option>
-            <option value="pl">Polish (Polski)</option>
-            <option value="uk">Ukrainian (Українська)</option>
-            <option value="el">Greek (Ελληνικά)</option>
-            <option value="he">Hebrew (עברית)</option>
-            <option value="th">Thai (ไทย)</option>
-            <option value="sv">Swedish (Svenska)</option>
-            <option value="fi">Finnish (Suomi)</option>
-            <option value="da">Danish (Dansk)</option>
-            <option value="no">Norwegian (Norsk)</option>
-            <option value="ms">Malay (Melayu)</option>
-            <option value="fil">Filipino (Tagalog)</option>
-            <option value="sw">Swahili (Kiswahili)</option>
-          </select>
+      <div class="translator-card-wrap">
+        <div class="translator-header">
+          <div class="translator-title">
+            <div class="translator-logo">A★</div>
+            DocuCraft AI Translator
+          </div>
         </div>
-        <div style="text-align: center; padding-top: 20px; color: #64748b;">
-          <i class="fa-solid fa-arrow-right-arrow-left"></i>
+
+        <div class="translator-row">
+          <div>
+            <label>From Language:</label>
+            <select id="fromLang"></select>
+          </div>
+          <button class="translator-swap" onclick="swapLanguages()" title="Swap">⇄</button>
+          <div>
+            <label>To Language:</label>
+            <select id="toLang"></select>
+          </div>
         </div>
-        <div class="calc-group" style="margin-bottom:0;">
-          <label>To Language:</label>
-          <select id="translatorTargetLang">
-            <option value="en" selected>English (English)</option>
-            <option value="bn">Bengali (বাংলা)</option>
-            <option value="hi">Hindi (हिन्दी)</option>
-            <option value="es">Spanish (Español)</option>
-            <option value="fr">French (Français)</option>
-            <option value="de">German (Deutsch)</option>
-            <option value="ar">Arabic (العربية)</option>
-            <option value="zh">Chinese (中文)</option>
-            <option value="ru">Russian (Русский)</option>
-            <option value="pt">Portuguese (Português)</option>
-            <option value="ja">Japanese (日本語)</option>
-            <option value="it">Italian (Italiano)</option>
-            <option value="ko">Korean (한국어)</option>
-            <option value="ur">Urdu (اردو)</option>
-            <option value="fa">Persian (فارسی)</option>
-            <option value="tr">Turkish (Türkçe)</option>
-            <option value="vi">Vietnamese (Tiếng Việt)</option>
-            <option value="id">Indonesian (Bahasa)</option>
-            <option value="nl">Dutch (Nederlands)</option>
-            <option value="pl">Polish (Polski)</option>
-            <option value="uk">Ukrainian (Українська)</option>
-            <option value="el">Greek (Ελληνικά)</option>
-            <option value="he">Hebrew (עברית)</option>
-            <option value="th">Thai (ไทย)</option>
-            <option value="sv">Swedish (Svenska)</option>
-            <option value="fi">Finnish (Suomi)</option>
-            <option value="da">Danish (Dansk)</option>
-            <option value="no">Norwegian (Norsk)</option>
-            <option value="ms">Malay (Melayu)</option>
-            <option value="fil">Filipino (Tagalog)</option>
-            <option value="sw">Swahili (Kiswahili)</option>
-          </select>
+
+        <div class="section" style="margin-top:15px;">
+          <label>Enter Text to Translate:</label>
+          <textarea id="inputText" placeholder="Type words, sentences or document paragraphs here..."></textarea>
         </div>
+
+        <button class="calc-btn" id="translateBtn" onclick="translateText()" style="background:#9333ea; margin-top:16px;">
+          Translate Instantly
+        </button>
+
+        <div class="section" style="margin-top:15px;">
+          <label>Translated Output:</label>
+          <div class="translator-output" id="output"></div>
+          <div class="status" id="status" style="margin-top:8px; font-size:13px; color:#64748b;"></div>
+        </div>
+
+        <button class="copy" onclick="copyTranslation()" style="width:100%; margin-top:16px; padding:15px; border:0; border-radius:13px; background:#0f172a; color:white; font-size:18px; font-weight:700; cursor:pointer;">
+          Copy Translation
+        </button>
       </div>
 
-      <div class="calc-group">
-        <label>Enter Text to Translate:</label>
-        <textarea id="translatorInput" rows="4" placeholder="Type words, sentences or document paragraphs here..."></textarea>
-      </div>
-      <button type="button" class="calc-btn" onclick="executeTranslation()" style="background:#9333ea;">Translate Instantly</button>
-      
-      <div class="calc-group" style="margin-top: 12px;">
-        <label>Translated Output:</label>
-        <textarea id="translatorOutput" rows="4" readonly style="background:#f8fafc; font-size:15px; font-weight:600; color:#0f172a;"></textarea>
-      </div>
-      <button type="button" onclick="copyTranslation()" class="calc-btn" style="background:#0f172a; margin-top:0;">Copy Translation</button>
     </div>
   </div>
 
@@ -2004,6 +2019,7 @@
       if (document.getElementById('dateDiffEnd')) document.getElementById('dateDiffEnd').value = today;
       if (document.getElementById('lifeDob')) document.getElementById('lifeDob').value = '2000-01-01';
       updateUnitConvFields();
+      loadLanguages();
 
       const cyberTab = document.getElementById('defaultCyberTab');
       if (cyberTab && typeof filterCategory === 'function') {
@@ -2029,9 +2045,9 @@
       for (let i = 1; i <= 5; i++) {
         const star = document.getElementById('star' + i);
         if (i <= score) {
-          star.style.color = '#f59e0b'; // Gold color for active stars
+          star.style.color = '#f59e0b';
         } else {
-          star.style.color = '#cbd5e1'; // Gray for inactive stars
+          star.style.color = '#cbd5e1';
         }
       }
       const feedback = document.getElementById('ratingFeedbackText');
@@ -2124,33 +2140,139 @@
       }, 1200);
     }
 
-    // DocuCraft AI Translator Logic Functions (Advanced Multilingual Engine)
+    /* =========================================================
+       DocuCraft AI Translator Script & Logic Integration
+       ========================================================= */
     function openDocTranslatorModal() { lockPageScroll(); document.getElementById('docTranslatorModal').style.display = 'flex'; }
     function closeDocTranslatorModal() { unlockPageScroll(); document.getElementById('docTranslatorModal').style.display = 'none'; }
-    function executeTranslation() {
-      const text = document.getElementById('translatorInput').value;
-      const srcLang = document.getElementById('translatorSourceLang').value;
-      const targetLang = document.getElementById('translatorTargetLang').value;
-      if (!text.trim()) { alert("Please enter text to translate."); return; }
-      
-      let translatedText = text;
-      const cleanText = text.trim().toLowerCase();
-      
-      if (cleanText.includes('kemon acho') || cleanText.includes('কেমন আছো')) {
-        translatedText = (targetLang === 'en') ? "How are you?" : text;
-      } else if (cleanText.includes('how are you')) {
-        translatedText = (targetLang === 'bn') ? "আপনি কেমন আছেন?" : text;
-      } else {
-        translatedText = `[Translated from ${srcLang.toUpperCase()} to ${targetLang.toUpperCase()}]: ${text}`;
-      }
-      
-      document.getElementById('translatorOutput').value = translatedText;
+
+    const languages = [
+      ["auto","Detect Language"],
+      ["bn","Bengali (বাংলা)"],
+      ["hi","Hindi (हिन्दी)"],
+      ["en","English"],
+      ["as","Assamese (অসমীয়া)"],
+      ["gu","Gujarati (ગુજરાતી)"],
+      ["kn","Kannada (ಕನ್ನಡ)"],
+      ["ml","Malayalam (മലയാളം)"],
+      ["mr","Marathi (मराठी)"],
+      ["ne","Nepali (नेपाली)"],
+      ["or","Odia (ଓଡ଼ିଆ)"],
+      ["pa","Punjabi (ਪੰਜਾਬੀ)"],
+      ["sa","Sanskrit (संस्कृतम्)"],
+      ["ta","Tamil (தமிழ்)"],
+      ["te","Telugu (తెలుగు)"],
+      ["ur","Urdu (اردو)"],
+      ["fr","French"],
+      ["de","German"],
+      ["es","Spanish"],
+      ["it","Italian"],
+      ["pt","Portuguese"],
+      ["ru","Russian"],
+      ["ar","Arabic"],
+      ["zh-CN","Chinese Simplified"],
+      ["ja","Japanese"],
+      ["ko","Korean"]
+    ];
+
+    const fromSelect = document.getElementById("fromLang");
+    const toSelect = document.getElementById("toLang");
+
+    function loadLanguages(){
+      if(!fromSelect || fromSelect.children.length > 0) return;
+      languages.forEach(([code,name])=>{
+        const a=document.createElement("option");
+        a.value=code;
+        a.textContent=name;
+        const b=a.cloneNode(true);
+        fromSelect.appendChild(a);
+        toSelect.appendChild(b);
+      });
+      fromSelect.value="auto";
+      toSelect.value="en";
     }
-    function copyTranslation() {
-      const val = document.getElementById('translatorOutput').value;
-      if (!val) { alert("No translation output to copy."); return; }
-      navigator.clipboard.writeText(val);
-      alert("Translated text copied to clipboard!");
+
+    function swapLanguages(){
+      if(fromSelect.value==="auto"){
+        alert("Detect Language cannot be swapped. Select a source language first.");
+        return;
+      }
+      const temp=fromSelect.value;
+      fromSelect.value=toSelect.value;
+      toSelect.value=temp;
+      const input=document.getElementById("inputText");
+      const output=document.getElementById("output");
+      if(output.textContent.trim()){
+        input.value=output.textContent;
+        output.textContent="";
+      }
+    }
+
+    async function translateText(){
+      const input=document.getElementById("inputText").value.trim();
+      const output=document.getElementById("output");
+      const status=document.getElementById("status");
+      const btn=document.getElementById("translateBtn");
+
+      if(!input){
+        output.textContent="";
+        status.textContent="Please enter text to translate.";
+        status.className="status error";
+        return;
+      }
+
+      let from=fromSelect.value;
+      const to=toSelect.value;
+
+      if(to==="auto"){
+        status.textContent="Please select a target language.";
+        status.className="status error";
+        return;
+      }
+
+      btn.disabled=true;
+      btn.textContent="Translating...";
+      output.textContent="";
+      status.textContent="Translating...";
+
+      try{
+        const url = "https://api.mymemory.translated.net/get?q="+encodeURIComponent(input)+"&langpair="+encodeURIComponent(from+"|"+to);
+        const response=await fetch(url);
+        if(!response.ok) throw new Error("Translation server error");
+        const data=await response.json();
+        if(!data || !data.responseData || !data.responseData.translatedText) throw new Error("No translation returned");
+
+        const textarea=document.createElement("textarea");
+        textarea.innerHTML=data.responseData.translatedText;
+        output.textContent=textarea.value;
+        status.textContent="Translation completed successfully.";
+        status.className="status";
+      }catch(error){
+        console.error(error);
+        output.textContent="";
+        status.textContent="Translation failed. Please try another language pair.";
+        status.className="status error";
+      }finally{
+        btn.disabled=false;
+        btn.textContent="Translate Instantly";
+      }
+    }
+
+    async function copyTranslation(){
+      const text=document.getElementById("output").textContent.trim();
+      if(!text){
+        alert("There is no translation to copy.");
+        return;
+      }
+      try{
+        await navigator.clipboard.writeText(text);
+        const btn=document.querySelector(".copy");
+        const old=btn.textContent;
+        btn.textContent="✓ Copied";
+        setTimeout(()=>{ btn.textContent=old; },1500);
+      }catch(e){
+        alert("Copy failed.");
+      }
     }
 
     // Repair PDF Logic Functions
