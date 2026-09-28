@@ -71,17 +71,17 @@
     }
 
     .calc-modal {
-      display: none; position: fixed !important; inset: 0 !important; background: rgba(15, 23, 42, 0.9) !important;
+      display: none; position: fixed !important; inset: 0 !important; background: rgba(15, 23, 42, 0.85) !important;
       backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); z-index: 99999 !important;
       justify-content: center; align-items: center; padding: 16px; overflow-y: auto !important;
       -webkit-overflow-scrolling: touch; overscroll-behavior: contain;
     }
     .calc-box {
-      background: #ffffff; width: 100%; max-width: 520px; border-radius: 16px; padding: 24px;
-      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6) !important; position: relative; max-height: 85vh; overflow-y: auto; z-index: 100000;
+      background: #ffffff; width: 100%; max-width: 560px; border-radius: 20px; padding: 26px;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5) !important; position: relative; max-height: 90vh; overflow-y: auto; z-index: 100000;
     }
     .calc-box h3 { margin-top: 0; margin-bottom: 16px; font-size: 1.25rem; font-weight: 700; color: #0f172a; display: flex; align-items: center; gap: 8px; }
-    .calc-close { position: absolute; top: 16px; right: 18px; font-size: 24px; border: none; background: none; cursor: pointer; color: #64748b; }
+    .calc-close { position: absolute; top: 18px; right: 20px; font-size: 24px; border: none; background: none; cursor: pointer; color: #64748b; }
     .calc-group { margin-bottom: 14px; text-align: left; }
     .calc-group label { display: block; font-size: 13px; font-weight: 600; color: #334155; margin-bottom: 6px; }
     .calc-group input, .calc-group select, .calc-group textarea {
@@ -112,70 +112,141 @@
       color: #0f172a !important;
     }
 
-    /* Custom Translator UI inside Modal */
-    .translator-card-wrap {
+    /* Professional Modern Translator Card Styling */
+    .translator-wrapper {
       width: 100%;
-      background: #fff;
+      background: #ffffff;
       border-radius: 20px;
-      padding: 5px;
     }
-    .translator-header {
+    .translator-top-header {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      margin-bottom: 18px;
+      margin-bottom: 20px;
+      border-bottom: 1px solid #f1f5f9;
+      padding-bottom: 14px;
     }
-    .translator-title {
+    .translator-brand-title {
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 12px;
       font-size: 22px;
-      font-weight: 700;
-      color: #111827;
+      font-weight: 800;
+      color: #0f172a;
     }
-    .translator-logo {
-      width: 38px;
-      height: 38px;
-      border-radius: 10px;
-      background: #9333ea;
+    .translator-brand-logo {
+      width: 42px;
+      height: 42px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #9333ea, #7e22ce);
       color: #fff;
       display: flex;
       align-items: center;
       justify-content: center;
       font-weight: bold;
-      font-size: 16px;
+      font-size: 18px;
+      box-shadow: 0 4px 12px rgba(147, 51, 234, 0.3);
     }
-    .translator-row {
+    .translator-grid-row {
       display: grid;
       grid-template-columns: 1fr 45px 1fr;
       gap: 10px;
       align-items: end;
+      margin-bottom: 16px;
     }
-    .translator-swap {
+    .translator-swap-btn {
       width: 42px;
       height: 42px;
       border: 0;
       border-radius: 50%;
-      background: #eef2ff;
+      background: #f1f5f9;
       color: #475569;
-      font-size: 20px;
+      font-size: 18px;
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
       margin-bottom: 2px;
+      transition: all 0.2s ease;
     }
-    .translator-output {
-      min-height: 120px;
+    .translator-swap-btn:hover {
+      background: #e2e8f0;
+      color: #0f172a;
+    }
+    .translator-textarea-box {
+      width: 100%;
+      border: 1px solid #cbd5e1;
+      border-radius: 12px;
+      padding: 14px;
+      font-size: 15px;
+      background: #f8fafc;
+      outline: none;
+      font-family: inherit;
+      resize: vertical;
+      min-height: 110px;
+      line-height: 1.5;
+      color: #1e293b;
+      box-sizing: border-box;
+    }
+    .translator-textarea-box:focus {
+      border-color: #9333ea;
+      background: #ffffff;
+      box-shadow: 0 0 0 3px rgba(147, 51, 234, 0.15);
+    }
+    .translator-output-box {
+      min-height: 110px;
       white-space: pre-wrap;
       word-break: break-word;
       background: #f8fafc;
-      border: 1px solid #d1d5db;
-      border-radius: 13px;
-      padding: 12px;
+      border: 1px solid #cbd5e1;
+      border-radius: 12px;
+      padding: 14px;
       font-size: 15px;
-      line-height: 1.55;
-      color: #111827;
+      line-height: 1.5;
+      color: #0f172a;
+      font-weight: 600;
+    }
+    .translator-action-btn {
+      width: 100%;
+      margin-top: 14px;
+      padding: 14px;
+      border: 0;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #9333ea, #7e22ce);
+      color: #fff;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(147, 51, 234, 0.3);
+      transition: opacity 0.2s;
+    }
+    .translator-action-btn:hover {
+      opacity: 0.92;
+    }
+    .translator-copy-btn {
+      width: 100%;
+      margin-top: 12px;
+      padding: 13px;
+      border: 0;
+      border-radius: 12px;
+      background: #0f172a;
+      color: white;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .translator-copy-btn:hover {
+      background: #1e293b;
+    }
+    @media(max-width: 600px) {
+      .translator-grid-row {
+        grid-template-columns: 1fr;
+      }
+      .translator-swap-btn {
+        transform: rotate(90deg);
+        justify-self: center;
+        margin: 4px 0;
+      }
     }
   </style>
 
@@ -957,47 +1028,49 @@
     </div>
   </div>
 
-  <!-- DocuCraft AI Translator Modal -->
+  <!-- DocuCraft AI Translator Modal (Clean & Polished UI) -->
   <div class="calc-modal" id="docTranslatorModal" onclick="if(event.target === this) closeDocTranslatorModal()">
     <div class="calc-box" style="max-width: 650px;">
       <button class="calc-close" onclick="closeDocTranslatorModal()">&times;</button>
       
-      <div class="translator-card-wrap">
-        <div class="translator-header">
-          <div class="translator-title">
-            <div class="translator-logo">A★</div>
+      <div class="translator-wrapper">
+        <div class="translator-top-header">
+          <div class="translator-brand-title">
+            <div class="translator-brand-logo">A★</div>
             DocuCraft AI Translator
           </div>
         </div>
 
-        <div class="translator-row">
+        <div class="translator-grid-row">
           <div>
             <label>From Language:</label>
-            <select id="fromLang"></select>
+            <select id="fromLang" class="translator-textarea-box" style="padding: 12px;"></select>
           </div>
-          <button class="translator-swap" onclick="swapLanguages()" title="Swap">⇄</button>
+          <button class="translator-swap-btn" onclick="swapLanguages()" title="Swap Languages">
+            <i class="fa-solid fa-arrow-right-arrow-left"></i>
+          </button>
           <div>
             <label>To Language:</label>
-            <select id="toLang"></select>
+            <select id="toLang" class="translator-textarea-box" style="padding: 12px;"></select>
           </div>
         </div>
 
-        <div class="section" style="margin-top:15px;">
+        <div style="margin-top: 14px;">
           <label>Enter Text to Translate:</label>
-          <textarea id="inputText" placeholder="Type words, sentences or document paragraphs here..."></textarea>
+          <textarea id="inputText" class="translator-textarea-box" placeholder="Type words, sentences or document paragraphs here..."></textarea>
         </div>
 
-        <button class="calc-btn" id="translateBtn" onclick="translateText()" style="background:#9333ea; margin-top:16px;">
+        <button class="translator-action-btn" id="translateBtn" onclick="translateText()">
           Translate Instantly
         </button>
 
-        <div class="section" style="margin-top:15px;">
+        <div style="margin-top: 14px;">
           <label>Translated Output:</label>
           <div class="translator-output" id="output"></div>
-          <div class="status" id="status" style="margin-top:8px; font-size:13px; color:#64748b;"></div>
+          <div class="status" id="status" style="margin-top: 6px; font-size: 13px; color: #64748b;"></div>
         </div>
 
-        <button class="copy" onclick="copyTranslation()" style="width:100%; margin-top:16px; padding:15px; border:0; border-radius:13px; background:#0f172a; color:white; font-size:18px; font-weight:700; cursor:pointer;">
+        <button class="translator-copy-btn" onclick="copyTranslation()">
           Copy Translation
         </button>
       </div>
@@ -1978,10 +2051,10 @@
       </div>
     </div>
     <div class="footer-bottom">
-      &copy; 2026 DocuCraft AI Studio. Files are processed securely in your browser[span_2](start_span)[span_2](end_span).
+      &copy; 2026 DocuCraft AI Studio. Files are processed securely in your browser[span_1](start_span)[span_1](end_span).
       <div class="trust-badges">
-        <span><i class="fa-solid fa-shield-halved"></i> Client-Side Privacy Guaranteed[span_3](start_span)[span_3](end_span)</span>
-        <span><i class="fa-solid fa-lock"></i> SSL Secured[span_4](start_span)[span_4](end_span)</span>
+        <span><i class="fa-solid fa-shield-halved"></i> Client-Side Privacy Guaranteed[span_2](start_span)[span_2](end_span)</span>
+        <span><i class="fa-solid fa-lock"></i> SSL Secured[span_3](start_span)[span_3](end_span)</span>
       </div>
     </div>
   </footer>
@@ -2148,6 +2221,8 @@
 
     const languages = [
       ["auto","Detect Language"],
+
+      /* India */
       ["bn","Bengali (বাংলা)"],
       ["hi","Hindi (हिन्दी)"],
       ["en","English"],
@@ -2163,16 +2238,79 @@
       ["ta","Tamil (தமிழ்)"],
       ["te","Telugu (తెలుగు)"],
       ["ur","Urdu (اردو)"],
+      ["ks","Kashmiri"],
+      ["sd","Sindhi"],
+      ["mai","Maithili"],
+      ["kok","Konkani"],
+      ["mni","Manipuri"],
+
+      /* Europe */
       ["fr","French"],
       ["de","German"],
       ["es","Spanish"],
       ["it","Italian"],
       ["pt","Portuguese"],
       ["ru","Russian"],
+      ["uk","Ukrainian"],
+      ["pl","Polish"],
+      ["nl","Dutch"],
+      ["sv","Swedish"],
+      ["no","Norwegian"],
+      ["da","Danish"],
+      ["fi","Finnish"],
+      ["el","Greek"],
+      ["cs","Czech"],
+      ["sk","Slovak"],
+      ["ro","Romanian"],
+      ["hu","Hungarian"],
+      ["bg","Bulgarian"],
+      ["sr","Serbian"],
+      ["hr","Croatian"],
+      ["sl","Slovenian"],
+      ["et","Estonian"],
+      ["lv","Latvian"],
+      ["lt","Lithuanian"],
+      ["is","Icelandic"],
+      ["ga","Irish"],
+      ["cy","Welsh"],
+      ["mt","Maltese"],
+
+      /* Middle East */
       ["ar","Arabic"],
+      ["fa","Persian"],
+      ["he","Hebrew"],
+      ["tr","Turkish"],
+      ["ku","Kurdish"],
+
+      /* Asia */
       ["zh-CN","Chinese Simplified"],
+      ["zh-TW","Chinese Traditional"],
       ["ja","Japanese"],
-      ["ko","Korean"]
+      ["ko","Korean"],
+      ["th","Thai"],
+      ["vi","Vietnamese"],
+      ["id","Indonesian"],
+      ["ms","Malay"],
+      ["tl","Filipino"],
+      ["my","Myanmar"],
+      ["km","Khmer"],
+      ["lo","Lao"],
+      ["mn","Mongolian"],
+
+      /* Africa */
+      ["sw","Swahili"],
+      ["af","Afrikaans"],
+      ["am","Amharic"],
+      ["zu","Zulu"],
+      ["xh","Xhosa"],
+      ["yo","Yoruba"],
+      ["ig","Igbo"],
+      ["ha","Hausa"],
+      ["so","Somali"],
+
+      /* Other */
+      ["la","Latin"],
+      ["eo","Esperanto"]
     ];
 
     const fromSelect = document.getElementById("fromLang");
@@ -2208,6 +2346,48 @@
       }
     }
 
+    async function detectLanguage(text){
+      if(/[\u0980-\u09FF]/.test(text)) return "bn";
+      if(/[\u0900-\u097F]/.test(text)) return "hi";
+      if(/[\u0B80-\u0BFF]/.test(text)) return "ta";
+      if(/[\u0C00-\u0C7F]/.test(text)) return "te";
+      if(/[\u0C80-\u0CFF]/.test(text)) return "kn";
+      if(/[\u0D00-\u0D7F]/.test(text)) return "ml";
+      if(/[\u0A00-\u0A7F]/.test(text)) return "pa";
+      if(/[\u0B00-\u0B7F]/.test(text)) return "or";
+      if(/[\u0600-\u06FF]/.test(text)) return "ar";
+      if(/[\u4E00-\u9FFF]/.test(text)) return "zh-CN";
+      if(/[\u3040-\u30FF]/.test(text)) return "ja";
+      if(/[\uAC00-\uD7AF]/.test(text)) return "ko";
+      if(/[\u0E00-\u0E7F]/.test(text)) return "th";
+      if(/[\u0400-\u04FF]/.test(text)) return "ru";
+      return "en";
+    }
+
+    function splitText(text,maxLength){
+      if(text.length<=maxLength) return [text];
+      const parts=[];
+      let current="";
+      const sentences=text.split(/(?<=[.!?।！？])\s+/);
+      for(const sentence of sentences){
+        if((current+" "+sentence).trim().length<=maxLength){
+          current=(current+" "+sentence).trim();
+        }else{
+          if(current) parts.push(current);
+          if(sentence.length>maxLength){
+            for(let i=0;i<sentence.length;i+=maxLength){
+              parts.push(sentence.slice(i,i+maxLength));
+            }
+            current="";
+          }else{
+            current=sentence;
+          }
+        }
+      }
+      if(current) parts.push(current);
+      return parts;
+    }
+
     async function translateText(){
       const input=document.getElementById("inputText").value.trim();
       const output=document.getElementById("output");
@@ -2230,21 +2410,44 @@
         return;
       }
 
+      if(from==="auto"){
+        from=await detectLanguage(input);
+        const detectedName = languages.find(x=>x[0]===from)?.[1] || from;
+        status.textContent="Detected source language: "+detectedName;
+      }else{
+        status.textContent="Translating...";
+      }
+
+      if(from===to){
+        output.textContent=input;
+        status.textContent="Source and target languages are the same.";
+        return;
+      }
+
       btn.disabled=true;
       btn.textContent="Translating...";
       output.textContent="";
-      status.textContent="Translating...";
 
       try{
-        const url = "https://api.mymemory.translated.net/get?q="+encodeURIComponent(input)+"&langpair="+encodeURIComponent(from+"|"+to);
-        const response=await fetch(url);
-        if(!response.ok) throw new Error("Translation server error");
-        const data=await response.json();
-        if(!data || !data.responseData || !data.responseData.translatedText) throw new Error("No translation returned");
+        const chunks=splitText(input,450);
+        let finalText="";
 
-        const textarea=document.createElement("textarea");
-        textarea.innerHTML=data.responseData.translatedText;
-        output.textContent=textarea.value;
+        for(let i=0;i<chunks.length;i++){
+          status.textContent = `Translating part ${i+1} of ${chunks.length}...`;
+          const url = "https://api.mymemory.translated.net/get?q="+encodeURIComponent(chunks[i])+"&langpair="+encodeURIComponent(from+"|"+to);
+          const response=await fetch(url);
+          if(!response.ok) throw new Error("Translation server error");
+          const data=await response.json();
+          if(!data || !data.responseData || !data.responseData.translatedText) throw new Error("No translation returned");
+
+          const textarea=document.createElement("textarea");
+          textarea.innerHTML=data.responseData.translatedText;
+          finalText += (finalText ? "\n" : "") + textarea.value;
+
+          if(i<chunks.length-1) await new Promise(r=>setTimeout(r,250));
+        }
+
+        output.textContent=finalText;
         status.textContent="Translation completed successfully.";
         status.className="status";
       }catch(error){
@@ -2266,7 +2469,7 @@
       }
       try{
         await navigator.clipboard.writeText(text);
-        const btn=document.querySelector(".copy");
+        const btn=document.querySelector(".translator-copy-btn");
         const old=btn.textContent;
         btn.textContent="✓ Copied";
         setTimeout(()=>{ btn.textContent=old; },1500);
