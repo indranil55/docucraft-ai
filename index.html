@@ -368,7 +368,7 @@
     </div>
   </div>
 
-  <!-- Main Tools Grid (Clean, Non-Duplicate Master List) -->
+  <!-- Main Tools Grid (Clean, Non-Duplicate Master List with Separate PDF Converters) -->
   <main class="main-grid-container">
     <div class="tools-grid" id="toolsGrid">
       
@@ -815,67 +815,87 @@
         <span class="tool-meta">Open Tool &rarr;</span>
       </div>
 
+      <!-- =========================================================
+           Convert to PDF - Separate Individual Cards
+           ========================================================= -->
       <div class="tool-card" data-cat="toPdf" onclick="launchTool('jpgToPdf')">
         <div class="tool-icon" style="background:#eff6ff; color:#2563eb;"><i class="fa-solid fa-file-image"></i></div>
-        <h3>Image to PDF (JPG/PNG to PDF)</h3>
-        <p>Convert gallery pictures, screenshots, or document scans into a standard A4 PDF (1 KB - 500 MB).</p>
-        <span class="tool-meta">Open Tool &rarr;</span>
+        <h3>JPG to PDF Converter</h3>
+        <p>Convert JPG photo gallery pictures and snapshots into a standardized A4 PDF document.</p>
+        <span class="tool-meta">Open JPG to PDF &rarr;</span>
+      </div>
+
+      <div class="tool-card" data-cat="toPdf" onclick="launchTool('pngToPdf')">
+        <div class="tool-icon" style="background:#eff6ff; color:#2563eb;"><i class="fa-solid fa-image"></i></div>
+        <h3>PNG to PDF Converter</h3>
+        <p>Transform PNG graphic files and transparent image scans into professional PDF files.</p>
+        <span class="tool-meta">Open PNG to PDF &rarr;</span>
       </div>
 
       <div class="tool-card" data-cat="toPdf" onclick="launchTool('wordToPdf')">
         <div class="tool-icon" style="background:#eff6ff; color:#2563eb;"><i class="fa-solid fa-file-word"></i></div>
-        <h3>Docx to PDF (Word to PDF)</h3>
-        <p>Convert Microsoft Word documents to clean, standardized PDF format instantly (1 KB - 500 MB).</p>
-        <span class="tool-meta">Open Tool &rarr;</span>
+        <h3>Word to PDF (Docx to PDF)</h3>
+        <p>Convert Microsoft Word documents directly to clean, standardized PDF format instantly.</p>
+        <span class="tool-meta">Open Word to PDF &rarr;</span>
       </div>
 
       <div class="tool-card" data-cat="toPdf" onclick="launchTool('excelToPdf')">
         <div class="tool-icon" style="background:#eff6ff; color:#2563eb;"><i class="fa-solid fa-file-excel"></i></div>
-        <h3>Excel to PDF (XLS/XLSX to PDF)</h3>
-        <p>Convert Excel spreadsheets and tables into formatted, printable PDF documents (1 KB - 500 MB).</p>
-        <span class="tool-meta">Open Tool &rarr;</span>
+        <h3>Excel to PDF (XLS/XLSX)</h3>
+        <p>Convert Excel spreadsheets, financial tables, and data sheets into formatted printable PDFs.</p>
+        <span class="tool-meta">Open Excel to PDF &rarr;</span>
       </div>
 
       <div class="tool-card" data-cat="toPdf" onclick="launchTool('pptToPdf')">
         <div class="tool-icon" style="background:#eff6ff; color:#2563eb;"><i class="fa-solid fa-file-powerpoint"></i></div>
-        <h3>PowerPoint to PDF (PPT/PPTX to PDF)</h3>
-        <p>Transform slideshow decks and presentations into portable PDF files (1 KB - 500 MB).</p>
-        <span class="tool-meta">Open Tool &rarr;</span>
+        <h3>PowerPoint to PDF (PPT/PPTX)</h3>
+        <p>Transform slideshow decks, business presentations, and notes into portable PDF files.</p>
+        <span class="tool-meta">Open PPT to PDF &rarr;</span>
       </div>
 
       <div class="tool-card" data-cat="toPdf" onclick="launchTool('htmlToPdf')">
         <div class="tool-icon" style="background:#eff6ff; color:#2563eb;"><i class="fa-solid fa-code"></i></div>
-        <h3>HTML / Web to PDF</h3>
-        <p>Convert HTML text, markup, or web content into downloadable PDF pages (1 KB - 500 MB).</p>
-        <span class="tool-meta">Open Tool &rarr;</span>
+        <h3>HTML to PDF Converter</h3>
+        <p>Convert raw HTML markup text, code snippets, or web content into downloadable PDF pages.</p>
+        <span class="tool-meta">Open HTML to PDF &rarr;</span>
       </div>
 
+      <!-- =========================================================
+           Convert from PDF - Separate Individual Cards
+           ========================================================= -->
       <div class="tool-card" data-cat="fromPdf" onclick="launchTool('pdfToJpg')">
         <div class="tool-icon" style="background:#eff6ff; color:#2563eb;"><i class="fa-solid fa-image"></i></div>
-        <h3>PDF to Image (PDF to JPG/PNG)</h3>
-        <p>Extract all pages or individual visual graphics from a PDF into JPG images (1 KB - 500 MB).</p>
-        <span class="tool-meta">Open Tool &rarr;</span>
+        <h3>PDF to JPG Converter</h3>
+        <p>Convert PDF pages into high-quality individual JPG image files instantly in browser.</p>
+        <span class="tool-meta">Open PDF to JPG &rarr;</span>
+      </div>
+
+      <div class="tool-card" data-cat="fromPdf" onclick="launchTool('pdfToPng')">
+        <div class="tool-icon" style="background:#eff6ff; color:#2563eb;"><i class="fa-solid fa-file-image"></i></div>
+        <h3>PDF to PNG Converter</h3>
+        <p>Extract and convert your PDF document pages into high-resolution PNG format images.</p>
+        <span class="tool-meta">Open PDF to PNG &rarr;</span>
       </div>
 
       <div class="tool-card" data-cat="fromPdf" onclick="launchTool('pdfToWord')">
         <div class="tool-icon" style="background:#eff6ff; color:#2563eb;"><i class="fa-solid fa-file-lines"></i></div>
-        <h3>PDF to Word (PDF to DOCX)</h3>
-        <p>Convert PDF documents into editable Word files with intact textual layout (1 KB - 500 MB).</p>
-        <span class="tool-meta">Open Tool &rarr;</span>
+        <h3>PDF to Word (DOCX) Converter</h3>
+        <p>Transform PDF documents into editable Microsoft Word files while keeping layouts intact.</p>
+        <span class="tool-meta">Open PDF to Word &rarr;</span>
       </div>
 
       <div class="tool-card" data-cat="fromPdf" onclick="launchTool('pdfToExcel')">
         <div class="tool-icon" style="background:#eff6ff; color:#2563eb;"><i class="fa-solid fa-table-cells"></i></div>
-        <h3>PDF to Excel (PDF to XLSX)</h3>
-        <p>Extract tables, cell grids, and numerical sheets from PDF files into Excel (1 KB - 500 MB).</p>
-        <span class="tool-meta">Open Tool &rarr;</span>
+        <h3>PDF to Excel (XLSX) Converter</h3>
+        <p>Extract numerical data tables and grids from PDF files directly into Excel spreadsheets.</p>
+        <span class="tool-meta">Open PDF to Excel &rarr;</span>
       </div>
 
       <div class="tool-card" data-cat="fromPdf" onclick="openOcrModal()">
         <div class="tool-icon" style="background:#f3e8ff; color:#9333ea;"><i class="fa-solid fa-file-lines"></i></div>
-        <h3>OCR - Image to Text</h3>
-        <p>Extract text from any image (JPG, PNG) in Bengali, Hindi, or English with live editing.</p>
-        <span class="tool-meta">Open Tool &rarr;</span>
+        <h3>PDF to Text (OCR Extractor)</h3>
+        <p>Extract selectable and editable text from scanned or image-based PDF books instantly.</p>
+        <span class="tool-meta">Open OCR Tool &rarr;</span>
       </div>
 
       <div class="tool-card" data-cat="editSecurity" onclick="launchTool('editPdf')">
@@ -2063,10 +2083,10 @@
       </div>
     </div>
     <div class="footer-bottom">
-      &copy; 2026 DocuCraft AI Studio. Files are processed securely in your browser[span_3](start_span)[span_3](end_span).
+      &copy; 2026 DocuCraft AI Studio. Files are processed securely in your browser.
       <div class="trust-badges">
-        <span><i class="fa-solid fa-shield-halved"></i> Client-Side Privacy Guaranteed[span_4](start_span)[span_4](end_span)</span>
-        <span><i class="fa-solid fa-lock"></i> SSL Secured[span_5](start_span)[span_5](end_span)</span>
+        <span><i class="fa-solid fa-shield-halved"></i> Client-Side Privacy Guaranteed</span>
+        <span><i class="fa-solid fa-lock"></i> SSL Secured</span>
       </div>
     </div>
   </footer>
