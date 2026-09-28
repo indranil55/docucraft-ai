@@ -146,7 +146,7 @@
       </a>
 
       <div class="nav-actions" style="display: flex; gap: 10px; align-items: center;">
-        <button onclick="openDonateModal()" style="background: linear-gradient(135deg, #16a34a, #15803d); color: #fff; border: none; padding: 6px 12px; border-radius: 20px; font-weight: 700; font-size: 12px; cursor: pointer; display: flex; align-items: center; gap: 5px; box-shadow: 0 2px 5px rgba(22, 163, 74, 0.4);">
+        <button onclick="openDonateModal()" style="background: linear-gradient(135deg, #2563eb, #dc2626); color: #fff; border: none; padding: 6px 14px; border-radius: 20px; font-weight: 700; font-size: 12px; cursor: pointer; display: flex; align-items: center; gap: 6px; box-shadow: 0 3px 8px rgba(37, 99, 235, 0.4);">
           <i class="fa-solid fa-heart" style="color: #fca5a5;"></i> Donate (India)
         </button>
         <button class="auth-icon-btn" id="authNavBtn" onclick="openAuthModal()" title="Login / Sign Up">
@@ -2148,7 +2148,7 @@
       }, 1200);
     }
 
-    // Document & Text Translator Logic Functions (All World Languages Active)
+    // Document & Text Translator Logic Functions (All World Languages)
     function openDocTranslatorModal() { lockPageScroll(); document.getElementById('docTranslatorModal').style.display = 'flex'; }
     function closeDocTranslatorModal() { unlockPageScroll(); document.getElementById('docTranslatorModal').style.display = 'none'; }
     function executeTranslation() {
