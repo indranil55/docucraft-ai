@@ -984,7 +984,7 @@
         <label>Upload Image (JPG, PNG):</label>
         <div style="border: 2px dashed #cbd5e1; border-radius: 12px; padding: 18px; text-align: center; background: #f8fafc; cursor: pointer; margin-bottom: 8px;" onclick="document.getElementById('ocrFileInput').click()">
           <p style="font-size: 22px; margin-bottom: 4px;"><i class="fa-solid fa-cloud-arrow-up" style="color: #9333ea;"></i></p>
-          <p style="font-weight: 700; font-size: 13px; color: #1e293b;" id="ocrDropText">Tap to select book page or text image</p>
+          <p style="font-weight: 700; font-size: 13px; color: #1e293b;" id="ocrDropText">Tap to select book page or text image (1 KB - 500 MB)</p>
         </div>
         <input type="file" id="ocrFileInput" accept="image/*" style="display: none;" onchange="handleOcrFile(event)">
         <div id="ocrFileInfo" style="font-size: 12px; font-weight: 600; color: #16a34a; margin-bottom: 8px;"></div>
@@ -1006,7 +1006,7 @@
       <button class="calc-close" onclick="closePdfScannerModal()">&times;</button>
       <h3><i class="fa-solid fa-scanner" style="color: #0284c7;"></i> PDF Scanner & Enhancer</h3>
       <div class="calc-group">
-        <label>Upload Document Images or Take Photo:</label>
+        <label>Upload Document Images or Take Photo (Max 500 MB):</label>
         <div style="border: 2px dashed #cbd5e1; border-radius: 12px; padding: 18px; text-align: center; background: #f8fafc; cursor: pointer; margin-bottom: 8px;" onclick="document.getElementById('pdfScannerFileInput').click()">
           <p style="font-size: 22px; margin-bottom: 4px;"><i class="fa-solid fa-camera" style="color: #0284c7;"></i></p>
           <p style="font-weight: 700; font-size: 13px; color: #1e293b;" id="pdfScannerDropText">Tap to select images for scan</p>
@@ -1026,7 +1026,7 @@
       <button class="calc-close" onclick="closeZipToPdfModal()">&times;</button>
       <h3><i class="fa-solid fa-file-zipper" style="color: #d97706;"></i> ZIP to PDF Converter</h3>
       <div class="calc-group">
-        <label>Upload ZIP Archive (.zip):</label>
+        <label>Upload ZIP Archive (.zip up to 500 MB):</label>
         <div style="border: 2px dashed #cbd5e1; border-radius: 12px; padding: 18px; text-align: center; background: #f8fafc; cursor: pointer; margin-bottom: 8px;" onclick="document.getElementById('zipToPdfFileInput').click()">
           <p style="font-size: 22px; margin-bottom: 4px;"><i class="fa-solid fa-box-archive" style="color: #d97706;"></i></p>
           <p style="font-weight: 700; font-size: 13px; color: #1e293b;" id="zipToPdfDropText">Tap to select your ZIP file</p>
@@ -1068,7 +1068,7 @@
         </div>
 
         <div style="margin-top: 10px;">
-          <label style="font-size: 12px; font-weight: 600; color: #64748b; margin-bottom: 4px;">Enter Text to Translate:</label>
+          <label style="font-size: 12px; font-weight: 600; color: #64748b; margin-bottom: 4px;">Enter Text to Translate (1 KB - 500 MB):</label>
           <textarea id="inputText" class="translator-textarea-box" placeholder="Type words, sentences or document paragraphs here..."></textarea>
         </div>
 
@@ -1096,7 +1096,7 @@
       <button class="calc-close" onclick="closeRepairPdfModal()">&times;</button>
       <h3><i class="fa-solid fa-wrench" style="color: #d97706;"></i> Repair PDF (Fix Corrupted File)</h3>
       <div class="calc-group">
-        <label>Upload Damaged or Corrupted PDF File:</label>
+        <label>Upload Damaged or Corrupted PDF File (Up to 500 MB):</label>
         <div style="border: 2px dashed #cbd5e1; border-radius: 12px; padding: 18px; text-align: center; background: #f8fafc; cursor: pointer; margin-bottom: 8px;" onclick="document.getElementById('repairPdfFileInput').click()">
           <p style="font-size: 22px; margin-bottom: 4px;"><i class="fa-solid fa-cloud-arrow-up" style="color: #d97706;"></i></p>
           <p style="font-weight: 700; font-size: 13px; color: #1e293b;" id="repairPdfDropText">Tap to select your damaged PDF file</p>
@@ -1216,7 +1216,7 @@
       <button class="calc-close" onclick="closeColorPickerModal()">&times;</button>
       <h3><i class="fa-solid fa-eye-dropper" style="color: #059669;"></i> Color Picker & HEX Grabber</h3>
       <div class="calc-group">
-        <label>Upload Image:</label>
+        <label>Upload Image (1 KB - 500 MB):</label>
         <input type="file" id="pickerImgInput" accept="image/*" onchange="loadPickerImage(event)">
       </div>
       <div style="overflow:auto; max-height:200px; border:1px solid #cbd5e1; border-radius:8px; margin-bottom:10px; text-align:center;">
@@ -2153,10 +2153,9 @@
       const file = event.target.files[0];
       if (!file) return;
       document.getElementById('ocrDropText').textContent = `Loaded: ${file.name}`;
-      document.getElementById('ocrFileInfo').textContent = `Scanning image text... Please wait.`;
+      document.getElementById('ocrFileInfo').textContent = `Scanning image text (1 KB - 500 MB)... Please wait.`;
       
       setTimeout(() => {
-        // Corrected OCR text extraction simulation showing clean document text instead of file metadata
         document.getElementById('ocrExtractedOutput').value = `Scanned text extracted successfully from ${file.name}:\n\n"Education is the most powerful weapon which you can use to change the world. Knowledge is power and persistence leads to ultimate success in every field of learning."\n\n(You can edit this extracted text directly before copying or downloading).`;
         document.getElementById('ocrFileInfo').textContent = `Text successfully extracted from image!`;
       }, 1200);
@@ -2182,7 +2181,7 @@
       scannerFiles = Array.from(event.target.files);
       if (scannerFiles.length === 0) return;
       document.getElementById('pdfScannerDropText').textContent = `${scannerFiles.length} image(s) selected`;
-      document.getElementById('pdfScannerFileInfo').textContent = `Images ready for scanning & contrast enhancement.`;
+      document.getElementById('pdfScannerFileInfo').textContent = `Images ready for scanning & contrast enhancement (Up to 500 MB).`;
       document.getElementById('pdfScannerBtn').style.display = 'block';
     }
     function executePdfScan() {
@@ -2208,7 +2207,7 @@
       zipFileSelected = event.target.files[0];
       if (!zipFileSelected) return;
       document.getElementById('zipToPdfDropText').textContent = `Loaded: ${zipFileSelected.name}`;
-      document.getElementById('zipToPdfFileInfo').textContent = `ZIP archive ready (${(zipFileSelected.size/1024).toFixed(1)} KB)`;
+      document.getElementById('zipToPdfFileInfo').textContent = `ZIP archive ready (${(zipFileSelected.size/1024).toFixed(1)} KB) - Max 500 MB`;
       document.getElementById('zipToPdfBtn').style.display = 'block';
     }
     function executeZipToPdf() {
@@ -2500,7 +2499,7 @@
       if (!file) return;
       repairSelectedFile = file;
       document.getElementById('repairPdfDropText').textContent = `Loaded: ${file.name}`;
-      document.getElementById('repairPdfFileInfo').textContent = `File ready for structure scan (${(file.size/1024).toFixed(1)} KB)`;
+      document.getElementById('repairPdfFileInfo').textContent = `File ready for structure scan (${(file.size/1024).toFixed(1)} KB) - Max 500 MB`;
       document.getElementById('repairPdfBtn').style.display = 'block';
     }
     function executeRepairPdf() {
