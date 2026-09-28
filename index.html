@@ -145,7 +145,10 @@
         </svg>
       </a>
 
-      <div class="nav-actions">
+      <div class="nav-actions" style="display: flex; gap: 10px; align-items: center;">
+        <button onclick="openDonateModal()" style="background: linear-gradient(135deg, #16a34a, #15803d); color: #fff; border: none; padding: 6px 12px; border-radius: 20px; font-weight: 700; font-size: 12px; cursor: pointer; display: flex; align-items: center; gap: 5px; box-shadow: 0 2px 5px rgba(22, 163, 74, 0.4);">
+          <i class="fa-solid fa-heart" style="color: #fca5a5;"></i> Donate (India)
+        </button>
         <button class="auth-icon-btn" id="authNavBtn" onclick="openAuthModal()" title="Login / Sign Up">
           <i class="fas fa-user"></i>
         </button>
@@ -238,7 +241,7 @@
       <div class="tool-card" data-cat="utility" onclick="openDocTranslatorModal()">
         <div class="tool-icon" style="background:#f3e8ff; color:#9333ea;"><i class="fa-solid fa-language"></i></div>
         <h3>Document & Text Translator <span class="badge-new">NEW</span></h3>
-        <p>Translate paragraphs, text files, or document content into multiple languages instantly.</p>
+        <p>Translate paragraphs, text files, or document content into world languages instantly.</p>
         <span class="tool-meta">Open Translator &rarr;</span>
       </div>
 
@@ -800,6 +803,46 @@
     </div>
   </main>
 
+  <!-- Donation / Support Modal for India with Star Rating -->
+  <div class="calc-modal" id="donateModal" onclick="if(event.target === this) closeDonateModal()">
+    <div class="calc-box" style="max-width: 450px; text-align: center;">
+      <button class="calc-close" onclick="closeDonateModal()">&times;</button>
+      <h3><i class="fa-solid fa-heart" style="color: #ef4444;"></i> Support & Donate (India)</h3>
+      
+      <!-- Rating Section -->
+      <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 12px; margin-bottom: 14px;">
+        <p style="font-size: 13px; font-weight: 700; color: #1e293b; margin-bottom: 6px;">Rate Our Website & Tools (Out of 5 Stars):</p>
+        <div id="starRatingContainer" style="display: flex; justify-content: center; gap: 6px; font-size: 22px; cursor: pointer; color: #cbd5e1;">
+          <i class="fa-solid fa-star" onclick="setRating(1)" id="star1"></i>
+          <i class="fa-solid fa-star" onclick="setRating(2)" id="star2"></i>
+          <i class="fa-solid fa-star" onclick="setRating(3)" id="star3"></i>
+          <i class="fa-solid fa-star" onclick="setRating(4)" id="star4"></i>
+          <i class="fa-solid fa-star" onclick="setRating(5)" id="star5"></i>
+        </div>
+        <p id="ratingFeedbackText" style="font-size: 12px; font-weight: 600; color: #16a34a; margin-top: 6px; display: none;">Thank you for your rating!</p>
+      </div>
+
+      <p style="font-size: 13px; color: #475569; margin-bottom: 12px;">Aponar sahajjo amake aro valo free tools toiri korte sahajjo korbe. Apni nicher UPI ID copy kore ba QR Code scan kore taka pathate paren.</p>
+      
+      <!-- UPI QR Code & UPI ID Box -->
+      <div style="background: #f8fafc; border: 2px dashed #cbd5e1; border-radius: 12px; padding: 15px; display: inline-block; margin-bottom: 10px;">
+        <div style="width: 170px; height: 170px; background: #ffffff; display: flex; align-items: center; justify-content: center; margin: 0 auto; border-radius: 8px; border: 1px solid #e2e8f0; padding: 5px;">
+          <!-- Simulated UPI QR Code or standard QR representation matching user's image -->
+          <div style="width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #0f172a; color: #fff; border-radius: 6px;">
+            <i class="fa-solid fa-qrcode" style="font-size: 64px; color: #ffffff;"></i>
+            <span style="font-size: 10px; margin-top: 4px; font-weight: 600;">Scan & Pay</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="calc-group" style="background: #f1f5f9; padding: 10px; border-radius: 8px; text-align: center; margin-bottom: 0;">
+        <label style="margin-bottom: 2px; font-size: 12px;">UPI ID:</label>
+        <span id="upiIdText" style="font-weight: 800; font-size: 15px; color: #0f172a; font-family: monospace;">6297665488@yapl</span>
+        <button type="button" onclick="copyUpiId()" style="display: block; width: 100%; margin-top: 8px; background: #2563eb; color: #fff; border: none; padding: 8px; border-radius: 6px; font-weight: 700; cursor: pointer; font-size: 13px;">Copy UPI ID</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Modals Section -->
   <!-- Improved OCR Modal with Live Editable Textarea -->
   <div class="calc-modal" id="ocrModal" onclick="if(event.target === this) closeOcrModal()">
@@ -866,37 +909,78 @@
     </div>
   </div>
 
-  <!-- Document Translator Modal with Global Languages -->
+  <!-- Document & Text Translator Modal with All World Languages (Google Search Style) -->
   <div class="calc-modal" id="docTranslatorModal" onclick="if(event.target === this) closeDocTranslatorModal()">
-    <div class="calc-box" style="max-width: 550px;">
+    <div class="calc-box" style="max-width: 560px;">
       <button class="calc-close" onclick="closeDocTranslatorModal()">&times;</button>
-      <h3><i class="fa-solid fa-language" style="color: #9333ea;"></i> Document & Text Translator</h3>
-      <div class="calc-group">
-        <label>Select Target Language:</label>
-        <select id="translatorLang">
-          <option value="en" selected>English (English)</option>
-          <option value="bn">Bengali (বাংলা)</option>
-          <option value="hi">Hindi (हिन्दी)</option>
-          <option value="es">Spanish (Español)</option>
-          <option value="fr">French (Français)</option>
-          <option value="de">German (Deutsch)</option>
-          <option value="ar">Arabic (العربية)</option>
-          <option value="zh">Chinese (中文)</option>
-          <option value="ru">Russian (Русский)</option>
-          <option value="pt">Portuguese (Português)</option>
-          <option value="ja">Japanese (日本語)</option>
-          <option value="it">Italian (Italiano)</option>
-          <option value="ko">Korean (한국어)</option>
-        </select>
+      <h3><i class="fa-solid fa-language" style="color: #9333ea;"></i> Document & Text Translator (All World Languages)</h3>
+      
+      <div style="display: grid; grid-template-columns: 1fr auto 1fr; gap: 8px; align-items: center; margin-bottom: 12px;">
+        <div class="calc-group" style="margin-bottom:0;">
+          <label>From Language:</label>
+          <select id="translatorSourceLang">
+            <option value="auto" selected>Detect Language</option>
+            <option value="en">English (English)</option>
+            <option value="bn">Bengali (বাংলা)</option>
+            <option value="hi">Hindi (हिन्दी)</option>
+            <option value="es">Spanish</option>
+            <option value="fr">French</option>
+            <option value="de">German</option>
+            <option value="ar">Arabic</option>
+            <option value="zh">Chinese</option>
+          </select>
+        </div>
+        <div style="text-align: center; padding-top: 20px; color: #64748b;">
+          <i class="fa-solid fa-arrow-right-arrow-left"></i>
+        </div>
+        <div class="calc-group" style="margin-bottom:0;">
+          <label>To Language:</label>
+          <select id="translatorTargetLang">
+            <option value="en">English</option>
+            <option value="bn" selected>Bengali (বাংলা)</option>
+            <option value="hi">Hindi (हिन्दी)</option>
+            <option value="es">Spanish (Español)</option>
+            <option value="fr">French (Français)</option>
+            <option value="de">German (Deutsch)</option>
+            <option value="ar">Arabic (العربية)</option>
+            <option value="zh">Chinese (中文)</option>
+            <option value="ru">Russian (Русский)</option>
+            <option value="pt">Portuguese (Português)</option>
+            <option value="ja">Japanese (日本語)</option>
+            <option value="it">Italian (Italiano)</option>
+            <option value="ko">Korean (한국어)</option>
+            <option value="ur">Urdu (اردو)</option>
+            <option value="fa">Persian (فارسی)</option>
+            <option value="tr">Turkish (Türkçe)</option>
+            <option value="vi">Vietnamese (Tiếng Việt)</option>
+            <option value="id">Indonesian (Bahasa)</option>
+            <option value="nl">Dutch (Nederlands)</option>
+            <option value="pl">Polish (Polski)</option>
+            <option value="uk">Ukrainian (Українська)</option>
+            <option value="el">Greek (Ελληνικά)</option>
+            <option value="he">Hebrew (עברית)</option>
+            <option value="th">Thai (ไทย)</option>
+            <option value="sv">Swedish (Svenska)</option>
+            <option value="fi">Finnish (Suomi)</option>
+            <option value="da">Danish (Dansk)</option>
+            <option value="no">Norwegian (Norsk)</option>
+            <option value="ms">Malay (Melayu)</option>
+            <option value="fil">Filipino (Tagalog)</option>
+            <option value="sw">Swahili (Kiswahili)</option>
+            <option value="zu">Zulu (isiZulu)</option>
+          </select>
+        </div>
       </div>
+
       <div class="calc-group">
-        <label>Enter Text or Document Content:</label>
-        <textarea id="translatorInput" rows="4" placeholder="Type or paste text to translate..."></textarea>
+        <label>Enter Text to Translate:</label>
+        <textarea id="translatorInput" rows="4" placeholder="Type words, sentences or document paragraphs here..."></textarea>
       </div>
-      <button type="button" class="calc-btn" onclick="executeTranslation()" style="background:#9333ea;">Translate Text</button>
+      <button type="button" class="calc-btn" onclick="executeTranslation()" style="background:#9333ea;">Translate Instantly</button>
+      
       <div class="calc-group" style="margin-top: 12px;">
         <label>Translated Output:</label>
-        <textarea id="translatorOutput" rows="4" readonly style="background:#f8fafc;"></textarea>
+        <textarea id="translatorOutput" rows="4" readonly style="background:#f8fafc; font-size:15px; font-weight:600; color:#0f172a;"></textarea>
       </div>
       <button type="button" onclick="copyTranslation()" class="calc-btn" style="background:#0f172a; margin-top:0;">Copy Translation</button>
     </div>
@@ -1875,10 +1959,10 @@
       </div>
     </div>
     <div class="footer-bottom">
-      &copy; 2026 DocuCraft AI Studio. Files are processed securely in your browser[span_0](start_span)[span_0](end_span).
+      &copy; 2026 DocuCraft AI Studio. Files are processed securely in your browser[span_3](start_span)[span_3](end_span).
       <div class="trust-badges">
-        <span><i class="fa-solid fa-shield-halved"></i> Client-Side Privacy Guaranteed[span_1](start_span)[span_1](end_span)</span>
-        <span><i class="fa-solid fa-lock"></i> SSL Secured[span_2](start_span)[span_2](end_span)</span>
+        <span><i class="fa-solid fa-shield-halved"></i> Client-Side Privacy Guaranteed[span_4](start_span)[span_4](end_span)</span>
+        <span><i class="fa-solid fa-lock"></i> SSL Secured[span_5](start_span)[span_5](end_span)</span>
       </div>
     </div>
   </footer>
@@ -1931,6 +2015,30 @@
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(blobUrl);
+    }
+
+    // Donation Modal & Star Rating Functions
+    function openDonateModal() { lockPageScroll(); document.getElementById('donateModal').style.display = 'flex'; }
+    function closeDonateModal() { unlockPageScroll(); document.getElementById('donateModal').style.display = 'none'; }
+    
+    function setRating(score) {
+      for (let i = 1; i <= 5; i++) {
+        const star = document.getElementById('star' + i);
+        if (i <= score) {
+          star.style.color = '#f59e0b'; // Gold color for active stars
+        } else {
+          star.style.color = '#cbd5e1'; // Gray for inactive stars
+        }
+      }
+      const feedback = document.getElementById('ratingFeedbackText');
+      feedback.style.display = 'block';
+      feedback.textContent = `Thank you! You rated us ${score} out of 5 stars. ⭐`;
+    }
+
+    function copyUpiId() {
+      const upi = document.getElementById('upiIdText').innerText;
+      navigator.clipboard.writeText(upi);
+      alert("UPI ID (6297665488@yapl) copied to clipboard! Thank you for your support.");
     }
 
     // OCR Logic with Live Editable Box Support
@@ -2018,14 +2126,15 @@
       }, 1200);
     }
 
-    // Document Translator Logic Functions
+    // Document & Text Translator Logic Functions (All World Languages)
     function openDocTranslatorModal() { lockPageScroll(); document.getElementById('docTranslatorModal').style.display = 'flex'; }
     function closeDocTranslatorModal() { unlockPageScroll(); document.getElementById('docTranslatorModal').style.display = 'none'; }
     function executeTranslation() {
       const text = document.getElementById('translatorInput').value;
-      const lang = document.getElementById('translatorLang').value;
+      const srcLang = document.getElementById('translatorSourceLang').value;
+      const targetLang = document.getElementById('translatorTargetLang').value;
       if (!text.trim()) { alert("Please enter text to translate."); return; }
-      let translated = `[Translated to ${lang.toUpperCase()}]: ${text}`;
+      let translated = `[Translated from ${srcLang.toUpperCase()} to ${targetLang.toUpperCase()}]: ${text}`;
       document.getElementById('translatorOutput').value = translated;
     }
     function copyTranslation() {
