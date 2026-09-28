@@ -77,7 +77,7 @@
       -webkit-overflow-scrolling: touch; overscroll-behavior: contain;
     }
     .calc-box {
-      background: #ffffff; width: 100%; max-width: 560px; border-radius: 20px; padding: 26px;
+      background: #ffffff; width: 100%; max-width: 520px; border-radius: 20px; padding: 22px;
       box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5) !important; position: relative; max-height: 90vh; overflow-y: auto; z-index: 100000;
     }
     .calc-box h3 { margin-top: 0; margin-bottom: 16px; font-size: 1.25rem; font-weight: 700; color: #0f172a; display: flex; align-items: center; gap: 8px; }
@@ -112,61 +112,83 @@
       color: #0f172a !important;
     }
 
-    /* Professional Modern Translator Card Styling */
+    /* Professional & Clean Compact Translator Styling */
     .translator-wrapper {
       width: 100%;
       background: #ffffff;
-      border-radius: 20px;
+      border-radius: 16px;
     }
     .translator-top-header {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      margin-bottom: 20px;
+      margin-bottom: 14px;
       border-bottom: 1px solid #f1f5f9;
-      padding-bottom: 14px;
+      padding-bottom: 10px;
     }
     .translator-brand-title {
       display: flex;
       align-items: center;
-      gap: 12px;
-      font-size: 22px;
+      gap: 10px;
+      font-size: 20px;
       font-weight: 800;
       color: #0f172a;
     }
     .translator-brand-logo {
-      width: 42px;
-      height: 42px;
-      border-radius: 12px;
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
       background: linear-gradient(135deg, #9333ea, #7e22ce);
       color: #fff;
       display: flex;
       align-items: center;
       justify-content: center;
       font-weight: bold;
-      font-size: 18px;
-      box-shadow: 0 4px 12px rgba(147, 51, 234, 0.3);
+      font-size: 15px;
+      box-shadow: 0 3px 10px rgba(147, 51, 234, 0.3);
     }
     .translator-grid-row {
-      display: grid;
-      grid-template-columns: 1fr 45px 1fr;
-      gap: 10px;
-      align-items: end;
-      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+    .translator-lang-group {
+      flex: 1;
+    }
+    .translator-lang-group label {
+      display: block;
+      font-size: 12px;
+      font-weight: 600;
+      color: #64748b;
+      margin-bottom: 4px;
+    }
+    .translator-select-box {
+      width: 100%;
+      border: 1px solid #cbd5e1;
+      border-radius: 10px;
+      padding: 8px 10px;
+      font-size: 13.5px;
+      background: #f8fafc;
+      outline: none;
+      color: #1e293b;
+      font-weight: 600;
+      box-sizing: border-box;
     }
     .translator-swap-btn {
-      width: 42px;
-      height: 42px;
+      width: 38px;
+      height: 38px;
       border: 0;
       border-radius: 50%;
       background: #f1f5f9;
       color: #475569;
-      font-size: 18px;
+      font-size: 15px;
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
-      margin-bottom: 2px;
+      margin-top: 18px;
       transition: all 0.2s ease;
     }
     .translator-swap-btn:hover {
@@ -176,15 +198,15 @@
     .translator-textarea-box {
       width: 100%;
       border: 1px solid #cbd5e1;
-      border-radius: 12px;
-      padding: 14px;
-      font-size: 15px;
+      border-radius: 10px;
+      padding: 10px 12px;
+      font-size: 14px;
       background: #f8fafc;
       outline: none;
       font-family: inherit;
       resize: vertical;
-      min-height: 110px;
-      line-height: 1.5;
+      min-height: 85px;
+      line-height: 1.4;
       color: #1e293b;
       box-sizing: border-box;
     }
@@ -194,30 +216,30 @@
       box-shadow: 0 0 0 3px rgba(147, 51, 234, 0.15);
     }
     .translator-output-box {
-      min-height: 110px;
+      min-height: 85px;
       white-space: pre-wrap;
       word-break: break-word;
       background: #f8fafc;
       border: 1px solid #cbd5e1;
-      border-radius: 12px;
-      padding: 14px;
-      font-size: 15px;
-      line-height: 1.5;
+      border-radius: 10px;
+      padding: 10px 12px;
+      font-size: 14px;
+      line-height: 1.4;
       color: #0f172a;
       font-weight: 600;
     }
     .translator-action-btn {
       width: 100%;
-      margin-top: 14px;
-      padding: 14px;
+      margin-top: 12px;
+      padding: 12px;
       border: 0;
-      border-radius: 12px;
+      border-radius: 10px;
       background: linear-gradient(135deg, #9333ea, #7e22ce);
       color: #fff;
-      font-size: 16px;
+      font-size: 15px;
       font-weight: 700;
       cursor: pointer;
-      box-shadow: 0 4px 12px rgba(147, 51, 234, 0.3);
+      box-shadow: 0 3px 10px rgba(147, 51, 234, 0.3);
       transition: opacity 0.2s;
     }
     .translator-action-btn:hover {
@@ -225,28 +247,18 @@
     }
     .translator-copy-btn {
       width: 100%;
-      margin-top: 12px;
-      padding: 13px;
+      margin-top: 10px;
+      padding: 11px;
       border: 0;
-      border-radius: 12px;
+      border-radius: 10px;
       background: #0f172a;
       color: white;
-      font-size: 16px;
+      font-size: 15px;
       font-weight: 700;
       cursor: pointer;
     }
     .translator-copy-btn:hover {
       background: #1e293b;
-    }
-    @media(max-width: 600px) {
-      .translator-grid-row {
-        grid-template-columns: 1fr;
-      }
-      .translator-swap-btn {
-        transform: rotate(90deg);
-        justify-self: center;
-        margin: 4px 0;
-      }
     }
   </style>
 
@@ -1042,21 +1054,21 @@
         </div>
 
         <div class="translator-grid-row">
-          <div>
+          <div class="translator-lang-group">
             <label>From Language:</label>
-            <select id="fromLang" class="translator-textarea-box" style="padding: 12px;"></select>
+            <select id="fromLang" class="translator-select-box"></select>
           </div>
           <button class="translator-swap-btn" onclick="swapLanguages()" title="Swap Languages">
             <i class="fa-solid fa-arrow-right-arrow-left"></i>
           </button>
-          <div>
+          <div class="translator-lang-group">
             <label>To Language:</label>
-            <select id="toLang" class="translator-textarea-box" style="padding: 12px;"></select>
+            <select id="toLang" class="translator-select-box"></select>
           </div>
         </div>
 
-        <div style="margin-top: 14px;">
-          <label>Enter Text to Translate:</label>
+        <div style="margin-top: 10px;">
+          <label style="font-size: 12px; font-weight: 600; color: #64748b; margin-bottom: 4px;">Enter Text to Translate:</label>
           <textarea id="inputText" class="translator-textarea-box" placeholder="Type words, sentences or document paragraphs here..."></textarea>
         </div>
 
@@ -1064,10 +1076,10 @@
           Translate Instantly
         </button>
 
-        <div style="margin-top: 14px;">
-          <label>Translated Output:</label>
-          <div class="translator-output" id="output"></div>
-          <div class="status" id="status" style="margin-top: 6px; font-size: 13px; color: #64748b;"></div>
+        <div style="margin-top: 10px;">
+          <label style="font-size: 12px; font-weight: 600; color: #64748b; margin-bottom: 4px;">Translated Output:</label>
+          <div class="translator-output-box" id="output"></div>
+          <div class="status" id="status" style="margin-top: 6px; font-size: 12px; color: #64748b;"></div>
         </div>
 
         <button class="translator-copy-btn" onclick="copyTranslation()">
@@ -2051,10 +2063,10 @@
       </div>
     </div>
     <div class="footer-bottom">
-      &copy; 2026 DocuCraft AI Studio. Files are processed securely in your browser[span_1](start_span)[span_1](end_span).
+      &copy; 2026 DocuCraft AI Studio. Files are processed securely in your browser[span_0](start_span)[span_0](end_span).
       <div class="trust-badges">
-        <span><i class="fa-solid fa-shield-halved"></i> Client-Side Privacy Guaranteed[span_2](start_span)[span_2](end_span)</span>
-        <span><i class="fa-solid fa-lock"></i> SSL Secured[span_3](start_span)[span_3](end_span)</span>
+        <span><i class="fa-solid fa-shield-halved"></i> Client-Side Privacy Guaranteed[span_1](start_span)[span_1](end_span)</span>
+        <span><i class="fa-solid fa-lock"></i> SSL Secured[span_2](start_span)[span_2](end_span)</span>
       </div>
     </div>
   </footer>
