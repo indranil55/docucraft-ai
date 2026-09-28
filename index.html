@@ -37,7 +37,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer">
   
   <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
-  <link rel="stylesheet" href="style.css?v=2.6">
+  <link rel="stylesheet" href="style.css?v=2.5">
 
   <style>
     .nav-container { display: flex; align-items: center; justify-content: space-between; padding: 12px 20px; }
@@ -50,27 +50,6 @@
       box-shadow: 0 2px 5px rgba(239, 68, 68, 0.4); animation: pulseBadge 2s infinite ease-in-out;
     }
     @keyframes pulseBadge { 0%, 100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.06); opacity: 0.92; } }
-
-    /* Custom Stylish Blue-Red Login/Auth Icon Button */
-    .auth-icon-btn {
-      width: 42px;
-      height: 42px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, #2563eb, #dc2626) !important;
-      color: #ffffff !important;
-      border: 2px solid rgba(255, 255, 255, 0.3);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 16px;
-      cursor: pointer;
-      box-shadow: 0 4px 15px rgba(37, 99, 235, 0.4);
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
-    }
-    .auth-icon-btn:hover {
-      transform: scale(1.08);
-      box-shadow: 0 6px 20px rgba(220, 38, 38, 0.5);
-    }
 
     .search-wrapper { max-width: 580px; margin: -10px auto 25px auto; padding: 0 15px; position: relative; }
     .search-box-inner {
@@ -389,160 +368,11 @@
     </div>
   </div>
 
-  <!-- Main Tools Grid (Individual & Distinct Converter Tools) -->
+  <!-- Main Tools Grid (Clean, Non-Duplicate Master List) -->
   <main class="main-grid-container">
     <div class="tools-grid" id="toolsGrid">
       
-      <!-- Convert to PDF Individual Tools -->
-      <div class="tool-card" data-cat="toPdf" onclick="launchTool('jpgToPdf')">
-        <div class="tool-icon" style="background:#eff6ff; color:#2563eb;"><i class="fa-solid fa-file-image"></i></div>
-        <h3>Image to pdf</h3>
-        <p>Convert gallery pictures, screenshots, or document scans into exact image-sized PDF (1 KB - 500 MB / 1 MB - 500 MB).</p>
-        <span class="tool-meta">Open Tool &rarr;</span>
-      </div>
-
-      <div class="tool-card" data-cat="toPdf" onclick="launchTool('jpgToPdf')">
-        <div class="tool-icon" style="background:#eff6ff; color:#2563eb;"><i class="fa-solid fa-file-image"></i></div>
-        <h3>Jpg to pdf</h3>
-        <p>Convert individual or multiple JPG images into a single professional PDF file (1 KB - 500 MB).</p>
-        <span class="tool-meta">Open Tool &rarr;</span>
-      </div>
-
-      <div class="tool-card" data-cat="toPdf" onclick="launchTool('jpgToPdf')">
-        <div class="tool-icon" style="background:#eff6ff; color:#2563eb;"><i class="fa-solid fa-file-image"></i></div>
-        <h3>Png to pdf</h3>
-        <p>Transform transparent or standard PNG graphic images into crisp PDF pages (1 KB - 500 MB).</p>
-        <span class="tool-meta">Open Tool &rarr;</span>
-      </div>
-
-      <div class="tool-card" data-cat="toPdf" onclick="launchTool('wordToPdf')">
-        <div class="tool-icon" style="background:#eff6ff; color:#2563eb;"><i class="fa-solid fa-file-word"></i></div>
-        <h3>Docx to pdf</h3>
-        <p>Convert Microsoft Word DOCX documents to clean, standardized PDF format instantly (1 KB - 500 MB).</p>
-        <span class="tool-meta">Open Tool &rarr;</span>
-      </div>
-
-      <div class="tool-card" data-cat="toPdf" onclick="launchTool('wordToPdf')">
-        <div class="tool-icon" style="background:#eff6ff; color:#2563eb;"><i class="fa-solid fa-file-word"></i></div>
-        <h3>Word to pdf</h3>
-        <p>Convert standard Word document files into secure and shareable PDF format (1 KB - 500 MB).</p>
-        <span class="tool-meta">Open Tool &rarr;</span>
-      </div>
-
-      <div class="tool-card" data-cat="toPdf" onclick="launchTool('excelToPdf')">
-        <div class="tool-icon" style="background:#eff6ff; color:#2563eb;"><i class="fa-solid fa-file-excel"></i></div>
-        <h3>Excel to pdf</h3>
-        <p>Convert Excel spreadsheets, tables and financial grids into formatted PDF documents (1 KB - 500 MB).</p>
-        <span class="tool-meta">Open Tool &rarr;</span>
-      </div>
-
-      <div class="tool-card" data-cat="toPdf" onclick="launchTool('excelToPdf')">
-        <div class="tool-icon" style="background:#eff6ff; color:#2563eb;"><i class="fa-solid fa-file-excel"></i></div>
-        <h3>Xls to pdf</h3>
-        <p>Transform old Microsoft Excel XLS sheets into clean, printable PDF documents (1 KB - 500 MB).</p>
-        <span class="tool-meta">Open Tool &rarr;</span>
-      </div>
-
-      <div class="tool-card" data-cat="toPdf" onclick="launchTool('excelToPdf')">
-        <div class="tool-icon" style="background:#eff6ff; color:#2563eb;"><i class="fa-solid fa-file-excel"></i></div>
-        <h3>Xlsx to pdf</h3>
-        <p>Convert modern XLSX spreadsheet files into structured PDF reports (1 KB - 500 MB).</p>
-        <span class="tool-meta">Open Tool &rarr;</span>
-      </div>
-
-      <div class="tool-card" data-cat="toPdf" onclick="launchTool('pptToPdf')">
-        <div class="tool-icon" style="background:#eff6ff; color:#2563eb;"><i class="fa-solid fa-file-powerpoint"></i></div>
-        <h3>PowerPoint to pdf</h3>
-        <p>Transform slideshow decks and presentations into portable PDF documents (1 KB - 500 MB).</p>
-        <span class="tool-meta">Open Tool &rarr;</span>
-      </div>
-
-      <div class="tool-card" data-cat="toPdf" onclick="launchTool('pptToPdf')">
-        <div class="tool-icon" style="background:#eff6ff; color:#2563eb;"><i class="fa-solid fa-file-powerpoint"></i></div>
-        <h3>Ppt to pdf</h3>
-        <p>Convert PPT slide presentations directly into structured PDF file formats (1 KB - 500 MB).</p>
-        <span class="tool-meta">Open Tool &rarr;</span>
-      </div>
-
-      <div class="tool-card" data-cat="toPdf" onclick="launchTool('pptToPdf')">
-        <div class="tool-icon" style="background:#eff6ff; color:#2563eb;"><i class="fa-solid fa-file-powerpoint"></i></div>
-        <h3>Pptx to pdf</h3>
-        <p>Export modern PowerPoint PPTX presentation slides into clean PDF view files (1 KB - 500 MB).</p>
-        <span class="tool-meta">Open Tool &rarr;</span>
-      </div>
-
-      <div class="tool-card" data-cat="toPdf" onclick="launchTool('htmlToPdf')">
-        <div class="tool-icon" style="background:#eff6ff; color:#2563eb;"><i class="fa-solid fa-code"></i></div>
-        <h3>Html to pdf</h3>
-        <p>Convert HTML markup text or live web page content into downloadable PDF files (1 KB - 500 MB).</p>
-        <span class="tool-meta">Open Tool &rarr;</span>
-      </div>
-
-      <div class="tool-card" data-cat="toPdf" onclick="launchTool('htmlToPdf')">
-        <div class="tool-icon" style="background:#eff6ff; color:#2563eb;"><i class="fa-solid fa-globe"></i></div>
-        <h3>Web to pdf</h3>
-        <p>Capture and convert online web pages or link markup directly into PDF layout (1 KB - 500 MB).</p>
-        <span class="tool-meta">Open Tool &rarr;</span>
-      </div>
-
-      <!-- Convert from PDF Individual Tools -->
-      <div class="tool-card" data-cat="fromPdf" onclick="launchTool('pdfToJpg')">
-        <div class="tool-icon" style="background:#eff6ff; color:#2563eb;"><i class="fa-solid fa-image"></i></div>
-        <h3>Pdf to Image</h3>
-        <p>Extract all pages or individual visual graphics from a PDF into high-res images (1 KB - 500 MB).</p>
-        <span class="tool-meta">Open Tool &rarr;</span>
-      </div>
-
-      <div class="tool-card" data-cat="fromPdf" onclick="launchTool('pdfToJpg')">
-        <div class="tool-icon" style="background:#eff6ff; color:#2563eb;"><i class="fa-solid fa-image"></i></div>
-        <h3>Jpg to Image</h3>
-        <p>Extract and convert PDF pages into standard picture formats instantly (1 KB - 500 MB).</p>
-        <span class="tool-meta">Open Tool &rarr;</span>
-      </div>
-
-      <div class="tool-card" data-cat="fromPdf" onclick="launchTool('pdfToJpg')">
-        <div class="tool-icon" style="background:#eff6ff; color:#2563eb;"><i class="fa-solid fa-image"></i></div>
-        <h3>Png to image</h3>
-        <p>Convert PDF pages into transparent or high quality PNG image files (1 KB - 500 MB).</p>
-        <span class="tool-meta">Open Tool &rarr;</span>
-      </div>
-
-      <div class="tool-card" data-cat="fromPdf" onclick="launchTool('pdfToWord')">
-        <div class="tool-icon" style="background:#eff6ff; color:#2563eb;"><i class="fa-solid fa-file-lines"></i></div>
-        <h3>Pdf to word</h3>
-        <p>Convert non-editable PDF files into fully editable Microsoft Word DOCX documents (1 KB - 500 MB).</p>
-        <span class="tool-meta">Open Tool &rarr;</span>
-      </div>
-
-      <div class="tool-card" data-cat="fromPdf" onclick="launchTool('pdfToWord')">
-        <div class="tool-icon" style="background:#eff6ff; color:#2563eb;"><i class="fa-solid fa-file-lines"></i></div>
-        <h3>Docx to word</h3>
-        <p>Manage and format text data smoothly between document layouts (1 KB - 500 MB).</p>
-        <span class="tool-meta">Open Tool &rarr;</span>
-      </div>
-
-      <div class="tool-card" data-cat="fromPdf" onclick="launchTool('pdfToExcel')">
-        <div class="tool-icon" style="background:#eff6ff; color:#2563eb;"><i class="fa-solid fa-table-cells"></i></div>
-        <h3>Pdf to excel</h3>
-        <p>Extract tables, cell grids, and financial numerical sheets from PDF files into Excel (1 KB - 500 MB).</p>
-        <span class="tool-meta">Open Tool &rarr;</span>
-      </div>
-
-      <div class="tool-card" data-cat="fromPdf" onclick="launchTool('pdfToExcel')">
-        <div class="tool-icon" style="background:#eff6ff; color:#2563eb;"><i class="fa-solid fa-table-cells"></i></div>
-        <h3>Pdf to xlsx</h3>
-        <p>Export scanned or text PDF tables directly into modern Excel XLSX sheets (1 KB - 500 MB).</p>
-        <span class="tool-meta">Open Tool &rarr;</span>
-      </div>
-
-      <div class="tool-card" data-cat="fromPdf" onclick="openOcrModal()">
-        <div class="tool-icon" style="background:#f3e8ff; color:#9333ea;"><i class="fa-solid fa-file-lines"></i></div>
-        <h3>Ocr image to text</h3>
-        <p>Extract accurate text from book pages or pictures in Bengali, Hindi, or English instantly (1 KB - 500 MB).</p>
-        <span class="tool-meta">Open Tool &rarr;</span>
-      </div>
-
-      <!-- Other Utility & Generator Tools -->
+      <!-- New Added Tools: PDF Scanner, Zip to PDF, DocuCraft AI Translator -->
       <div class="tool-card" data-cat="document" onclick="openPdfScannerModal()">
         <div class="tool-icon" style="background:#e0f2fe; color:#0284c7;"><i class="fa-solid fa-scanner"></i></div>
         <h3>PDF Scanner & Enhancer <span class="badge-new">NEW</span></h3>
@@ -564,6 +394,7 @@
         <span class="tool-meta">Open Translator &rarr;</span>
       </div>
 
+      <!-- Repair PDF Tool Card -->
       <div class="tool-card" data-cat="editSecurity" onclick="openRepairPdfModal()">
         <div class="tool-icon" style="background:#fef3c7; color:#d97706;"><i class="fa-solid fa-wrench"></i></div>
         <h3>Repair PDF (Fix Corrupted File) <span class="badge-new">NEW</span></h3>
@@ -984,6 +815,69 @@
         <span class="tool-meta">Open Tool &rarr;</span>
       </div>
 
+      <div class="tool-card" data-cat="toPdf" onclick="launchTool('jpgToPdf')">
+        <div class="tool-icon" style="background:#eff6ff; color:#2563eb;"><i class="fa-solid fa-file-image"></i></div>
+        <h3>Image to PDF (JPG/PNG to PDF)</h3>
+        <p>Convert gallery pictures, screenshots, or document scans into a standard A4 PDF (1 KB - 500 MB).</p>
+        <span class="tool-meta">Open Tool &rarr;</span>
+      </div>
+
+      <div class="tool-card" data-cat="toPdf" onclick="launchTool('wordToPdf')">
+        <div class="tool-icon" style="background:#eff6ff; color:#2563eb;"><i class="fa-solid fa-file-word"></i></div>
+        <h3>Docx to PDF (Word to PDF)</h3>
+        <p>Convert Microsoft Word documents to clean, standardized PDF format instantly (1 KB - 500 MB).</p>
+        <span class="tool-meta">Open Tool &rarr;</span>
+      </div>
+
+      <div class="tool-card" data-cat="toPdf" onclick="launchTool('excelToPdf')">
+        <div class="tool-icon" style="background:#eff6ff; color:#2563eb;"><i class="fa-solid fa-file-excel"></i></div>
+        <h3>Excel to PDF (XLS/XLSX to PDF)</h3>
+        <p>Convert Excel spreadsheets and tables into formatted, printable PDF documents (1 KB - 500 MB).</p>
+        <span class="tool-meta">Open Tool &rarr;</span>
+      </div>
+
+      <div class="tool-card" data-cat="toPdf" onclick="launchTool('pptToPdf')">
+        <div class="tool-icon" style="background:#eff6ff; color:#2563eb;"><i class="fa-solid fa-file-powerpoint"></i></div>
+        <h3>PowerPoint to PDF (PPT/PPTX to PDF)</h3>
+        <p>Transform slideshow decks and presentations into portable PDF files (1 KB - 500 MB).</p>
+        <span class="tool-meta">Open Tool &rarr;</span>
+      </div>
+
+      <div class="tool-card" data-cat="toPdf" onclick="launchTool('htmlToPdf')">
+        <div class="tool-icon" style="background:#eff6ff; color:#2563eb;"><i class="fa-solid fa-code"></i></div>
+        <h3>HTML / Web to PDF</h3>
+        <p>Convert HTML text, markup, or web content into downloadable PDF pages (1 KB - 500 MB).</p>
+        <span class="tool-meta">Open Tool &rarr;</span>
+      </div>
+
+      <div class="tool-card" data-cat="fromPdf" onclick="launchTool('pdfToJpg')">
+        <div class="tool-icon" style="background:#eff6ff; color:#2563eb;"><i class="fa-solid fa-image"></i></div>
+        <h3>PDF to Image (PDF to JPG/PNG)</h3>
+        <p>Extract all pages or individual visual graphics from a PDF into JPG images (1 KB - 500 MB).</p>
+        <span class="tool-meta">Open Tool &rarr;</span>
+      </div>
+
+      <div class="tool-card" data-cat="fromPdf" onclick="launchTool('pdfToWord')">
+        <div class="tool-icon" style="background:#eff6ff; color:#2563eb;"><i class="fa-solid fa-file-lines"></i></div>
+        <h3>PDF to Word (PDF to DOCX)</h3>
+        <p>Convert PDF documents into editable Word files with intact textual layout (1 KB - 500 MB).</p>
+        <span class="tool-meta">Open Tool &rarr;</span>
+      </div>
+
+      <div class="tool-card" data-cat="fromPdf" onclick="launchTool('pdfToExcel')">
+        <div class="tool-icon" style="background:#eff6ff; color:#2563eb;"><i class="fa-solid fa-table-cells"></i></div>
+        <h3>PDF to Excel (PDF to XLSX)</h3>
+        <p>Extract tables, cell grids, and numerical sheets from PDF files into Excel (1 KB - 500 MB).</p>
+        <span class="tool-meta">Open Tool &rarr;</span>
+      </div>
+
+      <div class="tool-card" data-cat="fromPdf" onclick="openOcrModal()">
+        <div class="tool-icon" style="background:#f3e8ff; color:#9333ea;"><i class="fa-solid fa-file-lines"></i></div>
+        <h3>OCR - Image to Text</h3>
+        <p>Extract text from any image (JPG, PNG) in Bengali, Hindi, or English with live editing.</p>
+        <span class="tool-meta">Open Tool &rarr;</span>
+      </div>
+
       <div class="tool-card" data-cat="editSecurity" onclick="launchTool('editPdf')">
         <div class="tool-icon" style="background:#fef3c7; color:#d97706;"><i class="fa-solid fa-pen-nib"></i></div>
         <h3>Edit PDF</h3>
@@ -1085,7 +979,7 @@
   <div class="calc-modal" id="ocrModal" onclick="if(event.target === this) closeOcrModal()">
     <div class="calc-box" style="max-width: 600px;">
       <button class="calc-close" onclick="closeOcrModal()">&times;</button>
-      <h3><i class="fa-solid fa-file-lines" style="color: #9333ea;"></i> Ocr image to text</h3>
+      <h3><i class="fa-solid fa-file-lines" style="color: #9333ea;"></i> OCR - Image to Text</h3>
       <div class="calc-group">
         <label>Upload Image (1 KB - 500 MB):</label>
         <div style="border: 2px dashed #cbd5e1; border-radius: 12px; padding: 18px; text-align: center; background: #f8fafc; cursor: pointer; margin-bottom: 8px;" onclick="document.getElementById('ocrFileInput').click()">
@@ -2169,10 +2063,10 @@
       </div>
     </div>
     <div class="footer-bottom">
-      &copy; 2026 DocuCraft AI Studio. Files are processed securely in your browser[span_0](start_span)[span_0](end_span).
+      &copy; 2026 DocuCraft AI Studio. Files are processed securely in your browser[span_3](start_span)[span_3](end_span).
       <div class="trust-badges">
-        <span><i class="fa-solid fa-shield-halved"></i> Client-Side Privacy Guaranteed[span_1](start_span)[span_1](end_span)</span>
-        <span><i class="fa-solid fa-lock"></i> SSL Secured[span_2](start_span)[span_2](end_span)</span>
+        <span><i class="fa-solid fa-shield-halved"></i> Client-Side Privacy Guaranteed[span_4](start_span)[span_4](end_span)</span>
+        <span><i class="fa-solid fa-lock"></i> SSL Secured[span_5](start_span)[span_5](end_span)</span>
       </div>
     </div>
   </footer>
@@ -3036,7 +2930,7 @@
       "The quick brown fox jumps over the lazy dog. Technology and automation enable swift digital transformation.",
       "Artificial intelligence and machine learning algorithms process massive datasets securely, empowering developers."
     ];
-    function changeTypingLevel() { document.getElementById('typingSnippet').innerText = typingParagraphs[document.getElementById('typingLevelSelect'].value]; resetTypingTest(); }
+    function changeTypingLevel() { document.getElementById('typingSnippet').innerText = typingParagraphs[document.getElementById('typingLevelSelect').value]; resetTypingTest(); }
     let typingTimerSeconds = 60, typingInterval = null, typingStarted = false;
     function resetTypingTest() { clearInterval(typingInterval); typingTimerSeconds = 60; typingStarted = false; document.getElementById('typingTimer').innerText = '60'; document.getElementById('typingInputArea').value = ''; document.getElementById('typingInputArea').disabled = false; document.getElementById('typingOutput').style.display = 'none'; }
     function handleTypingInput() {
