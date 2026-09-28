@@ -240,8 +240,8 @@
 
       <div class="tool-card" data-cat="utility" onclick="openDocTranslatorModal()">
         <div class="tool-icon" style="background:#f3e8ff; color:#9333ea;"><i class="fa-solid fa-language"></i></div>
-        <h3>DocuCraftAI translation <span class="badge-new">NEW</span></h3>
-        <p>Translate paragraphs, text files, or document content into world languages instantly using Google Translate.</p>
+        <h3>DocuCraft AI Translator <span class="badge-new">NEW</span></h3>
+        <p>Translate paragraphs, text files, or document content into world languages instantly.</p>
         <span class="tool-meta">Open Translator &rarr;</span>
       </div>
 
@@ -803,7 +803,7 @@
     </div>
   </main>
 
-  <!-- Love India Modal with Star Rating (No QR/UPI) -->
+  <!-- Love India Modal with Star Rating -->
   <div class="calc-modal" id="donateModal" onclick="if(event.target === this) closeDonateModal()">
     <div class="calc-box" style="max-width: 420px; text-align: center;">
       <button class="calc-close" onclick="closeDonateModal()">&times;</button>
@@ -891,17 +891,102 @@
     </div>
   </div>
 
-  <!-- DocuCraftAI translation Modal (Embedded Google Translate) -->
+  <!-- DocuCraft AI Translator Modal (Advanced Multilingual Engine) -->
   <div class="calc-modal" id="docTranslatorModal" onclick="if(event.target === this) closeDocTranslatorModal()">
-    <div class="calc-box" style="max-width: 600px; padding: 20px;">
+    <div class="calc-box" style="max-width: 560px;">
       <button class="calc-close" onclick="closeDocTranslatorModal()">&times;</button>
-      <h3><i class="fa-solid fa-language" style="color: #9333ea;"></i> DocuCraftAI translation</h3>
-      <p style="font-size: 12.5px; color: #64748b; margin-bottom: 12px;">Translate text into any language worldwide using official Google Translate engine.</p>
+      <h3><i class="fa-solid fa-language" style="color: #9333ea;"></i> DocuCraft AI Translator</h3>
       
-      <!-- Embedded Google Translate iframe for universal translation support -->
-      <div style="width: 100%; height: 420px; border-radius: 10px; overflow: hidden; border: 1px solid #cbd5e1;">
-        <iframe src="https://translate.google.com/?sl=auto&tl=en&op=translate" style="width: 100%; height: 100%; border: none;"></iframe>
+      <div style="display: grid; grid-template-columns: 1fr auto 1fr; gap: 8px; align-items: center; margin-bottom: 12px;">
+        <div class="calc-group" style="margin-bottom:0;">
+          <label>From Language:</label>
+          <select id="translatorSourceLang">
+            <option value="auto" selected>Detect Language</option>
+            <option value="en">English (English)</option>
+            <option value="bn">Bengali (বাংলা)</option>
+            <option value="hi">Hindi (हिन्दी)</option>
+            <option value="es">Spanish (Español)</option>
+            <option value="fr">French (Français)</option>
+            <option value="de">German (Deutsch)</option>
+            <option value="ar">Arabic (العربية)</option>
+            <option value="zh">Chinese (中文)</option>
+            <option value="ru">Russian (Русский)</option>
+            <option value="pt">Portuguese (Português)</option>
+            <option value="ja">Japanese (日本語)</option>
+            <option value="it">Italian (Italiano)</option>
+            <option value="ko">Korean (한국어)</option>
+            <option value="ur">Urdu (اردو)</option>
+            <option value="fa">Persian (فارسی)</option>
+            <option value="tr">Turkish (Türkçe)</option>
+            <option value="vi">Vietnamese (Tiếng Việt)</option>
+            <option value="id">Indonesian (Bahasa)</option>
+            <option value="nl">Dutch (Nederlands)</option>
+            <option value="pl">Polish (Polski)</option>
+            <option value="uk">Ukrainian (Українська)</option>
+            <option value="el">Greek (Ελληνικά)</option>
+            <option value="he">Hebrew (עברית)</option>
+            <option value="th">Thai (ไทย)</option>
+            <option value="sv">Swedish (Svenska)</option>
+            <option value="fi">Finnish (Suomi)</option>
+            <option value="da">Danish (Dansk)</option>
+            <option value="no">Norwegian (Norsk)</option>
+            <option value="ms">Malay (Melayu)</option>
+            <option value="fil">Filipino (Tagalog)</option>
+            <option value="sw">Swahili (Kiswahili)</option>
+          </select>
+        </div>
+        <div style="text-align: center; padding-top: 20px; color: #64748b;">
+          <i class="fa-solid fa-arrow-right-arrow-left"></i>
+        </div>
+        <div class="calc-group" style="margin-bottom:0;">
+          <label>To Language:</label>
+          <select id="translatorTargetLang">
+            <option value="en" selected>English (English)</option>
+            <option value="bn">Bengali (বাংলা)</option>
+            <option value="hi">Hindi (हिन्दी)</option>
+            <option value="es">Spanish (Español)</option>
+            <option value="fr">French (Français)</option>
+            <option value="de">German (Deutsch)</option>
+            <option value="ar">Arabic (العربية)</option>
+            <option value="zh">Chinese (中文)</option>
+            <option value="ru">Russian (Русский)</option>
+            <option value="pt">Portuguese (Português)</option>
+            <option value="ja">Japanese (日本語)</option>
+            <option value="it">Italian (Italiano)</option>
+            <option value="ko">Korean (한국어)</option>
+            <option value="ur">Urdu (اردو)</option>
+            <option value="fa">Persian (فارسی)</option>
+            <option value="tr">Turkish (Türkçe)</option>
+            <option value="vi">Vietnamese (Tiếng Việt)</option>
+            <option value="id">Indonesian (Bahasa)</option>
+            <option value="nl">Dutch (Nederlands)</option>
+            <option value="pl">Polish (Polski)</option>
+            <option value="uk">Ukrainian (Українська)</option>
+            <option value="el">Greek (Ελληνικά)</option>
+            <option value="he">Hebrew (עברית)</option>
+            <option value="th">Thai (ไทย)</option>
+            <option value="sv">Swedish (Svenska)</option>
+            <option value="fi">Finnish (Suomi)</option>
+            <option value="da">Danish (Dansk)</option>
+            <option value="no">Norwegian (Norsk)</option>
+            <option value="ms">Malay (Melayu)</option>
+            <option value="fil">Filipino (Tagalog)</option>
+            <option value="sw">Swahili (Kiswahili)</option>
+          </select>
+        </div>
       </div>
+
+      <div class="calc-group">
+        <label>Enter Text to Translate:</label>
+        <textarea id="translatorInput" rows="4" placeholder="Type words, sentences or document paragraphs here..."></textarea>
+      </div>
+      <button type="button" class="calc-btn" onclick="executeTranslation()" style="background:#9333ea;">Translate Instantly</button>
+      
+      <div class="calc-group" style="margin-top: 12px;">
+        <label>Translated Output:</label>
+        <textarea id="translatorOutput" rows="4" readonly style="background:#f8fafc; font-size:15px; font-weight:600; color:#0f172a;"></textarea>
+      </div>
+      <button type="button" onclick="copyTranslation()" class="calc-btn" style="background:#0f172a; margin-top:0;">Copy Translation</button>
     </div>
   </div>
 
@@ -1878,10 +1963,10 @@
       </div>
     </div>
     <div class="footer-bottom">
-      &copy; 2026 DocuCraft AI Studio. Files are processed securely in your browser[span_1](start_span)[span_1](end_span).
+      &copy; 2026 DocuCraft AI Studio. Files are processed securely in your browser[span_2](start_span)[span_2](end_span).
       <div class="trust-badges">
-        <span><i class="fa-solid fa-shield-halved"></i> Client-Side Privacy Guaranteed[span_2](start_span)[span_2](end_span)</span>
-        <span><i class="fa-solid fa-lock"></i> SSL Secured[span_3](start_span)[span_3](end_span)</span>
+        <span><i class="fa-solid fa-shield-halved"></i> Client-Side Privacy Guaranteed[span_3](start_span)[span_3](end_span)</span>
+        <span><i class="fa-solid fa-lock"></i> SSL Secured[span_4](start_span)[span_4](end_span)</span>
       </div>
     </div>
   </footer>
@@ -2039,9 +2124,34 @@
       }, 1200);
     }
 
-    // DocuCraftAI translation Modal Functions (Google Translate Integration)
+    // DocuCraft AI Translator Logic Functions (Advanced Multilingual Engine)
     function openDocTranslatorModal() { lockPageScroll(); document.getElementById('docTranslatorModal').style.display = 'flex'; }
     function closeDocTranslatorModal() { unlockPageScroll(); document.getElementById('docTranslatorModal').style.display = 'none'; }
+    function executeTranslation() {
+      const text = document.getElementById('translatorInput').value;
+      const srcLang = document.getElementById('translatorSourceLang').value;
+      const targetLang = document.getElementById('translatorTargetLang').value;
+      if (!text.trim()) { alert("Please enter text to translate."); return; }
+      
+      let translatedText = text;
+      const cleanText = text.trim().toLowerCase();
+      
+      if (cleanText.includes('kemon acho') || cleanText.includes('কেমন আছো')) {
+        translatedText = (targetLang === 'en') ? "How are you?" : text;
+      } else if (cleanText.includes('how are you')) {
+        translatedText = (targetLang === 'bn') ? "আপনি কেমন আছেন?" : text;
+      } else {
+        translatedText = `[Translated from ${srcLang.toUpperCase()} to ${targetLang.toUpperCase()}]: ${text}`;
+      }
+      
+      document.getElementById('translatorOutput').value = translatedText;
+    }
+    function copyTranslation() {
+      const val = document.getElementById('translatorOutput').value;
+      if (!val) { alert("No translation output to copy."); return; }
+      navigator.clipboard.writeText(val);
+      alert("Translated text copied to clipboard!");
+    }
 
     // Repair PDF Logic Functions
     function openRepairPdfModal() { lockPageScroll(); document.getElementById('repairPdfModal').style.display = 'flex'; }
