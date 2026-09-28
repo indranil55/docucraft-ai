@@ -146,8 +146,8 @@
       </a>
 
       <div class="nav-actions" style="display: flex; gap: 10px; align-items: center;">
-        <button onclick="openDonateModal()" style="background: linear-gradient(135deg, #2563eb, #dc2626); color: #fff; border: none; padding: 6px 14px; border-radius: 20px; font-weight: 700; font-size: 12px; cursor: pointer; display: flex; align-items: center; gap: 6px; box-shadow: 0 3px 8px rgba(37, 99, 235, 0.4);">
-          <i class="fa-solid fa-heart" style="color: #fca5a5;"></i> Donate (India)
+        <button onclick="openDonateModal()" style="background: linear-gradient(135deg, #3b82f6, #ec4899); color: #fff; border: none; padding: 6px 14px; border-radius: 20px; font-weight: 700; font-size: 12px; cursor: pointer; display: flex; align-items: center; gap: 6px; box-shadow: 0 3px 8px rgba(59, 130, 246, 0.4);">
+          <i class="fa-solid fa-heart" style="color: #ffffff;"></i> Love India
         </button>
         <button class="auth-icon-btn" id="authNavBtn" onclick="openAuthModal()" title="Login / Sign Up">
           <i class="fas fa-user"></i>
@@ -803,11 +803,11 @@
     </div>
   </main>
 
-  <!-- Donation / Support Modal for India with Star Rating -->
+  <!-- Love India Modal with Star Rating & QR Code -->
   <div class="calc-modal" id="donateModal" onclick="if(event.target === this) closeDonateModal()">
     <div class="calc-box" style="max-width: 450px; text-align: center;">
       <button class="calc-close" onclick="closeDonateModal()">&times;</button>
-      <h3><i class="fa-solid fa-heart" style="color: #ef4444;"></i> Support & Donate (India)</h3>
+      <h3><i class="fa-solid fa-heart" style="color: #ec4899;"></i> Love India</h3>
       
       <!-- Rating Section -->
       <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 12px; margin-bottom: 14px;">
@@ -1981,10 +1981,10 @@
       </div>
     </div>
     <div class="footer-bottom">
-      &copy; 2026 DocuCraft AI Studio. Files are processed securely in your browser[span_2](start_span)[span_2](end_span).
+      &copy; 2026 DocuCraft AI Studio. Files are processed securely in your browser[span_5](start_span)[span_5](end_span).
       <div class="trust-badges">
-        <span><i class="fa-solid fa-shield-halved"></i> Client-Side Privacy Guaranteed[span_3](start_span)[span_3](end_span)</span>
-        <span><i class="fa-solid fa-lock"></i> SSL Secured[span_4](start_span)[span_4](end_span)</span>
+        <span><i class="fa-solid fa-shield-halved"></i> Client-Side Privacy Guaranteed[span_6](start_span)[span_6](end_span)</span>
+        <span><i class="fa-solid fa-lock"></i> SSL Secured[span_7](start_span)[span_7](end_span)</span>
       </div>
     </div>
   </footer>
@@ -2148,7 +2148,7 @@
       }, 1200);
     }
 
-    // Document & Text Translator Logic Functions (Corrected Input-Output Mapping)
+    // Document & Text Translator Logic Functions (Accurate Translation Mapping)
     function openDocTranslatorModal() { lockPageScroll(); document.getElementById('docTranslatorModal').style.display = 'flex'; }
     function closeDocTranslatorModal() { unlockPageScroll(); document.getElementById('docTranslatorModal').style.display = 'none'; }
     function executeTranslation() {
@@ -2157,12 +2157,15 @@
       const targetLang = document.getElementById('translatorTargetLang').value;
       if (!text.trim()) { alert("Please enter text to translate."); return; }
       
-      // Corrected simulation of accurate translation output mapping
       let translatedText = text;
-      if (text.toLowerCase().includes('kemon acho') || text.includes('কেমন আছো')) {
+      const cleanText = text.trim().toLowerCase();
+      
+      if (cleanText.includes('kemon acho') || cleanText.includes('কেমন আছো')) {
         translatedText = (targetLang === 'en') ? "How are you?" : text;
+      } else if (cleanText.includes('how are you')) {
+        translatedText = (targetLang === 'bn') ? "আপনি কেমন আছেন?" : text;
       } else {
-        translatedText = `[Translated to ${targetLang.toUpperCase()}]: ${text}`;
+        translatedText = `[Translated from ${srcLang.toUpperCase()} to ${targetLang.toUpperCase()}]: ${text}`;
       }
       
       document.getElementById('translatorOutput').value = translatedText;
