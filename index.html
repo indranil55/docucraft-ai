@@ -36,6 +36,8 @@
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer">
   
+  <!-- Tesseract OCR Library -->
+  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
   <link rel="stylesheet" href="style.css?v=2.5">
 
@@ -51,6 +53,17 @@
     }
     @keyframes pulseBadge { 0%, 100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.06); opacity: 0.92; } }
 
+    .donate-nav-btn {
+      display: inline-flex; align-items: center; gap: 6px; background: linear-gradient(135deg, #10b981, #059669);
+      color: #fff; font-size: 13px; font-weight: 700; padding: 8px 14px; border-radius: 9999px;
+      text-decoration: none; border: none; cursor: pointer; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .donate-nav-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(16, 185, 129, 0.4); }
+
+    .star-rating { display: flex; justify-content: center; gap: 8px; font-size: 24px; color: #cbd5e1; cursor: pointer; margin: 12px 0; }
+    .star-rating .fa-star.active { color: #f59e0b; }
+
     .search-wrapper { max-width: 580px; margin: -10px auto 25px auto; padding: 0 15px; position: relative; }
     .search-box-inner {
       display: flex; align-items: center; background: #ffffff; border: 2px solid #e2e8f0;
@@ -62,12 +75,7 @@
     .search-input { width: 100%; border: none; outline: none; font-size: 15px; font-family: inherit; color: #1e293b; background: transparent; }
     
     body.modal-open {
-      position: fixed !important;
-      width: 100% !important;
-      height: 100% !important;
-      overflow: hidden !important;
-      left: 0;
-      top: 0;
+      position: fixed !important; width: 100% !important; height: 100% !important; overflow: hidden !important; left: 0; top: 0;
     }
 
     .calc-modal {
@@ -103,14 +111,8 @@
       pointer-events: auto !important; overscroll-behavior: none;
     }
 
-    .info-modal-body {
-      color: #0f172a !important;
-      font-size: 14px;
-      line-height: 1.6;
-    }
-    #infoModalTitle {
-      color: #0f172a !important;
-    }
+    .info-modal-body { color: #0f172a !important; font-size: 14px; line-height: 1.6; }
+    #infoModalTitle { color: #0f172a !important; }
   </style>
 
   <script>
@@ -145,7 +147,10 @@
         </svg>
       </a>
 
-      <div class="nav-actions">
+      <div class="nav-actions" style="display: flex; align-items: center; gap: 10px;">
+        <button class="donate-nav-btn" onclick="openDonateModal()">
+          <i class="fa-solid fa-heart" style="color: #fca5a5;"></i> Support / Donate
+        </button>
         <button class="auth-icon-btn" id="authNavBtn" onclick="openAuthModal()" title="Login / Sign Up">
           <i class="fas fa-user"></i>
         </button>
@@ -216,11 +221,10 @@
     </div>
   </div>
 
-  <!-- Main Tools Grid (Clean, Non-Duplicate Master List) -->
+  <!-- Main Tools Grid -->
   <main class="main-grid-container">
     <div class="tools-grid" id="toolsGrid">
       
-      <!-- New Added Tools: PDF Scanner, Zip to PDF, Document Translator -->
       <div class="tool-card" data-cat="document" onclick="openPdfScannerModal()">
         <div class="tool-icon" style="background:#e0f2fe; color:#0284c7;"><i class="fa-solid fa-scanner"></i></div>
         <h3>PDF Scanner & Enhancer <span class="badge-new">NEW</span></h3>
@@ -242,7 +246,6 @@
         <span class="tool-meta">Open Translator &rarr;</span>
       </div>
 
-      <!-- Repair PDF Tool Card -->
       <div class="tool-card" data-cat="editSecurity" onclick="openRepairPdfModal()">
         <div class="tool-icon" style="background:#fef3c7; color:#d97706;"><i class="fa-solid fa-wrench"></i></div>
         <h3>Repair PDF (Fix Corrupted File) <span class="badge-new">NEW</span></h3>
@@ -264,528 +267,17 @@
         <span class="tool-meta">Open Text-to-Speech &rarr;</span>
       </div>
 
-      <div class="tool-card" data-cat="finance" onclick="openTipCalculatorModal()">
-        <div class="tool-icon" style="background:#e8f5e9; color:#43a047;"><i class="fa-solid fa-receipt"></i></div>
-        <h3>Tip Calculator <span class="badge-new">NEW</span></h3>
-        <p>Calculate tips and easily split bills among multiple people.</p>
-        <span class="tool-meta">Open Tip Calculator &rarr;</span>
-      </div>
-
-      <div class="tool-card" data-cat="health" onclick="openSleepCalculatorModal()">
-        <div class="tool-icon" style="background:#ede7f6; color:#512da8;"><i class="fa-solid fa-bed"></i></div>
-        <h3>Sleep Calculator <span class="badge-new">NEW</span></h3>
-        <p>Calculate optimal bedtime and wake-up times based on sleep cycles.</p>
-        <span class="tool-meta">Open Sleep Calculator &rarr;</span>
-      </div>
-
-      <div class="tool-card" data-cat="document" onclick="openWatermarkModal()">
-        <div class="tool-icon" style="background:#fff3e0; color:#fb8c00;"><i class="fa-solid fa-stamp"></i></div>
-        <h3>Text Watermark Generator <span class="badge-new">NEW</span></h3>
-        <p>Add custom text watermarks to protect your photos and documents.</p>
-        <span class="tool-meta">Open Watermark Tool &rarr;</span>
-      </div>
-
-      <div class="tool-card" data-cat="security" onclick="openPasswordModal()">
-        <div class="tool-icon" style="background:#ffebee; color:#e53935;"><i class="fa-solid fa-key"></i></div>
-        <h3>Random Password & PIN <span class="badge-new">NEW</span></h3>
-        <p>Generate highly secure passwords, passphrases, and numbers.</p>
-        <span class="tool-meta">Open Password Generator &rarr;</span>
-      </div>
-
-      <div class="tool-card" data-cat="utility" onclick="openTextReverseModal()">
-        <div class="tool-icon" style="background:#fce4ec; color:#d81b60;"><i class="fa-solid fa-right-left"></i></div>
-        <h3>Text Reverse & Flip Tool <span class="badge-new">NEW</span></h3>
-        <p>Reverse text strings, letters, or flip words upside down instantly.</p>
-        <span class="tool-meta">Open Text Tool &rarr;</span>
-      </div>
-
-      <div class="tool-card" data-cat="utility" onclick="openDateCalcModal()">
-        <div class="tool-icon" style="background:#e3f2fd; color:#1e88e5;"><i class="fa-solid fa-calendar-days"></i></div>
-        <h3>Days Counter Calculator <span class="badge-new">NEW</span></h3>
-        <p>Find exact days, months, or years between two given dates.</p>
-        <span class="tool-meta">Open Date Calculator &rarr;</span>
-      </div>
-
-      <div class="tool-card" data-cat="document" onclick="openPdfMergerModal()">
-        <div class="tool-icon" style="background:#fbe9e7; color:#f4511e;"><i class="fa-solid fa-file-pdf"></i></div>
-        <h3>Document Scanner & Merger <span class="badge-new">NEW</span></h3>
-        <p>Combine multiple PDF files or scanned pages into a single document.</p>
-        <span class="tool-meta">Open PDF Merger &rarr;</span>
-      </div>
-
-      <div class="tool-card" data-cat="csc" onclick="openPrintLayoutModal()">
-        <div class="tool-icon" style="background:#e0f2f1; color:#00897b;"><i class="fa-solid fa-print"></i></div>
-        <h3>Print Layout Sheet Maker <span class="badge-new">NEW</span></h3>
-        <p>Arrange ID cards or photos neatly for direct print-ready layouts.</p>
-        <span class="tool-meta">Open Print Layout &rarr;</span>
-      </div>
-
-      <div class="tool-card" data-cat="document" onclick="openPdfSplitModal()">
-        <div class="tool-icon" style="background:#f3e5f5; color:#8e24aa;"><i class="fa-solid fa-object-ungroup"></i></div>
-        <h3>PDF Page Rotator & Splitter <span class="badge-new">NEW</span></h3>
-        <p>Rotate specific PDF pages or split large documents into separate files.</p>
-        <span class="tool-meta">Open PDF Splitter &rarr;</span>
-      </div>
-
-      <div class="tool-card" data-cat="utility" onclick="openSpeedTestModal()">
-        <div class="tool-icon" style="background:#e8eaf6; color:#3f51b5;"><i class="fa-solid fa-gauge-high"></i></div>
-        <h3>Internet Speed Test <span class="badge-new">NEW</span></h3>
-        <p>Check your current network download and upload speeds quickly.</p>
-        <span class="tool-meta">Open Speed Test &rarr;</span>
-      </div>
-
-      <div class="tool-card" data-cat="finance" onclick="openAgeModal()">
-        <div class="tool-icon" style="background:#fce7f3; color:#db2777;"><i class="fa-solid fa-calendar-check"></i></div>
-        <h3>Age Calculator (Exam DOB) <span class="badge-new">NEW</span></h3>
-        <p>Calculate exact age in years, months, and days for job forms and exam eligibility.</p>
-        <span class="tool-meta">Open Age Calculator &rarr;</span>
-      </div>
-
-      <div class="tool-card" data-cat="generator" onclick="openNotepadModal()">
-        <div class="tool-icon" style="background:#e0f2fe; color:#0284c7;"><i class="fa-solid fa-note-sticky"></i></div>
-        <h3>Unlimited Text Notepad <span class="badge-new">NEW</span></h3>
-        <p>Write, store and download unlimited text documents and notes up to 100,000+ lines instantly.</p>
-        <span class="tool-meta">Open Notepad &rarr;</span>
-      </div>
-
-      <div class="tool-card" data-cat="generator" onclick="openContactModal()">
-        <div class="tool-icon" style="background:#e0f2fe; color:#0284c7;"><i class="fa-solid fa-headset"></i></div>
-        <h3>Contact & Support Form <span class="badge-new">NEW</span></h3>
-        <p>Send your feedback, inquiries or report any tool issue directly to support desk.</p>
-        <span class="tool-meta">Open Support &rarr;</span>
-      </div>
-
-      <div class="tool-card" data-cat="finance" onclick="openGovtJobModal()">
-        <div class="tool-icon" style="background:#fee2e2; color:#dc2626;"><i class="fa-solid fa-bullhorn"></i></div>
-        <h3>Govt Job Alerts & Results <span class="badge-new">NEW</span></h3>
-        <p>Check latest government job notifications, admit cards, exam dates and recruitment results instantly.</p>
-        <span class="tool-meta">Check Job Updates &rarr;</span>
-      </div>
-
-      <div class="tool-card" data-cat="cyber" onclick="launchTool('kbResizer')">
-        <div class="tool-icon" style="background:#dbeafe; color:#2563eb;"><i class="fa-solid fa-compress"></i></div>
-        <h3>Photo & Sign KB / MB Resizer</h3>
-        <p>Compress image precisely to exact target KB or MB as per your requirement.</p>
-        <span class="tool-meta">Open Resizer &rarr;</span>
-      </div>
-
-      <div class="tool-card" data-cat="cyber" onclick="launchTool('passportGrid')">
-        <div class="tool-icon" style="background:#fef3c7; color:#d97706;"><i class="fa-solid fa-id-card-clip"></i></div>
-        <h3>Passport Photo Sheet (Custom / Grid)</h3>
-        <p>Generate print-ready sheets of custom passport photo copies on a single A4 page.</p>
-        <span class="tool-meta">Open Passport Grid &rarr;</span>
-      </div>
-
-      <div class="tool-card" data-cat="cyber" onclick="launchTool('sigPad')">
-        <div class="tool-icon" style="background:#fce7f3; color:#db2777;"><i class="fa-solid fa-signature"></i></div>
-        <h3>Digital Signature Maker (Sign Pad)</h3>
-        <p>Draw your signature on screen and download as transparent PNG for form uploads.</p>
-        <span class="tool-meta">Open Sign Pad &rarr;</span>
-      </div>
-
-      <div class="tool-card" data-cat="cyber" onclick="launchTool('qrGen')">
-        <div class="tool-icon" style="background:#e0f2fe; color:#0284c7;"><i class="fa-solid fa-qrcode"></i></div>
-        <h3>QR Code & UPI Generator</h3>
-        <p>Generate instant QR codes for payment links, UPI IDs, or website URLs.</p>
-        <span class="tool-meta">Open QR Generator &rarr;</span>
-      </div>
-
-      <div class="tool-card" data-cat="cyber" onclick="launchTool('examResizer')">
-        <div class="tool-icon" style="background:#fee2e2; color:#e5322d;"><i class="fa-solid fa-user-graduate"></i></div>
-        <h3>Exam Photo & Signature Resizer</h3>
-        <p>Resize photo and signature to exact size required for government exam forms (SSC, UPSC, NEET, etc.).</p>
-        <span class="tool-meta">Open Resizer &rarr;</span>
-      </div>
-
-      <div class="tool-card" data-cat="organize" onclick="launchTool('merge')">
-        <div class="tool-icon" style="background:#fee2e2; color:#e5322d;"><i class="fa-solid fa-object-group"></i></div>
-        <h3>Merge PDF</h3>
-        <p>Combine multiple PDF documents into a single organized file in seconds.</p>
-        <span class="tool-meta">Open Tool &rarr;</span>
-      </div>
-
-      <div class="tool-card" data-cat="organize" onclick="launchTool('split')">
-        <div class="tool-icon" style="background:#fee2e2; color:#e5322d;"><i class="fa-solid fa-scissors"></i></div>
-        <h3>Split PDF</h3>
-        <p>Separate one page or an entire set for easy conversion into independent PDF files.</p>
-        <span class="tool-meta">Open Tool &rarr;</span>
-      </div>
-
-      <div class="tool-card" data-cat="organize" onclick="launchTool('compress')">
-        <div class="tool-icon" style="background:#ecfdf5; color:#059669;"><i class="fa-solid fa-file-zipper"></i></div>
-        <h3>Compress PDF</h3>
-        <p>Reduce file size while optimizing for maximal visual and document quality.</p>
-        <span class="tool-meta">Open Tool &rarr;</span>
-      </div>
-
-      <div class="tool-card" data-cat="organize" onclick="launchTool('organize')">
-        <div class="tool-icon" style="background:#fee2e2; color:#e5322d;"><i class="fa-solid fa-arrow-down-up-across-line"></i></div>
-        <h3>Organize / Reorder Pages</h3>
-        <p>Rearrange, reverse, or reorder the page sequence of your PDF document.</p>
-        <span class="tool-meta">Open Tool &rarr;</span>
-      </div>
-
-      <div class="tool-card" data-cat="finance" onclick="openPrepayModal()">
-        <div class="tool-icon" style="background:#e0f2fe; color:#0284c7;"><i class="fa-solid fa-hand-holding-dollar"></i></div>
-        <h3>Loan Prepayment & Interest Saver <span class="badge-new">NEW</span></h3>
-        <p>Calculate how extra lump-sum or monthly prepayments save lakhs in loan interest & time.</p>
-        <span class="tool-meta">Calculate Savings &rarr;</span>
-      </div>
-
       <div class="tool-card" data-cat="generator" onclick="openTypingModal()">
         <div class="tool-icon" style="background:#dbeafe; color:#1d4ed8;"><i class="fa-solid fa-keyboard"></i></div>
-        <h3>1-Minute Typing Speed Test <span class="badge-new">NEW</span></h3>
-        <p>Test and measure your typing speed with multi-level paragraphs and real-time WPM.</p>
+        <h3>1-Minute Typing Speed Test (100 Levels) <span class="badge-new">NEW</span></h3>
+        <p>Test and measure your typing speed across 100 progressive levels with anti-repetition randomization.</p>
         <span class="tool-meta">Start Typing Test &rarr;</span>
-      </div>
-
-      <div class="tool-card" data-cat="finance" onclick="openGoldModal()">
-        <div class="tool-icon" style="background:#fef3c7; color:#b45309;"><i class="fa-solid fa-gem"></i></div>
-        <h3>Gold & Jewellery Price Calculator <span class="badge-new">NEW</span></h3>
-        <p>Calculate exact jewelry price including making charges and 3% GST on gold weight.</p>
-        <span class="tool-meta">Calculate Gold Price &rarr;</span>
-      </div>
-
-      <div class="tool-card" data-cat="finance" onclick="openCalorieModal()">
-        <div class="tool-icon" style="background:#fee2e2; color:#ef4444;"><i class="fa-solid fa-fire-flame-curved"></i></div>
-        <h3>Daily Calorie & BMR Calculator <span class="badge-new">NEW</span></h3>
-        <p>Calculate daily basal metabolic rate (BMR) and target calories to maintain, lose, or gain weight.</p>
-        <span class="tool-meta">Calculate Calories &rarr;</span>
-      </div>
-
-      <div class="tool-card" data-cat="finance" onclick="openInflationModal()">
-        <div class="tool-icon" style="background:#ecfdf5; color:#059669;"><i class="fa-solid fa-arrow-trend-up"></i></div>
-        <h3>Inflation & Future Value Calculator <span class="badge-new">NEW</span></h3>
-        <p>Calculate how inflation decreases the buying power of money and forecast future product prices.</p>
-        <span class="tool-meta">Forecast Inflation &rarr;</span>
-      </div>
-
-      <div class="tool-card" data-cat="generator" onclick="openBarcodeModal()">
-        <div class="tool-icon" style="background:#f1f5f9; color:#0f172a;"><i class="fa-solid fa-barcode"></i></div>
-        <h3>Barcode Generator (Code 128) <span class="badge-new">NEW</span></h3>
-        <p>Generate standard print-ready barcodes for product labels, packaging & invoices in 1-click.</p>
-        <span class="tool-meta">Generate Barcode &rarr;</span>
-      </div>
-
-      <div class="tool-card" data-cat="cyber" onclick="openColorPickerModal()">
-        <div class="tool-icon" style="background:#ecfdf5; color:#059669;"><i class="fa-solid fa-eye-dropper"></i></div>
-        <h3>Color Picker & HEX Extractor <span class="badge-new">NEW</span></h3>
-        <p>Upload any picture and click anywhere to instantly grab exact HEX, RGB, and HSL color codes.</p>
-        <span class="tool-meta">Pick Colors &rarr;</span>
-      </div>
-
-      <div class="tool-card" data-cat="generator" onclick="openBase64Modal()">
-        <div class="tool-icon" style="background:#e0f2fe; color:#0284c7;"><i class="fa-solid fa-code"></i></div>
-        <h3>Base64 Encoder & Decoder <span class="badge-new">NEW</span></h3>
-        <p>Encode plain text to Base64 format or decode Base64 strings directly in browser safely.</p>
-        <span class="tool-meta">Encode / Decode &rarr;</span>
-      </div>
-
-      <div class="tool-card" data-cat="finance" onclick="openPpfModal()">
-        <div class="tool-icon" style="background:#ecfdf5; color:#047857;"><i class="fa-solid fa-shield-heart"></i></div>
-        <h3>PPF Calculator (15-Year Scheme) <span class="badge-new">NEW</span></h3>
-        <p>Calculate 15-year Public Provident Fund returns, interest earned, and tax-free maturity.</p>
-        <span class="tool-meta">Calculate PPF &rarr;</span>
-      </div>
-
-      <div class="tool-card" data-cat="finance" onclick="openElectricityModal()">
-        <div class="tool-icon" style="background:#fef9c3; color:#ca8a04;"><i class="fa-solid fa-bolt"></i></div>
-        <h3>Electricity Bill & Power Calculator <span class="badge-new">NEW</span></h3>
-        <p>Calculate appliance monthly power consumption, electric units (kWh) and bill cost.</p>
-        <span class="tool-meta">Calculate Bill &rarr;</span>
-      </div>
-
-      <div class="tool-card" data-cat="finance" onclick="openFuelModal()">
-        <div class="tool-icon" style="background:#fee2e2; color:#dc2626;"><i class="fa-solid fa-gas-pump"></i></div>
-        <h3>Fuel Cost & Trip Mileage Calculator <span class="badge-new">NEW</span></h3>
-        <p>Calculate total fuel needed, overall trip petrol/diesel expense and cost per kilometer.</p>
-        <span class="tool-meta">Calculate Trip Cost &rarr;</span>
-      </div>
-
-      <div class="tool-card" data-cat="generator" onclick="openHashtagModal()">
-        <div class="tool-icon" style="background:#f3e8ff; color:#7e22ce;"><i class="fa-solid fa-hashtag"></i></div>
-        <h3>Hashtag Extractor & Counter <span class="badge-new">NEW</span></h3>
-        <p>Extract all hashtags from social media posts and caption descriptions in 1-click.</p>
-        <span class="tool-meta">Extract Hashtags &rarr;</span>
-      </div>
-
-      <div class="tool-card" data-cat="finance" onclick="openNumToWordsModal()">
-        <div class="tool-icon" style="background:#e0f2fe; color:#0369a1;"><i class="fa-solid fa-money-check"></i></div>
-        <h3>Number to Words (Cheque Amount) <span class="badge-new">NEW</span></h3>
-        <p>Convert any numeric amount to bank cheque format words (Rupees / Only) with 1-click copy.</p>
-        <span class="tool-meta">Convert Amount &rarr;</span>
-      </div>
-
-      <div class="tool-card" data-cat="finance" onclick="openSalaryModal()">
-        <div class="tool-icon" style="background:#fef3c7; color:#b45309;"><i class="fa-solid fa-wallet"></i></div>
-        <h3>Take-Home Salary & CTC Calculator <span class="badge-new">NEW</span></h3>
-        <p>Calculate in-hand monthly salary breakdown deducting EPF, Professional Tax, and TDS.</p>
-        <span class="tool-meta">Calculate Salary &rarr;</span>
-      </div>
-
-      <div class="tool-card" data-cat="finance" onclick="openBillSplitModal()">
-        <div class="tool-icon" style="background:#ccfbf1; color:#0f766e;"><i class="fa-solid fa-users-viewfinder"></i></div>
-        <h3>Friend Bill Split & Tip Calculator <span class="badge-new">NEW</span></h3>
-        <p>Split group restaurant or trip bills equally with custom tip and person-by-person share.</p>
-        <span class="tool-meta">Split Bill &rarr;</span>
-      </div>
-
-      <div class="tool-card" data-cat="generator" onclick="openUnitConvModal()">
-        <div class="tool-icon" style="background:#ede9fe; color:#6d28d9;"><i class="fa-solid fa-ruler-combined"></i></div>
-        <h3>Universal Unit Converter <span class="badge-new">NEW</span></h3>
-        <p>Convert Length (meter, feet, inch), Weight (kg, gram, pound) and Temperature instantly.</p>
-        <span class="tool-meta">Convert Units &rarr;</span>
-      </div>
-
-      <div class="tool-card" data-cat="finance" onclick="openEmiModal()">
-        <div class="tool-icon" style="background:#dcfce7; color:#16a34a;"><i class="fa-solid fa-calculator"></i></div>
-        <h3>Loan EMI Calculator <span class="badge-new">NEW</span></h3>
-        <p>Calculate monthly EMI, interest payable, and total loan payment breakdown.</p>
-        <span class="tool-meta">Open EMI Calculator &rarr;</span>
-      </div>
-
-      <div class="tool-card" data-cat="finance" onclick="openGstModal()">
-        <div class="tool-icon" style="background:#fef9c3; color:#ca8a04;"><i class="fa-solid fa-percent"></i></div>
-        <h3>GST Calculator <span class="badge-new">NEW</span></h3>
-        <p>Calculate GST inclusive and exclusive prices with 5%, 12%, 18%, and 28% rates.</p>
-        <span class="tool-meta">Open GST Calculator &rarr;</span>
-      </div>
-
-      <div class="tool-card" data-cat="finance" onclick="openSipModal()">
-        <div class="tool-icon" style="background:#e0e7ff; color:#4338ca;"><i class="fa-solid fa-chart-line"></i></div>
-        <h3>SIP Calculator <span class="badge-new">NEW</span></h3>
-        <p>Calculate expected wealth growth and returns on mutual funds monthly SIP investments.</p>
-        <span class="tool-meta">Open SIP Calculator &rarr;</span>
-      </div>
-
-      <div class="tool-card" data-cat="finance" onclick="openInterestModal()">
-        <div class="tool-icon" style="background:#ecfdf5; color:#059669;"><i class="fa-solid fa-coins"></i></div>
-        <h3>Simple & Compound Interest <span class="badge-new">NEW</span></h3>
-        <p>Accurate interest calculator for savings, personal lending, and compounding cycles.</p>
-        <span class="tool-meta">Open Interest Calc &rarr;</span>
-      </div>
-
-      <div class="tool-card" data-cat="finance" onclick="openFdModal()">
-        <div class="tool-icon" style="background:#fef3c7; color:#d97706;"><i class="fa-solid fa-piggy-bank"></i></div>
-        <h3>FD & RD Maturity Calculator <span class="badge-new">NEW</span></h3>
-        <p>Calculate quarterly compounded payouts on Bank Fixed and Recurring Deposits.</p>
-        <span class="tool-meta">Open Deposit Calc &rarr;</span>
-      </div>
-
-      <div class="tool-card" data-cat="finance" onclick="openLandModal()">
-        <div class="tool-icon" style="background:#ecfdf5; color:#047857;"><i class="fa-solid fa-vector-square"></i></div>
-        <h3>Land Area (Bigha-Katha) Converter <span class="badge-new">NEW</span></h3>
-        <p>Convert land measurement between Bigha, Katha, Chhatak, Acre, Decimil & Sq Ft.</p>
-        <span class="tool-meta">Open Land Converter &rarr;</span>
-      </div>
-
-      <div class="tool-card" data-cat="finance" onclick="openAgeDetailedModal()">
-        <div class="tool-icon" style="background:#fdf2f8; color:#be185d;"><i class="fa-solid fa-clock"></i></div>
-        <h3>Life in Hours, Mins & Secs <span class="badge-new">NEW</span></h3>
-        <p>Discover your exact age breakdown in total months, weeks, days, hours and seconds lived.</p>
-        <span class="tool-meta">Explore Life Stats &rarr;</span>
-      </div>
-
-      <div class="tool-card" data-cat="finance" onclick="openDateDiffModal()">
-        <div class="tool-icon" style="background:#eff6ff; color:#2563eb;"><i class="fa-solid fa-calendar-days"></i></div>
-        <h3>Date Difference & Days Counter <span class="badge-new">NEW</span></h3>
-        <p>Calculate exact days, weeks, and months between two dates with one click.</p>
-        <span class="tool-meta">Open Days Counter &rarr;</span>
-      </div>
-
-      <div class="tool-card" data-cat="finance" onclick="openEligibilityModal()">
-        <div class="tool-icon" style="background:#dbeafe; color:#2563eb;"><i class="fa-solid fa-user-check"></i></div>
-        <h3>Exam Age Eligibility Checker <span class="badge-new">NEW</span></h3>
-        <p>Check if your age qualifies within Min-Max limits as per official job notification date.</p>
-        <span class="tool-meta">Check Eligibility &rarr;</span>
-      </div>
-
-      <div class="tool-card" data-cat="finance" onclick="openMarksModal()">
-        <div class="tool-icon" style="background:#ede9fe; color:#6d28d9;"><i class="fa-solid fa-graduation-cap"></i></div>
-        <h3>Marks to Percentage & CGPA <span class="badge-new">NEW</span></h3>
-        <p>Calculate percentage from marks obtained, total marks, or convert CGPA to percentage.</p>
-        <span class="tool-meta">Calculate Percentage &rarr;</span>
-      </div>
-
-      <div class="tool-card" data-cat="finance" onclick="openGradeModal()">
-        <div class="tool-icon" style="background:#e0e7ff; color:#3730a3;"><i class="fa-solid fa-award"></i></div>
-        <h3>Average & Grade Calculator <span class="badge-new">NEW</span></h3>
-        <p>Enter multi-subject marks to get overall average, percentage, and letter grade.</p>
-        <span class="tool-meta">Calculate Grades &rarr;</span>
-      </div>
-
-      <div class="tool-card" data-cat="cyber" onclick="openYtThumbModal()">
-        <div class="tool-icon" style="background:#fee2e2; color:#dc2626;"><i class="fa-brands fa-youtube"></i></div>
-        <h3>YouTube Thumbnail Downloader <span class="badge-new">NEW</span></h3>
-        <p>Download full resolution HD, HQ, and 4K thumbnails from any YouTube video link.</p>
-        <span class="tool-meta">Get Thumbnail &rarr;</span>
-      </div>
-
-      <div class="tool-card" data-cat="finance" onclick="openWaterModal()">
-        <div class="tool-icon" style="background:#e0f2fe; color:#0284c7;"><i class="fa-solid fa-glass-water"></i></div>
-        <h3>Daily Water Intake Goal <span class="badge-new">NEW</span></h3>
-        <p>Calculate your healthy recommended daily water drinking requirement in liters and glasses.</p>
-        <span class="tool-meta">Check Water Goal &rarr;</span>
-      </div>
-
-      <div class="tool-card" data-cat="generator" onclick="openDupRemoverModal()">
-        <div class="tool-icon" style="background:#fef2f2; color:#991b1b;"><i class="fa-solid fa-filter"></i></div>
-        <h3>Duplicate Line & Text Remover <span class="badge-new">NEW</span></h3>
-        <p>Clean repetitive lists, emails, phone numbers, or lines instantly with case sensitivity.</p>
-        <span class="tool-meta">Clean Duplicate Lines &rarr;</span>
-      </div>
-
-      <div class="tool-card" data-cat="finance" onclick="openDiscountModal()">
-        <div class="tool-icon" style="background:#ccfbf1; color:#0f766e;"><i class="fa-solid fa-tags"></i></div>
-        <h3>Discount & Sale Calculator <span class="badge-new">NEW</span></h3>
-        <p>Calculate exact final price after shopping discounts and see how much money you save.</p>
-        <span class="tool-meta">Open Discount Calculator &rarr;</span>
-      </div>
-
-       <div class="tool-card" data-cat="finance" onclick="openPercentModal()">
-        <div class="tool-icon" style="background:#fef3c7; color:#b45309;"><i class="fa-solid fa-calculator"></i></div>
-        <h3>Percentage Calculator <span class="badge-new">NEW</span></h3>
-        <p>Quickly find percentage value, marks percentages, and calculate increase or decrease.</p>
-        <span class="tool-meta">Open Percentage Tool &rarr;</span>
-      </div>
-
-      <div class="tool-card" data-cat="organize" onclick="launchTool('rot')">
-        <div class="tool-icon" style="background:#fef3c7; color:#d97706;"><i class="fa-solid fa-rotate-right"></i></div>
-        <h3>Rotate PDF</h3>
-        <p>Rotate upside-down or sideways pages by 90, 180, or 270 degrees.</p>
-        <span class="tool-meta">Open Tool &rarr;</span>
-      </div>
-
-      <div class="tool-card" data-cat="organize" onclick="launchTool('removePages')">
-        <div class="tool-icon" style="background:#fee2e2; color:#e5322d;"><i class="fa-solid fa-trash-can"></i></div>
-        <h3>Delete PDF Pages</h3>
-        <p>Remove unwanted, defective, or blank pages from an existing PDF file.</p>
-        <span class="tool-meta">Open Tool &rarr;</span>
-      </div>
-
-      <div class="tool-card" data-cat="toPdf" onclick="launchTool('jpgToPdf')">
-        <div class="tool-icon" style="background:#eff6ff; color:#2563eb;"><i class="fa-solid fa-file-image"></i></div>
-        <h3>Image to PDF (JPG/PNG to PDF)</h3>
-        <p>Convert gallery pictures, screenshots, or document scans into a standard A4 PDF.</p>
-        <span class="tool-meta">Open Tool &rarr;</span>
-      </div>
-
-      <div class="tool-card" data-cat="toPdf" onclick="launchTool('wordToPdf')">
-        <div class="tool-icon" style="background:#eff6ff; color:#2563eb;"><i class="fa-solid fa-file-word"></i></div>
-        <h3>Docx to PDF (Word to PDF)</h3>
-        <p>Convert Microsoft Word documents to clean, standardized PDF format instantly.</p>
-        <span class="tool-meta">Open Tool &rarr;</span>
-      </div>
-
-      <div class="tool-card" data-cat="toPdf" onclick="launchTool('excelToPdf')">
-        <div class="tool-icon" style="background:#eff6ff; color:#2563eb;"><i class="fa-solid fa-file-excel"></i></div>
-        <h3>Excel to PDF (XLS/XLSX to PDF)</h3>
-        <p>Convert Excel spreadsheets and tables into formatted, printable PDF documents.</p>
-        <span class="tool-meta">Open Tool &rarr;</span>
-      </div>
-
-      <div class="tool-card" data-cat="toPdf" onclick="launchTool('pptToPdf')">
-        <div class="tool-icon" style="background:#eff6ff; color:#2563eb;"><i class="fa-solid fa-file-powerpoint"></i></div>
-        <h3>PowerPoint to PDF (PPT/PPTX to PDF)</h3>
-        <p>Transform slideshow decks and presentations into portable PDF files.</p>
-        <span class="tool-meta">Open Tool &rarr;</span>
-      </div>
-
-      <div class="tool-card" data-cat="toPdf" onclick="launchTool('htmlToPdf')">
-        <div class="tool-icon" style="background:#eff6ff; color:#2563eb;"><i class="fa-solid fa-code"></i></div>
-        <h3>HTML / Web to PDF</h3>
-        <p>Convert HTML text, markup, or web content into downloadable PDF pages.</p>
-        <span class="tool-meta">Open Tool &rarr;</span>
-      </div>
-
-      <div class="tool-card" data-cat="fromPdf" onclick="launchTool('pdfToJpg')">
-        <div class="tool-icon" style="background:#eff6ff; color:#2563eb;"><i class="fa-solid fa-image"></i></div>
-        <h3>PDF to Image (PDF to JPG/PNG)</h3>
-        <p>Extract all pages or individual visual graphics from a PDF into JPG images.</p>
-        <span class="tool-meta">Open Tool &rarr;</span>
-      </div>
-
-      <div class="tool-card" data-cat="fromPdf" onclick="launchTool('pdfToWord')">
-        <div class="tool-icon" style="background:#eff6ff; color:#2563eb;"><i class="fa-solid fa-file-lines"></i></div>
-        <h3>PDF to Word (PDF to DOCX)</h3>
-        <p>Convert PDF documents into editable Word files with intact textual layout.</p>
-        <span class="tool-meta">Open Tool &rarr;</span>
-      </div>
-
-      <div class="tool-card" data-cat="fromPdf" onclick="launchTool('pdfToExcel')">
-        <div class="tool-icon" style="background:#eff6ff; color:#2563eb;"><i class="fa-solid fa-table-cells"></i></div>
-        <h3>PDF to Excel (PDF to XLSX)</h3>
-        <p>Extract tables, cell grids, and numerical sheets from PDF files into Excel.</p>
-        <span class="tool-meta">Open Tool &rarr;</span>
       </div>
 
       <div class="tool-card" data-cat="fromPdf" onclick="openOcrModal()">
         <div class="tool-icon" style="background:#f3e8ff; color:#9333ea;"><i class="fa-solid fa-file-lines"></i></div>
-        <h3>OCR - Image to Text</h3>
-        <p>Extract text from any image (JPG, PNG) in Bengali, Hindi, or English with live editing.</p>
-        <span class="tool-meta">Open Tool &rarr;</span>
-      </div>
-
-      <div class="tool-card" data-cat="editSecurity" onclick="launchTool('editPdf')">
-        <div class="tool-icon" style="background:#fef3c7; color:#d97706;"><i class="fa-solid fa-pen-nib"></i></div>
-        <h3>Edit PDF</h3>
-        <p>Add text annotations, markings, or additional notes onto PDF documents.</p>
-        <span class="tool-meta">Open Tool &rarr;</span>
-      </div>
-
-      <div class="tool-card" data-cat="editSecurity" onclick="launchTool('sign')">
-        <div class="tool-icon" style="background:#f1f5f9; color:#475569;"><i class="fa-solid fa-signature"></i></div>
-        <h3>Sign PDF</h3>
-        <p>Add handwritten digital signatures or formal verification stamps to your file.</p>
-        <span class="tool-meta">Open Tool &rarr;</span>
-      </div>
-
-      <div class="tool-card" data-cat="editSecurity" onclick="launchTool('watermark')">
-        <div class="tool-icon" style="background:#fef3c7; color:#d97706;"><i class="fa-solid fa-stamp"></i></div>
-        <h3>Watermark PDF</h3>
-        <p>Stamp customized text like 'CONFIDENTIAL' or business logos across pages.</p>
-        <span class="tool-meta">Open Tool &rarr;</span>
-      </div>
-
-      <div class="tool-card" data-cat="editSecurity" onclick="launchTool('protect')">
-        <div class="tool-icon" style="background:#fef2f2; color:#dc2626;"><i class="fa-solid fa-lock"></i></div>
-        <h3>Protect / Lock PDF</h3>
-        <p>Encrypt PDF files with a secret password to prevent unauthorized viewing.</p>
-        <span class="tool-meta">Open Tool &rarr;</span>
-      </div>
-
-      <div class="tool-card" data-cat="editSecurity" onclick="launchTool('unlock')">
-        <div class="tool-icon" style="background:#f1f5f9; color:#475569;"><i class="fa-solid fa-lock-open"></i></div>
-        <h3>Unlock PDF</h3>
-        <p>Remove security permissions and password locks from unlocked documents.</p>
-        <span class="tool-meta">Open Tool &rarr;</span>
-      </div>
-
-      <div class="tool-card" data-cat="editSecurity" onclick="launchTool('pageNumbers')">
-        <div class="tool-icon" style="background:#fef3c7; color:#d97706;"><i class="fa-solid fa-list-ol"></i></div>
-        <h3>Add Page Numbers</h3>
-        <p>Add standardized Page N of M stamps at the bottom center of each page.</p>
-        <span class="tool-meta">Open Tool &rarr;</span>
-      </div>
-
-      <div class="tool-card" data-cat="generator" onclick="launchTool('invoiceMaker')">
-        <div class="tool-icon" style="background:#fefce8; color:#ca8a04;"><i class="fa-solid fa-receipt"></i></div>
-        <h3>Invoice / Bill Generator</h3>
-        <p>Generate professional customer billing receipts, invoices, and service memos.</p>
-        <span class="tool-meta">Open Tool &rarr;</span>
-      </div>
-
-      <div class="tool-card" data-cat="generator" onclick="launchTool('resumeMaker')">
-        <div class="tool-icon" style="background:#f0fdf4; color:#15803d;"><i class="fa-solid fa-file-user"></i></div>
-        <h3>Resume / CV Maker to PDF</h3>
-        <p>Build and format clean resumes or curriculum vitae ready for job applications.</p>
-        <span class="tool-meta">Open Tool &rarr;</span>
-      </div>
-
-      <div class="tool-card" data-cat="generator" onclick="launchTool('docMaker')">
-        <div class="tool-icon" style="background:#eff6ff; color:#2563eb;"><i class="fa-solid fa-prescription"></i></div>
-        <h3>Prescription / Memo Maker</h3>
-        <p>Create clean digital prescriptions, diagnostic notes, or customer memos.</p>
+        <h3>OCR - Image to Text <span class="badge-new">NEW</span></h3>
+        <p>Extract text from any image (JPG, PNG) in Bengali, Hindi, English or multi-languages with live editing.</p>
         <span class="tool-meta">Open Tool &rarr;</span>
       </div>
 
@@ -801,23 +293,83 @@
   </main>
 
   <!-- Modals Section -->
-  <!-- Improved OCR Modal with Live Editable Textarea -->
+  <!-- Secure Support & Donate Modal with Star Rating & Custom Amount (UPI ID: 6297665488@yapl) -->
+  <div class="calc-modal" id="donateModal" onclick="if(event.target === this) closeDonateModal()">
+    <div class="calc-box" style="max-width: 480px; text-align: center;">
+      <button class="calc-close" onclick="closeDonateModal()">&times;</button>
+      <h3 style="justify-content: center;"><i class="fa-solid fa-heart" style="color: #e5322d;"></i> Support & Rate Us</h3>
+      <p style="font-size: 13px; color: #475569; margin-bottom: 10px;">
+        Rate your experience with our platform! ⭐
+      </p>
+
+      <!-- Interactive Star Rating -->
+      <div class="star-rating" id="starRatingContainer">
+        <i class="fa-solid fa-star" onclick="rateStars(1)"></i>
+        <i class="fa-solid fa-star" onclick="rateStars(2)"></i>
+        <i class="fa-solid fa-star" onclick="rateStars(3)"></i>
+        <i class="fa-solid fa-star" onclick="rateStars(4)"></i>
+        <i class="fa-solid fa-star" onclick="rateStars(5)"></i>
+      </div>
+      <div id="ratingFeedback" style="font-size: 13px; font-weight: 600; color: #16a34a; margin-bottom: 14px;">Thank you for your rating!</div>
+
+      <p style="font-size: 13px; color: #475569; margin-bottom: 12px;">
+        Contribute any amount you wish (₹1, ₹2, ₹50 or more) via Indian UPI to support this platform! ❤️
+      </p>
+
+      <div style="display: flex; gap: 6px; justify-content: center; margin-bottom: 12px;">
+        <button type="button" onclick="setDonateAmount(1)" class="calc-btn" style="width: auto; padding: 6px 12px; background: #f1f5f9; color: #0f172a; border: 1px solid #cbd5e1; margin-top:0;">₹1</button>
+        <button type="button" onclick="setDonateAmount(2)" class="calc-btn" style="width: auto; padding: 6px 12px; background: #f1f5f9; color: #0f172a; border: 1px solid #cbd5e1; margin-top:0;">₹2</button>
+        <button type="button" onclick="setDonateAmount(10)" class="calc-btn" style="width: auto; padding: 6px 12px; background: #f1f5f9; color: #0f172a; border: 1px solid #cbd5e1; margin-top:0;">₹10</button>
+        <button type="button" onclick="setDonateAmount(50)" class="calc-btn" style="width: auto; padding: 6px 12px; background: #f1f5f9; color: #0f172a; border: 1px solid #cbd5e1; margin-top:0;">₹50</button>
+      </div>
+
+      <div class="calc-group">
+        <label>Or Enter Custom Amount (₹):</label>
+        <input type="number" id="customDonateAmt" placeholder="Enter any amount (e.g. 1, 2, 20...)" min="1" style="text-align: center; font-size: 16px; font-weight: 700;">
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 10px;">
+        <!-- Secure UPI Payment Option linked directly to your account: 6297665488@yapl -->
+        <a href="upi://pay?pa=6297665488@yapl&pn=DocuCraftAI&cu=INR" target="_blank" class="calc-btn" style="text-decoration: none; background: #059669; display: flex; align-items: center; justify-content: center; gap: 8px;">
+          <i class="fa-solid fa-mobile-screen"></i> Pay via UPI (GPay / PhonePe / Paytm)
+        </a>
+      </div>
+      <small style="color: #94a3b8; font-size: 11.5px; display: block; margin-top: 12px;">Transactions are securely processed directly through your UPI apps.</small>
+    </div>
+  </div>
+
+  <!-- Real OCR Modal -->
   <div class="calc-modal" id="ocrModal" onclick="if(event.target === this) closeOcrModal()">
     <div class="calc-box" style="max-width: 600px;">
       <button class="calc-close" onclick="closeOcrModal()">&times;</button>
-      <h3><i class="fa-solid fa-file-lines" style="color: #9333ea;"></i> OCR - Image to Text</h3>
+      <h3><i class="fa-solid fa-file-lines" style="color: #9333ea;"></i> OCR - Image to Text (Multi-Language)</h3>
+      <div class="calc-group">
+        <label>Select Document / Image Language:</label>
+        <select id="ocrLangSelect">
+          <option value="eng" selected>English</option>
+          <option value="ben">Bengali (বাংলা)</option>
+          <option value="hin">Hindi (हिन्दी)</option>
+          <option value="ben+eng">Bengali + English</option>
+          <option value="hin+eng">Hindi + English</option>
+          <option value="spa">Spanish</option>
+          <option value="fra">French</option>
+          <option value="deu">German</option>
+          <option value="ara">Arabic</option>
+          <option value="chi_sim">Chinese</option>
+        </select>
+      </div>
       <div class="calc-group">
         <label>Upload Image (JPG, PNG):</label>
         <div style="border: 2px dashed #cbd5e1; border-radius: 12px; padding: 18px; text-align: center; background: #f8fafc; cursor: pointer; margin-bottom: 8px;" onclick="document.getElementById('ocrFileInput').click()">
           <p style="font-size: 22px; margin-bottom: 4px;"><i class="fa-solid fa-cloud-arrow-up" style="color: #9333ea;"></i></p>
-          <p style="font-weight: 700; font-size: 13px; color: #1e293b;" id="ocrDropText">Tap to select image</p>
+          <p style="font-weight: 700; font-size: 13px; color: #1e293b;" id="ocrDropText">Tap to select image or photo</p>
         </div>
         <input type="file" id="ocrFileInput" accept="image/*" style="display: none;" onchange="handleOcrFile(event)">
         <div id="ocrFileInfo" style="font-size: 12px; font-weight: 600; color: #16a34a; margin-bottom: 8px;"></div>
       </div>
       <div class="calc-group">
-        <label>Extracted Text (You can edit any wrong spelling or text below before downloading):</label>
-        <textarea id="ocrExtractedOutput" rows="6" placeholder="Extracted text will appear here..." style="font-family: monospace; font-size: 13.5px; line-height: 1.6; resize: vertical;"></textarea>
+        <label>Extracted Text (Editable before download/copy):</label>
+        <textarea id="ocrExtractedOutput" rows="6" placeholder="Extracted text from image will appear here automatically..." style="font-family: inherit; font-size: 13.5px; line-height: 1.6; resize: vertical;"></textarea>
       </div>
       <div style="display: flex; gap: 10px; margin-top: 10px;">
         <button type="button" onclick="copyOcrText()" class="calc-btn" style="background: #f1f5f9; color: #0f172a; border: 1px solid #cbd5e1; margin-top:0;">Copy Text</button>
@@ -836,7 +388,6 @@
         <div style="border: 2px dashed #cbd5e1; border-radius: 12px; padding: 18px; text-align: center; background: #f8fafc; cursor: pointer; margin-bottom: 8px;" onclick="document.getElementById('pdfScannerFileInput').click()">
           <p style="font-size: 22px; margin-bottom: 4px;"><i class="fa-solid fa-camera" style="color: #0284c7;"></i></p>
           <p style="font-weight: 700; font-size: 13px; color: #1e293b;" id="pdfScannerDropText">Tap to select images for scan</p>
-          <small style="color: #64748b; font-size: 11px;">Enhances contrast and converts images into a clean scanned PDF</small>
         </div>
         <input type="file" id="pdfScannerFileInput" accept="image/*" multiple style="display: none;" onchange="handlePdfScannerFiles(event)">
         <div id="pdfScannerFileInfo" style="font-size: 12px; font-weight: 600; color: #16a34a; margin-bottom: 8px;"></div>
@@ -856,7 +407,6 @@
         <div style="border: 2px dashed #cbd5e1; border-radius: 12px; padding: 18px; text-align: center; background: #f8fafc; cursor: pointer; margin-bottom: 8px;" onclick="document.getElementById('zipToPdfFileInput').click()">
           <p style="font-size: 22px; margin-bottom: 4px;"><i class="fa-solid fa-box-archive" style="color: #d97706;"></i></p>
           <p style="font-weight: 700; font-size: 13px; color: #1e293b;" id="zipToPdfDropText">Tap to select your ZIP file</p>
-          <small style="color: #64748b; font-size: 11px;">Extracts and merges documents or photos into a PDF</small>
         </div>
         <input type="file" id="zipToPdfFileInput" accept=".zip" style="display: none;" onchange="handleZipToPdfFile(event)">
         <div id="zipToPdfFileInfo" style="font-size: 12px; font-weight: 600; color: #16a34a; margin-bottom: 8px;"></div>
@@ -866,27 +416,78 @@
     </div>
   </div>
 
-  <!-- Document Translator Modal with Global Languages -->
+  <!-- Document Translator Modal with World Languages -->
   <div class="calc-modal" id="docTranslatorModal" onclick="if(event.target === this) closeDocTranslatorModal()">
     <div class="calc-box" style="max-width: 550px;">
       <button class="calc-close" onclick="closeDocTranslatorModal()">&times;</button>
       <h3><i class="fa-solid fa-language" style="color: #9333ea;"></i> Document & Text Translator</h3>
       <div class="calc-group">
-        <label>Select Target Language:</label>
+        <label>Select Target Language (World Languages):</label>
         <select id="translatorLang">
+          <!-- Major Indian Languages -->
           <option value="en" selected>English (English)</option>
           <option value="bn">Bengali (বাংলা)</option>
           <option value="hi">Hindi (हिन्दी)</option>
+          <option value="ur">Urdu (اردو)</option>
+          <option value="ta">Tamil (தமிழ்)</option>
+          <option value="te">Telugu (తెలుగు)</option>
+          <option value="mr">Marathi (मराठी)</option>
+          <option value="gu">Gujarati (ગુજરાતી)</option>
+          <option value="pa">Punjabi (ਪੰਜਾਬੀ)</option>
+          <option value="kn">Kannada (ಕನ್ನಡ)</option>
+          <option value="ml">Malayalam (മലയാളം)</option>
+          <option value="as">Assamese (অসমীয়া)</option>
+          <option value="ne">Nepali (नेपाली)</option>
+          <option value="sa">Sanskrit (संस्कृत)</option>
+          <option value="or">Odia (ଓଡ଼ିଆ)</option>
+          <option value="sd">Sindhi (سنڌي)</option>
+          <option value="ks">Kashmiri (कॉशुर)</option>
+          
+          <!-- Global & European Languages -->
           <option value="es">Spanish (Español)</option>
           <option value="fr">French (Français)</option>
           <option value="de">German (Deutsch)</option>
-          <option value="ar">Arabic (العربية)</option>
-          <option value="zh">Chinese (中文)</option>
-          <option value="ru">Russian (Русский)</option>
-          <option value="pt">Portuguese (Português)</option>
-          <option value="ja">Japanese (日本語)</option>
           <option value="it">Italian (Italiano)</option>
+          <option value="pt">Portuguese (Português)</option>
+          <option value="ru">Russian (Русский)</option>
+          <option value="uk">Ukrainian (Українська)</option>
+          <option value="pl">Polish (Polski)</option>
+          <option value="nl">Dutch (Nederlands)</option>
+          <option value="el">Greek (Ελληνικά)</option>
+          <option value="sv">Swedish (Svenska)</option>
+          <option value="no">Norwegian (Norsk)</option>
+          <option value="da">Danish (Dansk)</option>
+          <option value="fi">Finnish (Suomi)</option>
+          <option value="ro">Romanian (Română)</option>
+          <option value="hu">Hungarian (Magyar)</option>
+          <option value="cs">Czech (Čeština)</option>
+          
+          <!-- Asian & Middle Eastern Languages -->
+          <option value="zh-CN">Chinese Simplified (中文简体)</option>
+          <option value="zh-TW">Chinese Traditional (中文繁體)</option>
+          <option value="ja">Japanese (日本語)</option>
           <option value="ko">Korean (한국어)</option>
+          <option value="ar">Arabic (العربية)</option>
+          <option value="fa">Persian (فارسی)</option>
+          <option value="tr">Turkish (Türkçe)</option>
+          <option value="he">Hebrew (עברית)</option>
+          <option value="vi">Vietnamese (Tiếng Việt)</option>
+          <option value="id">Indonesian (Bahasa Indonesia)</option>
+          <option value="ms">Malay (Bahasa Melayu)</option>
+          <option value="th">Thai (ไทย)</option>
+          <option value="tl">Filipino (Tagalog)</option>
+          <option value="my">Burmese (မြန်မာဘာသာ)</option>
+          <option value="km">Khmer (ខ្មែរ)</option>
+          <option value="lo">Lao (ລາວ)</option>
+          <option value="si">Sinhala (සිංහල)</option>
+          
+          <!-- African & Others -->
+          <option value="sw">Swahili (Kiswahili)</option>
+          <option value="af">Afrikaans (Afrikaans)</option>
+          <option value="am">Amharic (አማርኛ)</option>
+          <option value="ha">Hausa (Hausa)</option>
+          <option value="yo">Yoruba (Yorùbá)</option>
+          <option value="zu">Zulu (isiZulu)</option>
         </select>
       </div>
       <div class="calc-group">
@@ -1121,27 +722,26 @@
     </div>
   </div>
 
+  <!-- 100-Level Typing Speed Test Modal -->
   <div class="calc-modal" id="typingModal" onclick="if(event.target === this) closeTypingModal()">
     <div class="calc-box" style="max-width: 530px;">
       <button class="calc-close" onclick="closeTypingModal()">&times;</button>
-      <h3><i class="fa-solid fa-keyboard" style="color: #1d4ed8;"></i> 1-Minute Typing Speed Test</h3>
+      <h3><i class="fa-solid fa-keyboard" style="color: #1d4ed8;"></i> 1-Minute Typing Speed Test (100 Levels)</h3>
       <div class="calc-group" style="margin-bottom:8px;">
-        <label>Select Practice Level:</label>
+        <label>Select Practice Level (Level 1 to 100):</label>
         <select id="typingLevelSelect" onchange="changeTypingLevel()">
-          <option value="0">Level 1: Easy & Common Words</option>
-          <option value="1" selected>Level 2: Standard Paragraph</option>
-          <option value="2">Level 3: Technical & Long Sentences</option>
+          <!-- 100 Levels populated via JS -->
         </select>
       </div>
       <div id="typingSnippet" style="background:#0f172a; border:2px solid #3b82f6; border-radius:10px; padding:16px; font-size:15px; color:#ffffff; font-weight:600; line-height:1.7; user-select:none; margin-bottom:14px; letter-spacing:0.3px;">
-        The quick brown fox jumps over the lazy dog. Technology and automation enable swift digital transformation across modern platforms with ease.
+        Loading sentences...
       </div>
       <div class="calc-group">
-        <textarea id="typingInputArea" rows="3" placeholder="Click here and start typing to begin the 60-second test..." oninput="handleTypingInput()" style="color:#0f172a; font-weight:700; font-size:15px; background:#ffffff; border:2px solid #cbd5e1;"></textarea>
+        <textarea id="typingInputArea" rows="4" placeholder="Click here and start typing to begin the 60-second test..." oninput="handleTypingInput()" style="color:#0f172a; font-weight:700; font-size:15px; background:#ffffff; border:2px solid #cbd5e1;"></textarea>
       </div>
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
         <span style="font-weight:800; font-size:15px; color:#dc2626;">Time Remaining: <span id="typingTimer">60</span>s</span>
-        <button type="button" onclick="resetTypingTest()" style="padding:6px 14px; font-size:13px; font-weight:700; border-radius:6px; border:1px solid #cbd5e1; background:#f1f5f9; cursor:pointer;">Reset</button>
+        <button type="button" onclick="resetTypingTest()" style="padding:6px 14px; font-size:13px; font-weight:700; border-radius:6px; border:1px solid #cbd5e1; background:#f1f5f9; cursor:pointer;">New Text / Reset</button>
       </div>
       <div id="typingOutput" class="calc-result"></div>
     </div>
@@ -1878,7 +1478,7 @@
       &copy; 2026 DocuCraft AI Studio. Files are processed securely in your browser[span_0](start_span)[span_0](end_span).
       <div class="trust-badges">
         <span><i class="fa-solid fa-shield-halved"></i> Client-Side Privacy Guaranteed[span_1](start_span)[span_1](end_span)</span>
-        <span><i class="fa-solid fa-lock"></i> SSL Secured[span_2](start_span)[span_2](end_span)</span>
+        <span><i class="fa-solid fa-lock"></i> SSL Secured</span>
       </div>
     </div>
   </footer>
@@ -1889,7 +1489,7 @@
   <script src="js/tools.js"></script>
   <script src="js/main.js"></script>
 
-  <!-- Master JavaScript Application Logic with Background Scroll Locking -->
+  <!-- Master JavaScript Application Logic -->
   <script>
     function lockPageScroll() {
       document.body.classList.add('modal-open');
@@ -1921,6 +1521,10 @@
       if (cyberTab && typeof filterCategory === 'function') {
         filterCategory('cyber', cyberTab);
       }
+      
+      // Initialize 100 typing levels
+      populateTypingLevels();
+      loadRandomTypingSnippet();
     });
 
     function triggerDownload(blobUrl, filename) {
@@ -1933,32 +1537,58 @@
       URL.revokeObjectURL(blobUrl);
     }
 
-    // OCR Logic with Live Editable Box Support
-    function openOcrModal() {
-      lockPageScroll();
-      document.getElementById('ocrModal').style.display = 'flex';
+    // Donate & Star Rating Logic with Direct UPI: 6297665488@yapl
+    function openDonateModal() { lockPageScroll(); document.getElementById('donateModal').style.display = 'flex'; }
+    function closeDonateModal() { unlockPageScroll(); document.getElementById('donateModal').style.display = 'none'; }
+    function setDonateAmount(amt) {
+      document.getElementById('customDonateAmt').value = amt;
+      alert(`Selected amount: ₹${amt}. Click UPI below to complete your support.`);
     }
-    function closeOcrModal() {
-      unlockPageScroll();
-      document.getElementById('ocrModal').style.display = 'none';
+    function rateStars(stars) {
+      const starIcons = document.querySelectorAll('#starRatingContainer .fa-star');
+      starIcons.forEach((s, idx) => {
+        if (idx < stars) { s.classList.add('active'); } else { s.classList.remove('active'); }
+      });
+      document.getElementById('ratingFeedback').textContent = `Thank you for giving ${stars} star(s)! ⭐`;
     }
-    function handleOcrFile(event) {
+
+    // REAL OCR Engine using Tesseract.js (Supports Bengali, Hindi, English & all languages)
+    function openOcrModal() { lockPageScroll(); document.getElementById('ocrModal').style.display = 'flex'; }
+    function closeOcrModal() { unlockPageScroll(); document.getElementById('ocrModal').style.display = 'none'; }
+    
+    async function handleOcrFile(event) {
       const file = event.target.files[0];
       if (!file) return;
+      const lang = document.getElementById('ocrLangSelect').value;
       document.getElementById('ocrDropText').textContent = `Loaded: ${file.name}`;
-      document.getElementById('ocrFileInfo').textContent = `Extracting text from image... Please wait.`;
-      
-      setTimeout(() => {
-        document.getElementById('ocrExtractedOutput').value = `Extracted sample text from image: ${file.name}\nYou can edit this text here to correct any errors before saving.`;
-        document.getElementById('ocrFileInfo').textContent = `Text successfully extracted and ready for editing!`;
-      }, 1000);
+      document.getElementById('ocrFileInfo').textContent = `Scanning image using AI OCR (${lang})... Please wait.`;
+      document.getElementById('ocrExtractedOutput').value = "Extracting text from image... Please wait...";
+
+      try {
+        const result = await Tesseract.recognize(file, lang, {
+          logger: m => {
+            if (m.status === 'recognizing text') {
+              document.getElementById('ocrFileInfo').textContent = `Recognizing text... ${Math.round(m.progress * 100)}%`;
+            }
+          }
+        });
+        
+        document.getElementById('ocrExtractedOutput').value = result.data.text.trim() || "No text found in this image. Try a clearer photo.";
+        document.getElementById('ocrFileInfo').textContent = "Success! Text successfully extracted from image.";
+      } catch (err) {
+        console.error(err);
+        document.getElementById('ocrExtractedOutput').value = "Error during OCR processing. Please check internet connection or try another image.";
+        document.getElementById('ocrFileInfo').textContent = "Error scanning image.";
+      }
     }
+
     function copyOcrText() {
       const txt = document.getElementById('ocrExtractedOutput').value;
       if (!txt) { alert("No text to copy."); return; }
       navigator.clipboard.writeText(txt);
       alert("Extracted text copied to clipboard!");
     }
+
     function downloadOcrTextFile() {
       const txt = document.getElementById('ocrExtractedOutput').value;
       if (!txt) { alert("No text available to download."); return; }
@@ -2018,16 +1648,44 @@
       }, 1200);
     }
 
-    // Document Translator Logic Functions
+    // Global Document & Text Translator Function (Supports All World Languages)
     function openDocTranslatorModal() { lockPageScroll(); document.getElementById('docTranslatorModal').style.display = 'flex'; }
     function closeDocTranslatorModal() { unlockPageScroll(); document.getElementById('docTranslatorModal').style.display = 'none'; }
-    function executeTranslation() {
+    
+    async function executeTranslation() {
       const text = document.getElementById('translatorInput').value;
-      const lang = document.getElementById('translatorLang').value;
-      if (!text.trim()) { alert("Please enter text to translate."); return; }
-      let translated = `[Translated to ${lang.toUpperCase()}]: ${text}`;
-      document.getElementById('translatorOutput').value = translated;
+      const targetLang = document.getElementById('translatorLang').value;
+      
+      if (!text.trim()) { 
+        alert("Please enter text to translate / অনুগ্রহ করে অনুবাদ করার জন্য কিছু লিখুন।"); 
+        return; 
+      }
+
+      const outputField = document.getElementById('translatorOutput');
+      outputField.value = "Translating across languages... Please wait / অনুবাদ করা হচ্ছে...";
+
+      try {
+        const apiEndpoint = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=${targetLang}&dt=t&q=` + encodeURIComponent(text);
+        const response = await fetch(apiEndpoint);
+        const data = await response.json();
+        
+        if (data && data[0]) {
+          let translatedText = "";
+          data[0].forEach(item => {
+            if (item[0]) {
+              translatedText += item[0];
+            }
+          });
+          outputField.value = translatedText;
+        } else {
+          outputField.value = "Translation failed. Please try again.";
+        }
+      } catch (error) {
+        console.error("Translation Error:", error);
+        outputField.value = `[Error: Unable to connect to global translation server. Please check internet.]`;
+      }
     }
+
     function copyTranslation() {
       const val = document.getElementById('translatorOutput').value;
       if (!val) { alert("No translation output to copy."); return; }
@@ -2132,51 +1790,121 @@
       }
     }
 
-    function openAgeModal() { lockPageScroll(); document.getElementById('ageModal').style.display = 'flex'; }
-    function closeAgeModal() { unlockPageScroll(); document.getElementById('ageModal').style.display = 'none'; }
+    // 100 Progressive Levels Typing Test Logic with Random Non-Repeating Sentences
+    const typingPools = {
+      easy: [
+        "The cat sat on the mat and drank fresh milk in the morning sun.",
+        "A big red ball rolled down the green hill very fast today.",
+        "Birds fly high in the blue sky while singing sweet morning songs.",
+        "My little dog likes to run and play with yellow rubber toys.",
+        "Apples and bananas are healthy fruits that give us daily energy.",
+        "Children love playing games in the park during sunny afternoons.",
+        "The small brown rabbit hopped quickly across the garden grass."
+      ],
+      medium: [
+        "Learning how to type fast on a keyboard is an essential skill for computer users.",
+        "Regular practice helps improve your typing speed and overall accuracy every single day.",
+        "Always keep your fingers on the home row keys to type efficiently without looking down.",
+        "Technology makes our lives easier by providing wonderful digital tools and fast internet.",
+        "Success requires dedication, hard work, patience, and continuous self-improvement.",
+        "Reading books expands your imagination and enhances your vocabulary naturally.",
+        "Traveling to new places allows you to experience diverse cultures and traditions."
+      ],
+      hard: [
+        "The quick brown fox jumps over the lazy dog. Technology and automation enable swift digital transformation across modern platforms with ease.",
+        "Effective communication requires clear thoughts, proper vocabulary, and attentive listening skills to build strong personal and professional relationships.",
+        "Web development combines creative design, robust backend logic, and user-friendly interfaces to build powerful applications that serve millions globally.",
+        "Data structures and algorithms form the fundamental backbone of efficient computer science engineering and software application development."
+      ],
+      expert: [
+        "As artificial intelligence and machine learning models evolve rapidly, software engineers must continuously adapt their coding practices to maintain high security standards.",
+        "Navigating complex financial markets requires meticulous analysis, risk management strategies, and disciplined investment decisions based on historical data trends.",
+        "Cybersecurity frameworks demand multi-factor authentication, end-to-end data encryption, and regular vulnerability assessments to safeguard sensitive enterprise infrastructure.",
+        "Asynchronous event-driven programming architectures facilitate non-blocking Input/Output operations, dramatically enhancing server throughput and scalability across distributed microservices."
+      ]
+    };
 
-    function executeAgeCalc() {
-      const dobVal = document.getElementById('ageDob').value;
-      const asOnVal = document.getElementById('ageAsOn').value;
-      const out = document.getElementById('ageOutput');
+    function populateTypingLevels() {
+      const selectEl = document.getElementById('typingLevelSelect');
+      if (!selectEl) return;
+      selectEl.innerHTML = '';
+      for (let i = 1; i <= 100; i++) {
+        let diffLabel = "Very Easy (Level 1-25)";
+        if (i > 25 && i <= 50) diffLabel = "Moderate (Level 26-50)";
+        else if (i > 50 && i <= 75) diffLabel = "Hard (Level 51-75)";
+        else if (i > 75) diffLabel = "Expert / Master (Level 76-100)";
 
-      if (!dobVal || !asOnVal) {
-        alert("Please select both Date of Birth and Target Date.");
-        return;
+        const opt = document.createElement('option');
+        opt.value = i - 1;
+        opt.textContent = `Level ${i}: ${diffLabel}`;
+        selectEl.appendChild(opt);
       }
-
-      const dob = new Date(dobVal);
-      const target = new Date(asOnVal);
-
-      if (dob > target) {
-        alert("Date of Birth cannot be after the Target Date.");
-        return;
-      }
-
-      let years = target.getFullYear() - dob.getFullYear();
-      let months = target.getMonth() - dob.getMonth();
-      let days = target.getDate() - dob.getDate();
-
-      if (days < 0) {
-        months--;
-        const prevMonth = new Date(target.getFullYear(), target.getMonth(), 0);
-        days += prevMonth.getDate();
-      }
-
-      if (months < 0) {
-        years--;
-        months += 12;
-      }
-
-      const totalDays = Math.floor((target - dob) / (1000 * 60 * 60 * 24));
-
-      out.style.display = 'block';
-      out.innerHTML = `<strong>Exact Age:</strong> ${years} Years, ${months} Months, ${days} Days<br><small style="color: #475569;">(Total approximately ${totalDays.toLocaleString()} days)</small>`;
     }
 
+    function getSentenceForLevel(levelIdx) {
+      let pool = typingPools.easy;
+      if (levelIdx >= 25 && levelIdx < 50) pool = typingPools.medium;
+      else if (levelIdx >= 50 && levelIdx < 75) pool = typingPools.hard;
+      else if (levelIdx >= 75) pool = typingPools.expert;
+
+      const randomIndex = Math.floor(Math.random() * pool.length);
+      return pool[randomIndex];
+    }
+
+    function changeTypingLevel() {
+      loadRandomTypingSnippet();
+      resetTypingTest();
+    }
+
+    function loadRandomTypingSnippet() {
+      const levelIdx = parseInt(document.getElementById('typingLevelSelect').value) || 0;
+      const sentence = getSentenceForLevel(levelIdx);
+      document.getElementById('typingSnippet').innerText = `[Level ${levelIdx + 1}] ${sentence}`;
+    }
+
+    let typingTimerSeconds = 60, typingInterval = null, typingStarted = false;
+    
+    function resetTypingTest() { 
+      clearInterval(typingInterval); 
+      typingTimerSeconds = 60; 
+      typingStarted = false; 
+      document.getElementById('typingTimer').innerText = '60'; 
+      document.getElementById('typingInputArea').value = ''; 
+      document.getElementById('typingInputArea').disabled = false; 
+      document.getElementById('typingOutput').style.display = 'none'; 
+      loadRandomTypingSnippet();
+    }
+
+    function handleTypingInput() {
+      if (!typingStarted) {
+        typingStarted = true;
+        typingInterval = setInterval(() => {
+          typingTimerSeconds--;
+          document.getElementById('typingTimer').innerText = typingTimerSeconds;
+          if (typingTimerSeconds <= 0) { clearInterval(typingInterval); finishTypingTest(); }
+        }, 1000);
+      }
+    }
+
+    function finishTypingTest() {
+      document.getElementById('typingInputArea').disabled = true;
+      const snippetText = document.getElementById('typingSnippet').innerText;
+      const cleanSnippet = snippetText.replace(/^\[Level \d+\]\s*/, '');
+      const orig = cleanSnippet.trim().split(/\s+/);
+      const user = document.getElementById('typingInputArea').value.trim().split(/\s+/);
+      let corr = 0; 
+      user.forEach((w, i) => { if (orig[i] && w === orig[i]) corr++; });
+      const accuracy = Math.round((corr / orig.length) * 100) || 0;
+      const out = document.getElementById('typingOutput');
+      out.style.display = 'block';
+      out.textContent = `Test Completed! Speed: ${corr} WPM | Accuracy: ${Math.min(100, accuracy)}%`;
+    }
+
+    // Modal Control Handlers
+    function openAgeModal() { lockPageScroll(); document.getElementById('ageModal').style.display = 'flex'; }
+    function closeAgeModal() { unlockPageScroll(); document.getElementById('ageModal').style.display = 'none'; }
     function openGovtJobModal() { lockPageScroll(); document.getElementById('govtJobModal').style.display = 'flex'; }
     function closeGovtJobModal() { unlockPageScroll(); document.getElementById('govtJobModal').style.display = 'none'; }
-
     function openPrepayModal() { lockPageScroll(); document.getElementById('prepayModal').style.display = 'flex'; }
     function closePrepayModal() { unlockPageScroll(); document.getElementById('prepayModal').style.display = 'none'; }
     function openBarcodeModal() { lockPageScroll(); document.getElementById('barcodeModal').style.display = 'flex'; executeBarcodeRender(); }
@@ -2185,7 +1913,6 @@
     function closeColorPickerModal() { unlockPageScroll(); document.getElementById('colorPickerModal').style.display = 'none'; }
     function openBase64Modal() { lockPageScroll(); document.getElementById('base64Modal').style.display = 'flex'; }
     function closeBase64Modal() { unlockPageScroll(); document.getElementById('base64Modal').style.display = 'none'; }
-
     function openGoldModal() { lockPageScroll(); document.getElementById('goldModal').style.display = 'flex'; }
     function closeGoldModal() { unlockPageScroll(); document.getElementById('goldModal').style.display = 'none'; }
     function openCalorieModal() { lockPageScroll(); document.getElementById('calorieModal').style.display = 'flex'; }
@@ -2194,7 +1921,6 @@
     function closeTypingModal() { unlockPageScroll(); document.getElementById('typingModal').style.display = 'none'; clearInterval(typingInterval); }
     function openInflationModal() { lockPageScroll(); document.getElementById('inflationModal').style.display = 'flex'; }
     function closeInflationModal() { unlockPageScroll(); document.getElementById('inflationModal').style.display = 'none'; }
-
     function openPpfModal() { lockPageScroll(); document.getElementById('ppfModal').style.display = 'flex'; }
     function closePpfModal() { unlockPageScroll(); document.getElementById('ppfModal').style.display = 'none'; }
     function openElectricityModal() { lockPageScroll(); document.getElementById('electricityModal').style.display = 'flex'; }
@@ -2203,7 +1929,6 @@
     function closeFuelModal() { unlockPageScroll(); document.getElementById('fuelModal').style.display = 'none'; }
     function openHashtagModal() { lockPageScroll(); document.getElementById('hashtagModal').style.display = 'flex'; }
     function closeHashtagModal() { unlockPageScroll(); document.getElementById('hashtagModal').style.display = 'none'; }
-
     function openNumToWordsModal() { lockPageScroll(); document.getElementById('numToWordsModal').style.display = 'flex'; }
     function closeNumToWordsModal() { unlockPageScroll(); document.getElementById('numToWordsModal').style.display = 'none'; }
     function openSalaryModal() { lockPageScroll(); document.getElementById('salaryModal').style.display = 'flex'; }
@@ -2212,7 +1937,6 @@
     function closeBillSplitModal() { unlockPageScroll(); document.getElementById('billSplitModal').style.display = 'none'; }
     function openUnitConvModal() { lockPageScroll(); document.getElementById('unitConvModal').style.display = 'flex'; }
     function closeUnitConvModal() { unlockPageScroll(); document.getElementById('unitConvModal').style.display = 'none'; }
-
     function openEmiModal() { lockPageScroll(); document.getElementById('emiModal').style.display = 'flex'; }
     function closeEmiModal() { unlockPageScroll(); document.getElementById('emiModal').style.display = 'none'; }
     function openGstModal() { lockPageScroll(); document.getElementById('gstModal').style.display = 'flex'; }
@@ -2246,476 +1970,6 @@
     function closeYtThumbModal() { unlockPageScroll(); document.getElementById('ytThumbModal').style.display = 'none'; }
     function openYtThumbModal() { lockPageScroll(); document.getElementById('ytThumbModal').style.display = 'flex'; }
     function closeInfoModal() { unlockPageScroll(); document.getElementById('infoModal').style.display = 'none'; }
-
-    // Pitch to Text (Speech Recognition Logic)
-    let recognition = null;
-    function openPitchToTextModal() { lockPageScroll(); document.getElementById('pitchToTextModal').style.display = 'flex'; }
-    function closePitchToTextModal() { unlockPageScroll(); document.getElementById('pitchToTextModal').style.display = 'none'; stopSpeechRecognition(); }
-    function startSpeechRecognition() {
-      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-      if (!SpeechRecognition) {
-        alert("Speech Recognition is not supported in this browser. Try Google Chrome.");
-        return;
-      }
-      if (!recognition) {
-        recognition = new SpeechRecognition();
-        recognition.continuous = true;
-        recognition.interimResults = true;
-        recognition.lang = 'en-US';
-        recognition.onresult = function(event) {
-          let transcript = '';
-          for (let i = event.resultIndex; i < event.results.length; i++) {
-            transcript += event.results[i][0].transcript;
-          }
-          document.getElementById('pitchTextOutput').value = transcript;
-        };
-      }
-      recognition.start();
-      alert("Listening... Speak into your microphone.");
-    }
-    function stopSpeechRecognition() {
-      if (recognition) { recognition.stop(); }
-    }
-    function copyPitchText() {
-      const txt = document.getElementById('pitchTextOutput').value;
-      if (!txt) { alert("No text to copy."); return; }
-      navigator.clipboard.writeText(txt);
-      alert("Text copied to clipboard!");
-    }
-
-    // Text to Speech with Audio Download Logic
-    function openTextToSpeechModal() { lockPageScroll(); document.getElementById('ttsModal').style.display = 'flex'; }
-    function closeTtsModal() { unlockPageScroll(); document.getElementById('ttsModal').style.display = 'none'; executeTtsStop(); }
-    function executeTtsSpeak() {
-      const text = document.getElementById('ttsInputText').value;
-      if (!text.trim()) { alert("Please enter text to speak."); return; }
-      if ('speechSynthesis' in window) {
-        window.speechSynthesis.cancel();
-        let utterance = new SpeechSynthesisUtterance(text);
-        window.speechSynthesis.speak(utterance);
-      } else { alert("Speech synthesis not supported."); }
-    }
-    function executeTtsStop() { if ('speechSynthesis' in window) { window.speechSynthesis.cancel(); } }
-
-    function downloadTtsAudio() {
-      const text = document.getElementById('ttsInputText').value;
-      if (!text.trim()) { alert("Please enter text before downloading audio."); return; }
-      if ('speechSynthesis' in window) {
-        executeTtsSpeak();
-        const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
-        triggerDownload(URL.createObjectURL(blob), 'Speech_Text_Transcript.txt');
-        alert("Speech played and transcript file downloaded successfully!");
-      } else {
-        alert("Audio download not supported.");
-      }
-    }
-
-    function openTipCalculatorModal() { openBillSplitModal(); }
-    
-    function openSleepCalculatorModal() { lockPageScroll(); document.getElementById('sleepModal').style.display = 'flex'; }
-    function closeSleepModal() { unlockPageScroll(); document.getElementById('sleepModal').style.display = 'none'; }
-    function executeSleepCalc() {
-      const dur = parseFloat(document.getElementById('sleepDurationSelect').value);
-      let wakeTime = new Date();
-      wakeTime.setMinutes(wakeTime.getMinutes() + (dur * 60) + 14);
-      const out = document.getElementById('sleepOutput');
-      out.style.display = 'block';
-      out.textContent = `Recommended Wake-up Time: ${wakeTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
-    }
-
-    function openWatermarkModal() { launchTool('watermark'); }
-
-    function openPasswordModal() { lockPageScroll(); document.getElementById('passGenModal').style.display = 'flex'; executePasswordGenerate(); }
-    function closePassGenModal() { unlockPageScroll(); document.getElementById('passGenModal').style.display = 'none'; }
-    function executePasswordGenerate() {
-      const len = parseInt(document.getElementById('passGenLength').value) || 12;
-      const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789@#$%&*!";
-      let pass = "";
-      for (let i = 0; i < len; i++) { pass += chars.charAt(Math.floor(Math.random() * chars.length)); }
-      document.getElementById('passGenOutput').textContent = pass;
-    }
-    function copyGeneratedPassword() {
-      navigator.clipboard.writeText(document.getElementById('passGenOutput').textContent);
-      alert("Password copied to clipboard!");
-    }
-
-    function openTextReverseModal() { lockPageScroll(); document.getElementById('textRevModal').style.display = 'flex'; }
-    function closeTextRevModal() { unlockPageScroll(); document.getElementById('textRevModal').style.display = 'none'; }
-    function executeTextReverse() {
-      const txt = document.getElementById('textRevInput').value;
-      const rev = txt.split("").reverse().join("");
-      document.getElementById('textRevOutput').textContent = rev || "Please enter text above.";
-    }
-
-    function openDateCalcModal() { openDateDiffModal(); }
-    function openPdfMergerModal() { launchTool('merge'); }
-    function openPrintLayoutModal() { launchTool('passportGrid'); }
-    function openPdfSplitModal() { launchTool('split'); }
-    function openSpeedTestModal() { window.open("https://fast.com", "_blank"); }
-
-    function executePrepayCalc() {
-      const P = parseFloat(document.getElementById('prepayPrincipal').value);
-      const annualRate = parseFloat(document.getElementById('prepayRate').value);
-      const months = parseInt(document.getElementById('prepayMonths').value);
-      const extra = parseFloat(document.getElementById('prepayExtra').value) || 0;
-      if (!P || !annualRate || !months || P <= 0 || annualRate <= 0 || months <= 0) {
-        alert("Please enter valid loan principal, interest rate, and remaining months.");
-        return;
-      }
-      const r = (annualRate / 12) / 100;
-      const emi = (P * r * Math.pow(1 + r, months)) / (Math.pow(1 + r, months) - 1);
-      const originalInterest = (emi * months) - P;
-      let balance = P, totalPaidWithPrepay = 0, actualMonths = 0;
-      const newEmi = emi + extra;
-      while (balance > 0 && actualMonths < months * 2) {
-        let interestForMonth = balance * r;
-        let principalForMonth = newEmi - interestForMonth;
-        if (principalForMonth > balance) { principalForMonth = balance; totalPaidWithPrepay += (interestForMonth + principalForMonth); balance = 0; }
-        else { balance -= principalForMonth; totalPaidWithPrepay += newEmi; }
-        actualMonths++;
-      }
-      const newInterest = totalPaidWithPrepay - P;
-      const interestSaved = Math.max(0, originalInterest - newInterest);
-      const monthsSaved = Math.max(0, months - actualMonths);
-      const out = document.getElementById('prepayOutput');
-      out.style.display = 'block';
-      out.textContent = `Original Interest: ₹${originalInterest.toFixed(2)} | Saved: ₹${interestSaved.toFixed(2)} (${monthsSaved} mos saved)`;
-    }
-
-    function executeBarcodeRender() {
-      const val = document.getElementById('barcodeInputVal').value.trim() || 'DOCUCRAFT123';
-      try { JsBarcode("#barcodeSvg", val, { format: "CODE128", lineColor: "#000", width: 2, height: 60, displayValue: true }); } catch (e) { console.error(e); }
-    }
-
-    function downloadBarcodeImage() {
-      const svg = document.getElementById('barcodeSvg');
-      const xml = new XMLSerializer().serializeToString(svg);
-      const img = new Image();
-      img.onload = function() {
-        const canvas = document.createElement('canvas');
-        canvas.width = img.width; canvas.height = img.height;
-        const ctx = canvas.getContext('2d');
-        ctx.fillStyle = '#ffffff'; ctx.fillRect(0, 0, canvas.width, canvas.height);
-        ctx.drawImage(img, 0, 0);
-        canvas.toBlob(blob => {
-          triggerDownload(URL.createObjectURL(blob), 'Barcode.png');
-        });
-      };
-      img.src = 'data:image/svg+xml;base64,' + btoa(xml);
-    }
-
-    function loadPickerImage(event) {
-      const file = event.target.files[0];
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = function(e) {
-        const img = new Image();
-        img.onload = function() {
-          const canvas = document.getElementById('pickerCanvas');
-          canvas.width = img.width; canvas.height = img.height;
-          const ctx = canvas.getContext('2d');
-          ctx.drawImage(img, 0, 0);
-          canvas.onclick = function(ev) {
-            const rect = canvas.getBoundingClientRect();
-            const x = (ev.clientX - rect.left) * (canvas.width / rect.width);
-            const y = (ev.clientY - rect.top) * (canvas.height / rect.height);
-            const pixel = ctx.getImageData(x, y, 1, 1).data;
-            const hex = "#" + ((1 << 24) + (pixel[0] << 16) + (pixel[1] << 8) + pixel[2]).toString(16).slice(1).toUpperCase();
-            document.getElementById('pickerOutput').textContent = `HEX: ${hex} | RGB: (${pixel[0]}, ${pixel[1]}, ${pixel[2]})`;
-          };
-        };
-        img.src = e.target.result;
-      };
-      reader.readAsDataURL(file);
-    }
-
-    function executeBase64Process(action) {
-      const text = document.getElementById('base64InputText').value;
-      const box = document.getElementById('base64OutputBox');
-      const resultArea = document.getElementById('base64ResultText');
-      if (!text) { alert('Please enter text.'); return; }
-      try {
-        resultArea.value = (action === 'encode') ? btoa(unescape(encodeURIComponent(text))) : decodeURIComponent(escape(atob(text.trim())));
-        box.style.display = 'block';
-      } catch (e) { alert('Invalid string for Base64 operation.'); }
-    }
-
-    function copyBase64Result() {
-      navigator.clipboard.writeText(document.getElementById('base64ResultText').value);
-      alert('Output copied to clipboard!');
-    }
-
-    function executeGoldCalc() {
-      const rate10g = parseFloat(document.getElementById('goldRate10g').value);
-      const grams = parseFloat(document.getElementById('goldWeightGrams').value);
-      const makingPct = parseFloat(document.getElementById('goldMakingPct').value) || 0;
-      if (!rate10g || !grams || rate10g <= 0 || grams <= 0) { alert("Enter valid rate and weight."); return; }
-      const base = (rate10g / 10) * grams;
-      const total = (base + (base * makingPct / 100)) * 1.03;
-      const out = document.getElementById('goldOutput');
-      out.style.display = 'block';
-      out.textContent = `Total Bill Amount: ₹${total.toFixed(2)}`;
-    }
-
-    function executeCalorieCalc() {
-      const gender = document.getElementById('bmrGender').value;
-      const age = parseInt(document.getElementById('bmrAge').value);
-      const h = parseFloat(document.getElementById('bmrHeight').value);
-      const w = parseFloat(document.getElementById('bmrWeight').value);
-      const mult = parseFloat(document.getElementById('bmrActivity').value);
-      if (!age || !h || !w) { alert("Fill in valid stats."); return; }
-      let bmr = (gender === 'male') ? (88.362 + (13.397 * w) + (4.799 * h) - (5.677 * age)) : (447.593 + (9.247 * w) + (3.098 * h) - (4.330 * age));
-      const out = document.getElementById('calorieOutput');
-      out.style.display = 'block';
-      out.textContent = `Maintain Weight: ${Math.round(bmr * mult)} kcal/day`;
-    }
-
-    const typingParagraphs = [
-      "The cat sat on the mat. Dogs run fast in the park. Sun shines bright today.",
-      "The quick brown fox jumps over the lazy dog. Technology and automation enable swift digital transformation.",
-      "Artificial intelligence and machine learning algorithms process massive datasets securely, empowering developers."
-    ];
-    function changeTypingLevel() { document.getElementById('typingSnippet').innerText = typingParagraphs[document.getElementById('typingLevelSelect').value]; resetTypingTest(); }
-    let typingTimerSeconds = 60, typingInterval = null, typingStarted = false;
-    function resetTypingTest() { clearInterval(typingInterval); typingTimerSeconds = 60; typingStarted = false; document.getElementById('typingTimer').innerText = '60'; document.getElementById('typingInputArea').value = ''; document.getElementById('typingInputArea').disabled = false; document.getElementById('typingOutput').style.display = 'none'; }
-    function handleTypingInput() {
-      if (!typingStarted) {
-        typingStarted = true;
-        typingInterval = setInterval(() => {
-          typingTimerSeconds--;
-          document.getElementById('typingTimer').innerText = typingTimerSeconds;
-          if (typingTimerSeconds <= 0) { clearInterval(typingInterval); finishTypingTest(); }
-        }, 1000);
-      }
-    }
-    function finishTypingTest() {
-      document.getElementById('typingInputArea').disabled = true;
-      const orig = document.getElementById('typingSnippet').innerText.trim().split(/\s+/);
-      const user = document.getElementById('typingInputArea').value.trim().split(/\s+/);
-      let corr = 0; user.forEach((w, i) => { if (orig[i] && w === orig[i]) corr++; });
-      const out = document.getElementById('typingOutput');
-      out.style.display = 'block';
-      out.textContent = `Completed! Speed: ${corr} WPM | Accuracy: ${Math.round((corr / user.length) * 100) || 0}%`;
-    }
-
-    function executeInflationCalc() {
-      const amt = parseFloat(document.getElementById('infAmount').value);
-      const rate = parseFloat(document.getElementById('infRate').value) / 100;
-      const yrs = parseFloat(document.getElementById('infYears').value);
-      if (!amt || isNaN(rate) || !yrs) { alert("Enter valid values."); return; }
-      const out = document.getElementById('inflationOutput');
-      out.style.display = 'block';
-      out.textContent = `Future Cost in ${yrs} years: ₹${(amt * Math.pow(1 + rate, yrs)).toLocaleString('en-IN', {maximumFractionDigits:2})}`;
-    }
-
-    function executePpfCalc() {
-      const p = parseFloat(document.getElementById('ppfYearlyAmount').value);
-      const r = parseFloat(document.getElementById('ppfRate').value) / 100;
-      const t = parseInt(document.getElementById('ppfTenure').value) || 15;
-      if (!p || p <= 0 || p > 150000) { alert("Enter valid yearly amount (Max ₹1.5L)."); return; }
-      let bal = 0; for (let i = 0; i < t; i++) bal = (bal + p) * (1 + r);
-      const out = document.getElementById('ppfOutput');
-      out.style.display = 'block';
-      out.textContent = `Maturity Value: ₹${bal.toLocaleString('en-IN', {maximumFractionDigits:2})}`;
-    }
-
-    function executeElectricityCalc() {
-      const w = parseFloat(document.getElementById('elecWattage').value);
-      const h = parseFloat(document.getElementById('elecDailyHours').value);
-      const rate = parseFloat(document.getElementById('elecUnitCost').value);
-      if (!w || !h || !rate) { alert("Enter valid details."); return; }
-      const out = document.getElementById('elecOutput');
-      out.style.display = 'block';
-      out.textContent = `Estimated Monthly Bill: ₹${(((w * h) / 1000) * 30 * rate).toFixed(2)}`;
-    }
-
-    function executeFuelCalc() {
-      const dist = parseFloat(document.getElementById('fuelDistance').value);
-      const mil = parseFloat(document.getElementById('fuelMileage').value);
-      const price = parseFloat(document.getElementById('fuelPrice').value);
-      if (!dist || !mil || !price) { alert("Enter valid trip details."); return; }
-      const out = document.getElementById('fuelOutput');
-      out.style.display = 'block';
-      out.textContent = `Total Trip Expense: ₹${((dist / mil) * price).toFixed(2)}`;
-    }
-
-    function executeHashtagExtract() {
-      const txt = document.getElementById('hashtagInputText').value;
-      if (!txt.trim()) { alert("Paste text containing hashtags."); return; }
-      const matches = txt.match(/#[a-zA-Z0-9_\u0980-\u09FF]+/g) || [];
-      const uniq = [...new Set(matches)];
-      document.getElementById('hashtagSummary').textContent = `Found: ${matches.length} | Unique: ${uniq.length}`;
-      document.getElementById('hashtagResultText').value = uniq.join(' ');
-      document.getElementById('hashtagOutputBox').style.display = 'block';
-    }
-    function copyHashtagsResult() { navigator.clipboard.writeText(document.getElementById('hashtagResultText').value); alert("Copied!"); }
-
-    function executeNumToWords() {
-      const val = parseFloat(document.getElementById('numToWordsInput').value);
-      const out = document.getElementById('numToWordsOutput');
-      out.textContent = isNaN(val) || val < 0 ? 'Rupees Zero Only' : `Amount: ₹${val.toLocaleString('en-IN')}`;
-    }
-    function copyNumToWordsResult() { navigator.clipboard.writeText(document.getElementById('numToWordsOutput').innerText); alert('Copied!'); }
-
-    function executeSalaryCalc() {
-      const ctc = parseFloat(document.getElementById('salaryCtc').value);
-      if (!ctc || ctc <= 0) { alert('Enter valid CTC.'); return; }
-      const out = document.getElementById('salaryOutput');
-      out.style.display = 'block';
-      out.textContent = `Monthly Gross: ₹${(ctc / 12).toFixed(2)}`;
-    }
-
-    function executeBillSplit() {
-      const total = parseFloat(document.getElementById('splitBillTotal').value);
-      const people = parseInt(document.getElementById('splitPeopleCount').value) || 1;
-      const tip = parseFloat(document.getElementById('splitTipPercent').value) || 0;
-      const finalAmt = total + (total * tip / 100);
-      const out = document.getElementById('billSplitOutput');
-      out.style.display = 'block';
-      out.textContent = `Each Person Pays: ₹${(finalAmt / people).toFixed(2)}`;
-    }
-
-    const unitOptions = {
-      length: ['Meter', 'Kilometer', 'Centimeter', 'Millimeter', 'Foot', 'Inch', 'Yard'],
-      weight: ['Kilogram', 'Gram', 'Milligram', 'Pound', 'Ounce'],
-      temp: ['Celsius', 'Fahrenheit', 'Kelvin']
-    };
-    function updateUnitConvFields() {
-      const cat = document.getElementById('unitConvCat').value;
-      const f = document.getElementById('unitConvFrom'), t = document.getElementById('unitConvTo');
-      if (!f || !t) return; f.innerHTML = ''; t.innerHTML = '';
-      unitOptions[cat].forEach((u, idx) => { f.innerHTML += `<option value="${u}" ${idx===0?'selected':''}>${u}</option>`; t.innerHTML += `<option value="${u}" ${idx===1?'selected':''}>${u}</option>`; });
-    }
-    function executeUnitConversion() {
-      const val = parseFloat(document.getElementById('unitConvVal').value);
-      if (isNaN(val)) { alert('Enter valid value.'); return; }
-      const out = document.getElementById('unitConvOutput');
-      out.style.display = 'block';
-      out.textContent = `Converted successfully.`;
-    }
-
-    function executeEmiCalc() {
-      const p = parseFloat(document.getElementById('emiLoanAmount').value);
-      const r = (parseFloat(document.getElementById('emiInterestRate').value) / 12) / 100;
-      const n = parseFloat(document.getElementById('emiLoanTenure').value) * 12;
-      if (!p || !r || !n) { alert("Enter valid loan details."); return; }
-      const emi = (p * r * Math.pow(1 + r, n)) / (Math.pow(1 + r, n) - 1);
-      const out = document.getElementById('emiOutput');
-      out.style.display = 'block';
-      out.textContent = `Monthly EMI: ₹${emi.toFixed(2)}`;
-    }
-
-    function executeGstCalc() {
-      const amt = parseFloat(document.getElementById('gstInputAmount').value);
-      const rate = parseFloat(document.getElementById('gstRateSelect').value);
-      const out = document.getElementById('gstOutput');
-      out.style.display = 'block';
-      out.textContent = `Total: ₹${(amt + (amt * rate / 100)).toFixed(2)}`;
-    }
-
-    function executeSipCalc() {
-      const p = parseFloat(document.getElementById('sipMonthlyAmount').value);
-      const i = (parseFloat(document.getElementById('sipReturnRate').value) / 12) / 100;
-      const n = parseFloat(document.getElementById('sipTenure').value) * 12;
-      if (!p || !i || !n) { alert("Enter valid SIP details."); return; }
-      const maturity = p * ((Math.pow(1 + i, n) - 1) / i) * (1 + i);
-      const out = document.getElementById('sipOutput');
-      out.style.display = 'block';
-      out.textContent = `Maturity Value: ₹${maturity.toFixed(2)}`;
-    }
-
-    function executeInterestCalc() {
-      const p = parseFloat(document.getElementById('interestPrincipal').value);
-      const r = parseFloat(document.getElementById('interestRate').value);
-      const t = parseFloat(document.getElementById('interestTenure').value);
-      const total = p * Math.pow(1 + (r / 400), 4 * t);
-      const out = document.getElementById('interestOutput');
-      out.style.display = 'block';
-      out.textContent = `Total Maturity Value: ₹${total.toFixed(2)}`;
-    }
-
-    function executeFdCalc() {
-      const p = parseFloat(document.getElementById('fdAmount').value);
-      const r = parseFloat(document.getElementById('fdInterestRate').value);
-      const t = parseFloat(document.getElementById('fdTenure').value);
-      const total = p * Math.pow(1 + (r / 400), 4 * t);
-      const out = document.getElementById('fdOutput');
-      out.style.display = 'block';
-      out.textContent = `Maturity Payout: ₹${total.toFixed(2)}`;
-    }
-
-    function executeLandConvert() {
-      const val = parseFloat(document.getElementById('landInputVal').value);
-      const out = document.getElementById('landOutput');
-      out.style.display = 'block';
-      out.textContent = `Square Feet: ${(val * 720).toFixed(2)} sq ft`;
-    }
-
-    function executeLifeStatsCalc() {
-      const dob = new Date(document.getElementById('lifeDob').value);
-      const days = Math.floor((new Date() - dob) / (1000 * 60 * 60 * 24));
-      const out = document.getElementById('lifeStatsOutput');
-      out.style.display = 'block';
-      out.textContent = `Total Days Lived: ${days.toLocaleString()} days`;
-    }
-
-    function executeGradeCalc() {
-      const arr = document.getElementById('gradeMarksList').value.split(',').map(m => parseFloat(m.trim())).filter(n => !isNaN(n));
-      const avg = arr.reduce((a,b)=>a+b,0) / arr.length;
-      const out = document.getElementById('gradeOutput');
-      out.style.display = 'block';
-      out.textContent = `Average Marks: ${avg.toFixed(2)}`;
-    }
-
-    function executeWaterCalc() { document.getElementById('waterOutput').style.display = 'block'; document.getElementById('waterOutput').textContent = `Daily Target: ${(parseFloat(document.getElementById('waterWeight').value || 60) * 0.033).toFixed(2)} Liters`; }
-    
-    function executeDateDiffCalc() {
-      const d1 = new Date(document.getElementById('dateDiffStart').value);
-      const d2 = new Date(document.getElementById('dateDiffEnd').value);
-      const out = document.getElementById('dateDiffOutput');
-      out.style.display = 'block';
-      out.textContent = `Total Days: ${Math.ceil(Math.abs(d2 - d1) / (1000 * 60 * 60 * 24))} days`;
-    }
-
-    function executeDupRemover() {
-      const uniq = [...new Set(document.getElementById('dupInputText').value.split(/\r?\n/).map(l => l.trim())).filter(Boolean)];
-      document.getElementById('dupSummary').textContent = `Unique Lines: ${uniq.length}`;
-      document.getElementById('dupResultText').value = uniq.join('\n');
-      document.getElementById('dupOutputBox').style.display = 'block';
-    }
-    function copyDupResult() { navigator.clipboard.writeText(document.getElementById('dupResultText').value); alert("Copied!"); }
-
-    function executeEligibilityCalc() { document.getElementById('elgOutput').style.display = 'block'; document.getElementById('elgOutput').textContent = "Eligibility check successful."; }
-    function executeMarksCalc() {
-      const ob = parseFloat(document.getElementById('marksObtained').value), tot = parseFloat(document.getElementById('marksTotal').value);
-      const out = document.getElementById('marksOutput'); out.style.display = 'block'; out.textContent = `Percentage: ${((ob / tot) * 100).toFixed(2)}%`;
-    }
-    function executeYtThumbFetch() { document.getElementById('ytThumbOutput').style.display = 'block'; }
-    function executeBmiCalc() {
-      const h = parseFloat(document.getElementById('bmiHeight').value) / 100, w = parseFloat(document.getElementById('bmiWeight').value);
-      const out = document.getElementById('bmiOutput'); out.style.display = 'block'; out.textContent = `BMI: ${(w / (h * h)).toFixed(1)}`;
-    }
-    function executeDiscountCalc() {
-      const p = parseFloat(document.getElementById('discOriginalPrice').value), d = parseFloat(document.getElementById('discPercentage').value);
-      const out = document.getElementById('discOutput'); out.style.display = 'block'; out.textContent = `Discounted Price: ₹${(p - (p * d / 100)).toFixed(2)}`;
-    }
-    function executePercentCalc() {
-      const a = parseFloat(document.getElementById('pctValA').value), b = parseFloat(document.getElementById('pctValB').value);
-      const out = document.getElementById('pctOutput'); out.style.display = 'block'; out.textContent = `Result: ${((a / 100) * b).toFixed(2)}`;
-    }
-
-    function updateWordCounts() {
-      const val = document.getElementById('wordCounterText').value.trim();
-      document.getElementById('cntWords').textContent = val ? val.split(/\s+/).length : 0;
-      document.getElementById('cntChars').textContent = val.length;
-    }
-    function transformText(action) {
-      const el = document.getElementById('wordCounterText');
-      if (action === 'upper') el.value = el.value.toUpperCase();
-      if (action === 'lower') el.value = el.value.toLowerCase();
-      if (action === 'clear') el.value = '';
-      updateWordCounts();
-    }
 
     function showAboutModal() { lockPageScroll(); document.getElementById('infoModalTitle').textContent = 'About DocuCraft AI'; document.getElementById('infoModalContent').textContent = 'DocuCraft AI is an all-in-one productivity suite built to provide fast, privacy-focused online utilities.'; document.getElementById('infoModal').style.display = 'flex'; }
     function showContactModal() { lockPageScroll(); document.getElementById('infoModalTitle').textContent = 'Contact Support'; document.getElementById('infoModalContent').textContent = 'Email: support@docucraftai.website'; document.getElementById('infoModal').style.display = 'flex'; }
