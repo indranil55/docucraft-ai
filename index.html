@@ -260,6 +260,73 @@
     .translator-copy-btn:hover {
       background: #1e293b;
     }
+
+    /* Scientific Calculator Additional Styling */
+    .calc-app-box {
+      background-color: #1e1e1e;
+      color: #ffffff;
+      padding: 15px;
+      border-radius: 12px;
+      margin-top: 10px;
+    }
+    .calc-mode-tabs {
+      display: flex;
+      justify-content: space-around;
+      background-color: #2c2c2c;
+      border-radius: 8px;
+      margin-bottom: 12px;
+      padding: 4px;
+    }
+    .calc-tab-btn {
+      background: none;
+      border: none;
+      color: #9aa0a6;
+      padding: 6px 10px;
+      font-size: 0.85rem;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    .calc-tab-btn.active {
+      background-color: #3c4043;
+      color: #ffffff;
+      font-weight: 600;
+    }
+    .calc-screen-display {
+      background-color: #2c2c2c;
+      padding: 12px;
+      border-radius: 8px;
+      margin-bottom: 12px;
+      text-align: right;
+      min-height: 70px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    #scientificHistory { font-size: 0.85rem; color: #9aa0a6; overflow-x: auto; }
+    #scientificOutput { font-size: 1.6rem; color: #ffffff; font-weight: 500; overflow-x: auto; }
+    .calc-buttons-grid-box {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 6px;
+    }
+    .calc-buttons-grid-box button {
+      background-color: #333333;
+      color: #ffffff;
+      border: none;
+      padding: 10px;
+      font-size: 0.95rem;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background-color 0.2s, transform 0.1s;
+    }
+    .calc-buttons-grid-box button:active { transform: scale(0.95); }
+    .calc-buttons-grid-box button:hover { background-color: #444444; }
+    .btn-sci-op { background-color: #393b40; color: #8ab4f8; }
+    .btn-sci-ac { background-color: #422727; color: #f28b82; }
+    .btn-sci-eq { background-color: #8ab4f8; color: #121212; font-weight: bold; }
+    .calc-panel-sec { display: none; }
+    .calc-panel-sec.active { display: grid; }
   </style>
 
   <script>
@@ -330,11 +397,11 @@
           <span>Combine files</span>
         </div>
       </div>
-      <div class="popular-card" onclick="launchTool('kbResizer')">
-        <div class="popular-icon" style="background:#dbeafe; color:#2563eb;"><i class="fa-solid fa-compress"></i></div>
+      <div class="popular-card" onclick="openScientificCalcModal()">
+        <div class="popular-icon" style="background:#e0f2fe; color:#0284c7;"><i class="fa-solid fa-calculator"></i></div>
         <div class="popular-info">
-          <h4>KB Resizer</h4>
-          <span>Exact KB/MB</span>
+          <h4>Scientific Calculator</h4>
+          <span>Math Solver</span>
         </div>
       </div>
       <div class="popular-card" onclick="launchTool('compress')">
@@ -368,11 +435,18 @@
     </div>
   </div>
 
-  <!-- Main Tools Grid (Clean, Non-Duplicate Master List with Separate PDF Converters) -->
+  <!-- Main Tools Grid -->
   <main class="main-grid-container">
     <div class="tools-grid" id="toolsGrid">
       
-      <!-- New Added Tools: PDF Scanner, Zip to PDF, DocuCraft AI Translator -->
+      <!-- Scientific Calculator Card Added -->
+      <div class="tool-card" data-cat="finance" onclick="openScientificCalcModal()">
+        <div class="tool-icon" style="background:#e0f2fe; color:#0284c7;"><i class="fa-solid fa-calculator"></i></div>
+        <h3>DocuCraft AI Scientific Calculator <span class="badge-new">NEW</span></h3>
+        <p>Advanced scientific calculator with Trigonometry[span_0](start_span)[span_0](end_span), Calculus[span_1](start_span)[span_1](end_span), Algebra[span_2](start_span)[span_2](end_span), and Math Solver features.</p>
+        <span class="tool-meta">Open Calculator &rarr;</span>
+      </div>
+
       <div class="tool-card" data-cat="document" onclick="openPdfScannerModal()">
         <div class="tool-icon" style="background:#e0f2fe; color:#0284c7;"><i class="fa-solid fa-scanner"></i></div>
         <h3>PDF Scanner & Enhancer <span class="badge-new">NEW</span></h3>
@@ -394,7 +468,6 @@
         <span class="tool-meta">Open Translator &rarr;</span>
       </div>
 
-      <!-- Repair PDF Tool Card -->
       <div class="tool-card" data-cat="editSecurity" onclick="openRepairPdfModal()">
         <div class="tool-icon" style="background:#fef3c7; color:#d97706;"><i class="fa-solid fa-wrench"></i></div>
         <h3>Repair PDF (Fix Corrupted File) <span class="badge-new">NEW</span></h3>
@@ -815,9 +888,7 @@
         <span class="tool-meta">Open Tool &rarr;</span>
       </div>
 
-      <!-- =========================================================
-           Convert to PDF - Separate Individual Cards
-           ========================================================= -->
+      <!-- Convert to PDF - Separate Individual Cards -->
       <div class="tool-card" data-cat="toPdf" onclick="launchTool('jpgToPdf')">
         <div class="tool-icon" style="background:#eff6ff; color:#2563eb;"><i class="fa-solid fa-file-image"></i></div>
         <h3>JPG to PDF Converter</h3>
@@ -860,9 +931,7 @@
         <span class="tool-meta">Open HTML to PDF &rarr;</span>
       </div>
 
-      <!-- =========================================================
-           Convert from PDF - Separate Individual Cards
-           ========================================================= -->
+      <!-- Convert from PDF - Separate Individual Cards -->
       <div class="tool-card" data-cat="fromPdf" onclick="launchTool('pdfToJpg')">
         <div class="tool-icon" style="background:#eff6ff; color:#2563eb;"><i class="fa-solid fa-image"></i></div>
         <h3>PDF to JPG Converter</h3>
@@ -972,12 +1041,18 @@
     </div>
   </main>
 
-  <!-- Love India Modal with Star Rating -->
+  <!-- Love India Modal with Star Rating & QR Image (1000050250.jpg) -->
   <div class="calc-modal" id="donateModal" onclick="if(event.target === this) closeDonateModal()">
     <div class="calc-box" style="max-width: 420px; text-align: center;">
       <button class="calc-close" onclick="closeDonateModal()">&times;</button>
       <h3><i class="fa-solid fa-heart" style="color: #ec4899;"></i> Love India</h3>
       
+      <!-- QR Image Display -->
+      <div style="margin: 10px 0; background: #f8fafc; padding: 10px; border-radius: 12px; border: 1px solid #e2e8f0;">
+        <img src="1000050250.jpg" alt="Love India QR Code" style="width: 100%; max-width: 220px; height: auto; border-radius: 8px; display: block; margin: 0 auto;">
+        <p style="font-size: 11.5px; color: #64748b; margin-top: 6px;">Scan QR Code to Support</p>
+      </div>
+
       <!-- Rating Section -->
       <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 14px; margin-bottom: 8px;">
         <p style="font-size: 13.5px; font-weight: 700; color: #1e293b; margin-bottom: 8px;">Rate Our Website & Tools (Out of 5 Stars):</p>
@@ -994,8 +1069,122 @@
     </div>
   </div>
 
+  <!-- Scientific Calculator Modal Added -->
+  <div class="calc-modal" id="scientificCalcModal" onclick="if(event.target === this) closeScientificCalcModal()">
+    <div class="calc-box" style="max-width: 440px;">
+      <button class="calc-close" onclick="closeScientificCalcModal()">&times;</button>
+      <h3><i class="fa-solid fa-calculator" style="color: #0284c7;"></i> DocuCraft AI Scientific Calculator</h3>
+      
+      <div class="calc-app-box">
+        <div class="calc-mode-tabs">
+          <button class="calc-tab-btn active" onclick="switchSciTab('sciBasic', event)">Basic</button>
+          <button class="calc-tab-btn" onclick="switchSciTab('sciTrig', event)">Trigonometry</button>
+          <button class="calc-tab-btn" onclick="switchSciTab('sciCalc', event)">Calculus</button>
+        </div>
+
+        <div class="calc-screen-display">
+          <div id="scientificHistory"></div>
+          <div id="scientificOutput">0</div>
+        </div>
+
+        <!-- Basic Panel -->
+        <div id="sciBasic" class="calc-buttons-grid-box calc-panel-sec active">
+          <button class="btn-sci-ac" onclick="clearSciScreen()">AC</button>
+          <button class="btn-sci-op" onclick="appendSciValue('(')">(</button>
+          <button class="btn-sci-op" onclick="appendSciValue(')')">)</button>
+          <button class="btn-sci-op" onclick="appendSciValue('/')">÷</button>
+
+          <button onclick="appendSciValue('7')">7</button>
+          <button onclick="appendSciValue('8')">8</button>
+          <button onclick="appendSciValue('9')">9</button>
+          <button class="btn-sci-op" onclick="appendSciValue('*')">×</button>
+
+          <button onclick="appendSciValue('4')">4</button>
+          <button onclick="appendSciValue('5')">5</button>
+          <button onclick="appendSciValue('6')">6</button>
+          <button class="btn-sci-op" onclick="appendSciValue('-')">-</button>
+
+          <button onclick="appendSciValue('1')">1</button>
+          <button onclick="appendSciValue('2')">2</button>
+          <button onclick="appendSciValue('3')">3</button>
+          <button class="btn-sci-op" onclick="appendSciValue('+')">+</button>
+
+          <button onclick="appendSciValue('0')">0</button>
+          <button onclick="appendSciValue('.')">.</button>
+          <button class="btn-sci-ac" onclick="sciBackspace()">⌫</button>
+          <button class="btn-sci-eq" onclick="calculateSciResult()">=</button>
+        </div>
+
+        <!-- Trigonometry Panel -->
+        <div id="sciTrig" class="calc-buttons-grid-box calc-panel-sec">
+          <button class="btn-sci-op" onclick="appendSciFunc('Math.sin(')">sin</button>
+          <button class="btn-sci-op" onclick="appendSciFunc('Math.cos(')">cos</button>
+          <button class="btn-sci-op" onclick="appendSciFunc('Math.tan(')">tan</button>
+          <button class="btn-sci-ac" onclick="clearSciScreen()">AC</button>
+
+          <button class="btn-sci-op" onclick="appendSciFunc('Math.asin(')">arcsin</button>
+          <button class="btn-sci-op" onclick="appendSciFunc('Math.acos(')">arccos</button>
+          <button class="btn-sci-op" onclick="appendSciFunc('Math.atan(')">arctan</button>
+          <button class="btn-sci-op" onclick="appendSciValue('Math.PI')">π</button>
+
+          <button onclick="appendSciValue('7')">7</button>
+          <button onclick="appendSciValue('8')">8</button>
+          <button onclick="appendSciValue('9')">9</button>
+          <button class="btn-sci-op" onclick="appendSciValue('/')">÷</button>
+
+          <button onclick="appendSciValue('4')">4</button>
+          <button onclick="appendSciValue('5')">5</button>
+          <button onclick="appendSciValue('6')">6</button>
+          <button class="btn-sci-op" onclick="appendSciValue('*')">×</button>
+
+          <button onclick="appendSciValue('1')">1</button>
+          <button onclick="appendSciValue('2')">2</button>
+          <button onclick="appendSciValue('3')">3</button>
+          <button class="btn-sci-op" onclick="appendSciValue('-')">-</button>
+
+          <button onclick="appendSciValue('0')">0</button>
+          <button onclick="appendSciValue('.')">.</button>
+          <button class="btn-sci-ac" onclick="sciBackspace()">⌫</button>
+          <button class="btn-sci-eq" onclick="calculateSciResult()">=</button>
+        </div>
+
+        <!-- Calculus Panel -->
+        <div id="sciCalc" class="calc-buttons-grid-box calc-panel-sec">
+          <button class="btn-sci-op" onclick="appendSciFunc('Math.log(')">ln</button>
+          <button class="btn-sci-op" onclick="appendSciFunc('Math.log10(')">log</button>
+          <button class="btn-sci-op" onclick="appendSciValue('Math.E')">e</button>
+          <button class="btn-sci-ac" onclick="clearSciScreen()">AC</button>
+
+          <button class="btn-sci-op" onclick="appendSciFunc('Math.sqrt(')">√</button>
+          <button class="btn-sci-op" onclick="appendSciValue('**2')">x²</button>
+          <button class="btn-sci-op" onclick="appendSciValue('**')">x^y</button>
+          <button class="btn-sci-op" onclick="appendSciValue('%')">%</button>
+
+          <button onclick="appendSciValue('7')">7</button>
+          <button onclick="appendSciValue('8')">8</button>
+          <button onclick="appendSciValue('9')">9</button>
+          <button class="btn-sci-op" onclick="appendSciValue('/')">÷</button>
+
+          <button onclick="appendSciValue('4')">4</button>
+          <button onclick="appendSciValue('5')">5</button>
+          <button onclick="appendSciValue('6')">6</button>
+          <button class="btn-sci-op" onclick="appendSciValue('*')">×</button>
+
+          <button onclick="appendSciValue('1')">1</button>
+          <button onclick="appendSciValue('2')">2</button>
+          <button onclick="appendSciValue('3')">3</button>
+          <button class="btn-sci-op" onclick="appendSciValue('-')">-</button>
+
+          <button onclick="appendSciValue('0')">0</button>
+          <button onclick="appendSciValue('.')">.</button>
+          <button class="btn-sci-ac" onclick="sciBackspace()">⌫</button>
+          <button class="btn-sci-eq" onclick="calculateSciResult()">=</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Modals Section -->
-  <!-- Improved OCR Modal with Live Editable Textarea & Clean Text Extraction -->
   <div class="calc-modal" id="ocrModal" onclick="if(event.target === this) closeOcrModal()">
     <div class="calc-box" style="max-width: 600px;">
       <button class="calc-close" onclick="closeOcrModal()">&times;</button>
@@ -2140,6 +2329,60 @@
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(blobUrl);
+    }
+
+    // Scientific Calculator Logic Added
+    function openScientificCalcModal() { lockPageScroll(); document.getElementById('scientificCalcModal').style.display = 'flex'; }
+    function closeScientificCalcModal() { unlockPageScroll(); document.getElementById('scientificCalcModal').style.display = 'none'; }
+
+    function switchSciTab(panelId, event) {
+      document.querySelectorAll('.calc-panel-sec').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('.calc-tab-btn').forEach(b => b.classList.remove('active'));
+      document.getElementById(panelId).classList.add('active');
+      event.currentTarget.classList.add('active');
+    }
+
+    let sciOutputScreen = document.getElementById("scientificOutput");
+    let sciHistoryScreen = document.getElementById("scientificHistory");
+
+    function appendSciValue(value) {
+      if (sciOutputScreen.innerText === "0" && value !== '.') {
+        sciOutputScreen.innerText = value;
+      } else {
+        sciOutputScreen.innerText += value;
+      }
+    }
+
+    function appendSciFunc(func) {
+      if (sciOutputScreen.innerText === "0") {
+        sciOutputScreen.innerText = func;
+      } else {
+        sciOutputScreen.innerText += func;
+      }
+    }
+
+    function clearSciScreen() {
+      sciOutputScreen.innerText = "0";
+      sciHistoryScreen.innerText = "";
+    }
+
+    function sciBackspace() {
+      if (sciOutputScreen.innerText.length > 1) {
+        sciOutputScreen.innerText = sciOutputScreen.innerText.slice(0, -1);
+      } else {
+        sciOutputScreen.innerText = "0";
+      }
+    }
+
+    function calculateSciResult() {
+      try {
+        let expression = sciOutputScreen.innerText.replace(/×/g, '*').replace(/÷/g, '/');
+        let result = eval(expression);
+        sciHistoryScreen.innerText = sciOutputScreen.innerText + " =";
+        sciOutputScreen.innerText = result;
+      } catch (error) {
+        sciOutputScreen.innerText = "Error";
+      }
     }
 
     // Love India Modal & Star Rating Functions
