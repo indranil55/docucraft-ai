@@ -36,8 +36,10 @@
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer">
   
+  <!-- Tesseract.js & JsBarcode CDNs -->
+  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
-  <link rel="stylesheet" href="style.css?v=2.5">
+  <link rel="stylesheet" href="style.css?v=2.8">
 
   <style>
     .nav-container { display: flex; align-items: center; justify-content: space-between; padding: 12px 20px; }
@@ -50,6 +52,27 @@
       box-shadow: 0 2px 5px rgba(239, 68, 68, 0.4); animation: pulseBadge 2s infinite ease-in-out;
     }
     @keyframes pulseBadge { 0%, 100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.06); opacity: 0.92; } }
+
+    /* Custom Stylish Blue-Red Login/Auth Icon Button */
+    .auth-icon-btn {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #2563eb, #dc2626) !important;
+      color: #ffffff !important;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      cursor: pointer;
+      box-shadow: 0 4px 15px rgba(37, 99, 235, 0.4);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .auth-icon-btn:hover {
+      transform: scale(1.08);
+      box-shadow: 0 6px 20px rgba(220, 38, 38, 0.5);
+    }
 
     .search-wrapper { max-width: 580px; margin: -10px auto 25px auto; padding: 0 15px; position: relative; }
     .search-box-inner {
@@ -260,6 +283,22 @@
     .translator-copy-btn:hover {
       background: #1e293b;
     }
+    .translator-clear-btn {
+      width: 100%;
+      margin-top: 8px;
+      padding: 10px;
+      border: 1px solid #cbd5e1;
+      border-radius: 10px;
+      background: #f8fafc;
+      color: #dc2626;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .translator-clear-btn:hover {
+      background: #fee2e2;
+    }
   </style>
 
   <script>
@@ -368,11 +407,160 @@
     </div>
   </div>
 
-  <!-- Main Tools Grid (Clean, Non-Duplicate Master List with Separate PDF Converters) -->
+  <!-- Main Tools Grid (Individual & Distinct Converter Tools with clean names) -->
   <main class="main-grid-container">
     <div class="tools-grid" id="toolsGrid">
       
-      <!-- New Added Tools: PDF Scanner, Zip to PDF, DocuCraft AI Translator -->
+      <!-- Convert to PDF Individual Tools -->
+      <div class="tool-card" data-cat="toPdf" onclick="launchTool('jpgToPdf')">
+        <div class="tool-icon" style="background:#eff6ff; color:#2563eb;"><i class="fa-solid fa-file-image"></i></div>
+        <h3>Image to PDF</h3>
+        <p>Convert gallery pictures, screenshots, or document scans into exact image-sized PDF.</p>
+        <span class="tool-meta">Open Tool &rarr;</span>
+      </div>
+
+      <div class="tool-card" data-cat="toPdf" onclick="launchTool('jpgToPdf')">
+        <div class="tool-icon" style="background:#eff6ff; color:#2563eb;"><i class="fa-solid fa-file-image"></i></div>
+        <h3>Jpg to PDF</h3>
+        <p>Convert individual or multiple JPG images into a single professional PDF file.</p>
+        <span class="tool-meta">Open Tool &rarr;</span>
+      </div>
+
+      <div class="tool-card" data-cat="toPdf" onclick="launchTool('jpgToPdf')">
+        <div class="tool-icon" style="background:#eff6ff; color:#2563eb;"><i class="fa-solid fa-file-image"></i></div>
+        <h3>Png to PDF</h3>
+        <p>Transform transparent or standard PNG graphic images into crisp PDF pages.</p>
+        <span class="tool-meta">Open Tool &rarr;</span>
+      </div>
+
+      <div class="tool-card" data-cat="toPdf" onclick="launchTool('wordToPdf')">
+        <div class="tool-icon" style="background:#eff6ff; color:#2563eb;"><i class="fa-solid fa-file-word"></i></div>
+        <h3>Docx to PDF</h3>
+        <p>Convert Microsoft Word DOCX documents to clean, standardized PDF format instantly.</p>
+        <span class="tool-meta">Open Tool &rarr;</span>
+      </div>
+
+      <div class="tool-card" data-cat="toPdf" onclick="launchTool('wordToPdf')">
+        <div class="tool-icon" style="background:#eff6ff; color:#2563eb;"><i class="fa-solid fa-file-word"></i></div>
+        <h3>Word to PDF</h3>
+        <p>Convert standard Word document files into secure and shareable PDF format.</p>
+        <span class="tool-meta">Open Tool &rarr;</span>
+      </div>
+
+      <div class="tool-card" data-cat="toPdf" onclick="launchTool('excelToPdf')">
+        <div class="tool-icon" style="background:#eff6ff; color:#2563eb;"><i class="fa-solid fa-file-excel"></i></div>
+        <h3>Excel to PDF</h3>
+        <p>Convert Excel spreadsheets, tables and financial grids into formatted PDF documents.</p>
+        <span class="tool-meta">Open Tool &rarr;</span>
+      </div>
+
+      <div class="tool-card" data-cat="toPdf" onclick="launchTool('excelToPdf')">
+        <div class="tool-icon" style="background:#eff6ff; color:#2563eb;"><i class="fa-solid fa-file-excel"></i></div>
+        <h3>Xls to PDF</h3>
+        <p>Transform old Microsoft Excel XLS sheets into clean, printable PDF documents.</p>
+        <span class="tool-meta">Open Tool &rarr;</span>
+      </div>
+
+      <div class="tool-card" data-cat="toPdf" onclick="launchTool('excelToPdf')">
+        <div class="tool-icon" style="background:#eff6ff; color:#2563eb;"><i class="fa-solid fa-file-excel"></i></div>
+        <h3>Xlsx to PDF</h3>
+        <p>Convert modern XLSX spreadsheet files into structured PDF reports.</p>
+        <span class="tool-meta">Open Tool &rarr;</span>
+      </div>
+
+      <div class="tool-card" data-cat="toPdf" onclick="launchTool('pptToPdf')">
+        <div class="tool-icon" style="background:#eff6ff; color:#2563eb;"><i class="fa-solid fa-file-powerpoint"></i></div>
+        <h3>PowerPoint to PDF</h3>
+        <p>Transform slideshow decks and presentations into portable PDF documents.</p>
+        <span class="tool-meta">Open Tool &rarr;</span>
+      </div>
+
+      <div class="tool-card" data-cat="toPdf" onclick="launchTool('pptToPdf')">
+        <div class="tool-icon" style="background:#eff6ff; color:#2563eb;"><i class="fa-solid fa-file-powerpoint"></i></div>
+        <h3>Ppt to PDF</h3>
+        <p>Convert PPT slide presentations directly into structured PDF file formats.</p>
+        <span class="tool-meta">Open Tool &rarr;</span>
+      </div>
+
+      <div class="tool-card" data-cat="toPdf" onclick="launchTool('pptToPdf')">
+        <div class="tool-icon" style="background:#eff6ff; color:#2563eb;"><i class="fa-solid fa-file-powerpoint"></i></div>
+        <h3>Pptx to PDF</h3>
+        <p>Export modern PowerPoint PPTX presentation slides into clean PDF view files.</p>
+        <span class="tool-meta">Open Tool &rarr;</span>
+      </div>
+
+      <div class="tool-card" data-cat="toPdf" onclick="launchTool('htmlToPdf')">
+        <div class="tool-icon" style="background:#eff6ff; color:#2563eb;"><i class="fa-solid fa-code"></i></div>
+        <h3>Html to PDF</h3>
+        <p>Convert HTML markup text or live web page content into downloadable PDF files.</p>
+        <span class="tool-meta">Open Tool &rarr;</span>
+      </div>
+
+      <div class="tool-card" data-cat="toPdf" onclick="launchTool('htmlToPdf')">
+        <div class="tool-icon" style="background:#eff6ff; color:#2563eb;"><i class="fa-solid fa-globe"></i></div>
+        <h3>Web to PDF</h3>
+        <p>Capture and convert online web pages or link markup directly into PDF layout.</p>
+        <span class="tool-meta">Open Tool &rarr;</span>
+      </div>
+
+      <!-- Convert from PDF Individual Tools -->
+      <div class="tool-card" data-cat="fromPdf" onclick="launchTool('pdfToJpg')">
+        <div class="tool-icon" style="background:#eff6ff; color:#2563eb;"><i class="fa-solid fa-image"></i></div>
+        <h3>Pdf to Image</h3>
+        <p>Extract all pages or individual visual graphics from a PDF into high-res images.</p>
+        <span class="tool-meta">Open Tool &rarr;</span>
+      </div>
+
+      <div class="tool-card" data-cat="fromPdf" onclick="launchTool('pdfToJpg')">
+        <div class="tool-icon" style="background:#eff6ff; color:#2563eb;"><i class="fa-solid fa-image"></i></div>
+        <h3>Jpg to Image</h3>
+        <p>Extract and convert PDF pages into standard picture formats instantly.</p>
+        <span class="tool-meta">Open Tool &rarr;</span>
+      </div>
+
+      <div class="tool-card" data-cat="fromPdf" onclick="launchTool('pdfToJpg')">
+        <div class="tool-icon" style="background:#eff6ff; color:#2563eb;"><i class="fa-solid fa-image"></i></div>
+        <h3>Png to Image</h3>
+        <p>Convert PDF pages into transparent or high quality PNG image files.</p>
+        <span class="tool-meta">Open Tool &rarr;</span>
+      </div>
+
+      <div class="tool-card" data-cat="fromPdf" onclick="launchTool('pdfToWord')">
+        <div class="tool-icon" style="background:#eff6ff; color:#2563eb;"><i class="fa-solid fa-file-lines"></i></div>
+        <h3>Pdf to Word</h3>
+        <p>Convert non-editable PDF files into fully editable Microsoft Word DOCX documents.</p>
+        <span class="tool-meta">Open Tool &rarr;</span>
+      </div>
+
+      <div class="tool-card" data-cat="fromPdf" onclick="launchTool('pdfToWord')">
+        <div class="tool-icon" style="background:#eff6ff; color:#2563eb;"><i class="fa-solid fa-file-lines"></i></div>
+        <h3>Docx to Word</h3>
+        <p>Manage and format text data smoothly between document layouts.</p>
+        <span class="tool-meta">Open Tool &rarr;</span>
+      </div>
+
+      <div class="tool-card" data-cat="fromPdf" onclick="launchTool('pdfToExcel')">
+        <div class="tool-icon" style="background:#eff6ff; color:#2563eb;"><i class="fa-solid fa-table-cells"></i></div>
+        <h3>Pdf to Excel</h3>
+        <p>Extract tables, cell grids, and financial numerical sheets from PDF files into Excel.</p>
+        <span class="tool-meta">Open Tool &rarr;</span>
+      </div>
+
+      <div class="tool-card" data-cat="fromPdf" onclick="launchTool('pdfToExcel')">
+        <div class="tool-icon" style="background:#eff6ff; color:#2563eb;"><i class="fa-solid fa-table-cells"></i></div>
+        <h3>Pdf to Xlsx</h3>
+        <p>Export scanned or text PDF tables directly into modern Excel XLSX sheets.</p>
+        <span class="tool-meta">Open Tool &rarr;</span>
+      </div>
+
+      <div class="tool-card" data-cat="fromPdf" onclick="openOcrModal()">
+        <div class="tool-icon" style="background:#f3e8ff; color:#9333ea;"><i class="fa-solid fa-file-lines"></i></div>
+        <h3>Ocr Image to Text</h3>
+        <p>Extract accurate text from book pages or pictures in Bengali, Hindi, or English instantly.</p>
+        <span class="tool-meta">Open Tool &rarr;</span>
+      </div>
+
+      <!-- Other Utility & Generator Tools -->
       <div class="tool-card" data-cat="document" onclick="openPdfScannerModal()">
         <div class="tool-icon" style="background:#e0f2fe; color:#0284c7;"><i class="fa-solid fa-scanner"></i></div>
         <h3>PDF Scanner & Enhancer <span class="badge-new">NEW</span></h3>
@@ -390,11 +578,10 @@
       <div class="tool-card" data-cat="utility" onclick="openDocTranslatorModal()">
         <div class="tool-icon" style="background:#f3e8ff; color:#9333ea;"><i class="fa-solid fa-language"></i></div>
         <h3>DocuCraft AI Translator <span class="badge-new">NEW</span></h3>
-        <p>Translate paragraphs, text files, or document content into world languages instantly.</p>
+        <p>Translate text, documents, or paragraphs into world languages instantly with clear option.</p>
         <span class="tool-meta">Open Translator &rarr;</span>
       </div>
 
-      <!-- Repair PDF Tool Card -->
       <div class="tool-card" data-cat="editSecurity" onclick="openRepairPdfModal()">
         <div class="tool-icon" style="background:#fef3c7; color:#d97706;"><i class="fa-solid fa-wrench"></i></div>
         <h3>Repair PDF (Fix Corrupted File) <span class="badge-new">NEW</span></h3>
@@ -815,89 +1002,6 @@
         <span class="tool-meta">Open Tool &rarr;</span>
       </div>
 
-      <!-- =========================================================
-           Convert to PDF - Separate Individual Cards
-           ========================================================= -->
-      <div class="tool-card" data-cat="toPdf" onclick="launchTool('jpgToPdf')">
-        <div class="tool-icon" style="background:#eff6ff; color:#2563eb;"><i class="fa-solid fa-file-image"></i></div>
-        <h3>JPG to PDF Converter</h3>
-        <p>Convert JPG photo gallery pictures and snapshots into a standardized A4 PDF document.</p>
-        <span class="tool-meta">Open JPG to PDF &rarr;</span>
-      </div>
-
-      <div class="tool-card" data-cat="toPdf" onclick="launchTool('pngToPdf')">
-        <div class="tool-icon" style="background:#eff6ff; color:#2563eb;"><i class="fa-solid fa-image"></i></div>
-        <h3>PNG to PDF Converter</h3>
-        <p>Transform PNG graphic files and transparent image scans into professional PDF files.</p>
-        <span class="tool-meta">Open PNG to PDF &rarr;</span>
-      </div>
-
-      <div class="tool-card" data-cat="toPdf" onclick="launchTool('wordToPdf')">
-        <div class="tool-icon" style="background:#eff6ff; color:#2563eb;"><i class="fa-solid fa-file-word"></i></div>
-        <h3>Word to PDF (Docx to PDF)</h3>
-        <p>Convert Microsoft Word documents directly to clean, standardized PDF format instantly.</p>
-        <span class="tool-meta">Open Word to PDF &rarr;</span>
-      </div>
-
-      <div class="tool-card" data-cat="toPdf" onclick="launchTool('excelToPdf')">
-        <div class="tool-icon" style="background:#eff6ff; color:#2563eb;"><i class="fa-solid fa-file-excel"></i></div>
-        <h3>Excel to PDF (XLS/XLSX)</h3>
-        <p>Convert Excel spreadsheets, financial tables, and data sheets into formatted printable PDFs.</p>
-        <span class="tool-meta">Open Excel to PDF &rarr;</span>
-      </div>
-
-      <div class="tool-card" data-cat="toPdf" onclick="launchTool('pptToPdf')">
-        <div class="tool-icon" style="background:#eff6ff; color:#2563eb;"><i class="fa-solid fa-file-powerpoint"></i></div>
-        <h3>PowerPoint to PDF (PPT/PPTX)</h3>
-        <p>Transform slideshow decks, business presentations, and notes into portable PDF files.</p>
-        <span class="tool-meta">Open PPT to PDF &rarr;</span>
-      </div>
-
-      <div class="tool-card" data-cat="toPdf" onclick="launchTool('htmlToPdf')">
-        <div class="tool-icon" style="background:#eff6ff; color:#2563eb;"><i class="fa-solid fa-code"></i></div>
-        <h3>HTML to PDF Converter</h3>
-        <p>Convert raw HTML markup text, code snippets, or web content into downloadable PDF pages.</p>
-        <span class="tool-meta">Open HTML to PDF &rarr;</span>
-      </div>
-
-      <!-- =========================================================
-           Convert from PDF - Separate Individual Cards
-           ========================================================= -->
-      <div class="tool-card" data-cat="fromPdf" onclick="launchTool('pdfToJpg')">
-        <div class="tool-icon" style="background:#eff6ff; color:#2563eb;"><i class="fa-solid fa-image"></i></div>
-        <h3>PDF to JPG Converter</h3>
-        <p>Convert PDF pages into high-quality individual JPG image files instantly in browser.</p>
-        <span class="tool-meta">Open PDF to JPG &rarr;</span>
-      </div>
-
-      <div class="tool-card" data-cat="fromPdf" onclick="launchTool('pdfToPng')">
-        <div class="tool-icon" style="background:#eff6ff; color:#2563eb;"><i class="fa-solid fa-file-image"></i></div>
-        <h3>PDF to PNG Converter</h3>
-        <p>Extract and convert your PDF document pages into high-resolution PNG format images.</p>
-        <span class="tool-meta">Open PDF to PNG &rarr;</span>
-      </div>
-
-      <div class="tool-card" data-cat="fromPdf" onclick="launchTool('pdfToWord')">
-        <div class="tool-icon" style="background:#eff6ff; color:#2563eb;"><i class="fa-solid fa-file-lines"></i></div>
-        <h3>PDF to Word (DOCX) Converter</h3>
-        <p>Transform PDF documents into editable Microsoft Word files while keeping layouts intact.</p>
-        <span class="tool-meta">Open PDF to Word &rarr;</span>
-      </div>
-
-      <div class="tool-card" data-cat="fromPdf" onclick="launchTool('pdfToExcel')">
-        <div class="tool-icon" style="background:#eff6ff; color:#2563eb;"><i class="fa-solid fa-table-cells"></i></div>
-        <h3>PDF to Excel (XLSX) Converter</h3>
-        <p>Extract numerical data tables and grids from PDF files directly into Excel spreadsheets.</p>
-        <span class="tool-meta">Open PDF to Excel &rarr;</span>
-      </div>
-
-      <div class="tool-card" data-cat="fromPdf" onclick="openOcrModal()">
-        <div class="tool-icon" style="background:#f3e8ff; color:#9333ea;"><i class="fa-solid fa-file-lines"></i></div>
-        <h3>PDF to Text (OCR Extractor)</h3>
-        <p>Extract selectable and editable text from scanned or image-based PDF books instantly.</p>
-        <span class="tool-meta">Open OCR Tool &rarr;</span>
-      </div>
-
       <div class="tool-card" data-cat="editSecurity" onclick="launchTool('editPdf')">
         <div class="tool-icon" style="background:#fef3c7; color:#d97706;"><i class="fa-solid fa-pen-nib"></i></div>
         <h3>Edit PDF</h3>
@@ -999,9 +1103,9 @@
   <div class="calc-modal" id="ocrModal" onclick="if(event.target === this) closeOcrModal()">
     <div class="calc-box" style="max-width: 600px;">
       <button class="calc-close" onclick="closeOcrModal()">&times;</button>
-      <h3><i class="fa-solid fa-file-lines" style="color: #9333ea;"></i> OCR - Image to Text</h3>
+      <h3><i class="fa-solid fa-file-lines" style="color: #9333ea;"></i> Ocr Image to Text</h3>
       <div class="calc-group">
-        <label>Upload Image (1 KB - 500 MB):</label>
+        <label>Upload Image:</label>
         <div style="border: 2px dashed #cbd5e1; border-radius: 12px; padding: 18px; text-align: center; background: #f8fafc; cursor: pointer; margin-bottom: 8px;" onclick="document.getElementById('ocrFileInput').click()">
           <p style="font-size: 22px; margin-bottom: 4px;"><i class="fa-solid fa-cloud-arrow-up" style="color: #9333ea;"></i></p>
           <p style="font-weight: 700; font-size: 13px; color: #1e293b;" id="ocrDropText">Tap to select book page or text image</p>
@@ -1026,7 +1130,7 @@
       <button class="calc-close" onclick="closePdfScannerModal()">&times;</button>
       <h3><i class="fa-solid fa-scanner" style="color: #0284c7;"></i> PDF Scanner & Enhancer</h3>
       <div class="calc-group">
-        <label>Upload Document Images (1 KB - 500 MB):</label>
+        <label>Upload Document Images:</label>
         <div style="border: 2px dashed #cbd5e1; border-radius: 12px; padding: 18px; text-align: center; background: #f8fafc; cursor: pointer; margin-bottom: 8px;" onclick="document.getElementById('pdfScannerFileInput').click()">
           <p style="font-size: 22px; margin-bottom: 4px;"><i class="fa-solid fa-camera" style="color: #0284c7;"></i></p>
           <p style="font-weight: 700; font-size: 13px; color: #1e293b;" id="pdfScannerDropText">Tap to select images for scan</p>
@@ -1046,7 +1150,7 @@
       <button class="calc-close" onclick="closeZipToPdfModal()">&times;</button>
       <h3><i class="fa-solid fa-file-zipper" style="color: #d97706;"></i> ZIP to PDF Converter</h3>
       <div class="calc-group">
-        <label>Upload ZIP Archive (.zip up to 500 MB):</label>
+        <label>Upload ZIP Archive (.zip):</label>
         <div style="border: 2px dashed #cbd5e1; border-radius: 12px; padding: 18px; text-align: center; background: #f8fafc; cursor: pointer; margin-bottom: 8px;" onclick="document.getElementById('zipToPdfFileInput').click()">
           <p style="font-size: 22px; margin-bottom: 4px;"><i class="fa-solid fa-box-archive" style="color: #d97706;"></i></p>
           <p style="font-weight: 700; font-size: 13px; color: #1e293b;" id="zipToPdfDropText">Tap to select your ZIP file</p>
@@ -1060,7 +1164,7 @@
     </div>
   </div>
 
-  <!-- DocuCraft AI Translator Modal (Clean & Polished UI) -->
+  <!-- DocuCraft AI Translator Modal (All World Languages & Clear Button) -->
   <div class="calc-modal" id="docTranslatorModal" onclick="if(event.target === this) closeDocTranslatorModal()">
     <div class="calc-box" style="max-width: 650px;">
       <button class="calc-close" onclick="closeDocTranslatorModal()">&times;</button>
@@ -1088,7 +1192,7 @@
         </div>
 
         <div style="margin-top: 10px;">
-          <label style="font-size: 12px; font-weight: 600; color: #64748b; margin-bottom: 4px;">Enter Text to Translate (1 KB - 500 MB):</label>
+          <label style="font-size: 12px; font-weight: 600; color: #64748b; margin-bottom: 4px;">Enter Text to Translate:</label>
           <textarea id="inputText" class="translator-textarea-box" placeholder="Type words, sentences or document paragraphs here..."></textarea>
         </div>
 
@@ -1102,9 +1206,14 @@
           <div class="status" id="status" style="margin-top: 6px; font-size: 12px; color: #64748b;"></div>
         </div>
 
-        <button class="translator-copy-btn" onclick="copyTranslation()">
-          Copy Translation
-        </button>
+        <div style="display: flex; gap: 8px; margin-top: 8px;">
+          <button class="translator-copy-btn" onclick="copyTranslation()" style="flex: 1; margin-top: 0;">
+            Copy Translation
+          </button>
+          <button class="translator-clear-btn" onclick="clearTranslator()" style="flex: 1;">
+            Clear / New Text
+          </button>
+        </div>
       </div>
 
     </div>
@@ -1116,7 +1225,7 @@
       <button class="calc-close" onclick="closeRepairPdfModal()">&times;</button>
       <h3><i class="fa-solid fa-wrench" style="color: #d97706;"></i> Repair PDF (Fix Corrupted File)</h3>
       <div class="calc-group">
-        <label>Upload Damaged or Corrupted PDF File (1 KB - 500 MB):</label>
+        <label>Upload Damaged or Corrupted PDF File:</label>
         <div style="border: 2px dashed #cbd5e1; border-radius: 12px; padding: 18px; text-align: center; background: #f8fafc; cursor: pointer; margin-bottom: 8px;" onclick="document.getElementById('repairPdfFileInput').click()">
           <p style="font-size: 22px; margin-bottom: 4px;"><i class="fa-solid fa-cloud-arrow-up" style="color: #d97706;"></i></p>
           <p style="font-weight: 700; font-size: 13px; color: #1e293b;" id="repairPdfDropText">Tap to select your damaged PDF file</p>
@@ -1236,7 +1345,7 @@
       <button class="calc-close" onclick="closeColorPickerModal()">&times;</button>
       <h3><i class="fa-solid fa-eye-dropper" style="color: #059669;"></i> Color Picker & HEX Grabber</h3>
       <div class="calc-group">
-        <label>Upload Image (1 KB - 500 MB):</label>
+        <label>Upload Image:</label>
         <input type="file" id="pickerImgInput" accept="image/*" onchange="loadPickerImage(event)">
       </div>
       <div style="overflow:auto; max-height:200px; border:1px solid #cbd5e1; border-radius:8px; margin-bottom:10px; text-align:center;">
@@ -2045,7 +2154,7 @@
 
       <div class="dropzone" id="wsDropzone" onclick="document.getElementById('wsFileInput').click()">
         <p style="font-size: 26px; margin-bottom: 4px;"><i class="fa-solid fa-cloud-arrow-up" style="color: #94a3b8;"></i></p>
-        <p style="font-weight: 700; font-size: 13.5px;" id="wsDropText">Tap to select file (1 KB - 500 MB)</p>
+        <p style="font-weight: 700; font-size: 13.5px;" id="wsDropText">Tap to select file</p>
       </div>
       <input type="file" id="wsFileInput" style="display: none;" autocomplete="off">
 
@@ -2083,10 +2192,10 @@
       </div>
     </div>
     <div class="footer-bottom">
-      &copy; 2026 DocuCraft AI Studio. Files are processed securely in your browser.
+      &copy; 2026 DocuCraft AI Studio. Files are processed securely in your browser[span_0](start_span)[span_0](end_span).
       <div class="trust-badges">
-        <span><i class="fa-solid fa-shield-halved"></i> Client-Side Privacy Guaranteed</span>
-        <span><i class="fa-solid fa-lock"></i> SSL Secured</span>
+        <span><i class="fa-solid fa-shield-halved"></i> Client-Side Privacy Guaranteed[span_1](start_span)[span_1](end_span)</span>
+        <span><i class="fa-solid fa-lock"></i> SSL Secured[span_2](start_span)[span_2](end_span)</span>
       </div>
     </div>
   </footer>
@@ -2160,7 +2269,7 @@
       feedback.textContent = `Thank you! You rated us ${score} out of 5 stars. ⭐`;
     }
 
-    // Fixed OCR Logic: Extracts actual readable text properly from book/document images (1 KB - 500 MB)
+    // OCR Logic with Tesseract.js (Extracts real text cleanly)
     function openOcrModal() {
       lockPageScroll();
       document.getElementById('ocrModal').style.display = 'flex';
@@ -2169,16 +2278,30 @@
       unlockPageScroll();
       document.getElementById('ocrModal').style.display = 'none';
     }
-    function handleOcrFile(event) {
+    async function handleOcrFile(event) {
       const file = event.target.files[0];
       if (!file) return;
       document.getElementById('ocrDropText').textContent = `Loaded: ${file.name} (${(file.size/1024).toFixed(1)} KB)`;
-      document.getElementById('ocrFileInfo').textContent = `Scanning image text (1 KB - 500 MB)... Please wait.`;
-      
-      setTimeout(() => {
-        document.getElementById('ocrExtractedOutput').value = `Scanned text extracted successfully from ${file.name}:\n\n"Education is the most powerful weapon which you can use to change the world. Knowledge is power and persistence leads to ultimate success in every field of learning."\n\n(You can edit this extracted text directly before copying or downloading).`;
-        document.getElementById('ocrFileInfo').textContent = `Text successfully extracted from image!`;
-      }, 1200);
+      document.getElementById('ocrFileInfo').textContent = `Scanning image text... Please wait.`;
+      document.getElementById('ocrExtractedOutput').value = "Processing image text using OCR engine... Please hold on.";
+
+      try {
+        const worker = await Tesseract.createWorker('eng+ben+hin');
+        const ret = await worker.recognize(file);
+        await worker.terminate();
+
+        if (ret && ret.data && ret.data.text.trim()) {
+          document.getElementById('ocrExtractedOutput').value = ret.data.text.trim();
+          document.getElementById('ocrFileInfo').textContent = `Text successfully extracted! You can edit below.`;
+        } else {
+          document.getElementById('ocrExtractedOutput').value = "No clear text found in this image. Please upload a sharper or closer picture.";
+          document.getElementById('ocrFileInfo').textContent = `Scan completed, but no text detected.`;
+        }
+      } catch (error) {
+        console.error(error);
+        document.getElementById('ocrExtractedOutput').value = "Error extracting text. Please try another clear document image.";
+        document.getElementById('ocrFileInfo').textContent = `Extraction failed.`;
+      }
     }
     function copyOcrText() {
       const txt = document.getElementById('ocrExtractedOutput').value;
@@ -2193,7 +2316,7 @@
       triggerDownload(URL.createObjectURL(blob), 'Extracted_Text.txt');
     }
 
-    // PDF Scanner Logic Functions (1 KB - 500 MB)
+    // PDF Scanner Logic Functions
     function openPdfScannerModal() { lockPageScroll(); document.getElementById('pdfScannerModal').style.display = 'flex'; }
     function closePdfScannerModal() { unlockPageScroll(); document.getElementById('pdfScannerModal').style.display = 'none'; }
     let scannerFiles = [];
@@ -2201,7 +2324,7 @@
       scannerFiles = Array.from(event.target.files);
       if (scannerFiles.length === 0) return;
       document.getElementById('pdfScannerDropText').textContent = `${scannerFiles.length} image(s) selected`;
-      document.getElementById('pdfScannerFileInfo').textContent = `Images ready for scanning & contrast enhancement (1 KB - 500 MB).`;
+      document.getElementById('pdfScannerFileInfo').textContent = `Images ready for scanning & contrast enhancement.`;
       document.getElementById('pdfScannerBtn').style.display = 'block';
     }
     function executePdfScan() {
@@ -2219,7 +2342,7 @@
       }, 1000);
     }
 
-    // ZIP to PDF Logic Functions (1 KB - 500 MB)
+    // ZIP to PDF Logic Functions
     function openZipToPdfModal() { lockPageScroll(); document.getElementById('zipToPdfModal').style.display = 'flex'; }
     function closeZipToPdfModal() { unlockPageScroll(); document.getElementById('zipToPdfModal').style.display = 'none'; }
     let zipFileSelected = null;
@@ -2227,7 +2350,7 @@
       zipFileSelected = event.target.files[0];
       if (!zipFileSelected) return;
       document.getElementById('zipToPdfDropText').textContent = `Loaded: ${zipFileSelected.name}`;
-      document.getElementById('zipToPdfFileInfo').textContent = `ZIP archive ready (${(zipFileSelected.size/1024).toFixed(1)} KB) - Max 500 MB`;
+      document.getElementById('zipToPdfFileInfo').textContent = `ZIP archive ready (${(zipFileSelected.size/1024).toFixed(1)} KB)`;
       document.getElementById('zipToPdfBtn').style.display = 'block';
     }
     function executeZipToPdf() {
@@ -2510,7 +2633,14 @@
       }
     }
 
-    // Repair PDF Logic Functions (1 KB - 500 MB)
+    function clearTranslator() {
+      document.getElementById('inputText').value = '';
+      document.getElementById('output').textContent = '';
+      document.getElementById('status').textContent = '';
+      document.getElementById('inputText').focus();
+    }
+
+    // Repair PDF Logic Functions
     function openRepairPdfModal() { lockPageScroll(); document.getElementById('repairPdfModal').style.display = 'flex'; }
     function closeRepairPdfModal() { unlockPageScroll(); document.getElementById('repairPdfModal').style.display = 'none'; }
     let repairSelectedFile = null;
@@ -2519,7 +2649,7 @@
       if (!file) return;
       repairSelectedFile = file;
       document.getElementById('repairPdfDropText').textContent = `Loaded: ${file.name} (${(file.size/1024).toFixed(1)} KB)`;
-      document.getElementById('repairPdfFileInfo').textContent = `File ready for structure scan (1 KB - 500 MB)`;
+      document.getElementById('repairPdfFileInfo').textContent = `File ready for structure scan`;
       document.getElementById('repairPdfBtn').style.display = 'block';
     }
     function executeRepairPdf() {
@@ -2950,7 +3080,7 @@
       "The quick brown fox jumps over the lazy dog. Technology and automation enable swift digital transformation.",
       "Artificial intelligence and machine learning algorithms process massive datasets securely, empowering developers."
     ];
-    function changeTypingLevel() { document.getElementById('typingSnippet').innerText = typingParagraphs[document.getElementById('typingLevelSelect').value]; resetTypingTest(); }
+    function changeTypingLevel() { document.getElementById('typingSnippet').innerText = typingParagraphs[document.getElementById('typingLevelSelect'].value]; resetTypingTest(); }
     let typingTimerSeconds = 60, typingInterval = null, typingStarted = false;
     function resetTypingTest() { clearInterval(typingInterval); typingTimerSeconds = 60; typingStarted = false; document.getElementById('typingTimer').innerText = '60'; document.getElementById('typingInputArea').value = ''; document.getElementById('typingInputArea').disabled = false; document.getElementById('typingOutput').style.display = 'none'; }
     function handleTypingInput() {
