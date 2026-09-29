@@ -439,11 +439,11 @@
   <main class="main-grid-container">
     <div class="tools-grid" id="toolsGrid">
       
-      <!-- Scientific Calculator Card Added -->
+      <!-- Cleaned up Scientific Calculator Card -->
       <div class="tool-card" data-cat="finance" onclick="openScientificCalcModal()">
         <div class="tool-icon" style="background:#e0f2fe; color:#0284c7;"><i class="fa-solid fa-calculator"></i></div>
         <h3>DocuCraft AI Scientific Calculator <span class="badge-new">NEW</span></h3>
-        <p>Advanced scientific calculator with Trigonometry[span_0](start_span)[span_0](end_span), Calculus[span_1](start_span)[span_1](end_span), Algebra[span_2](start_span)[span_2](end_span), and Math Solver features.</p>
+        <p>Advanced scientific calculator with Trigonometry, Calculus, Algebra, and powerful Math Solver features.</p>
         <span class="tool-meta">Open Calculator &rarr;</span>
       </div>
 
@@ -1047,10 +1047,9 @@
       <button class="calc-close" onclick="closeDonateModal()">&times;</button>
       <h3><i class="fa-solid fa-heart" style="color: #ec4899;"></i> Love India</h3>
       
-      <!-- QR Image Display -->
+      <!-- QR Image Display (1000050250.jpg) -->
       <div style="margin: 10px 0; background: #f8fafc; padding: 10px; border-radius: 12px; border: 1px solid #e2e8f0;">
         <img src="1000050250.jpg" alt="Love India QR Code" style="width: 100%; max-width: 220px; height: auto; border-radius: 8px; display: block; margin: 0 auto;">
-        <p style="font-size: 11.5px; color: #64748b; margin-top: 6px;">Scan QR Code to Support</p>
       </div>
 
       <!-- Rating Section -->
@@ -3193,7 +3192,7 @@
       "The quick brown fox jumps over the lazy dog. Technology and automation enable swift digital transformation.",
       "Artificial intelligence and machine learning algorithms process massive datasets securely, empowering developers."
     ];
-    function changeTypingLevel() { document.getElementById('typingSnippet').innerText = typingParagraphs[document.getElementById('typingLevelSelect').value]; resetTypingTest(); }
+    function changeTypingLevel() { document.getElementById('typingSnippet').innerText = typingParagraphs[document.getElementById('typingLevelSelect'].value]; resetTypingTest(); }
     let typingTimerSeconds = 60, typingInterval = null, typingStarted = false;
     function resetTypingTest() { clearInterval(typingInterval); typingTimerSeconds = 60; typingStarted = false; document.getElementById('typingTimer').innerText = '60'; document.getElementById('typingInputArea').value = ''; document.getElementById('typingInputArea').disabled = false; document.getElementById('typingOutput').style.display = 'none'; }
     function handleTypingInput() {
