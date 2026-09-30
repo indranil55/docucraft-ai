@@ -21,7 +21,7 @@
   
   <meta name="description" content="DocuCraft AI - Free Online PDF, Photo, Financial & Productivity Utilities. Resize Photo, Docx to PDF, Govt Job Alerts, Barcode, Gold Price, Notepad and more.">
   <meta name="keywords" content="PDF editor, KB resizer, docx to pdf, govt jobs, sarkari result, barcode generator, color picker, typing speed test, notepad">
-  <meta property="og:title" content="​DocuCraft AI ⚡ Fast PDF Tools & Daily Utilities">
+  <meta property="og:title" content="​​DocuCraft AI ⚡ Fast PDF Tools & Daily Utilities">
   <meta property="og:description" content="Merge, Compress, Resize KB, Docx to PDF, Govt Job Alerts, Barcode, Gold Price, BMR, PPF, EMI, Notepad, GST free in browser.">
   <meta property="og:type" content="website">
   
@@ -276,6 +276,7 @@
       border-radius: 8px;
       margin-bottom: 12px;
       padding: 4px;
+      gap: 4px;
     }
     .calc-tab-btn {
       background: none;
@@ -286,6 +287,7 @@
       border-radius: 6px;
       cursor: pointer;
       transition: 0.2s;
+      flex: 1;
     }
     .calc-tab-btn.active {
       background-color: #3c4043;
@@ -323,10 +325,29 @@
     .calc-buttons-grid-box button:active { transform: scale(0.95); }
     .calc-buttons-grid-box button:hover { background-color: #444444; }
     .btn-sci-op { background-color: #393b40; color: #8ab4f8; }
+    .btn-sci-var { background-color: #2e384d; color: #93c5fd; font-weight: 700; }
     .btn-sci-ac { background-color: #422727; color: #f28b82; }
     .btn-sci-eq { background-color: #8ab4f8; color: #121212; font-weight: bold; }
     .calc-panel-sec { display: none; }
     .calc-panel-sec.active { display: grid; }
+
+    /* Sign Pad Dynamic Color Options */
+    .pen-color-dot {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      display: inline-block;
+      cursor: pointer;
+      border: 2px solid #ffffff;
+      box-shadow: 0 0 0 1px #cbd5e1;
+      margin-right: 8px;
+      vertical-align: middle;
+      transition: transform 0.1s, box-shadow 0.2s;
+    }
+    .pen-color-dot.active {
+      box-shadow: 0 0 0 2px #2563eb;
+      transform: scale(1.15);
+    }
   </style>
 
   <script>
@@ -397,11 +418,11 @@
           <span>Combine files</span>
         </div>
       </div>
-      <div class="popular-card" onclick="openScientificCalcModal()">
-        <div class="popular-icon" style="background:#e0f2fe; color:#0284c7;"><i class="fa-solid fa-calculator"></i></div>
+      <div class="popular-card" onclick="launchTool('kbResizer')">
+        <div class="popular-icon" style="background:#dbeafe; color:#2563eb;"><i class="fa-solid fa-compress"></i></div>
         <div class="popular-info">
-          <h4>Scientific Calculator</h4>
-          <span>Math Solver</span>
+          <h4>Photo & Sign KB / MB Resizer</h4>
+          <span>Compress image size</span>
         </div>
       </div>
       <div class="popular-card" onclick="launchTool('compress')">
@@ -443,7 +464,7 @@
       <div class="tool-card" data-cat="finance" onclick="openScientificCalcModal()">
         <div class="tool-icon" style="background:#e0f2fe; color:#0284c7;"><i class="fa-solid fa-calculator"></i></div>
         <h3>DocuCraft AI Scientific Calculator <span class="badge-new">NEW</span></h3>
-        <p>Advanced scientific calculator with Trigonometry[span_0](start_span)[span_0](end_span), Calculus[span_1](start_span)[span_1](end_span), Algebra[span_2](start_span)[span_2](end_span), and Math Solver features.</p>
+        <p>Advanced scientific calculator with Trigonometry, Calculus, Algebra, and Math Solver features.</p>
         <span class="tool-meta">Open Calculator &rarr;</span>
       </div>
 
@@ -1041,18 +1062,12 @@
     </div>
   </main>
 
-  <!-- Love India Modal with Star Rating & QR Image (1000050250.jpg) -->
+  <!-- Love India Modal with Star Rating -->
   <div class="calc-modal" id="donateModal" onclick="if(event.target === this) closeDonateModal()">
     <div class="calc-box" style="max-width: 420px; text-align: center;">
       <button class="calc-close" onclick="closeDonateModal()">&times;</button>
       <h3><i class="fa-solid fa-heart" style="color: #ec4899;"></i> Love India</h3>
       
-      <!-- QR Image Display -->
-      <div style="margin: 10px 0; background: #f8fafc; padding: 10px; border-radius: 12px; border: 1px solid #e2e8f0;">
-        <img src="1000050250.jpg" alt="Love India QR Code" style="width: 100%; max-width: 220px; height: auto; border-radius: 8px; display: block; margin: 0 auto;">
-        <p style="font-size: 11.5px; color: #64748b; margin-top: 6px;">Scan QR Code to Support</p>
-      </div>
-
       <!-- Rating Section -->
       <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 14px; margin-bottom: 8px;">
         <p style="font-size: 13.5px; font-weight: 700; color: #1e293b; margin-bottom: 8px;">Rate Our Website & Tools (Out of 5 Stars):</p>
@@ -1069,7 +1084,7 @@
     </div>
   </div>
 
-  <!-- Scientific Calculator Modal Added -->
+  <!-- Scientific Calculator Modal with Algebra / Alphabet Tab Added -->
   <div class="calc-modal" id="scientificCalcModal" onclick="if(event.target === this) closeScientificCalcModal()">
     <div class="calc-box" style="max-width: 440px;">
       <button class="calc-close" onclick="closeScientificCalcModal()">&times;</button>
@@ -1080,6 +1095,7 @@
           <button class="calc-tab-btn active" onclick="switchSciTab('sciBasic', event)">Basic</button>
           <button class="calc-tab-btn" onclick="switchSciTab('sciTrig', event)">Trigonometry</button>
           <button class="calc-tab-btn" onclick="switchSciTab('sciCalc', event)">Calculus</button>
+          <button class="calc-tab-btn" onclick="switchSciTab('sciAlgebra', event)">Algebra</button>
         </div>
 
         <div class="calc-screen-display">
@@ -1174,6 +1190,44 @@
           <button onclick="appendSciValue('2')">2</button>
           <button onclick="appendSciValue('3')">3</button>
           <button class="btn-sci-op" onclick="appendSciValue('-')">-</button>
+
+          <button onclick="appendSciValue('0')">0</button>
+          <button onclick="appendSciValue('.')">.</button>
+          <button class="btn-sci-ac" onclick="sciBackspace()">⌫</button>
+          <button class="btn-sci-eq" onclick="calculateSciResult()">=</button>
+        </div>
+
+        <!-- Algebra (Alphabet / Variables) Panel Added -->
+        <div id="sciAlgebra" class="calc-buttons-grid-box calc-panel-sec">
+          <button class="btn-sci-var" onclick="appendSciValue('x')">x</button>
+          <button class="btn-sci-var" onclick="appendSciValue('y')">y</button>
+          <button class="btn-sci-var" onclick="appendSciValue('z')">z</button>
+          <button class="btn-sci-ac" onclick="clearSciScreen()">AC</button>
+
+          <button class="btn-sci-var" onclick="appendSciValue('a')">a</button>
+          <button class="btn-sci-var" onclick="appendSciValue('b')">b</button>
+          <button class="btn-sci-var" onclick="appendSciValue('c')">c</button>
+          <button class="btn-sci-op" onclick="appendSciValue('**2')">²</button>
+
+          <button class="btn-sci-op" onclick="appendSciValue('(')">(</button>
+          <button class="btn-sci-op" onclick="appendSciValue(')')">)</button>
+          <button class="btn-sci-op" onclick="appendSciValue('**')">^</button>
+          <button class="btn-sci-op" onclick="appendSciValue('/')">÷</button>
+
+          <button onclick="appendSciValue('7')">7</button>
+          <button onclick="appendSciValue('8')">8</button>
+          <button onclick="appendSciValue('9')">9</button>
+          <button class="btn-sci-op" onclick="appendSciValue('*')">×</button>
+
+          <button onclick="appendSciValue('4')">4</button>
+          <button onclick="appendSciValue('5')">5</button>
+          <button onclick="appendSciValue('6')">6</button>
+          <button class="btn-sci-op" onclick="appendSciValue('-')">-</button>
+
+          <button onclick="appendSciValue('1')">1</button>
+          <button onclick="appendSciValue('2')">2</button>
+          <button onclick="appendSciValue('3')">3</button>
+          <button class="btn-sci-op" onclick="appendSciValue('+')">+</button>
 
           <button onclick="appendSciValue('0')">0</button>
           <button onclick="appendSciValue('.')">.</button>
@@ -1325,7 +1379,7 @@
       <h3><i class="fa-solid fa-note-sticky" style="color: #0284c7;"></i> Unlimited Text Notepad</h3>
       <div class="calc-group">
         <label>Write or paste your notes (Supports 100,000+ lines):</label>
-        <textarea id="notepadTextarea" rows="12" placeholder="Start typing or paste your content here..." style="font-family: monospace; font-size: 13.5px; line-height: 1.6; resize: vertical;" oninput="updateNotepadStats()"></textarea>
+        <textarea id="notepadTextarea" rows="12" placeholder="Start typing or paste your content here..." style="font-family: monospace; font-size: 13.5px; line-line-height: 1.6; resize: vertical;" oninput="updateNotepadStats()"></textarea>
       </div>
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; font-size: 13px; color: #475569;">
         <span id="notepadStats">Lines: 0 | Characters: 0</span>
@@ -2305,6 +2359,70 @@
       });
     }
 
+    /* =========================================================
+       Automatic Welcome Voice with Current Date and Time
+       ========================================================= */
+    let voiceHasSpoken = false;
+    function announceDateAndTime() {
+      if (voiceHasSpoken) return;
+      if (!('speechSynthesis' in window)) return;
+
+      const now = new Date();
+      const optionsDate = { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' };
+      const formattedDate = now.toLocaleDateString('en-US', optionsDate);
+      const formattedTime = now.toLocaleTimeString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true });
+
+      const welcomeMessage = `Welcome to DocuCraft AI. Today is ${formattedDate}, and the current time is ${formattedTime}. Have a productive day!`;
+
+      const utterance = new SpeechSynthesisUtterance(welcomeMessage);
+      utterance.lang = 'en-US';
+      utterance.rate = 0.95;
+      utterance.pitch = 1.0;
+
+      window.speechSynthesis.cancel();
+      window.speechSynthesis.speak(utterance);
+      voiceHasSpoken = true;
+
+      // Remove fallback interaction listeners once spoken
+      ['click', 'touchstart', 'keydown'].forEach(evt => {
+        window.removeEventListener(evt, triggerFirstInteractionVoice);
+      });
+    }
+
+    function triggerFirstInteractionVoice() {
+      if (!voiceHasSpoken) {
+        announceDateAndTime();
+      }
+    }
+
+    /* Digital Signature Maker (Sign Pad) Green Color Integration Helper */
+    function injectSignPadGreenColor() {
+      const colorContainer = document.querySelector('.pen-colors, .sig-colors, #sigPenColors');
+      if (colorContainer && !document.getElementById('sigColorGreen')) {
+        const greenBtn = document.createElement('span');
+        greenBtn.id = 'sigColorGreen';
+        greenBtn.className = 'pen-color-dot';
+        greenBtn.style.backgroundColor = '#16a34a';
+        greenBtn.title = 'Green';
+        greenBtn.onclick = function() {
+          if (typeof setSigColor === 'function') {
+            setSigColor('#16a34a');
+          } else if (window.currentSigPenColor !== undefined) {
+            window.currentSigPenColor = '#16a34a';
+          }
+          document.querySelectorAll('.pen-color-dot').forEach(d => d.classList.remove('active'));
+          greenBtn.classList.add('active');
+        };
+        colorContainer.appendChild(greenBtn);
+      }
+    }
+
+    // Observe modal DOM mutations so when Digital Signature Pad opens, Green color dot is present
+    const modalObserver = new MutationObserver(() => {
+      injectSignPadGreenColor();
+    });
+    modalObserver.observe(document.body, { childList: true, subtree: true });
+
     document.addEventListener('DOMContentLoaded', () => {
       const today = new Date().toISOString().split('T')[0];
       if (document.getElementById('ageAsOn')) document.getElementById('ageAsOn').value = today;
@@ -2319,6 +2437,15 @@
       if (cyberTab && typeof filterCategory === 'function') {
         filterCategory('cyber', cyberTab);
       }
+
+      // Automatically speak when site opens or on first user click/touch
+      setTimeout(() => {
+        announceDateAndTime();
+      }, 700);
+
+      ['click', 'touchstart', 'keydown'].forEach(evt => {
+        window.addEventListener(evt, triggerFirstInteractionVoice, { once: true });
+      });
     });
 
     function triggerDownload(blobUrl, filename) {
@@ -2376,7 +2503,14 @@
 
     function calculateSciResult() {
       try {
-        let expression = sciOutputScreen.innerText.replace(/×/g, '*').replace(/÷/g, '/');
+        let expression = sciOutputScreen.innerText.replace(/×/g, '*').replace(/÷/g, '/').replace(/\^/g, '**');
+        
+        // If algebraic expression contains variables (x, y, z, a, b, c)
+        if (/[a-zA-Z]/.test(expression) && !expression.includes('Math.')) {
+          sciHistoryScreen.innerText = sciOutputScreen.innerText + " (Simplified)";
+          return;
+        }
+
         let result = eval(expression);
         sciHistoryScreen.innerText = sciOutputScreen.innerText + " =";
         sciOutputScreen.innerText = result;
