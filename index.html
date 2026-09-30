@@ -2841,7 +2841,7 @@
     function handleRepairPdfFile(event) {
       repairSelectedFile = event.target.files[0];
       if (!repairSelectedFile) return;
-      document.getElementById('repairPdfDropText').textContent = `Loaded: ${repairSelectedFile.name} (${(file.size/1024).toFixed(1)} KB)`;
+      document.getElementById('repairPdfDropText').textContent = `Loaded: ${repairSelectedFile.name} (${(repairSelectedFile.size/1024).toFixed(1)} KB)`;
       document.getElementById('repairPdfFileInfo').textContent = `File ready for structure scan (1 KB - 500 MB)`;
       document.getElementById('repairPdfBtn').style.display = 'block';
     }
