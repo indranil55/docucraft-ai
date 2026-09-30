@@ -15,8 +15,9 @@
   box-sizing: border-box;
   margin: 0;
   padding: 0;
-  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   -webkit-tap-highlight-color: transparent;
+  -webkit-font-smoothing: antialiased;
 }
 
 body {
@@ -30,11 +31,10 @@ body {
   -webkit-overflow-scrolling: touch;
 }
 
+/* আইফোন ও সাফারির জন্য ফিক্সড ব্যাকগ্রাউন্ড স্ক্রল লক */
 body.modal-open {
   overflow: hidden !important;
-  position: fixed !important;
-  width: 100% !important;
-  height: 100% !important;
+  touch-action: none;
 }
 
 header {
@@ -183,6 +183,7 @@ header {
   gap: 12px;
   transition: all 0.25s ease;
   box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  touch-action: manipulation;
 }
 
 .popular-card:hover {
@@ -202,6 +203,7 @@ header {
   align-items: center;
   justify-content: center;
   font-size: 18px;
+  flex-shrink: 0;
 }
 
 .popular-info h4 {
@@ -247,6 +249,7 @@ header {
   cursor: pointer;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
   transition: all 0.25s ease;
+  touch-action: manipulation;
 }
 
 .filter-btn.active, .filter-btn:hover {
@@ -281,6 +284,8 @@ header {
   flex-direction: column;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
+  touch-action: manipulation;
+  -webkit-transform: translateZ(0);
 }
 
 .tool-card:hover {
@@ -304,6 +309,7 @@ header {
   font-size: 22px;
   margin-bottom: 14px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  flex-shrink: 0;
 }
 
 .tool-card h3 {
@@ -336,7 +342,7 @@ header {
   gap: 10px;
 }
 
-/* ব্যাকগ্রাউন্ড হেভি ব্লার এবং ডার্ক ওভারলে ফিক্স (ফাঁকা জায়গায় ক্লিক বা স্ক্রল করলে পপআপ যাতে না কাটে) */
+/* মোডাল ও ওভারলে ফিক্স (iOS এবং সাফারির জন্য) */
 .workspace-overlay {
   position: fixed !important;
   inset: 0 !important;
@@ -350,6 +356,7 @@ header {
   padding: 0;
   overflow-y: auto;
   pointer-events: auto !important;
+  -webkit-overflow-scrolling: touch;
 }
 
 .workspace-box {
@@ -395,6 +402,7 @@ header {
   align-items: center;
   justify-content: center;
   transition: all 0.2s;
+  touch-action: manipulation;
 }
 
 .close-btn:hover {
@@ -412,6 +420,7 @@ header {
   cursor: pointer;
   margin-bottom: 16px;
   transition: all 0.3s ease;
+  touch-action: manipulation;
 }
 
 .dropzone.dragover {
@@ -496,6 +505,7 @@ header {
   display: block;
   box-shadow: 0 4px 15px rgba(229, 50, 45, 0.4);
   transition: all 0.2s ease;
+  touch-action: manipulation;
 }
 
 .btn-main:hover {
@@ -505,6 +515,27 @@ header {
 
 .btn-main:active {
   transform: scale(0.98);
+}
+
+/* ক্যালকুলেটর মোডাল এবং অনুভূমিক স্ক্রলবার ফিক্স */
+.calc-mode-tabs {
+  display: flex !important;
+  flex-wrap: nowrap !important;
+  overflow-x: auto !important;
+  -webkit-overflow-scrolling: touch !important;
+  scrollbar-width: none !important;
+  gap: 6px !important;
+  padding: 4px !important;
+  background-color: #2c2c2c;
+  border-radius: 8px;
+  margin-bottom: 12px;
+}
+.calc-mode-tabs::-webkit-scrollbar {
+  display: none !important;
+}
+.calc-tab-btn {
+  flex-shrink: 0 !important;
+  white-space: nowrap !important;
 }
 
 #smartAiChatModal {
