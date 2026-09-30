@@ -40,6 +40,15 @@
   <link rel="stylesheet" href="style.css?v=2.5">
 
   <style>
+    /* Universal Apple iOS/Safari & Touch Optimization */
+    * {
+      -webkit-tap-highlight-color: transparent;
+    }
+    .tool-card, .popular-card, .filter-btn, .calc-tab-btn, button, [onclick] {
+      cursor: pointer !important;
+      touch-action: manipulation;
+    }
+
     .nav-container { display: flex; align-items: center; justify-content: space-between; padding: 12px 20px; }
     .brand-logo-svg { display: flex; align-items: center; text-decoration: none; }
     .badge-new {
@@ -79,6 +88,7 @@
     .calc-box {
       background: #ffffff; width: 100%; max-width: 520px; border-radius: 20px; padding: 22px;
       box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5) !important; position: relative; max-height: 90vh; overflow-y: auto; z-index: 100000;
+      -webkit-overflow-scrolling: touch;
     }
     .calc-box h3 { margin-top: 0; margin-bottom: 16px; font-size: 1.25rem; font-weight: 700; color: #0f172a; display: flex; align-items: center; gap: 8px; }
     .calc-close { position: absolute; top: 18px; right: 20px; font-size: 24px; border: none; background: none; cursor: pointer; color: #64748b; }
@@ -261,7 +271,7 @@
       background: #1e293b;
     }
 
-    /* Scientific Calculator Additional Styling */
+    /* Scientific Calculator Styling & Horizontal Scrollable Tabs Fix */
     .calc-app-box {
       background-color: #1e1e1e;
       color: #ffffff;
@@ -270,24 +280,32 @@
       margin-top: 10px;
     }
     .calc-mode-tabs {
-      display: flex;
-      justify-content: space-around;
+      display: flex !important;
+      flex-wrap: nowrap !important;
+      overflow-x: auto !important;
+      -webkit-overflow-scrolling: touch !important; /* iOS Safari Smooth Scroll */
+      scrollbar-width: none !important; /* Firefox */
       background-color: #2c2c2c;
       border-radius: 8px;
       margin-bottom: 12px;
-      padding: 4px;
-      gap: 4px;
+      padding: 5px;
+      gap: 6px;
+      max-width: 100%;
+    }
+    .calc-mode-tabs::-webkit-scrollbar {
+      display: none !important; /* Chrome & Safari Scrollbar Hide */
     }
     .calc-tab-btn {
       background: none;
       border: none;
       color: #9aa0a6;
-      padding: 6px 10px;
+      padding: 7px 14px;
       font-size: 0.85rem;
       border-radius: 6px;
       cursor: pointer;
       transition: 0.2s;
-      flex: 1;
+      flex-shrink: 0 !important; /* Prevents tab shrinking */
+      white-space: nowrap !important;
     }
     .calc-tab-btn.active {
       background-color: #3c4043;
@@ -1091,6 +1109,7 @@
       <h3><i class="fa-solid fa-calculator" style="color: #0284c7;"></i> DocuCraft AI Scientific Calculator</h3>
       
       <div class="calc-app-box">
+        <!-- Horizontal Scrollable Tabs on Mobile & Apple devices -->
         <div class="calc-mode-tabs">
           <button class="calc-tab-btn active" onclick="switchSciTab('sciBasic', event)">Basic</button>
           <button class="calc-tab-btn" onclick="switchSciTab('sciTrig', event)">Trigonometry</button>
@@ -2340,7 +2359,7 @@
   <script src="js/tools.js"></script>
   <script src="js/main.js"></script>
 
-  <!-- Master JavaScript Application Logic with Background Scroll Locking -->
+  <!-- Master JavaScript Application Logic with Apple Safari & Mobile Touch Adaptations -->
   <script>
     function lockPageScroll() {
       document.body.classList.add('modal-open');
@@ -2472,7 +2491,9 @@
       document.querySelectorAll('.calc-panel-sec').forEach(p => p.classList.remove('active'));
       document.querySelectorAll('.calc-tab-btn').forEach(b => b.classList.remove('active'));
       document.getElementById(panelId).classList.add('active');
-      event.currentTarget.classList.add('active');
+      if (event && event.currentTarget) {
+        event.currentTarget.classList.add('active');
+      }
     }
 
     let sciOutputScreen = document.getElementById("scientificOutput");
