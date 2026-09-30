@@ -12,11 +12,9 @@ document.addEventListener('DOMContentLoaded', () => {
 function initCategoryFilter() {
   const buttons = document.querySelectorAll('.filter-btn');
   buttons.forEach(btn => {
-    // Safari ও Touch ডিভাইসে দ্রুত ও নির্ভুল রেসপন্সের জন্য ফিক্স
     btn.addEventListener('click', (e) => {
       buttons.forEach(b => b.classList.remove('active'));
-      const targetBtn = e.currentTarget || e.target;
-      targetBtn.classList.add('active');
+      e.target.classList.add('active');
     });
   });
 }
@@ -126,11 +124,7 @@ function openSmartAiChat() {
   const modal = document.getElementById('smartAiChatModal');
   if (modal) {
     modal.style.display = 'flex';
-    if (typeof lockPageScroll === 'function') {
-      lockPageScroll();
-    } else {
-      document.body.classList.add('modal-open');
-    }
+    document.body.classList.add('modal-open');
   }
 }
 
@@ -138,10 +132,6 @@ function closeSmartAiChat() {
   const modal = document.getElementById('smartAiChatModal');
   if (modal) {
     modal.style.display = 'none';
-    if (typeof unlockPageScroll === 'function') {
-      unlockPageScroll();
-    } else {
-      document.body.classList.remove('modal-open');
-    }
+    document.body.classList.remove('modal-open');
   }
 }
