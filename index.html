@@ -916,14 +916,6 @@
         <span class="tool-meta">Open Tool &rarr;</span>
       </div>
 
-      <!-- Convert to PDF - Only ZIP to PDF Card Kept -->
-      <div class="tool-card" data-cat="toPdf" onclick="openZipToPdfModal()">
-        <div class="tool-icon" style="background:#fef3c7; color:#d97706;"><i class="fa-solid fa-file-zipper"></i></div>
-        <h3>ZIP to PDF Converter <span class="badge-new">NEW</span></h3>
-        <p>Upload a ZIP archive containing images or docs and convert them into a single PDF.</p>
-        <span class="tool-meta">Open ZIP to PDF &rarr;</span>
-      </div>
-
       <div class="tool-card" onclick="openSmartAiChat()">
         <div class="tool-icon" style="background: #fee2e2; color:#e5322d;">
           <i class="fa-solid fa-robot"></i>
@@ -3330,7 +3322,7 @@
       const out = document.getElementById('discOutput'); out.style.display = 'block'; out.textContent = `Discounted Price: ₹${(p - (p * d / 100)).toFixed(2)}`;
     }
     function executePercentCalc() {
-      const a = parseFloat(document.getElementById('pctValA').value), b = parseFloat(document.getElementById('pctValB').value);
+      const a = parseFloat(document.getElementById('pctValA').value), b =FilesparseFloat(document.getElementById('pctValB').value);
       const out = document.getElementById('pctOutput'); out.style.display = 'block'; out.textContent = `Result: ${((a / 100) * b).toFixed(2)}`;
     }
 
