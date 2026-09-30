@@ -21,12 +21,12 @@
   
   <meta name="description" content="DocuCraft AI - Free Online PDF, Photo, Financial & Productivity Utilities. Resize Photo, Docx to PDF, Govt Job Alerts, Barcode, Gold Price, Notepad and more.">
   <meta name="keywords" content="PDF editor, KB resizer, docx to pdf, govt jobs, sarkari result, barcode generator, color picker, typing speed test, notepad">
-  <meta property="og:title" content="​​DocuCraft AI ⚡ Fast PDF Tools & Daily Utilities">
+  <meta property="og:title" content="DocuCraft AI ⚡ Fast PDF Tools & Daily Utilities">
   <meta property="og:description" content="Merge, Compress, Resize KB, Docx to PDF, Govt Job Alerts, Barcode, Gold Price, BMR, PPF, EMI, Notepad, GST free in browser.">
   <meta property="og:type" content="website">
   
   <link rel="sitemap" type="application/xml" title="Sitemap" href="/sitemap.xml">
-  <title>​DocuCraft AI ⚡ Fast PDF Tools & Daily Utilities</title>
+  <title>DocuCraft AI ⚡ Fast PDF Tools & Daily Utilities</title>
 
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='40' cy='50' r='35' fill='%232563EB'/><text x='38' y='63' font-family='Arial, sans-serif' font-weight='bold' font-size='42' fill='%23FFFFFF' text-anchor='middle'>D</text><text x='65' y='63' font-family='Arial, sans-serif' font-weight='bold' font-size='42' fill='%23DC2626' text-anchor='middle'>C</text></svg>">
   <link rel="shortcut icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='40' cy='50' r='35' fill='%232563EB'/><text x='38' y='63' font-family='Arial, sans-serif' font-weight='bold' font-size='42' fill='%23FFFFFF' text-anchor='middle'>D</text><text x='65' y='63' font-family='Arial, sans-serif' font-weight='bold' font-size='42' fill='%23DC2626' text-anchor='middle'>C</text></svg>">
@@ -1379,7 +1379,7 @@
       <h3><i class="fa-solid fa-note-sticky" style="color: #0284c7;"></i> Unlimited Text Notepad</h3>
       <div class="calc-group">
         <label>Write or paste your notes (Supports 100,000+ lines):</label>
-        <textarea id="notepadTextarea" rows="12" placeholder="Start typing or paste your content here..." style="font-family: monospace; font-size: 13.5px; line-line-height: 1.6; resize: vertical;" oninput="updateNotepadStats()"></textarea>
+        <textarea id="notepadTextarea" rows="12" placeholder="Start typing or paste your content here..." style="font-family: monospace; font-size: 13.5px; line-height: 1.6; resize: vertical;" oninput="updateNotepadStats()"></textarea>
       </div>
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; font-size: 13px; color: #475569;">
         <span id="notepadStats">Lines: 0 | Characters: 0</span>
@@ -2360,11 +2360,13 @@
     }
 
     /* =========================================================
-       Automatic Welcome Voice with Current Date and Time
+       Automatic Welcome Voice - Speaks ONLY ONCE per visit/session
        ========================================================= */
-    let voiceHasSpoken = false;
     function announceDateAndTime() {
-      if (voiceHasSpoken) return;
+      // Check if voice has already been spoken in this browser session
+      if (sessionStorage.getItem('docucraft_voice_announced') === 'true') {
+        return;
+      }
       if (!('speechSynthesis' in window)) return;
 
       const now = new Date();
@@ -2381,7 +2383,9 @@
 
       window.speechSynthesis.cancel();
       window.speechSynthesis.speak(utterance);
-      voiceHasSpoken = true;
+      
+      // Mark as announced so it never repeats on refresh
+      sessionStorage.setItem('docucraft_voice_announced', 'true');
 
       // Remove fallback interaction listeners once spoken
       ['click', 'touchstart', 'keydown'].forEach(evt => {
@@ -2390,7 +2394,7 @@
     }
 
     function triggerFirstInteractionVoice() {
-      if (!voiceHasSpoken) {
+      if (sessionStorage.getItem('docucraft_voice_announced') !== 'true') {
         announceDateAndTime();
       }
     }
@@ -2438,14 +2442,16 @@
         filterCategory('cyber', cyberTab);
       }
 
-      // Automatically speak when site opens or on first user click/touch
-      setTimeout(() => {
-        announceDateAndTime();
-      }, 700);
+      // Check if already announced in this session
+      if (sessionStorage.getItem('docucraft_voice_announced') !== 'true') {
+        setTimeout(() => {
+          announceDateAndTime();
+        }, 700);
 
-      ['click', 'touchstart', 'keydown'].forEach(evt => {
-        window.addEventListener(evt, triggerFirstInteractionVoice, { once: true });
-      });
+        ['click', 'touchstart', 'keydown'].forEach(evt => {
+          window.addEventListener(evt, triggerFirstInteractionVoice, { once: true });
+        });
+      }
     });
 
     function triggerDownload(blobUrl, filename) {
