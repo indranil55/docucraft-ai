@@ -681,10 +681,26 @@
         <span class="tool-meta">Open Age Calculator &rarr;</span>
       </div>
 
+      <!-- Resume Maker Tool Card Added -->
+      <div class="tool-card" data-cat="generator" onclick="openResumeMakerModal()">
+        <div class="tool-icon" style="background:#dbeafe; color:#1d4ed8;"><i class="fa-solid fa-file-lines"></i></div>
+        <h3>Professional Resume Maker <span class="badge-new">NEW</span></h3>
+        <p>Create, customize and download professional employment resumes instantly.</p>
+        <span class="tool-meta">Open Resume Maker &rarr;</span>
+      </div>
+
+      <!-- Prescription Maker Tool Card Added -->
+      <div class="tool-card" data-cat="generator" onclick="openPrescriptionMakerModal()">
+        <div class="tool-icon" style="background:#e0f2fe; color:#059669;"><i class="fa-solid fa-notes-medical"></i></div>
+        <h3>Digital Prescription Maker <span class="badge-new">NEW</span></h3>
+        <p>Generate clean medical prescriptions with doctor details, patient info, and medicines.</p>
+        <span class="tool-meta">Open Prescription Maker &rarr;</span>
+      </div>
+
       <div class="tool-card" data-cat="generator" onclick="openNotepadModal()">
         <div class="tool-icon" style="background:#e0f2fe; color:#0284c7;"><i class="fa-solid fa-note-sticky"></i></div>
         <h3>Unlimited Text Notepad <span class="badge-new">NEW</span></h3>
-        <p>Write, store and download unlimited text documents and notes up to 100,000+ lines instantly.</p>
+        <p>Write, store and download unlimited text documents and notes with no line restrictions.</p>
         <span class="tool-meta">Open Notepad &rarr;</span>
       </div>
 
@@ -775,7 +791,7 @@
       <div class="tool-card" data-cat="generator" onclick="openTypingModal()">
         <div class="tool-icon" style="background:#dbeafe; color:#1d4ed8;"><i class="fa-solid fa-keyboard"></i></div>
         <h3>1-Minute Typing Speed Test <span class="badge-new">NEW</span></h3>
-        <p>Test and measure your typing speed with multi-level paragraphs and real-time WPM.</p>
+        <p>Test and measure your typing speed with 100 progressive levels and instant certification.</p>
         <span class="tool-meta">Start Typing Test &rarr;</span>
       </div>
 
@@ -1310,7 +1326,7 @@
       <button class="calc-close" onclick="closeNotepadModal()">&times;</button>
       <h3><i class="fa-solid fa-note-sticky" style="color: #0284c7;"></i> Unlimited Text Notepad</h3>
       <div class="calc-group">
-        <label>Write or paste your notes (Supports 100,000+ lines):</label>
+        <label>Write or paste your notes (Unlimited Lines & Storage):</label>
         <textarea id="notepadTextarea" rows="12" placeholder="Start typing or paste your content here..." style="font-family: monospace; font-size: 13.5px; line-height: 1.6; resize: vertical;" oninput="updateNotepadStats()"></textarea>
       </div>
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; font-size: 13px; color: #475569;">
@@ -1321,6 +1337,74 @@
         </div>
       </div>
       <button class="calc-btn" onclick="downloadNotepadFile()">Download as .txt File</button>
+    </div>
+  </div>
+
+  <!-- Resume Maker Modal Added -->
+  <div class="calc-modal" id="resumeMakerModal" onclick="if(event.target === this) closeResumeMakerModal()">
+    <div class="calc-box" style="max-width: 600px;">
+      <button class="calc-close" onclick="closeResumeMakerModal()">&times;</button>
+      <h3><i class="fa-solid fa-file-lines" style="color: #1d4ed8;"></i> Professional Resume Maker</h3>
+      <div class="calc-group">
+        <label>Full Name:</label>
+        <input type="text" id="resumeName" placeholder="e.g. Indranil Ruidas">
+      </div>
+      <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+        <div class="calc-group">
+          <label>Email:</label>
+          <input type="email" id="resumeEmail" placeholder="e.g. email@example.com">
+        </div>
+        <div class="calc-group">
+          <label>Phone Number:</label>
+          <input type="text" id="resumePhone" placeholder="e.g. +91 9876543210">
+        </div>
+      </div>
+      <div class="calc-group">
+        <label>Professional Summary & Experience:</label>
+        <textarea id="resumeSummary" rows="3" placeholder="Write a brief professional summary or work experience..."></textarea>
+      </div>
+      <div class="calc-group">
+        <label>Education & Skills:</label>
+        <textarea id="resumeSkills" rows="3" placeholder="Mention degrees, technical skills, certifications..."></textarea>
+      </div>
+      <button class="calc-btn" onclick="generateResumeDownload()">Download Resume (HTML/Text)</button>
+    </div>
+  </div>
+
+  <!-- Prescription Maker Modal Added -->
+  <div class="calc-modal" id="prescriptionMakerModal" onclick="if(event.target === this) closePrescriptionMakerModal()">
+    <div class="calc-box" style="max-width: 600px;">
+      <button class="calc-close" onclick="closePrescriptionMakerModal()">&times;</button>
+      <h3><i class="fa-solid fa-notes-medical" style="color: #059669;"></i> Digital Prescription Maker</h3>
+      <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+        <div class="calc-group">
+          <label>Doctor Name & Qualification:</label>
+          <input type="text" id="rxDoctor" placeholder="e.g. Dr. A. Sharma, MBBS">
+        </div>
+        <div class="calc-group">
+          <label>Clinic / Hospital Name:</label>
+          <input type="text" id="rxClinic" placeholder="e.g. City Health Clinic">
+        </div>
+      </div>
+      <div style="display:grid; grid-template-columns: 2fr 1fr; gap:10px;">
+        <div class="calc-group">
+          <label>Patient Name:</label>
+          <input type="text" id="rxPatient" placeholder="e.g. Patient Name">
+        </div>
+        <div class="calc-group">
+          <label>Age / Gender:</label>
+          <input type="text" id="rxAgeGender" placeholder="e.g. 28 / M">
+        </div>
+      </div>
+      <div class="calc-group">
+        <label>Medicines & Dosage (Rx):</label>
+        <textarea id="rxMedicines" rows="4" placeholder="1. Tab. Paracetamol 650mg - 1-0-1 (After Food) x 5 days&#10;2. Syrup Cough - 2 tsp thrice daily"></textarea>
+      </div>
+      <div class="calc-group">
+        <label>Advice / Tests:</label>
+        <input type="text" id="rxAdvice" placeholder="e.g. Drink warm water, Complete Blood Count test">
+      </div>
+      <button class="calc-btn" onclick="generatePrescriptionDownload()" style="background:#059669;">Download Prescription (.txt)</button>
     </div>
   </div>
 
@@ -1504,23 +1588,22 @@
     </div>
   </div>
 
+  <!-- 1-Minute Typing Speed Test Modal Updated to 100 Progressive Levels & Auto-Finish Certificate Display -->
   <div class="calc-modal" id="typingModal" onclick="if(event.target === this) closeTypingModal()">
-    <div class="calc-box" style="max-width: 530px;">
+    <div class="calc-box" style="max-width: 550px;">
       <button class="calc-close" onclick="closeTypingModal()">&times;</button>
-      <h3><i class="fa-solid fa-keyboard" style="color: #1d4ed8;"></i> 1-Minute Typing Speed Test</h3>
+      <h3><i class="fa-solid fa-keyboard" style="color: #1d4ed8;"></i> 1-Minute Typing Speed Test (100 Levels)</h3>
       <div class="calc-group" style="margin-bottom:8px;">
-        <label>Select Practice Level:</label>
+        <label>Select Practice Level (1 to 100):</label>
         <select id="typingLevelSelect" onchange="changeTypingLevel()">
-          <option value="0">Level 1: Easy & Common Words</option>
-          <option value="1" selected>Level 2: Standard Paragraph</option>
-          <option value="2">Level 3: Technical & Long Sentences</option>
+          <!-- Dynamically populated 100 levels -->
         </select>
       </div>
-      <div id="typingSnippet" style="background:#0f172a; border:2px solid #3b82f6; border-radius:10px; padding:16px; font-size:15px; color:#ffffff; font-weight:600; line-height:1.7; user-select:none; margin-bottom:14px; letter-spacing:0.3px;">
-        The quick brown fox jumps over the lazy dog. Technology and automation enable swift digital transformation across modern platforms with ease.
+      <div id="typingSnippet" style="background:#0f172a; border:2px solid #3b82f6; border-radius:10px; padding:16px; font-size:14.5px; color:#ffffff; font-weight:600; line-height:1.7; user-select:none; margin-bottom:14px; letter-spacing:0.3px;">
+        Loading progressive typing level...
       </div>
       <div class="calc-group">
-        <textarea id="typingInputArea" rows="3" placeholder="Click here and start typing to begin the 60-second test..." oninput="handleTypingInput()" style="color:#0f172a; font-weight:700; font-size:15px; background:#ffffff; border:2px solid #cbd5e1;"></textarea>
+        <textarea id="typingInputArea" rows="3" placeholder="Click here and start typing to begin the test. As soon as you finish the text, your certificate will appear instantly!" oninput="handleTypingInput()" style="color:#0f172a; font-weight:700; font-size:15px; background:#ffffff; border:2px solid #cbd5e1;"></textarea>
       </div>
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
         <span style="font-weight:800; font-size:15px; color:#dc2626;">Time Remaining: <span id="typingTimer">60</span>s</span>
@@ -2349,6 +2432,7 @@
       
       try { updateUnitConvFields(); } catch(e){}
       try { loadLanguages(); } catch(e){}
+      try { initTypingLevels(); } catch(e){}
 
       const cyberTab = document.getElementById('defaultCyberTab');
       if (cyberTab && typeof filterCategory === 'function') {
@@ -2653,7 +2737,6 @@
       return "en";
     }
 
-    // Safe splitting for mobile & Safari
     function splitTextSafe(text, maxLength) {
       if (text.length <= maxLength) return [text];
       const parts = [];
@@ -2807,6 +2890,39 @@
       if (!val) { alert("Please write some notes before downloading."); return; }
       const blob = new Blob([val], { type: 'text/plain;charset=utf-8' });
       triggerDownload(URL.createObjectURL(blob), 'DocuCraft_Notepad_Document.txt');
+    }
+
+    // Resume Maker Logic Added
+    function openResumeMakerModal() { showModal('resumeMakerModal'); }
+    function closeResumeMakerModal() { hideModal('resumeMakerModal'); }
+    function generateResumeDownload() {
+      const name = document.getElementById('resumeName').value || 'My Resume';
+      const email = document.getElementById('resumeEmail').value || '';
+      const phone = document.getElementById('resumePhone').value || '';
+      const summary = document.getElementById('resumeSummary').value || '';
+      const skills = document.getElementById('resumeSkills').value || '';
+
+      const content = `===============================\nRESUME: ${name}\n===============================\nEmail: ${email}\nPhone: ${phone}\n\nSUMMARY & EXPERIENCE:\n${summary}\n\nEDUCATION & SKILLS:\n${skills}\n===============================\nGenerated via DocuCraft AI Resume Maker`;
+      const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+      triggerDownload(URL.createObjectURL(blob), `${name.replace(/\s+/g, '_')}_Resume.txt`);
+      alert("Resume successfully generated and downloaded!");
+    }
+
+    // Prescription Maker Logic Added
+    function openPrescriptionMakerModal() { showModal('prescriptionMakerModal'); }
+    function closePrescriptionMakerModal() { hideModal('prescriptionMakerModal'); }
+    function generatePrescriptionDownload() {
+      const doctor = document.getElementById('rxDoctor').value || 'Dr. Doctor';
+      const clinic = document.getElementById('rxClinic').value || 'Clinic';
+      const patient = document.getElementById('rxPatient').value || 'Patient';
+      const ageGender = document.getElementById('rxAgeGender').value || '';
+      const meds = document.getElementById('rxMedicines').value || '';
+      const advice = document.getElementById('rxAdvice').value || '';
+
+      const content = `--------------------------------------------------\n${clinic.toUpperCase()}\n${doctor}\n--------------------------------------------------\nPatient Name: ${patient}   |   Age/Gender: ${ageGender}\nDate: ${new Date().toLocaleDateString()}\n\nRx (Medicines):\n${meds}\n\nAdvice & Tests:\n${advice}\n--------------------------------------------------\nSignature: ______________________\n`;
+      const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+      triggerDownload(URL.createObjectURL(blob), `Prescription_${patient.replace(/\s+/g, '_')}.txt`);
+      alert("Prescription successfully generated and downloaded!");
     }
 
     // Contact
@@ -3178,32 +3294,93 @@
       out.textContent = `Maintain Weight: ${Math.round(bmr * mult)} kcal/day`;
     }
 
-    const typingParagraphs = [
-      "The cat sat on the mat. Dogs run fast in the park. Sun shines bright today.",
-      "The quick brown fox jumps over the lazy dog. Technology and automation enable swift digital transformation.",
-      "Artificial intelligence and machine learning algorithms process massive datasets securely, empowering developers."
+    // 100 Progressive Typing Practice Levels & Auto-Finish Certificate Display
+    const typingParagraphs = [];
+    const baseSentences = [
+      "The cat sat on the mat. Dogs run fast in the park.",
+      "Swift digital transformation requires robust web applications and clean code.",
+      "Advanced machine learning algorithms process massive datasets securely every day."
     ];
-    function changeTypingLevel() { document.getElementById('typingSnippet').innerText = typingParagraphs[document.getElementById('typingLevelSelect').value]; resetTypingTest(); }
+    for (let i = 1; i <= 100; i++) {
+      let repeated = "";
+      for(let j = 0; j < Math.ceil(i/15); j++) {
+        repeated += baseSentences[(i + j) % baseSentences.length] + " ";
+      }
+      typingParagraphs.push(`Level ${i} (Difficulty ${i}/100): ` + repeated.trim());
+    }
+
+    function initTypingLevels() {
+      const sel = document.getElementById('typingLevelSelect');
+      if(!sel || sel.children.length > 0) return;
+      for (let i = 0; i < 100; i++) {
+        const opt = document.createElement('option');
+        opt.value = i;
+        opt.textContent = `Level ${i+1}: Practice Test ${i+1} (${i < 30 ? 'Beginner' : i < 70 ? 'Intermediate' : 'Expert Hard'})`;
+        sel.appendChild(opt);
+      }
+      sel.value = 0;
+      changeTypingLevel();
+    }
+
+    function changeTypingLevel() {
+      const lvl = parseInt(document.getElementById('typingLevelSelect').value) || 0;
+      document.getElementById('typingSnippet').innerText = typingParagraphs[lvl];
+      resetTypingTest();
+    }
+
     let typingTimerSeconds = 60, typingInterval = null, typingStarted = false;
-    function resetTypingTest() { clearInterval(typingInterval); typingTimerSeconds = 60; typingStarted = false; document.getElementById('typingTimer').innerText = '60'; document.getElementById('typingInputArea').value = ''; document.getElementById('typingInputArea').disabled = false; document.getElementById('typingOutput').style.display = 'none'; }
+    function resetTypingTest() { 
+      clearInterval(typingInterval); 
+      typingTimerSeconds = 60; 
+      typingStarted = false; 
+      document.getElementById('typingTimer').innerText = '60'; 
+      document.getElementById('typingInputArea').value = ''; 
+      document.getElementById('typingInputArea').disabled = false; 
+      document.getElementById('typingOutput').style.display = 'none'; 
+    }
+
     function handleTypingInput() {
       if (!typingStarted) {
         typingStarted = true;
         typingInterval = setInterval(() => {
           typingTimerSeconds--;
           document.getElementById('typingTimer').innerText = typingTimerSeconds;
-          if (typingTimerSeconds <= 0) { clearInterval(typingInterval); finishTypingTest(); }
+          if (typingTimerSeconds <= 0) { 
+            clearInterval(typingInterval); 
+            finishTypingTest(false); 
+          }
         }, 1000);
       }
+
+      // Check if user finished typing the exact target snippet early
+      const targetText = document.getElementById('typingSnippet').innerText;
+      const userText = document.getElementById('typingInputArea').value;
+      if (userText.trim() === targetText.trim() || userText.length >= targetText.length) {
+        clearInterval(typingInterval);
+        finishTypingTest(true);
+      }
     }
-    function finishTypingTest() {
+
+    function finishTypingTest(isFinishedEarly) {
       document.getElementById('typingInputArea').disabled = true;
       const orig = document.getElementById('typingSnippet').innerText.trim().split(/\s+/);
       const user = document.getElementById('typingInputArea').value.trim().split(/\s+/);
-      let corr = 0; user.forEach((w, i) => { if (orig[i] && w === orig[i]) corr++; });
+      let corr = 0; 
+      user.forEach((w, i) => { if (orig[i] && w === orig[i]) corr++; });
+      const wpm = Math.max(1, Math.round((corr / Math.max(1, (60 - typingTimerSeconds))) * 60));
+      const accuracy = Math.round((corr / orig.length) * 100) || 0;
+
       const out = document.getElementById('typingOutput');
       out.style.display = 'block';
-      out.textContent = `Completed! Speed: ${corr} WPM | Accuracy: ${Math.round((corr / user.length) * 100) || 0}%`;
+      out.innerHTML = `
+        <div style="background:#ffffff; border:2px solid #2563eb; border-radius:12px; padding:15px; color:#1e293b; text-align:center;">
+          <h4 style="color:#2563eb; margin-top:0; margin-bottom:8px;">🏆 OFFICIAL TYPING CERTIFICATE 🏆</h4>
+          <p style="margin:4px 0; font-size:13px;">This is to certify successful completion of Typing Test.</p>
+          <hr style="border:0; border-top:1px solid #e2e8f0; margin:10px 0;">
+          <p style="font-weight:700; font-size:15px; margin:4px 0;">Speed: ${wpm} WPM &nbsp;|&nbsp; Accuracy: ${accuracy}%</p>
+          <p style="font-size:12px; color:#64748b; margin-top:6px;">Status: Completed Successfully ${isFinishedEarly ? '(Finished Early!)' : ''}</p>
+        </div>
+      `;
     }
 
     function executeInflationCalc() {
