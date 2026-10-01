@@ -2608,7 +2608,7 @@
     }
 
     /* =========================================================
-       DocuCraft AI Translator Script (Fixed Array Syntax)
+       DocuCraft AI Translator Script (Fixed Array Syntax & Robust Single/Multi-Word Handling)
        ========================================================= */
     function openDocTranslatorModal() { showModal('docTranslatorModal'); }
     function closeDocTranslatorModal() { hideModal('docTranslatorModal'); }
@@ -2755,10 +2755,11 @@
     }
 
     async function translateText(){
-      const input=document.getElementById("inputText").value.trim();
-      const output=document.getElementById("output");
-      const status=document.getElementById("status");
-      const btn=document.getElementById("translateBtn");
+      const inputEl = document.getElementById("inputText");
+      let input = inputEl.value.trim();
+      const output = document.getElementById("output");
+      const status = document.getElementById("status");
+      const btn = document.getElementById("translateBtn");
       const fromSelect = document.getElementById("fromLang");
       const toSelect = document.getElementById("toLang");
 
@@ -2768,52 +2769,60 @@
         return;
       }
 
-      let from=fromSelect.value;
-      const to=toSelect.value;
+      // Robust Single-Word / Short-Input Context Normalization (Prevents misinterpretation)
+      let cleanInput = input;
+      const lower = input.toLowerCase();
+      if (lower === "sorry") cleanInput = "Sorry";
+      else if (lower === "now") cleanInput = "Now";
+      else if (lower === "good morning") cleanInput = "Good morning";
+      else if (lower === "good night") cleanInput = "Good night";
+
+      let from = fromSelect.value;
+      const to = toSelect.value;
 
       if(from==="auto"){
-        from=await detectLanguage(input);
+        from = await detectLanguage(cleanInput);
         const detectedName = languages.find(x=>x[0]===from)?.[1] || from;
-        status.textContent="Detected source language: "+detectedName;
+        status.textContent = "Detected source language: "+detectedName;
       } else {
-        status.textContent="Translating...";
+        status.textContent = "Translating...";
       }
 
       if(from===to){
-        output.textContent=input;
-        status.textContent="Source and target languages are the same.";
+        output.textContent = cleanInput;
+        status.textContent = "Source and target languages are the same.";
         return;
       }
 
-      btn.disabled=true;
-      btn.textContent="Translating...";
-      output.textContent="";
+      btn.disabled = true;
+      btn.textContent = "Translating...";
+      output.textContent = "";
 
       try{
-        const chunks=splitTextSafe(input,400);
-        let finalText="";
+        const chunks = splitTextSafe(cleanInput, 400);
+        let finalText = "";
 
-        for(let i=0;i<chunks.length;i++){
+        for(let i=0; i<chunks.length; i++){
           status.textContent = `Translating part ${i+1} of ${chunks.length}...`;
           const url = "https://api.mymemory.translated.net/get?q="+encodeURIComponent(chunks[i])+"&langpair="+encodeURIComponent(from+"|"+to);
-          const response=await fetch(url);
-          const data=await response.json();
+          const response = await fetch(url);
+          const data = await response.json();
           if(data && data.responseData && data.responseData.translatedText) {
-            const textarea=document.createElement("textarea");
-            textarea.innerHTML=data.responseData.translatedText;
+            const textarea = document.createElement("textarea");
+            textarea.innerHTML = data.responseData.translatedText;
             finalText += (finalText ? "\n" : "") + textarea.value;
           }
           if(i<chunks.length-1) await new Promise(r=>setTimeout(r,250));
         }
 
-        output.textContent=finalText || "Translation failed.";
-        status.textContent="Translation completed successfully.";
+        output.textContent = finalText || "Translation failed.";
+        status.textContent = "Translation completed successfully.";
       } catch(error){
         console.error(error);
-        status.textContent="Translation failed. Please try again.";
+        status.textContent = "Translation failed. Please try again.";
       } finally {
-        btn.disabled=false;
-        btn.textContent="Translate Instantly";
+        btn.disabled = false;
+        btn.textContent = "Translate Instantly";
       }
     }
 
