@@ -710,14 +710,6 @@
         <span class="tool-meta">Open Tool &rarr;</span>
       </div>
 
-      <!-- UPDATED: DocuCraft AI Tally 9 -->
-      <div class="tool-card" data-cat="finance" onclick="openTallyModal()">
-        <div class="tool-icon" style="background:#e0f2fe; color:#0284c7;"><i class="fa-solid fa-calculator"></i></div>
-        <h3>DocuCraft AI Tally 9 <span class="badge-new">NEW</span></h3>
-        <p>Comprehensive Tally ERP 9 ledger creation, inventory, voucher entries & GST accounting programs.</p>
-        <span class="tool-meta">Open Tally Programs &rarr;</span>
-      </div>
-
       <!-- NEW: Watermark & Stamp Maker -->
       <div class="tool-card" data-cat="editSecurity" onclick="openWatermarkModal()">
         <div class="tool-icon" style="background:#f3e8ff; color:#7e22ce;"><i class="fa-solid fa-stamp"></i></div>
@@ -796,34 +788,6 @@
         <h3>Exam Photo & Signature Resizer</h3>
         <p>Resize photo and signature to exact size required for government exam forms (SSC, UPSC, NEET, etc.).</p>
         <span class="tool-meta">Open Resizer &rarr;</span>
-      </div>
-
-      <div class="tool-card" data-cat="organize" onclick="launchTool('merge')">
-        <div class="tool-icon" style="background:#fee2e2; color:#e5322d;"><i class="fa-solid fa-object-group"></i></div>
-        <h3>Merge PDF</h3>
-        <p>Combine multiple PDF documents into a single organized file in seconds.</p>
-        <span class="tool-meta">Open Tool &rarr;</span>
-      </div>
-
-      <div class="tool-card" data-cat="organize" onclick="launchTool('split')">
-        <div class="tool-icon" style="background:#fee2e2; color:#e5322d;"><i class="fa-solid fa-scissors"></i></div>
-        <h3>Split PDF</h3>
-        <p>Separate one page or an entire set for easy conversion into independent PDF files.</p>
-        <span class="tool-meta">Open Tool &rarr;</span>
-      </div>
-
-      <div class="tool-card" data-cat="organize" onclick="launchTool('compress')">
-        <div class="tool-icon" style="background:#ecfdf5; color:#059669;"><i class="fa-solid fa-file-zipper"></i></div>
-        <h3>Compress PDF</h3>
-        <p>Reduce file size while optimizing for maximal visual and document quality.</p>
-        <span class="tool-meta">Open Tool &rarr;</span>
-      </div>
-
-      <div class="tool-card" data-cat="organize" onclick="launchTool('organize')">
-        <div class="tool-icon" style="background:#fee2e2; color:#e5322d;"><i class="fa-solid fa-arrow-down-up-across-line"></i></div>
-        <h3>Organize / Reorder Pages</h3>
-        <p>Rearrange, reverse, or reorder the page sequence of your PDF document.</p>
-        <span class="tool-meta">Open Tool &rarr;</span>
       </div>
 
       <div class="tool-card" data-cat="finance" onclick="openPrepayModal()">
@@ -2330,28 +2294,6 @@
     </div>
   </div>
 
-  <!-- DocuCraft AI Tally 9 Modal -->
-  <div class="calc-modal" id="tallyModal" onclick="if(event.target === this) closeTallyModal()">
-    <div class="calc-box" style="max-width: 600px;">
-      <button class="calc-close" onclick="closeTallyModal()">&times;</button>
-      <h3><i class="fa-solid fa-calculator" style="color: #0284c7;"></i> DocuCraft AI Tally 9</h3>
-      <div class="calc-group">
-        <label>Select Tally ERP 9 Module:</label>
-        <select id="tallyModuleSelect" class="calc-group select">
-          <option value="ledgers">1. Ledger Creation & Group Classification</option>
-          <option value="vouchers">2. Accounting & Inventory Voucher Entries</option>
-          <option value="gst">3. GST Calculation & Return Filing Setup</option>
-          <option value="reports">4. Balance Sheet & Profit/Loss Analysis</option>
-        </select>
-      </div>
-      <div class="calc-group">
-        <label>Program Details / Notes:</label>
-        <textarea id="tallyProgramOutput" rows="6" readonly style="font-family:monospace; font-size:13px; background:#f8fafc; color:#1e293b;">Welcome to DocuCraft AI Tally 9 hub! Select a module above to access ledger rules, shortcut keys, and standard accounting program steps.</textarea>
-      </div>
-      <button type="button" onclick="loadTallyModuleInfo()" class="calc-btn" style="background:#0284c7;">Load Module Guide</button>
-    </div>
-  </div>
-
   <div class="calc-modal" id="infoModal" onclick="if(event.target === this) closeInfoModal()">
     <div class="calc-box" style="max-width: 550px;">
       <button class="calc-close" onclick="closeInfoModal()">&times;</button>
@@ -2576,23 +2518,6 @@
         scr.innerText = result;
       } catch (error) {
         scr.innerText = "Error";
-      }
-    }
-
-    // Tally 9 Modal & Functions
-    function openTallyModal() { showModal('tallyModal'); loadTallyModuleInfo(); }
-    function closeTallyModal() { hideModal('tallyModal'); }
-    function loadTallyModuleInfo() {
-      const mod = document.getElementById('tallyModuleSelect').value;
-      const out = document.getElementById('tallyProgramOutput');
-      if (mod === 'ledgers') {
-        out.value = "=== Tally ERP 9: Ledger Creation ===\n1. Go to Gateway of Tally > Accounts Info > Ledgers > Create.\n2. Enter Ledger Name (e.g., Sales Account, Purchase Account, Capital Account).\n3. Select Under Group (e.g., Sales Accounts under Direct/Indirect Incomes, Sundry Debtors, Sundry Creditors).\n4. Enable inventory values affected if required and save (Ctrl+A).";
-      } else if (mod === 'vouchers') {
-        out.value = "=== Tally ERP 9: Voucher Entries ===\n1. Receipt Voucher (F6): Cash/Bank Dr. To Party Cr.\n2. Payment Voucher (F5): Party Dr. To Cash/Bank Cr.\n3. Contra Voucher (F4): Bank Dr. To Cash Cr. (or Bank to Bank).\n4. Journal Voucher (F7): Adjustment & non-cash entries.\n5. Sales (F8) & Purchase (F9) Vouchers.";
-      } else if (mod === 'gst') {
-        out.value = "=== Tally ERP 9: GST Setup & Return ===\n1. Enable GST in F11: Features > Statutory & Taxation.\n2. Set State and GSTIN/UIN number.\n3. Create CGST, SGST, and IGST duty ledgers under Duties & Taxes.\n4. View GSTR-1, GSTR-2, and GSTR-3B reports directly from Gateway of Tally > Display > Statutory Reports > GST.";
-      } else {
-        out.value = "=== Tally ERP 9: Financial Reports ===\n1. Balance Sheet: Gateway of Tally > Balance Sheet (Shows Assets & Liabilities).\n2. Profit & Loss A/c: Gateway of Tally > Profit & Loss (Shows Net Profit / Loss).\n3. Stock Summary: Gateway of Tally > Stock Summary (Tracks inventory closing balance).";
       }
     }
 
@@ -2853,7 +2778,6 @@
         return;
       }
 
-      // Robust Single-Word / Short-Input Context Normalization (Prevents misinterpretation)
       let cleanInput = input;
       const lower = input.toLowerCase();
       if (lower === "sorry") cleanInput = "Sorry";
@@ -3387,7 +3311,6 @@
       out.textContent = `Maintain Weight: ${Math.round(bmr * mult)} kcal/day`;
     }
 
-    // 100 Progressive Typing Practice Levels & Auto-Finish Certificate Display
     const typingParagraphs = [];
     const baseSentences = [
       "The cat sat on the mat. Dogs run fast in the park.",
@@ -3445,7 +3368,6 @@
         }, 1000);
       }
 
-      // Check if user finished typing the exact target snippet early
       const targetText = document.getElementById('typingSnippet').innerText;
       const userText = document.getElementById('typingInputArea').value;
       if (userText.trim() === targetText.trim() || userText.length >= targetText.length) {
