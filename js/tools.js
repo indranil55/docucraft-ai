@@ -286,7 +286,7 @@ function launchTool(toolKey) {
     }
   } else if (toolKey === 'split') {
     if (title) title.innerText = 'Split PDF';
-    if (desc) desc.innerText = 'Extract specific pages or page ranges from a PDF[span_0](start_span)[span_0](end_span).';
+    if (desc) desc.innerText = 'Extract specific pages or page ranges from a PDF.';
     if (dropText) dropText.innerText = 'Tap to select a PDF';
     if (customUI) {
       customUI.innerHTML = `
@@ -402,6 +402,24 @@ function launchTool(toolKey) {
     if (title) title.innerText = toolKey.toUpperCase();
     if (desc) desc.innerText = 'Process your document instantly.';
     if (dropText) dropText.innerText = 'Tap to select file(s)';
+  }
+}
+
+// Tally Module Guide Functionality Fix
+function loadTallyModuleInfo() {
+  const modSelect = document.getElementById('tallyModuleSelect');
+  const outArea = document.getElementById('tallyProgramOutput');
+  if (!modSelect || !outArea) return;
+
+  const mod = modSelect.value;
+  if (mod === 'ledgers') {
+    outArea.value = "=== DocuCraft AI Tally 9: Ledger Creation ===\n1. Go to Gateway of Tally > Accounts Info > Ledgers > Create.\n2. Enter Ledger Name (e.g., Sales Account, Purchase Account, Capital Account).\n3. Select Under Group (e.g., Sales Accounts under Direct/Indirect Incomes, Sundry Debtors, Sundry Creditors).\n4. Enable inventory values affected if required and save (Ctrl+A).";
+  } else if (mod === 'vouchers') {
+    outArea.value = "=== DocuCraft AI Tally 9: Voucher Entries ===\n1. Receipt Voucher (F6): Cash/Bank Dr. To Party Cr.\n2. Payment Voucher (F5): Party Dr. To Cash/Bank Cr.\n3. Contra Voucher (F4): Bank Dr. To Cash Cr. (or Bank to Bank).\n4. Journal Voucher (F7): Adjustment & non-cash entries.\n5. Sales (F8) & Purchase (F9) Vouchers.";
+  } else if (mod === 'gst') {
+    outArea.value = "=== DocuCraft AI Tally 9: GST Setup & Return ===\n1. Enable GST in F11: Features > Statutory & Taxation.\n2. Set State and GSTIN/UIN number.\n3. Create CGST, SGST, and IGST duty ledgers under Duties & Taxes.\n4. View GSTR-1, GSTR-2, and GSTR-3B reports directly from Gateway of Tally > Display > Statutory Reports > GST.";
+  } else {
+    outArea.value = "=== DocuCraft AI Tally 9: Financial Reports ===\n1. Balance Sheet: Gateway of Tally > Balance Sheet (Shows Assets & Liabilities).\n2. Profit & Loss A/c: Gateway of Tally > Profit & Loss (Shows Net Profit / Loss).\n3. Stock Summary: Gateway of Tally > Stock Summary (Tracks inventory closing balance).";
   }
 }
 
