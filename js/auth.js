@@ -1,4 +1,4 @@
-// DocuCraft AI - Authentication & Gate Security Logic (with 3-Use Limit Counter)
+// DocuCraft AI - Authentication & Gate Security Logic (Unlimited Access - 3 Use Limit Removed)
 
 let isSignUpMode = false;
 let isResetMode = false;
@@ -21,26 +21,9 @@ window.addEventListener('DOMContentLoaded', () => {
   }
 });
 
-// Gate Security: Check if user can use tool or reached the 3-use limit
+// Gate Security: Unlimited Access enabled (3-use restriction removed)
 function checkGateAccess(toolName) {
-  const isLogged = localStorage.getItem('docucraft_logged_in') === 'true';
-  if (isLogged) {
-    return true; // If logged in, unlimited access
-  }
-
-  let usageCount = parseInt(localStorage.getItem('docucraft_free_uses') || '0', 10);
-  
-  if (usageCount >= 3) {
-    sessionStorage.setItem('pending_tool', toolName);
-    alert('You have reached your 3 free uses limit! Please Login or Sign Up to continue using DocuCraft AI tools.');
-    openAuthModal();
-    return false;
-  } else {
-    usageCount++;
-    localStorage.setItem('docucraft_free_uses', usageCount.toString());
-    console.log(`Free use count: ${usageCount}/3`);
-    return true;
-  }
+  return true;
 }
 
 // Hook into tool launching if launchTool exists globally
@@ -214,9 +197,6 @@ function handleAuthSubmit() {
   localStorage.setItem('docuCraft_user_email', email);
   localStorage.setItem('docucraft_logged_in', 'true');
   sessionStorage.setItem('docuCraft_logged_in_user', email);
-  
-  // Reset free usage counter upon successful login
-  localStorage.setItem('docucraft_free_uses', '0');
 
   closeAuthModal();
   updateHeaderAuthUI();
@@ -264,7 +244,7 @@ function updateHeaderAuthUI() {
       authBtn.style.width = '38px';
       authBtn.style.height = '38px';
       authBtn.style.borderRadius = '50%';
-      authBtn.title = `Logged in as ${loggedUser || 'User'} (Click to Lock Gate & Logout)`;
+      authBtn.title = `Logged in as ${loggedUser || 'User'} (Click to Logout)`;
     } else {
       authBtn.innerHTML = `<i class="fas fa-user"></i>`;
       authBtn.style.background = '#10b981';
@@ -293,13 +273,12 @@ function sendDataToGoogleSheet(email, actionType) {
 }
 
 function handleLogout() {
-  if (confirm('Are you sure you want to lock the gate and log out?')) {
+  if (confirm('Are you sure you want to log out?')) {
     localStorage.removeItem('docucraft_logged_in');
     localStorage.removeItem('docuCraft_user_email');
     sessionStorage.removeItem('docuCraft_logged_in_user');
     sessionStorage.removeItem('pending_tool');
-    localStorage.setItem('docucraft_free_uses', '0');
-    alert('Gate locked successfully.');
+    alert('Logged out successfully.');
     location.reload();
   }
 }
