@@ -433,7 +433,7 @@
     </div>
   </div>
 
-  <!-- NEW: Retention & Quick Access Bar added for User Engagement -->
+  <!-- Retention & Quick Access Bar (Added Free Job Alert pill) -->
   <div class="retention-bar">
     <div class="streak-pill" id="userStreakBadge">
       <i class="fa-solid fa-fire"></i> Daily Streak: Day 1
@@ -449,6 +449,9 @@
     </div>
     <div class="quick-pin-pill" onclick="openGovtJobModal()">
       <i class="fa-solid fa-bullhorn text-red-600"></i> Govt Jobs
+    </div>
+    <div class="quick-pin-pill" onclick="openFreeJobAlertModal()">
+      <i class="fa-solid fa-bell text-blue-600"></i> Free Job Alert
     </div>
   </div>
 
@@ -786,6 +789,14 @@
         <span class="tool-meta">Check Job Updates &rarr;</span>
       </div>
 
+      <!-- Free Job Alert Card Added -->
+      <div class="tool-card" data-cat="finance" onclick="openFreeJobAlertModal()">
+        <div class="tool-icon" style="background:#dbeafe; color:#2563eb;"><i class="fa-solid fa-bell"></i></div>
+        <h3>Free Job Alert Portal <span class="badge-new">NEW</span></h3>
+        <p>Check daily updated government and private job openings across all states directly.</p>
+        <span class="tool-meta">Open Job Alert &rarr;</span>
+      </div>
+
       <div class="tool-card" data-cat="cyber" onclick="launchTool('kbResizer')">
         <div class="tool-icon" style="background:#dbeafe; color:#2563eb;"><i class="fa-solid fa-compress"></i></div>
         <h3>Photo & Sign KB / MB Resizer</h3>
@@ -1049,12 +1060,19 @@
     </div>
   </main>
 
-  <!-- Love India Modal with Star Rating -->
+  <!-- Love India Modal with Star Rating & QR Code Support -->
   <div class="calc-modal" id="donateModal" onclick="if(event.target === this) closeDonateModal()">
     <div class="calc-box" style="max-width: 420px; text-align: center;">
       <button class="calc-close" onclick="closeDonateModal()">&times;</button>
-      <h3><i class="fa-solid fa-heart" style="color: #ec4899;"></i> Love India</h3>
+      <h3><i class="fa-solid fa-heart" style="color: #ec4899;"></i> Support & Donate</h3>
       
+      <!-- UPI QR Code Section -->
+      <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 18px; margin-bottom: 14px;">
+        <p style="font-size: 13.5px; font-weight: 700; color: #1e293b; margin-bottom: 12px;">Scan QR Code to Support via UPI:</p>
+        <img src="1000059616.jpg" alt="UPI QR Code" style="width: 100%; max-width: 220px; height: auto; border-radius: 8px; border: 1px solid #cbd5e1; background: #ffffff; padding: 8px; margin: 0 auto; display: block;">
+        <p style="font-size: 12px; color: #64748b; margin-top: 10px;">Scan using Google Pay, PhonePe, Paytm, or any UPI app.</p>
+      </div>
+
       <!-- Rating Section -->
       <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 14px; margin-bottom: 8px;">
         <p style="font-size: 13.5px; font-weight: 700; color: #1e293b; margin-bottom: 8px;">Rate Our Website & Tools (Out of 5 Stars):</p>
@@ -1068,6 +1086,18 @@
         <p id="ratingFeedbackText" style="font-size: 13px; font-weight: 700; color: #16a34a; margin-top: 8px; display: none;">Thank you for your rating!</p>
       </div>
       <p style="font-size: 13px; color: #64748b; margin-top: 10px;">Your feedback helps us build better tools for everyone in India and worldwide.</p>
+    </div>
+  </div>
+
+  <!-- Free Job Alert Modal -->
+  <div class="calc-modal" id="freeJobAlertModal" onclick="if(event.target === this) closeFreeJobAlertModal()">
+    <div class="calc-box" style="max-width: 520px;">
+      <button class="calc-close" onclick="closeFreeJobAlertModal()">&times;</button>
+      <h3><i class="fa-solid fa-bell" style="color: #2563eb;"></i> Free Job Alert Portal</h3>
+      <p style="font-size: 13.5px; color: #475569; margin-bottom: 14px;">Select the official Free Job Alert portal to browse live notifications, admit cards, and recruitment results:</p>
+      <div style="display: flex; flex-direction: column; gap: 10px;">
+        <a href="https://www.freejobalert.com" target="_blank" class="calc-btn" style="text-decoration: none; text-align: center; background: #2563eb;"><i class="fa-solid fa-globe"></i> Visit Free Job Alert (Official) &rarr;</a>
+      </div>
     </div>
   </div>
 
@@ -3083,6 +3113,8 @@
     // Modal Triggers
     function openGovtJobModal() { showModal('govtJobModal'); }
     function closeGovtJobModal() { hideModal('govtJobModal'); }
+    function openFreeJobAlertModal() { showModal('freeJobAlertModal'); }
+    function closeFreeJobAlertModal() { hideModal('freeJobAlertModal'); }
     function openPrepayModal() { showModal('prepayModal'); }
     function closePrepayModal() { hideModal('prepayModal'); }
     function openBarcodeModal() { showModal('barcodeModal'); executeBarcodeRender(); }
