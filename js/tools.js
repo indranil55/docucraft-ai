@@ -286,7 +286,7 @@ function launchTool(toolKey) {
     }
   } else if (toolKey === 'split') {
     if (title) title.innerText = 'Split PDF';
-    if (desc) desc.innerText = 'Extract specific pages or page ranges from a PDF[span_0](start_span)[span_0](end_span).';
+    if (desc) desc.innerText = 'Extract specific pages or page ranges from a PDF.';
     if (dropText) dropText.innerText = 'Tap to select a PDF';
     if (customUI) {
       customUI.innerHTML = `
@@ -399,7 +399,24 @@ function launchTool(toolKey) {
         </div>`;
     }
   } else {
-    if (title) title.innerText = toolKey.toUpperCase();
+    // Format toolKey nicely with spaces/To if missing
+    let formattedTitle = toolKey;
+    const lowerKey = toolKey.toLowerCase();
+    if (lowerKey === 'pdfexcel') formattedTitle = 'PDF to Excel';
+    else if (lowerKey === 'pdftext') formattedTitle = 'PDF to Text';
+    else if (lowerKey === 'pdfword') formattedTitle = 'PDF to Word';
+    else if (lowerKey === 'pdfjpg') formattedTitle = 'PDF to JPG';
+    else if (lowerKey === 'pdfpng') formattedTitle = 'PDF to PNG';
+    else if (lowerKey === 'wordtopdf') formattedTitle = 'Word to PDF';
+    else if (lowerKey === 'exceltopdf') formattedTitle = 'Excel to PDF';
+    else if (lowerKey === 'ppttopdf') formattedTitle = 'PowerPoint to PDF';
+    else if (lowerKey === 'htmltopdf') formattedTitle = 'HTML to PDF';
+    else if (lowerKey === 'texttopdf') formattedTitle = 'Text to PDF';
+    else {
+      formattedTitle = toolKey.replace(/([A-Z])/g, ' $1').toUpperCase();
+    }
+
+    if (title) title.innerText = formattedTitle;
     if (desc) desc.innerText = 'Process your document instantly.';
     if (dropText) dropText.innerText = 'Tap to select file(s)';
   }
