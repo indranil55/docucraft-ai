@@ -8,7 +8,7 @@ document.addEventListener('DOMContentLoaded', () => {
     updateHeaderAuthUI();
   }
 
-  // FIX: Robust history popstate handler for all modals and tool overlays
+  // FIX: Robust history popstate handler for all modals and tool overlays (Ensures home screen retention)
   window.addEventListener('popstate', function(event) {
     const openModals = document.querySelectorAll('.calc-modal, .workspace-overlay');
     let modalWasClosed = false;
@@ -28,9 +28,11 @@ document.addEventListener('DOMContentLoaded', () => {
         document.body.style.overflow = '';
       }
       document.body.classList.remove('modal-open');
-      
-      // Prevent further default actions if needed
-      event.preventDefault();
+    } else {
+      // If user presses back and no modal is open, ensure URL hash/state is cleaned up to stay on site home
+      if (window.location.hash.includes('#tool-')) {
+        history.replaceState(null, '', window.location.pathname);
+      }
     }
   });
 });
@@ -147,7 +149,8 @@ function openSmartAiChat() {
     modal.style.display = 'flex';
     document.body.classList.add('modal-open');
     try {
-      history.pushState({ modalOpen: true }, '', window.location.href);
+      const chatStateUrl = window.location.pathname + '#tool-aiChat';
+      history.pushState({ modalOpen: true }, '', chatStateUrl);
     } catch(e) {}
   }
 }
