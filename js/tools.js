@@ -132,10 +132,14 @@ function launchTool(toolKey) {
   if (overlay) {
     overlay.style.display = 'flex';
     document.body.style.overflow = 'hidden'; // iOS Safe Lock
-    // হিস্টরিতে স্টেট পুশ করা হলো যাতে মোবাইল বা ব্রাউজারের ব্যাক বাটনে শুধু টুল/মডালটি বন্ধ হয়
+    
+    // FIX: Perfect history state push with unique tool hash so back button always stays inside the site
     try {
+      const toolStateUrl = window.location.pathname + '#tool-' + toolKey;
+      history.pushState({ modalOpen: true, tool: toolKey }, '', toolStateUrl);
+    } catch(e) {
       history.pushState({ modalOpen: true }, '', window.location.href);
-    } catch(e) {}
+    }
   }
 
   if (toolKey === 'sigPad') {
