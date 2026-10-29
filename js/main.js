@@ -8,18 +8,37 @@ document.addEventListener('DOMContentLoaded', () => {
     updateHeaderAuthUI();
   }
 
-  // FIX: Robust history popstate handler for all modals and tool overlays (Ensures home screen retention)
+  // FIX: Universal robust history popstate handler for ALL modals, tools, overlays & widgets across the site
   window.addEventListener('popstate', function(event) {
-    const openModals = document.querySelectorAll('.calc-modal, .workspace-overlay');
     let modalWasClosed = false;
 
+    // 1. Close Workspace Overlay if open
+    const workspaceOverlay = document.getElementById('workspaceOverlay');
+    if (workspaceOverlay && (workspaceOverlay.style.display === 'flex' || workspaceOverlay.style.display === 'block')) {
+      workspaceOverlay.style.display = 'none';
+      modalWasClosed = true;
+    }
+
+    // 2. Close Smart AI Chat Modal if open
+    const aiModal = document.getElementById('smartAiChatModal');
+    if (aiModal && (aiModal.style.display === 'flex' || aiModal.style.display === 'block')) {
+      aiModal.style.display = 'none';
+      modalWasClosed = true;
+    }
+
+    // 3. Close any other open modals or calculator popups (.calc-modal or general modals)
+    const openModals = document.querySelectorAll('.calc-modal, .modal, .popup-overlay');
     openModals.forEach(modal => {
-      // Check if any modal or workspace overlay is currently open
-      if (modal.style.display === 'flex' || modal.style.display === 'block') {
+      if (modal && (modal.style.display === 'flex' || modal.style.display === 'block')) {
         modal.style.display = 'none';
         modalWasClosed = true;
       }
     });
+
+    // 4. Safely trigger workspace close function if available
+    if (typeof closeWorkspace === 'function') {
+      try { closeWorkspace(); } catch(e) {}
+    }
 
     if (modalWasClosed) {
       if (typeof unlockPageScroll === 'function') {
@@ -28,11 +47,13 @@ document.addEventListener('DOMContentLoaded', () => {
         document.body.style.overflow = '';
       }
       document.body.classList.remove('modal-open');
-    } else {
-      // If user presses back and no modal is open, ensure URL hash/state is cleaned up to stay on site home
-      if (window.location.hash.includes('#tool-')) {
+    }
+
+    // Always ensure URL hash/state is cleaned up so browser stays strictly on site home
+    if (window.location.hash || window.location.href.includes('#')) {
+      try {
         history.replaceState(null, '', window.location.pathname);
-      }
+      } catch(e) {}
     }
   });
 });
@@ -160,5 +181,8 @@ function closeSmartAiChat() {
   if (modal) {
     modal.style.display = 'none';
     document.body.classList.remove('modal-open');
+    try {
+      history.replaceState(null, '', window.location.pathname);
+    } catch(e) {}
   }
 }
