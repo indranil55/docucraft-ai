@@ -78,6 +78,18 @@ function filterCategory(cat, btn) {
   });
 }
 
+// Universal helper to open any modal/calculator with history state so Back button closes it
+function openCustomModal(modalId) {
+  const modal = document.getElementById(modalId);
+  if (!modal) return;
+  modal.style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+  document.body.classList.add('modal-open');
+  try {
+    history.pushState({ modalOpen: true, target: modalId }, '', window.location.pathname + '#modal-' + modalId);
+  } catch(e) {}
+}
+
 function launchTool(toolKey) {
   // Support both 'rot' and 'rotate' aliases
   if (toolKey === 'rot') toolKey = 'rotate';
@@ -552,6 +564,12 @@ function closeWorkspace() {
   const overlay = document.getElementById('workspaceOverlay');
   if (overlay) overlay.style.display = 'none';
   document.body.style.overflow = '';
+  document.body.classList.remove('modal-open');
+  if (window.location.hash.includes('#tool-')) {
+    try {
+      history.replaceState(null, '', window.location.pathname);
+    } catch(e) {}
+  }
 }
 
 function handleBackdropClick(e) {
@@ -576,6 +594,16 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
   }
+
+  // Intercept all clicks on Calculator, Translator, ZIP or other modal openers to push history state automatically
+  document.addEventListener('click', function(e) {
+    const trigger = e.target.closest('[onclick*="open"], [onclick*="Modal"], [onclick*="Calculator"], [onclick*="Translator"], [onclick*="Zip"]');
+    if (trigger) {
+      try {
+        history.pushState({ modalOpen: true }, '', window.location.pathname + '#modal-popup');
+      } catch(e) {}
+    }
+  });
 });
 
 function escapeHtml(value) {
@@ -854,9 +882,9 @@ function readFileAsDataURL(file) {
   });
 }
 
-function downloadBlob(content, name, type) {
+function downloadBlob(content, name, type, mimeType) {
   if (!content) return;
-  const blob = content instanceof Blob ? content : new Blob([content], { type: type || 'application/octet-stream' });
+  const blob = content instanceof Blob ? content : new Blob([content], { type: mimeType || 'application/octet-stream' });
   const url = window.URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.style.display = 'none';
