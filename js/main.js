@@ -7,6 +7,29 @@ document.addEventListener('DOMContentLoaded', () => {
   if (typeof updateHeaderAuthUI === 'function') {
     updateHeaderAuthUI();
   }
+
+  // FIX: Prevent browser back button from exiting the site when modals are open
+  window.addEventListener('popstate', function(event) {
+    const openModals = document.querySelectorAll('.calc-modal, .workspace-overlay');
+    let modalWasClosed = false;
+
+    openModals.forEach(modal => {
+      // Check if any modal or workspace overlay is currently open
+      if (modal.style.display === 'flex') {
+        modal.style.display = 'none';
+        modalWasClosed = true;
+      }
+    });
+
+    if (modalWasClosed) {
+      if (typeof unlockPageScroll === 'function') {
+        unlockPageScroll();
+      } else {
+        document.body.style.overflow = '';
+      }
+      document.body.classList.remove('modal-open');
+    }
+  });
 });
 
 function initCategoryFilter() {
@@ -100,12 +123,12 @@ function triggerFileSuccessAnimation(msg) {
   }
 }
 
-// লক সিস্টেম রিমুভ করে সব টুল সবার জন্য উন্মুক্ত করা হলো
+// Lock system removed; all tools are now open to everyone
 function checkUserAccess(toolKey) {
   return true;
 }
 
-// আসল launchTool ফাংশনটি tools.js-এ আছে, তাই এখানে শুধু এক্সেস চেক রেখে বাকিটা গাইড করা হলো
+// Original launchTool is handled in tools.js; access check retained here
 const originalLaunchTool = window.launchTool;
 // Note: launchTool is fully handled inside tools.js, secured via checkUserAccess check.
 
@@ -125,6 +148,8 @@ function openSmartAiChat() {
   if (modal) {
     modal.style.display = 'flex';
     document.body.classList.add('modal-open');
+    // Push state into history so pressing back closes the modal
+    history.pushState({ modalOpen: true }, '', window.location.href);
   }
 }
 
