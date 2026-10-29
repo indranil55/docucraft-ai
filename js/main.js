@@ -8,14 +8,14 @@ document.addEventListener('DOMContentLoaded', () => {
     updateHeaderAuthUI();
   }
 
-  // FIX: Prevent browser back button from exiting the site when modals are open
+  // FIX: Robust history popstate handler for all modals and tool overlays
   window.addEventListener('popstate', function(event) {
     const openModals = document.querySelectorAll('.calc-modal, .workspace-overlay');
     let modalWasClosed = false;
 
     openModals.forEach(modal => {
       // Check if any modal or workspace overlay is currently open
-      if (modal.style.display === 'flex') {
+      if (modal.style.display === 'flex' || modal.style.display === 'block') {
         modal.style.display = 'none';
         modalWasClosed = true;
       }
@@ -28,6 +28,9 @@ document.addEventListener('DOMContentLoaded', () => {
         document.body.style.overflow = '';
       }
       document.body.classList.remove('modal-open');
+      
+      // Prevent further default actions if needed
+      event.preventDefault();
     }
   });
 });
@@ -80,7 +83,6 @@ function initDropzoneHandlers() {
       const files = dt.files;
       if (files.length > 0) {
         if (fileInput.hasAttribute('multiple')) {
-          // FIX: Prevent duplicate or accidental accumulation of files on drop
           const newFiles = Array.from(files);
           const uniqueFiles = newFiles.filter(nf => !selectedFiles.some(sf => sf.name === nf.name && sf.size === nf.size));
           selectedFiles = [...selectedFiles, ...uniqueFiles];
@@ -96,7 +98,6 @@ function initDropzoneHandlers() {
       if (!checkUserAccess(typeof activeTool !== 'undefined' ? activeTool : '')) return;
       if (e.target.files.length > 0) {
         if (fileInput.hasAttribute('multiple')) {
-          // FIX: Prevent duplicate file addition on file input change
           const newFiles = Array.from(e.target.files);
           const uniqueFiles = newFiles.filter(nf => !selectedFiles.some(sf => sf.name === nf.name && sf.size === nf.size));
           selectedFiles = [...selectedFiles, ...uniqueFiles];
@@ -123,14 +124,11 @@ function triggerFileSuccessAnimation(msg) {
   }
 }
 
-// Lock system removed; all tools are now open to everyone
 function checkUserAccess(toolKey) {
   return true;
 }
 
-// Original launchTool is handled in tools.js; access check retained here
 const originalLaunchTool = window.launchTool;
-// Note: launchTool is fully handled inside tools.js, secured via checkUserAccess check.
 
 function handleBackdropClick(event) {
   if (event.target.id === 'workspaceOverlay') {
@@ -148,8 +146,9 @@ function openSmartAiChat() {
   if (modal) {
     modal.style.display = 'flex';
     document.body.classList.add('modal-open');
-    // Push state into history so pressing back closes the modal
-    history.pushState({ modalOpen: true }, '', window.location.href);
+    try {
+      history.pushState({ modalOpen: true }, '', window.location.href);
+    } catch(e) {}
   }
 }
 
