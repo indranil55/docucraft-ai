@@ -116,7 +116,7 @@ function toggleVoiceOutput() {
   }
 }
 
-// Speak Diwali greeting and date/time welcome message
+// Speak Diwali greeting and date/time welcome message reliably
 function triggerWelcomeSpeech() {
   if (hasSpokenWelcome || !isVoiceOutputEnabled || !('speechSynthesis' in window)) return;
   hasSpokenWelcome = true;
@@ -129,25 +129,39 @@ function triggerWelcomeSpeech() {
   const currentDate = `${now.getDate()} ${months[now.getMonth()]} ${now.getFullYear()}`;
   const currentTime = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
-  const diwaliWish = "Happy Diwali! Wishing you light, happiness, and prosperity from DocuCraft AI. ";
-  const welcomeText = `${diwaliWish}Welcome to DocuCraft AI. Today is ${currentDay}, ${currentDate}, and the current time is ${currentTime}. Have a productive day!`;
-
+  // Clear any existing voice queue
   window.speechSynthesis.cancel();
-  const utterance = new SpeechSynthesisUtterance(welcomeText);
-  utterance.rate = 0.95;
-  utterance.pitch = 1.0;
-  utterance.lang = 'en-US';
 
-  if (availableVoices.length > 0) {
-    const matchedVoice = availableVoices.find(v => v.lang.toLowerCase().includes('en'));
-    if (matchedVoice) utterance.voice = matchedVoice;
+  // Part 1: Clear and loud Diwali Greeting
+  const diwaliWish = "Happy Diwali! Wishing you joy, light, and prosperity from DocuCraft AI.";
+  const diwaliUtterance = new SpeechSynthesisUtterance(diwaliWish);
+  diwaliUtterance.rate = 0.95;
+  diwaliUtterance.pitch = 1.0;
+  diwaliUtterance.lang = 'en-US';
+
+  // Part 2: Site intro, Day, Date, and Time
+  const siteWelcome = `Welcome to DocuCraft AI. Today is ${currentDay}, ${currentDate}, and the current time is ${currentTime}. Have a productive day!`;
+  const welcomeUtterance = new SpeechSynthesisUtterance(siteWelcome);
+  welcomeUtterance.rate = 0.95;
+  welcomeUtterance.pitch = 1.0;
+  welcomeUtterance.lang = 'en-US';
+
+  const voices = window.speechSynthesis.getVoices();
+  if (voices.length > 0) {
+    const matchedVoice = voices.find(v => v.lang.toLowerCase().includes('en'));
+    if (matchedVoice) {
+      diwaliUtterance.voice = matchedVoice;
+      welcomeUtterance.voice = matchedVoice;
+    }
   }
 
-  window.speechSynthesis.speak(utterance);
+  // Speak Diwali first, then immediately follow with the welcome and time
+  window.speechSynthesis.speak(diwaliUtterance);
+  window.speechSynthesis.speak(welcomeUtterance);
 }
 
-// Auto-play safe trigger on first user interaction
-['click', 'touchstart'].forEach(eventType => {
+// Safe trigger on user's first click or touch
+['click', 'touchstart', 'pointerdown'].forEach(eventType => {
   document.addEventListener(eventType, () => {
     triggerWelcomeSpeech();
   }, { once: true });
