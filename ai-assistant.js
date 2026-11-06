@@ -6,7 +6,6 @@ let availableVoices = [];
 let isVoiceOutputEnabled = true;
 let globalRecognition = null;
 let isListening = false;
-let hasSpokenWelcome = false;
 
 // Knowledge base of all tools available on the site
 const siteKnowledgeBase = [
@@ -91,7 +90,7 @@ const siteKnowledgeBase = [
   { name: "Contact & Support Desk", cat: "Support", desc: "Direct contact form to send questions or report issues." }
 ];
 
-// Load available system voices
+// Load available browser voices
 function loadSystemVoices() {
   if ('speechSynthesis' in window) {
     availableVoices = window.speechSynthesis.getVoices();
@@ -102,7 +101,7 @@ if ('speechSynthesis' in window) {
   loadSystemVoices();
 }
 
-// Toggle voice output on or off
+// Toggle voice output on/off
 function toggleVoiceOutput() {
   isVoiceOutputEnabled = !isVoiceOutputEnabled;
   const btn = document.getElementById('voiceToggleBtn');
@@ -116,58 +115,7 @@ function toggleVoiceOutput() {
   }
 }
 
-// Speak Diwali greeting and date/time welcome message reliably
-function triggerWelcomeSpeech() {
-  if (hasSpokenWelcome || !isVoiceOutputEnabled || !('speechSynthesis' in window)) return;
-  hasSpokenWelcome = true;
-
-  const now = new Date();
-  const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-  const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-
-  const currentDay = days[now.getDay()];
-  const currentDate = `${now.getDate()} ${months[now.getMonth()]} ${now.getFullYear()}`;
-  const currentTime = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-
-  // Clear any existing voice queue
-  window.speechSynthesis.cancel();
-
-  // Part 1: Clear and loud Diwali Greeting
-  const diwaliWish = "Happy Diwali! Wishing you joy, light, and prosperity from DocuCraft AI.";
-  const diwaliUtterance = new SpeechSynthesisUtterance(diwaliWish);
-  diwaliUtterance.rate = 0.95;
-  diwaliUtterance.pitch = 1.0;
-  diwaliUtterance.lang = 'en-US';
-
-  // Part 2: Site intro, Day, Date, and Time
-  const siteWelcome = `Welcome to DocuCraft AI. Today is ${currentDay}, ${currentDate}, and the current time is ${currentTime}. Have a productive day!`;
-  const welcomeUtterance = new SpeechSynthesisUtterance(siteWelcome);
-  welcomeUtterance.rate = 0.95;
-  welcomeUtterance.pitch = 1.0;
-  welcomeUtterance.lang = 'en-US';
-
-  const voices = window.speechSynthesis.getVoices();
-  if (voices.length > 0) {
-    const matchedVoice = voices.find(v => v.lang.toLowerCase().includes('en'));
-    if (matchedVoice) {
-      diwaliUtterance.voice = matchedVoice;
-      welcomeUtterance.voice = matchedVoice;
-    }
-  }
-
-  // Speak Diwali first, then immediately follow with the welcome and time
-  window.speechSynthesis.speak(diwaliUtterance);
-  window.speechSynthesis.speak(welcomeUtterance);
-}
-
-// Safe trigger on user's first click or touch
-['click', 'touchstart', 'pointerdown'].forEach(eventType => {
-  document.addEventListener(eventType, () => {
-    triggerWelcomeSpeech();
-  }, { once: true });
-});
-
-// Automatically detect and translate text universally
+// Automatically detect source language and translate text globally
 async function translateUniversal(text, targetLang, sourceLang = 'auto') {
   if (!text || targetLang === sourceLang) return { text, detected: sourceLang };
   try {
@@ -183,7 +131,7 @@ async function translateUniversal(text, targetLang, sourceLang = 'auto') {
   }
 }
 
-// Speak the assistant response in the user's native language
+// Speak response aloud using native voice matching the query language
 function speakResponseInNativeLanguage(text, langCode) {
   if (!isVoiceOutputEnabled || !('speechSynthesis' in window)) return;
   window.speechSynthesis.cancel();
@@ -194,6 +142,7 @@ function speakResponseInNativeLanguage(text, langCode) {
   utterance.lang = langCode;
 
   if (availableVoices.length > 0) {
+    // Select the best matching voice for the target language code (e.g., bn, hi, en, es, ar, fr)
     const matchedVoice = availableVoices.find(v => 
       v.lang.toLowerCase() === langCode.toLowerCase() ||
       v.lang.toLowerCase().startsWith(langCode.toLowerCase().split('-')[0])
@@ -206,7 +155,7 @@ function speakResponseInNativeLanguage(text, langCode) {
   window.speechSynthesis.speak(utterance);
 }
 
-// Generate the core reply based on user intent
+// Generate the core assistant response based on the query
 function generateCoreResponse(englishQuery) {
   const q = englishQuery.toLowerCase().trim();
 
@@ -240,32 +189,32 @@ function generateCoreResponse(englishQuery) {
   return "I can guide you to any tool on DocuCraft AI. Let me know what you want to do (such as PDF editing, photo resizing, or calculating loan EMI).";
 }
 
-// Process incoming smart assistant chat messages in any language
+// Process incoming user messages in any language
 async function processSmartAssistantMessage(userMessage) {
   if (!userMessage || !userMessage.trim()) return "";
 
-  // 1. Detect language and translate query to English
+  // 1. Detect user language and translate input to English
   const translatedInput = await translateUniversal(userMessage, 'en', 'auto');
   const userLang = translatedInput.detected || 'en';
   const englishQuery = translatedInput.text;
 
-  // 2. Generate the core response
+  // 2. Generate the base reply
   const englishReply = generateCoreResponse(englishQuery);
 
-  // 3. Translate response back to the user's native language
+  // 3. Translate the reply back to the user's native language
   let finalReply = englishReply;
   if (userLang !== 'en') {
     const translatedOutput = await translateUniversal(englishReply, userLang, 'en');
     finalReply = translatedOutput.text;
   }
 
-  // 4. Speak response in native language voice
+  // 4. Speak the final reply in the user's native tongue
   speakResponseInNativeLanguage(finalReply, userLang);
 
   return finalReply;
 }
 
-// Voice input handling via microphone Speech Recognition
+// Global voice input (Microphone / Speech Recognition)
 function toggleVoiceInput(inputElementId, callback) {
   const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
   if (!SpeechRecognition) {
@@ -282,6 +231,7 @@ function toggleVoiceInput(inputElementId, callback) {
   globalRecognition = new SpeechRecognition();
   globalRecognition.continuous = false;
   globalRecognition.interimResults = false;
+  // Automatically set speech recognition language to device locale
   globalRecognition.lang = navigator.language || 'en-US';
 
   globalRecognition.onstart = function() {
