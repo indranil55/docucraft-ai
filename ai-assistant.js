@@ -6,8 +6,9 @@ let availableVoices = [];
 let isVoiceOutputEnabled = true;
 let globalRecognition = null;
 let isListening = false;
+let hasSpokenWelcome = false;
 
-// সাইটের সমস্ত টুলের নলেজবেস
+// Knowledge base of all tools available on the site
 const siteKnowledgeBase = [
   // Document & PDF Tools
   { name: "Merge PDF / Document Scanner & Merger", cat: "PDF", desc: "Combines multiple PDF files or scanned pages into a single document." },
@@ -90,7 +91,7 @@ const siteKnowledgeBase = [
   { name: "Contact & Support Desk", cat: "Support", desc: "Direct contact form to send questions or report issues." }
 ];
 
-// ব্রাউজারের ভয়েস লোড করা
+// Load available system voices
 function loadSystemVoices() {
   if ('speechSynthesis' in window) {
     availableVoices = window.speechSynthesis.getVoices();
@@ -101,7 +102,7 @@ if ('speechSynthesis' in window) {
   loadSystemVoices();
 }
 
-// ভয়েস অন/অফ টগল
+// Toggle voice output on or off
 function toggleVoiceOutput() {
   isVoiceOutputEnabled = !isVoiceOutputEnabled;
   const btn = document.getElementById('voiceToggleBtn');
@@ -115,7 +116,44 @@ function toggleVoiceOutput() {
   }
 }
 
-// বিশ্বব্যাপী যেকোনো টেক্সটের ভাষা স্বয়ংক্রিয়ভাবে শনাক্ত ও অনুবাদ
+// Speak Diwali greeting and date/time welcome message
+function triggerWelcomeSpeech() {
+  if (hasSpokenWelcome || !isVoiceOutputEnabled || !('speechSynthesis' in window)) return;
+  hasSpokenWelcome = true;
+
+  const now = new Date();
+  const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+  const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+
+  const currentDay = days[now.getDay()];
+  const currentDate = `${now.getDate()} ${months[now.getMonth()]} ${now.getFullYear()}`;
+  const currentTime = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+  const diwaliWish = "Happy Diwali! Wishing you light, happiness, and prosperity from DocuCraft AI. ";
+  const welcomeText = `${diwaliWish}Welcome to DocuCraft AI. Today is ${currentDay}, ${currentDate}, and the current time is ${currentTime}. Have a productive day!`;
+
+  window.speechSynthesis.cancel();
+  const utterance = new SpeechSynthesisUtterance(welcomeText);
+  utterance.rate = 0.95;
+  utterance.pitch = 1.0;
+  utterance.lang = 'en-US';
+
+  if (availableVoices.length > 0) {
+    const matchedVoice = availableVoices.find(v => v.lang.toLowerCase().includes('en'));
+    if (matchedVoice) utterance.voice = matchedVoice;
+  }
+
+  window.speechSynthesis.speak(utterance);
+}
+
+// Auto-play safe trigger on first user interaction
+['click', 'touchstart'].forEach(eventType => {
+  document.addEventListener(eventType, () => {
+    triggerWelcomeSpeech();
+  }, { once: true });
+});
+
+// Automatically detect and translate text universally
 async function translateUniversal(text, targetLang, sourceLang = 'auto') {
   if (!text || targetLang === sourceLang) return { text, detected: sourceLang };
   try {
@@ -131,7 +169,7 @@ async function translateUniversal(text, targetLang, sourceLang = 'auto') {
   }
 }
 
-// যে ভাষায় কথা বলা হয়েছে, ঠিক সেই ভাষার কণ্ঠে উত্তর শোনানো
+// Speak the assistant response in the user's native language
 function speakResponseInNativeLanguage(text, langCode) {
   if (!isVoiceOutputEnabled || !('speechSynthesis' in window)) return;
   window.speechSynthesis.cancel();
@@ -142,7 +180,6 @@ function speakResponseInNativeLanguage(text, langCode) {
   utterance.lang = langCode;
 
   if (availableVoices.length > 0) {
-    // সঠিক ল্যাঙ্গুয়েজ কোডের ভয়েস নির্বাচন (যেমন: bn, hi, en, es, ar, fr ইত্যাদি)
     const matchedVoice = availableVoices.find(v => 
       v.lang.toLowerCase() === langCode.toLowerCase() ||
       v.lang.toLowerCase().startsWith(langCode.toLowerCase().split('-')[0])
@@ -155,7 +192,7 @@ function speakResponseInNativeLanguage(text, langCode) {
   window.speechSynthesis.speak(utterance);
 }
 
-// ব্যবহারকারীর প্রশ্নের মূল উত্তর তৈরি
+// Generate the core reply based on user intent
 function generateCoreResponse(englishQuery) {
   const q = englishQuery.toLowerCase().trim();
 
@@ -189,32 +226,32 @@ function generateCoreResponse(englishQuery) {
   return "I can guide you to any tool on DocuCraft AI. Let me know what you want to do (such as PDF editing, photo resizing, or calculating loan EMI).";
 }
 
-// চ্যাটে পাঠানো যেকোনো ভাষার মেসেজ প্রসেস করা
+// Process incoming smart assistant chat messages in any language
 async function processSmartAssistantMessage(userMessage) {
   if (!userMessage || !userMessage.trim()) return "";
 
-  // ১. ব্যবহারকারীর ভাষা শনাক্ত এবং তা ইংরেজিতে রূপান্তর
+  // 1. Detect language and translate query to English
   const translatedInput = await translateUniversal(userMessage, 'en', 'auto');
   const userLang = translatedInput.detected || 'en';
   const englishQuery = translatedInput.text;
 
-  // ২. মূল উত্তর তৈরি
+  // 2. Generate the core response
   const englishReply = generateCoreResponse(englishQuery);
 
-  // ৩. ব্যবহারকারীর নিজস্ব ভাষায় উত্তরটি অনুবাদ
+  // 3. Translate response back to the user's native language
   let finalReply = englishReply;
   if (userLang !== 'en') {
     const translatedOutput = await translateUniversal(englishReply, userLang, 'en');
     finalReply = translatedOutput.text;
   }
 
-  // ৪. সেই নির্দিষ্ট ভাষার ভয়েসে পড়ে শোনানো
+  // 4. Speak response in native language voice
   speakResponseInNativeLanguage(finalReply, userLang);
 
   return finalReply;
 }
 
-// বিশ্বব্যাপী যেকোনো ভাষার জন্য ভয়েস ইনপুট (Microphone / Speech Recognition)
+// Voice input handling via microphone Speech Recognition
 function toggleVoiceInput(inputElementId, callback) {
   const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
   if (!SpeechRecognition) {
@@ -231,7 +268,6 @@ function toggleVoiceInput(inputElementId, callback) {
   globalRecognition = new SpeechRecognition();
   globalRecognition.continuous = false;
   globalRecognition.interimResults = false;
-  // ব্যবহারকারীর ডিভাইসের বর্তমান লোকাল ভাষা স্বয়ংক্রিয়ভাবে নির্ধারণ করবে
   globalRecognition.lang = navigator.language || 'en-US';
 
   globalRecognition.onstart = function() {
