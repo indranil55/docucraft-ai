@@ -376,54 +376,6 @@
       transform: scale(1.15);
     }
   </style>
-/* =========================================================
-
-FESTIVE DIWALI THEME STYLES (Lights, Banner & Sparkles)
-
-========================================================= */
-
-.diwali-banner-bar {
-background: linear-gradient(90deg, #991b1b, #d97706, #b45309, #dc2626);
-background-size: 300% 300%;
-animation: diwaliGradientShift 5s ease infinite;
-color: #ffffff;
-padding: 7px 15px;
-text-align: center;
-font-size: 13px;
-font-weight: 700;
-letter-spacing: 0.4px;
-box-shadow: 0 2px 10px rgba(217, 119, 6, 0.35);
-position: relative;
-z-index: 100;
-display: flex;
-align-items: center;
-justify-content: center;
-gap: 8px;
-}
-@keyframes diwaliGradientShift {
-0% { background-position: 0% 50%; }
-50% { background-position: 100% 50%; }
-100% { background-position: 0% 50%; }
-}
-.diwali-diya {
-font-size: 15px;
-animation: flickerDiya 1.5s infinite alternate;
-}
-@keyframes flickerDiya {
-0% { transform: scale(1); filter: drop-shadow(0 0 2px #fde047); }
-100% { transform: scale(1.18); filter: drop-shadow(0 0 8px #f59e0b); }
-}
-.diwali-sparkle-dot { 
-position: fixed;
-pointer-events: none;
-border-radius: 50%;
-z-index: 999999;
-animation: burstSpark 0.65s ease-out forwards;
-}
-@keyframes burstSpark {
-0% { transform: translate(0, 0) scale(1); opacity: 1; }
-100% { transform: translate(var(--tx), var(--ty)) scale(0.2); opacity: 0; }
-}
 
 </style>
   <script>
