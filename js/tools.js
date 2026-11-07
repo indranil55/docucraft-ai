@@ -721,7 +721,6 @@ async function executeToolAction() {
       const unit = document.getElementById('optTargetUnit')?.value || 'KB';
       const customName = document.getElementById('optCustomFileName')?.value?.trim() || 'Resized_Photo';
       
-      // Calculate exact target in bytes (works for 10 KB up to 500 MB)
       const targetBytes = unit === 'MB' 
         ? Math.round(valInput * 1024 * 1024) 
         : Math.round(valInput * 1024);
@@ -730,29 +729,36 @@ async function executeToolAction() {
       const img = new Image();
       await new Promise((res, rej) => { img.onload = res; img.onerror = rej; img.src = rawData; });
 
-      let canvas = document.createElement('canvas');
-      let ctx = canvas.getContext('2d');
+      const origW = img.width;
+      const origH = img.height;
+      const origSize = selectedFiles[0].size;
+      const aspect = origW / origH;
+
       let bestBlob = null;
 
-      // CASE 1: Target size is larger than source (e.g. 90 KB up to 500 MB)
-      if (selectedFiles[0].size < targetBytes * 0.90) {
+      // CASE 1: টার্গেট সাইজ মূল ছবির চেয়ে বড় (যেমন বড় KB বা 1 MB - 500 MB)
+      if (origSize < targetBytes * 0.90) {
         setProgress(35, `Scaling to ${valInput} ${unit}...`);
         
-        // Scale canvas safely to enhance quality without memory exhaustion
-        const scaleFactor = Math.min(2.5, Math.max(1.0, Math.sqrt(targetBytes / (selectedFiles[0].size * 4))));
-        canvas.width = Math.round(img.width * scaleFactor);
-        canvas.height = Math.round(img.height * scaleFactor);
+        let scaleFactor = Math.min(2.5, Math.max(1.0, Math.sqrt(targetBytes / (origSize * 2))));
+        let canvas = document.createElement('canvas');
+        canvas.width = Math.round(origW * scaleFactor);
+        canvas.height = Math.round(canvas.width / aspect);
+
+        let ctx = canvas.getContext('2d');
+        ctx.imageSmoothingEnabled = true;
+        ctx.imageSmoothingQuality = 'high';
         ctx.fillStyle = '#ffffff';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
         ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
 
-        let baseBlob = await new Promise(r => canvas.toBlob(r, 'image/jpeg', 0.95));
-        
-        // Chunk-based safe padding to accurately reach exact target (10 KB to 500 MB)
+        let baseBlob = await new Promise(r => canvas.toBlob(r, 'image/jpeg', 0.96));
+
+        // নিরাপদ জিরো-প্যাডিং (ইমেজ ফ্র্যাকচার ছাড়া নিখুঁত সাইজ মিলবে)
         if (baseBlob && baseBlob.size < targetBytes) {
-          setProgress(65, 'Building target size...');
+          setProgress(65, 'Finalizing target size...');
           const diff = targetBytes - baseBlob.size;
-          const chunkSize = 10 * 1024 * 1024; // 10MB safe memory chunk
+          const chunkSize = 8 * 1024 * 1024;
           const parts = [baseBlob];
           let remaining = diff;
 
@@ -761,32 +767,43 @@ async function executeToolAction() {
             parts.push(new Uint8Array(currentChunk));
             remaining -= currentChunk;
           }
-
           bestBlob = new Blob(parts, { type: 'image/jpeg' });
         } else {
           bestBlob = baseBlob;
         }
       } 
-      // CASE 2: Target size is smaller than source (Compress from large source down to 10 KB - 500 KB)
+      // CASE 2: টার্গেট সাইজ মূল ছবির চেয়ে ছোট (কম্প্রেশন: 10 KB - 500 KB)
       else {
-        setProgress(35, 'Compressing to target size...');
+        setProgress(30, 'Compressing safely...');
+        
+        // রেজোলিউশনকে অতিরিক্ত ছোট হওয়া থেকে রক্ষা করা
         let scale = 1.0;
-        const minBytes = targetBytes * 0.88;
+        if (targetBytes < 40 * 1024 && Math.max(origW, origH) > 1600) {
+          scale = 1400 / Math.max(origW, origH);
+        } else if (targetBytes < 25 * 1024 && Math.max(origW, origH) > 1200) {
+          scale = 1000 / Math.max(origW, origH);
+        }
 
-        for (let attempt = 0; attempt < 7; attempt++) {
-          canvas.width = Math.round(img.width * scale);
-          canvas.height = Math.round(img.height * scale);
+        let canvas = document.createElement('canvas');
+        let ctx = canvas.getContext('2d');
+        ctx.imageSmoothingEnabled = true;
+        ctx.imageSmoothingQuality = 'high';
+
+        // সর্বোচ্চ ৪ ধাপে রেজোলিউশন ও কোয়ালিটি ভারসাম্য রাখা
+        for (let step = 0; step < 4; step++) {
+          canvas.width = Math.round(origW * scale);
+          canvas.height = Math.round(canvas.width / aspect);
           ctx.fillStyle = '#ffffff';
           ctx.fillRect(0, 0, canvas.width, canvas.height);
           ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
 
-          let low = 0.03, high = 0.95;
-          for (let i = 0; i < 8; i++) {
+          // কোয়ালিটি যাতে ০.৩৮ এর নিচে না নামে (কালার ব্যান্ডিং ও ফ্র্যাকচার দূর রাখতে)
+          let low = 0.38, high = 0.98;
+          for (let i = 0; i < 9; i++) {
             const q = (low + high) / 2;
-            const blob = await new Promise(r => canvas.toBlob(r, 'image/jpeg', q));
-            if (blob.size <= targetBytes) {
-              bestBlob = blob;
-              if (blob.size >= minBytes) break;
+            const b = await new Promise(r => canvas.toBlob(r, 'image/jpeg', q));
+            if (b.size <= targetBytes) {
+              bestBlob = b;
               low = q;
             } else {
               high = q;
@@ -794,19 +811,28 @@ async function executeToolAction() {
           }
 
           if (bestBlob && bestBlob.size <= targetBytes) break;
-          scale *= 0.70;
+          scale *= 0.82;
+        }
+
+        if (bestBlob && bestBlob.size < targetBytes * 0.95) {
+          const diff = targetBytes - bestBlob.size;
+          bestBlob = new Blob([bestBlob, new Uint8Array(diff)], { type: 'image/jpeg' });
         }
       }
 
       if (!bestBlob) {
-        bestBlob = await new Promise(r => canvas.toBlob(r, 'image/jpeg', 0.2));
+        let canvas = document.createElement('canvas');
+        canvas.width = origW;
+        canvas.height = origH;
+        let ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0);
+        bestBlob = await new Promise(r => canvas.toBlob(r, 'image/jpeg', 0.6));
       }
 
       setProgress(90, 'Downloading...');
       const finalFileName = `${customName}_${valInput}${unit}.jpg`;
       downloadBlob(bestBlob, finalFileName, 'image/jpeg');
 
-      // Accurate unit formatting
       const sizeDisplay = bestBlob.size >= (1024 * 1024)
         ? (bestBlob.size / (1024 * 1024)).toFixed(2) + ' MB'
         : (bestBlob.size / 1024).toFixed(1) + ' KB';
@@ -845,7 +871,7 @@ async function executeToolAction() {
         sx = (img.width - sw) / 2;
       } else {
         sh = img.width / targetAspect;
-        sy = Math.max(0, (img.height - sh) * 0.08); // Keep top headroom intact
+        sy = Math.max(0, (img.height - sh) * 0.08);
       }
       sCtx.drawImage(img, sx, sy, sw, sh, 0, 0, pw, ph);
 
@@ -861,13 +887,11 @@ async function executeToolAction() {
 
       const getBlob = (cv) => new Promise(res => cv.toBlob(res, 'image/jpeg', 0.95));
 
-      // 1. Download single photo
       if (downloadType === 'single') {
         setProgress(60, 'Downloading Single Photo...');
         const sBlob = await getBlob(singleCanvas);
         downloadBlob(sBlob, `${fileName}_Single_3.5x4.5cm.jpg`, 'image/jpeg');
       } 
-      // 2. Download grid sheet (tight layout, minimal padding)
       else if (downloadType === 'grid') {
         setProgress(75, 'Generating Tight Grid...');
         let cols = 3;
@@ -899,7 +923,6 @@ async function executeToolAction() {
         const gBlob = await getBlob(gridCanvas);
         downloadBlob(gBlob, `${fileName}_${copies}_Copies_Grid.jpg`, 'image/jpeg');
       }
-      // 3. Download both formats
       else if (downloadType === 'both') {
         setProgress(50, 'Downloading Single Photo...');
         const sBlob = await getBlob(singleCanvas);
