@@ -5,26 +5,13 @@ let isResetMode = false;
 
 const GOOGLE_SHEET_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbw7ypSy3VkabsXyc0aiDStAC7xCsEW5Xks-OPGa9SUmpDIlgaXidHT7jC56cQlw-LpXsw/exec";
 
-window.addEventListener('DOMContentLoaded', () => {
-  if (typeof pdfjsLib !== 'undefined') {
-    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-  }
-
-  updateHeaderAuthUI();
-  
-  const submitBtn = document.getElementById('authSubmitBtn');
-  if (submitBtn) {
-    submitBtn.onclick = (e) => {
-      e.preventDefault();
-      handleAuthSubmit();
-    };
-  }
-});
-
 // Gate Security: Unlimited Access enabled (3-use restriction removed)
 function checkGateAccess(toolName) {
   return true;
 }
+// Ensure both alias works for tools.js
+window.checkGateAccess = checkGateAccess;
+window.checkUserAccess = checkGateAccess;
 
 // Hook into tool launching if launchTool exists globally
 if (typeof window.launchTool === 'function') {
@@ -35,6 +22,13 @@ if (typeof window.launchTool === 'function') {
     }
   };
 }
+
+window.addEventListener('DOMContentLoaded', () => {
+  if (typeof pdfjsLib !== 'undefined') {
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+  }
+  updateHeaderAuthUI();
+});
 
 function openAuthModal() {
   const isLogged = localStorage.getItem('docucraft_logged_in') === 'true';
@@ -57,7 +51,7 @@ function openAuthModal() {
             <input type="email" id="authEmail" class="form-control" placeholder="Enter your email" autocomplete="email">
           </div>
           <div class="form-group" id="passwordGroup">
-            <label>Password:</label>
+            <label id="passwordLabel">Password:</label>
             <div style="position: relative;">
               <input type="password" id="authPassword" class="form-control" placeholder="Enter password (min 8 chars)" style="padding-right: 40px;" autocomplete="current-password">
               <span onclick="togglePasswordVisibility()" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); cursor: pointer; color: #64748b;">
@@ -102,27 +96,34 @@ function toggleResetMode() {
 function updateAuthModalUI() {
   const title = document.getElementById('authTitle');
   const submitBtn = document.getElementById('authSubmitBtn');
+  const passLabel = document.getElementById('passwordLabel');
+  const passInput = document.getElementById('authPassword');
   const passwordGroup = document.getElementById('passwordGroup');
   const toggleContainer = document.getElementById('authToggleContainer');
 
+  if (passwordGroup) passwordGroup.style.display = 'block';
+
   if (isResetMode) {
     if (title) title.innerText = 'Reset Password';
-    if (submitBtn) submitBtn.innerText = 'Reset Password';
-    if (passwordGroup) passwordGroup.style.display = 'none';
+    if (submitBtn) submitBtn.innerText = 'Save New Password';
+    if (passLabel) passLabel.innerText = 'New Password:';
+    if (passInput) passInput.placeholder = 'Enter new password (min 8 chars)';
     if (toggleContainer) {
       toggleContainer.innerHTML = 'Remembered your password? <a href="javascript:void(0)" onclick="toggleResetMode()" style="color: #e5322d; font-weight: 700;">Login</a>';
     }
   } else if (isSignUpMode) {
     if (title) title.innerText = 'Create Account (Sign Up)';
     if (submitBtn) submitBtn.innerText = 'Register';
-    if (passwordGroup) passwordGroup.style.display = 'block';
+    if (passLabel) passLabel.innerText = 'Password:';
+    if (passInput) passInput.placeholder = 'Create password (min 8 chars)';
     if (toggleContainer) {
       toggleContainer.innerHTML = 'Already have an account? <a href="javascript:void(0)" onclick="toggleAuthMode()" style="color: #e5322d; font-weight: 700;">Login</a>';
     }
   } else {
     if (title) title.innerText = 'User Login';
     if (submitBtn) submitBtn.innerText = 'Login';
-    if (passwordGroup) passwordGroup.style.display = 'block';
+    if (passLabel) passLabel.innerText = 'Password:';
+    if (passInput) passInput.placeholder = 'Enter password (min 8 chars)';
     if (toggleContainer) {
       toggleContainer.innerHTML = `
         <span>Don't have an account?</span> 
@@ -176,22 +177,26 @@ function handleAuthSubmit() {
     return;
   }
 
+  if (!pass || pass.length < 8) {
+    alert('Password must be at least 8 characters.');
+    return;
+  }
+
   if (isResetMode) {
     const savedEmail = localStorage.getItem('docuCraft_user_email');
     if (!savedEmail || savedEmail !== email) {
       alert('No account found with this email address.');
       return;
     }
-    localStorage.setItem('docuCraft_user_email', email);
+    localStorage.setItem('docuCraft_user_password', pass);
     sendDataToGoogleSheet(email, 'Reset Password');
     alert('Password updated successfully! Please login with your new password.');
     toggleResetMode();
     return;
   }
 
-  if (!pass || pass.length < 8) {
-    alert('Password must be at least 8 characters.');
-    return;
+  if (isSignUpMode) {
+    localStorage.setItem('docuCraft_user_password', pass);
   }
 
   localStorage.setItem('docuCraft_user_email', email);
@@ -259,7 +264,7 @@ function updateHeaderAuthUI() {
 }
 
 function sendDataToGoogleSheet(email, actionType) {
-  if (!GOOGLE_SHEET_WEB_APP_URL || GOOGLE_SHEET_WEB_APP_URL.includes("YOUR_URL")) return;
+  if (!GOOGLE_SHEET_WEB_APP_URL || GOOGLE_SHEET_WEB_APP_URL.includes("YOUR_URL") return;
   try {
     fetch(GOOGLE_SHEET_WEB_APP_URL, {
       method: 'POST',
@@ -276,6 +281,7 @@ function handleLogout() {
   if (confirm('Are you sure you want to log out?')) {
     localStorage.removeItem('docucraft_logged_in');
     localStorage.removeItem('docuCraft_user_email');
+    localStorage.removeItem('docuCraft_user_password');
     sessionStorage.removeItem('docuCraft_logged_in_user');
     sessionStorage.removeItem('pending_tool');
     alert('Logged out successfully.');
