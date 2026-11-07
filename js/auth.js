@@ -46,30 +46,38 @@ function openAuthModal() {
   let modal = document.getElementById('authModal');
   if (!modal) {
     const modalHTML = `
-      <div id="authModal" class="workspace-overlay" style="display: flex;" onclick="if(event.target.id==='authModal') closeAuthModal()">
-        <div class="workspace-box" style="max-width: 400px; border-radius: 20px; padding: 20px 24px;">
-          <div class="workspace-header" style="margin-bottom: 12px; padding-bottom: 8px;">
-            <h3 id="authTitle" style="margin: 0; font-size: 18px;">User Login</h3>
-            <button class="close-btn" onclick="closeAuthModal()" style="font-size: 20px;">&times;</button>
+      <div id="authModal" class="workspace-overlay" style="display: flex; align-items: center; justify-content: center; position: fixed; inset: 0; z-index: 99999; background: rgba(0,0,0,0.6);" onclick="if(event.target.id==='authModal') closeAuthModal()">
+        <div class="workspace-box" style="width: 90%; max-width: 380px; min-height: auto !important; height: auto !important; border-radius: 20px; padding: 22px 20px; box-sizing: border-box; display: flex; flex-direction: column; justify-content: flex-start !important; gap: 0 !important;">
+          
+          <div class="workspace-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px !important; padding: 0 !important;">
+            <h3 id="authTitle" style="margin: 0; font-size: 19px; font-weight: 700;">User Login</h3>
+            <button class="close-btn" onclick="closeAuthModal()" style="background: rgba(255,255,255,0.08); border: none; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 18px;">&times;</button>
           </div>
-          <div class="form-group" style="margin-bottom: 10px;">
-            <label style="display: block; margin-bottom: 4px; font-size: 13px; font-weight: 600;">Email Address:</label>
-            <input type="email" id="authEmail" class="form-control" placeholder="Enter your email" autocomplete="email" style="padding: 8px 12px; font-size: 14px; width: 100%; box-sizing: border-box;">
+          
+          <div class="form-group" style="margin: 0 0 14px 0 !important; padding: 0 !important;">
+            <label style="display: block; margin-bottom: 6px; font-size: 13px; font-weight: 600; opacity: 0.9;">Email Address:</label>
+            <input type="email" id="authEmail" class="form-control" placeholder="Enter your email" autocomplete="email" style="width: 100%; height: 44px; padding: 0 14px; font-size: 14px; box-sizing: border-box; border-radius: 10px;">
           </div>
-          <div class="form-group" id="passwordGroup" style="margin-bottom: 14px;">
-            <label style="display: block; margin-bottom: 4px; font-size: 13px; font-weight: 600;">Password:</label>
-            <div style="position: relative;">
-              <input type="password" id="authPassword" class="form-control" placeholder="Enter password (min 8 chars)" style="padding: 8px 38px 8px 12px; font-size: 14px; width: 100%; box-sizing: border-box;" autocomplete="current-password">
-              <span onclick="togglePasswordVisibility()" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); cursor: pointer; color: #64748b; font-size: 14px;">
+          
+          <div class="form-group" id="passwordGroup" style="margin: 0 0 18px 0 !important; padding: 0 !important;">
+            <label style="display: block; margin-bottom: 6px; font-size: 13px; font-weight: 600; opacity: 0.9;">Password:</label>
+            <div style="position: relative; width: 100%;">
+              <input type="password" id="authPassword" class="form-control" placeholder="Enter password (min 8 chars)" autocomplete="current-password" style="width: 100%; height: 44px; padding: 0 40px 0 14px; font-size: 14px; box-sizing: border-box; border-radius: 10px;">
+              <span onclick="togglePasswordVisibility()" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); cursor: pointer; opacity: 0.6; font-size: 15px; display: flex; align-items: center;">
                 <i class="fas fa-eye" id="eyeIcon"></i>
               </span>
             </div>
           </div>
-          <button class="btn-main" id="authSubmitBtn" onclick="handleAuthSubmit()" style="margin-top: 4px; padding: 10px; width: 100%; font-size: 14px; border-radius: 8px;">Login</button>
-          <div id="authToggleContainer" style="text-align: center; margin-top: 10px; font-size: 12px; color: #64748b;">
-            Don't have an account? <a href="javascript:void(0)" onclick="toggleAuthMode()" style="color: #e5322d; font-weight: 700;">Sign Up</a>
-            <br><a href="javascript:void(0)" onclick="toggleResetMode()" style="color: #64748b; font-size: 11px; font-weight: 600; display: inline-block; margin-top: 4px;">Forgot Password?</a>
+          
+          <button class="btn-main" id="authSubmitBtn" onclick="handleAuthSubmit()" style="width: 100%; height: 46px; margin: 0 0 14px 0 !important; font-size: 15px; font-weight: 600; border-radius: 12px; cursor: pointer;">Login</button>
+          
+          <div id="authToggleContainer" style="text-align: center; margin: 0 !important; padding: 0 !important; font-size: 12px; opacity: 0.85;">
+            Don't have an account? <a href="javascript:void(0)" onclick="toggleAuthMode()" style="color: #e5322d; font-weight: 700; text-decoration: none;">Sign Up</a>
+            <div style="margin-top: 6px;">
+              <a href="javascript:void(0)" onclick="toggleResetMode()" style="font-size: 11px; font-weight: 600; text-decoration: none; opacity: 0.8;">Forgot Password?</a>
+            </div>
           </div>
+
         </div>
       </div>
     `;
@@ -110,14 +118,14 @@ function updateAuthModalUI() {
     if (submitBtn) submitBtn.innerText = 'Reset Password';
     if (passwordGroup) passwordGroup.style.display = 'none';
     if (toggleContainer) {
-      toggleContainer.innerHTML = 'Remembered your password? <a href="javascript:void(0)" onclick="toggleResetMode()" style="color: #e5322d; font-weight: 700;">Login</a>';
+      toggleContainer.innerHTML = 'Remembered your password? <a href="javascript:void(0)" onclick="toggleResetMode()" style="color: #e5322d; font-weight: 700; text-decoration: none;">Login</a>';
     }
   } else if (isSignUpMode) {
     if (title) title.innerText = 'Create Account (Sign Up)';
     if (submitBtn) submitBtn.innerText = 'Register';
     if (passwordGroup) passwordGroup.style.display = 'block';
     if (toggleContainer) {
-      toggleContainer.innerHTML = 'Already have an account? <a href="javascript:void(0)" onclick="toggleAuthMode()" style="color: #e5322d; font-weight: 700;">Login</a>';
+      toggleContainer.innerHTML = 'Already have an account? <a href="javascript:void(0)" onclick="toggleAuthMode()" style="color: #e5322d; font-weight: 700; text-decoration: none;">Login</a>';
     }
   } else {
     if (title) title.innerText = 'User Login';
@@ -125,9 +133,10 @@ function updateAuthModalUI() {
     if (passwordGroup) passwordGroup.style.display = 'block';
     if (toggleContainer) {
       toggleContainer.innerHTML = `
-        <span>Don't have an account?</span> 
-        <a href="javascript:void(0)" onclick="toggleAuthMode()" style="color: #e5322d; font-weight: 700;">Sign Up</a>
-        <br><a href="javascript:void(0)" onclick="toggleResetMode()" style="color: #64748b; font-size: 11px; font-weight: 600; display: inline-block; margin-top: 4px;">Forgot Password?</a>
+        Don't have an account? <a href="javascript:void(0)" onclick="toggleAuthMode()" style="color: #e5322d; font-weight: 700; text-decoration: none;">Sign Up</a>
+        <div style="margin-top: 6px;">
+          <a href="javascript:void(0)" onclick="toggleResetMode()" style="font-size: 11px; font-weight: 600; text-decoration: none; opacity: 0.8;">Forgot Password?</a>
+        </div>
       `;
     }
   }
