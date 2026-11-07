@@ -721,13 +721,10 @@ async function executeToolAction() {
       const unit = document.getElementById('optTargetUnit')?.value || 'KB';
       const customName = document.getElementById('optCustomFileName')?.value?.trim() || 'Resized_Photo';
 
-      // Strict Upper Limit: Guarantees output NEVER exceeds selected KB/MB on any file manager/browser
-      const rawTargetBytes = unit === 'MB'
-        ? Math.round(valInput * 1000 * 1000)
-        : Math.round(valInput * 1000);
-
-      const maxAllowedBytes = Math.floor(rawTargetBytes * 0.98); // Hard ceiling (e.g., 49.0 KB for 50 KB)
-      const minAcceptableBytes = Math.floor(rawTargetBytes * 0.88); // Safe target window
+      // Accurate Byte Target
+      const targetBytes = unit === 'MB'
+        ? Math.round(valInput * 1024 * 1024)
+        : Math.round(valInput * 1024);
 
       const rawData = await readFileAsDataURL(selectedFiles[0]);
       const img = new Image();
@@ -739,8 +736,8 @@ async function executeToolAction() {
 
       let bestBlob = null;
 
-      // CASE 1: Source file is smaller than target ceiling
-      if (selectedFiles[0].size < maxAllowedBytes) {
+      // CASE 1: Upscaling / Expanding when source is smaller than target
+      if (selectedFiles[0].size < targetBytes * 0.92) {
         setProgress(35, `Scaling to ${valInput} ${unit}...`);
 
         let canvas = document.createElement('canvas');
@@ -751,26 +748,28 @@ async function executeToolAction() {
         ctx.fillRect(0, 0, canvas.width, canvas.height);
         ctx.drawImage(img, 0, 0);
 
-        let baseBlob = await new Promise(r => canvas.toBlob(r, 'image/jpeg', 0.95));
+        let baseBlob = await new Promise(r => canvas.toBlob(r, 'image/jpeg', 0.98));
 
-        if (baseBlob && baseBlob.size < maxAllowedBytes) {
+        if (baseBlob && baseBlob.size < targetBytes) {
           setProgress(65, 'Finalizing exact size...');
-          const diff = maxAllowedBytes - baseBlob.size;
+          const diff = targetBytes - baseBlob.size;
+          // Pad safe zero bytes to strictly hit target size
           bestBlob = new Blob([baseBlob, new Uint8Array(diff)], { type: 'image/jpeg' });
         } else {
           bestBlob = baseBlob;
         }
       }
-      // CASE 2: Strict Downscaling & Compression (Ensures output never exceeds 50 KB, 100 KB, etc.)
+      // CASE 2: Strict Downscaling / Compressing
       else {
-        setProgress(30, 'Compressing safely below limit...');
+        setProgress(30, 'Compressing to exact target...');
 
         let canvas = document.createElement('canvas');
         let ctx = canvas.getContext('2d');
         ctx.imageSmoothingEnabled = true;
         ctx.imageSmoothingQuality = 'high';
 
-        let scale = Math.min(1.0, Math.sqrt(maxAllowedBytes / selectedFiles[0].size) * 0.98);
+        // Aggressive estimate for scale down if target is significantly smaller
+        let scale = Math.min(1.0, Math.sqrt(targetBytes / selectedFiles[0].size) * 1.05);
 
         for (let iter = 0; iter < 12; iter++) {
           const w = Math.max(50, Math.round(origW * scale));
@@ -782,11 +781,12 @@ async function executeToolAction() {
           ctx.fillRect(0, 0, w, h);
           ctx.drawImage(img, 0, 0, w, h);
 
-          let lowQ = 0.05, highQ = 0.92, localBest = null;
+          // Binary search for optimal quality level
+          let lowQ = 0.05, highQ = 0.95, localBest = null;
           for (let step = 0; step < 7; step++) {
             const midQ = (lowQ + highQ) / 2;
             const b = await new Promise(r => canvas.toBlob(r, 'image/jpeg', midQ));
-            if (b.size <= maxAllowedBytes) {
+            if (b.size <= targetBytes) {
               localBest = b;
               lowQ = midQ;
             } else {
@@ -794,23 +794,25 @@ async function executeToolAction() {
             }
           }
 
-          if (localBest && localBest.size <= maxAllowedBytes) {
+          if (localBest && localBest.size <= targetBytes) {
             bestBlob = localBest;
-            if (bestBlob.size >= minAcceptableBytes) break;
+            // Target satisfied if within 85% to 100% of target
+            if (bestBlob.size >= targetBytes * 0.85) break;
           }
 
-          scale *= 0.80;
+          // If still over budget, shrink resolution aggressively
+          scale *= 0.78;
         }
 
-        // Keep bytes strictly within the safe target ceiling
-        if (bestBlob && bestBlob.size < minAcceptableBytes) {
-          const diff = minAcceptableBytes - bestBlob.size;
+        // Align bytes to exactly match selected size
+        if (bestBlob && bestBlob.size < targetBytes) {
+          const diff = targetBytes - bestBlob.size;
           bestBlob = new Blob([bestBlob, new Uint8Array(diff)], { type: 'image/jpeg' });
         }
       }
 
-      // Safeguard against boundary overflow
-      if (!bestBlob || bestBlob.size > maxAllowedBytes) {
+      // Fallback safeguard
+      if (!bestBlob || bestBlob.size > targetBytes) {
         let canvas = document.createElement('canvas');
         canvas.width = Math.min(300, origW);
         canvas.height = Math.round(canvas.width / aspect);
@@ -823,9 +825,9 @@ async function executeToolAction() {
       const finalFileName = `${customName}_${valInput}${unit}.jpg`;
       downloadBlob(bestBlob, finalFileName, 'image/jpeg');
 
-      const sizeDisplay = bestBlob.size >= (1000 * 1000)
-        ? (bestBlob.size / (1000 * 1000)).toFixed(2) + ' MB'
-        : (bestBlob.size / 1000).toFixed(1) + ' KB';
+      const sizeDisplay = bestBlob.size >= (1024 * 1024)
+        ? (bestBlob.size / (1024 * 1024)).toFixed(2) + ' MB'
+        : (bestBlob.size / 1024).toFixed(1) + ' KB';
 
       closeWorkspace();
       setTimeout(() => {
