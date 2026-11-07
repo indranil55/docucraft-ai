@@ -13,7 +13,7 @@ function loadScript(url) {
     }
     const script = document.createElement('script');
     script.src = url;
-    script.crossOrigin = 'anonymous';
+    script.crossOrigin = "anonymous";
     script.onload = resolve;
     script.onerror = reject;
     document.head.appendChild(script);
@@ -107,22 +107,17 @@ function launchTool(toolKey) {
   const customUI = document.getElementById('wsCustomUI');
   const dropzone = document.getElementById('wsDropzone');
   const dropText = document.getElementById('wsDropText');
-  const btn = document.getElementById('wsActionBtn');
 
   if (fileList) fileList.innerHTML = '';
   if (customUI) customUI.innerHTML = '';
-  if (btn) {
-    btn.disabled = false;
-    btn.innerText = 'Process & Download';
-  }
   resetProgress();
-
+  
   if (fileInput) {
     fileInput.value = '';
     if (['merge', 'split', 'compress', 'organize', 'rotate', 'removePages', 'watermark', 'protect', 'unlock', 'pdfToJpg', 'pdfToWord', 'pdfToExcel', 'editPdf'].includes(toolKey)) {
       fileInput.accept = 'application/pdf';
     } else if (['jpgToPdf', 'pngToPdf', 'kbResizer', 'examResizer', 'ocr', 'passportGrid'].includes(toolKey)) {
-      fileInput.accept = 'image/*,image/jpeg,image/png,image/webp,image/jpg';
+      fileInput.accept = 'image/*';
     } else if (toolKey === 'wordToPdf') {
       fileInput.accept = '.doc,.docx,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document';
     } else if (toolKey === 'excelToPdf') {
@@ -142,18 +137,11 @@ function launchTool(toolKey) {
     }
   }
 
-  // Ensure clicking the dropzone opens file selection
-  if (dropzone && fileInput) {
-    dropzone.style.display = 'block';
-    dropzone.onclick = () => {
-      fileInput.click();
-    };
-  }
-
+  if (dropzone) dropzone.style.display = 'block';
   if (overlay) {
     overlay.style.display = 'flex';
     document.body.style.overflow = 'hidden';
-
+    
     try {
       history.pushState({ modalOpen: true, tool: toolKey }, '', window.location.pathname + '#tool-' + toolKey);
     } catch(e) {
@@ -163,7 +151,7 @@ function launchTool(toolKey) {
 
   if (toolKey === 'sigPad') {
     if (title) title.innerText = 'Digital Signature Maker';
-    if (desc) desc.innerText = 'Draw your signature, select color, format, and download.';
+    if (desc) desc.innerText = 'Draw your signature, select color, format and download.';
     if (dropzone) dropzone.style.display = 'none';
     if (customUI) {
       customUI.innerHTML = `
@@ -245,7 +233,7 @@ function launchTool(toolKey) {
     }
   } else if (toolKey === 'examResizer') {
     if (title) title.innerText = 'Exam Photo & Signature Resizer';
-    if (desc) desc.innerText = 'Resize photo and signature to exact dimensions required for government exam forms (SSC, UPSC, NEET, etc.).';
+    if (desc) desc.innerText = 'Resize photo and signature to exact size required for government exam forms (SSC, UPSC, NEET, etc.).';
     if (dropText) dropText.innerText = 'Tap to select photo or signature';
     if (customUI) {
       customUI.innerHTML = `
@@ -261,7 +249,7 @@ function launchTool(toolKey) {
           <input type="text" id="optExamFileName" class="form-control" value="Exam_Photo" style="width:100%; padding:10px; border:1px solid #d1d5db; border-radius:8px;">
         </div>`;
     }
-  } else if (toolKey === 'passportGrid') {
+ } else if (toolKey === 'passportGrid') {
     if (title) title.innerText = 'Smart Passport Photo Studio';
     if (desc) desc.innerText = 'Select photo: get original 3.5x4.5 cm photo and print-ready tight grid.';
     if (dropText) dropText.innerText = 'Tap to select photo';
@@ -474,7 +462,8 @@ function initSignaturePad() {
   const canvas = document.getElementById('sigCanvas');
   if (!canvas) return;
   const ctx = canvas.getContext('2d');
-
+  
+  // Retina / High-DPI Display Scaling
   const dpr = window.devicePixelRatio || 1;
   const rect = canvas.getBoundingClientRect();
   canvas.width = rect.width * dpr;
@@ -572,19 +561,10 @@ document.addEventListener('DOMContentLoaded', () => {
           const uniqueFiles = newFiles.filter(nf => !selectedFiles.some(sf => sf.name === nf.name && sf.size === nf.size));
           selectedFiles = [...selectedFiles, ...uniqueFiles];
         } else {
-          selectedFiles = [e.target.files[0]];
+          selectedFiles = Array.from(e.target.files);
         }
         renderFileList();
-
-        const dropText = document.getElementById('wsDropText');
-        if (dropText && selectedFiles.length > 0) {
-          dropText.innerText = `Selected: ${selectedFiles[0].name}`;
-        }
       }
-    });
-
-    fileInput.addEventListener('click', function() {
-      this.value = null;
     });
   }
 });
@@ -615,8 +595,8 @@ function renderFileList() {
 
   selectedFiles.forEach((file, index) => {
     const fileSize = (file.size / 1024).toFixed(1) + ' KB';
-    const safeFileName = escapeHtml(file.name);
-
+    const safeFileName = escapeHtml(file.name); 
+    
     html += `<div style="display: flex; justify-content: space-between; align-items: center; padding: 6px 0; border-bottom: 1px solid #e2e8f0; font-size: 12px;">
       <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 170px; color: #334155;">${index + 1}. ${safeFileName} (${fileSize})</span>
       <button type="button" onclick="removeSelectedFile(${index})" style="background: #fee2e2; color: #991b1b; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 10px;">×</button>
@@ -628,10 +608,6 @@ function renderFileList() {
 
 function removeSelectedFile(index) {
   selectedFiles.splice(index, 1);
-  if (selectedFiles.length === 0) {
-    const dropText = document.getElementById('wsDropText');
-    if (dropText) dropText.innerText = 'Tap to select photo';
-  }
   renderFileList();
 }
 
@@ -639,8 +615,6 @@ function clearAllSelectedFiles() {
   selectedFiles = [];
   const fileInput = document.getElementById('wsFileInput');
   if (fileInput) fileInput.value = '';
-  const dropText = document.getElementById('wsDropText');
-  if (dropText) dropText.innerText = 'Tap to select photo';
   renderFileList();
 }
 
@@ -670,19 +644,8 @@ async function executeToolAction() {
     if (!sigCanvasInstance) return;
     const format = document.getElementById('sigFormat')?.value || 'image/png';
     const ext = format === 'image/jpeg' ? 'jpg' : 'png';
-
-    const exportCanvas = document.createElement('canvas');
-    exportCanvas.width = sigCanvasInstance.width;
-    exportCanvas.height = sigCanvasInstance.height;
-    const expCtx = exportCanvas.getContext('2d');
-
-    if (format === 'image/jpeg') {
-      expCtx.fillStyle = '#ffffff';
-      expCtx.fillRect(0, 0, exportCanvas.width, exportCanvas.height);
-    }
-    expCtx.drawImage(sigCanvasInstance, 0, 0);
-
-    exportCanvas.toBlob(async (blob) => {
+    
+    sigCanvasInstance.toBlob(async (blob) => {
       await downloadBlob(blob, `Digital_Signature.${ext}`, format);
       showSuccessPopup('Digital Signature Downloaded Successfully!');
       closeWorkspace();
@@ -707,7 +670,7 @@ async function executeToolAction() {
 
   const fileNeeded = ['kbResizer', 'examResizer', 'passportGrid', 'merge', 'split', 'compress', 'organize', 'rotate', 'removePages', 'jpgToPdf', 'pngToPdf', 'watermark'];
   if (fileNeeded.includes(activeTool) && selectedFiles.length === 0) {
-    alert('Please tap to select the required file(s) first.');
+    alert('Please select the required file(s).');
     return;
   }
 
@@ -723,16 +686,16 @@ async function executeToolAction() {
       const unit = document.getElementById('optTargetUnit')?.value || 'KB';
       const customName = document.getElementById('optCustomFileName')?.value?.trim() || 'Resized_Photo';
       const targetBytes = unit === 'MB' ? valInput * 1024 * 1024 : valInput * 1024;
-
+      
       const rawData = await readFileAsDataURL(selectedFiles[0]);
       const img = new Image();
       await new Promise((res, rej) => { img.onload = res; img.onerror = rej; img.src = rawData; });
 
       const canvas = document.createElement('canvas');
-      canvas.width = img.width;
+      canvas.width = img.width; 
       canvas.height = img.height;
       const ctx = canvas.getContext('2d');
-      ctx.fillStyle = '#ffffff';
+      ctx.fillStyle = '#ffffff'; 
       ctx.fillRect(0, 0, canvas.width, canvas.height);
       ctx.drawImage(img, 0, 0);
 
@@ -740,11 +703,11 @@ async function executeToolAction() {
       for (let i = 0; i < 10; i++) {
         const quality = (low + high) / 2;
         const blob = await new Promise(r => canvas.toBlob(r, 'image/jpeg', quality));
-        if (blob.size <= targetBytes) {
-          bestBlob = blob;
-          low = quality;
-        } else {
-          high = quality;
+        if (blob.size <= targetBytes) { 
+          bestBlob = blob; 
+          low = quality; 
+        } else { 
+          high = quality; 
         }
       }
       if (!bestBlob) bestBlob = await new Promise(r => canvas.toBlob(r, 'image/jpeg', 0.1));
@@ -753,110 +716,77 @@ async function executeToolAction() {
       showSuccessPopup('Photo Resized Successfully!');
 
     } else if (activeTool === 'passportGrid') {
-      setProgress(25, 'Processing Passport Photo...');
-      const downloadType = document.getElementById('optPassportType')?.value || 'both';
+      setProgress(30, 'Generating Passport Photo Grid...');
       const copies = parseInt(document.getElementById('optPassportCopies')?.value) || 8;
+      const bgColor = document.getElementById('optPassportBgColor')?.value || 'white';
       const borderType = document.getElementById('optPassportBorder')?.value || 'thin';
-      const fileName = document.getElementById('optPassportFileName')?.value?.trim() || 'Passport_Photo';
+      const fileName = document.getElementById('optPassportFileName')?.value?.trim() || 'Smart_Passport_Sheet';
 
       const rawData = await readFileAsDataURL(selectedFiles[0]);
       const img = new Image();
       await new Promise((res, rej) => { img.onload = res; img.onerror = rej; img.src = rawData; });
 
-      // Standard Passport Dimensions: 3.5cm x 4.5cm @ 300 DPI = 413 x 531 px
-      const pw = 413;
-      const ph = 531;
-      const targetAspect = pw / ph;
+      const sheetCanvas = document.createElement('canvas');
+      sheetCanvas.width = 2480;
+      sheetCanvas.height = 3508;
+      const sheetCtx = sheetCanvas.getContext('2d');
 
-      // 1. Render single passport photo canvas with top-focused crop
-      const singleCanvas = document.createElement('canvas');
-      singleCanvas.width = pw;
-      singleCanvas.height = ph;
-      const sCtx = singleCanvas.getContext('2d');
+      sheetCtx.fillStyle = '#ffffff';
+      sheetCtx.fillRect(0, 0, sheetCanvas.width, sheetCanvas.height);
 
-      const imgAspect = img.width / img.height;
-      let sx = 0, sy = 0, sw = img.width, sh = img.height;
+      let cols = 2, rows = 2;
+      if (copies === 8) { cols = 2; rows = 4; }
+      else if (copies === 12) { cols = 3; rows = 4; }
+      else if (copies === 20) { cols = 4; rows = 5; }
 
-      if (imgAspect > targetAspect) {
-        sw = img.height * targetAspect;
-        sx = (img.width - sw) / 2;
-      } else {
-        sh = img.width / targetAspect;
-        sy = Math.max(0, (img.height - sh) * 0.10); // Preserves forehead and hair
-      }
-      sCtx.drawImage(img, sx, sy, sw, sh, 0, 0, pw, ph);
+      const pw = 413, ph = 531, gapX = 60, gapY = 60;
+      const totalGridW = (cols * pw) + ((cols - 1) * gapX);
+      const totalGridH = (rows * ph) + ((rows - 1) * gapY);
+      const startX = (sheetCanvas.width - totalGridW) / 2;
+      const startY = (sheetCanvas.height - totalGridH) / 2;
 
-      // Border styles
-      if (borderType === 'thin') {
-        sCtx.strokeStyle = '#d1d5db';
-        sCtx.lineWidth = 4;
-        sCtx.strokeRect(0, 0, pw, ph);
-      } else if (borderType === 'black') {
-        sCtx.strokeStyle = '#000000';
-        sCtx.lineWidth = 6;
-        sCtx.strokeRect(0, 0, pw, ph);
-      }
+      for (let r = 0; r < rows; r++) {
+        for (let c = 0; c < cols; c++) {
+          const x = startX + c * (pw + gapX);
+          const y = startY + r * (ph + gapY);
 
-      const triggerCanvasDownload = (canvas, suffix) => {
-        return new Promise((resolve) => {
-          canvas.toBlob(async (blob) => {
-            if (blob) {
-              await downloadBlob(blob, `${fileName}_${suffix}.jpg`, 'image/jpeg');
-            }
-            resolve();
-          }, 'image/jpeg', 0.95);
-        });
-      };
+          sheetCtx.fillStyle = bgColor === 'blue' ? '#1d4ed8' : '#ffffff';
+          sheetCtx.fillRect(x, y, pw, ph);
 
-      // 2. Download original single photo if requested
-      if (downloadType === 'single' || downloadType === 'both' || copies === 1) {
-        setProgress(50, 'Downloading Original Single Photo...');
-        await triggerCanvasDownload(singleCanvas, 'Original_Single_3.5x4.5cm');
-      }
+          const aspectImg = img.width / img.height;
+          const aspectPass = pw / ph;
+          let sx = 0, sy = 0, sw = img.width, sh = img.height;
 
-      // 3. Download tight grid sheet without excess blank space
-      if ((downloadType === 'grid' || downloadType === 'both') && copies > 1) {
-        setProgress(75, 'Generating Tight Photo Grid...');
+          if (aspectImg > aspectPass) {
+            sw = img.height * aspectPass;
+            sx = (img.width - sw) / 2;
+          } else {
+            sh = img.width / aspectPass;
+            sy = (img.height - sh) / 2;
+          }
+          sheetCtx.drawImage(img, sx, sy, sw, sh, x, y, pw, ph);
 
-        let cols = 3;
-        if (copies === 2 || copies === 4) cols = 2;
-
-        const rows = Math.ceil(copies / cols);
-        const gap = 40;
-        const padding = 50;
-
-        const gridCanvas = document.createElement('canvas');
-        gridCanvas.width = (cols * pw) + ((cols - 1) * gap) + (padding * 2);
-        gridCanvas.height = (rows * ph) + ((rows - 1) * gap) + (padding * 2);
-        const gCtx = gridCanvas.getContext('2d');
-
-        gCtx.fillStyle = '#ffffff';
-        gCtx.fillRect(0, 0, gridCanvas.width, gridCanvas.height);
-
-        let placed = 0;
-        for (let r = 0; r < rows; r++) {
-          for (let c = 0; c < cols; c++) {
-            if (placed >= copies) break;
-            const x = padding + c * (pw + gap);
-            const y = padding + r * (ph + gap);
-            gCtx.drawImage(singleCanvas, x, y, pw, ph);
-            placed++;
+          if (borderType === 'thin') {
+            sheetCtx.strokeStyle = '#cbd5e1';
+            sheetCtx.lineWidth = 4;
+            sheetCtx.strokeRect(x, y, pw, ph);
+          } else if (borderType === 'black') {
+            sheetCtx.strokeStyle = '#000000';
+            sheetCtx.lineWidth = 6;
+            sheetCtx.strokeRect(x, y, pw, ph);
           }
         }
-
-        await triggerCanvasDownload(gridCanvas, `${copies}_Copies_Grid`);
       }
 
-      setProgress(100, 'Done');
-      showSuccessPopup('Passport Photo Processed & Downloaded Successfully!');
-      closeWorkspace();
-      return;
+      const sheetBlob = await new Promise(r => sheetCanvas.toBlob(r, 'image/jpeg', 0.95));
+      await downloadBlob(sheetBlob, `${fileName}.jpg`, 'image/jpeg');
+      showSuccessPopup('Passport Photo Sheet Generated Successfully!');
 
     } else if (activeTool === 'examResizer') {
       setProgress(30, 'Formatting Exam Photo/Signature...');
       const examType = document.getElementById('optExamType')?.value || 'photo';
       const fileName = document.getElementById('optExamFileName')?.value?.trim() || 'Exam_Document';
-
+      
       const targetW = examType === 'photo' ? 200 : 140;
       const targetH = examType === 'photo' ? 230 : 60;
       const targetMaxBytes = examType === 'photo' ? 50 * 1024 : 20 * 1024;
@@ -883,20 +813,20 @@ async function executeToolAction() {
       if (!bestBlob) bestBlob = await new Promise(r => canvas.toBlob(r, 'image/jpeg', 0.3));
 
       await downloadBlob(bestBlob, `${fileName}.jpg`, 'image/jpeg');
-      showSuccessPopup('Exam Document Resized Successfully!');
+      showSuccessPopup('Exam Photo/Sign Resized Successfully!');
 
     } else if (activeTool === 'merge' && PDFLibObj) {
       setProgress(20, 'Combining PDF files...');
       const customName = document.getElementById('optMergeFileName')?.value?.trim() || 'Merged_Document';
       const mergedPdf = await PDFLibObj.PDFDocument.create();
-
+      
       for (let i = 0; i < selectedFiles.length; i++) {
         const fileBuffer = await selectedFiles[i].arrayBuffer();
         const doc = await PDFLibObj.PDFDocument.load(fileBuffer);
         const copiedPages = await mergedPdf.copyPages(doc, doc.getPageIndices());
         copiedPages.forEach((page) => mergedPdf.addPage(page));
       }
-
+      
       const mergedPdfBytes = await mergedPdf.save();
       await downloadBlob(mergedPdfBytes, `${customName}.pdf`, 'application/pdf');
       showSuccessPopup('PDFs Merged Successfully!');
@@ -963,7 +893,7 @@ async function executeToolAction() {
     } else if (activeTool === 'jpgToPdf' || activeTool === 'pngToPdf') {
       const jsPdfLib = await ensureJsPdfLoaded();
       const { jsPDF } = jsPdfLib || window.jspdf;
-
+      
       const orientation = document.getElementById('optImgPdfOrientation')?.value || 'portrait';
       const pageSize = document.getElementById('optImgPdfPageSize')?.value || 'a4';
 
@@ -999,7 +929,7 @@ async function executeToolAction() {
 
         pdf.addImage(rawData, 'JPEG', x, y, renderW, renderH);
       }
-
+      
       const pdfBlob = pdf.output('blob');
       await downloadBlob(pdfBlob, 'Images_Converted.pdf', 'application/pdf');
       showSuccessPopup('Images Converted to PDF!');
@@ -1050,11 +980,12 @@ function readFileAsDataURL(file) {
   });
 }
 
-// Universal Cross-Platform Downloader (Supports Native Share Sheet on iOS/Android + Desktop Anchor Click)
+// Universal Cross-Platform Downloader (Supports iOS/Android Native Share Sheet + Desktop Anchor)
 async function downloadBlob(content, name, mimeType = 'application/octet-stream') {
   if (!content) return;
   const blob = content instanceof Blob ? content : new Blob([content], { type: mimeType });
 
+  // Native mobile sharing if supported
   if (navigator.canShare) {
     try {
       const testFile = new File([blob], name, { type: mimeType });
@@ -1066,11 +997,11 @@ async function downloadBlob(content, name, mimeType = 'application/octet-stream'
         return;
       }
     } catch (e) {
-      if (e.name === 'AbortError') return;
-      console.warn('Native share failed, using fallback:', e);
+      if (e.name !== 'AbortError') console.warn('Native share failed, using fallback:', e);
     }
   }
 
+  // Anchor download fallback
   const url = window.URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.style.display = 'none';
