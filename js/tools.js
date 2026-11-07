@@ -716,11 +716,15 @@ async function executeToolAction() {
     const PDFLibObj = await ensurePdfLibLoaded();
 
     if (activeTool === 'kbResizer') {
-      setProgress(25, 'Analyzing image...');
+      setProgress(15, 'Analyzing image...');
       const valInput = parseFloat(document.getElementById('optPresetSize')?.value) || 50;
       const unit = document.getElementById('optTargetUnit')?.value || 'KB';
       const customName = document.getElementById('optCustomFileName')?.value?.trim() || 'Resized_Photo';
-      const targetBytes = unit === 'MB' ? Math.round(valInput * 1024 * 1024) : Math.round(valInput * 1024);
+      
+      // Calculate exact target in bytes (works for 10 KB up to 500 MB)
+      const targetBytes = unit === 'MB' 
+        ? Math.round(valInput * 1024 * 1024) 
+        : Math.round(valInput * 1024);
 
       const rawData = await readFileAsDataURL(selectedFiles[0]);
       const img = new Image();
@@ -730,41 +734,54 @@ async function executeToolAction() {
       let ctx = canvas.getContext('2d');
       let bestBlob = null;
 
-      // যদি টার্গেট সাইজ আসল ছবির থেকে বড় হয় (যেমন ৯৩ KB-র ফাইলকে ১ MB করা)
-      if (selectedFiles[0].size < targetBytes * 0.85) {
-        setProgress(50, 'Upscaling image to target size...');
-        const scaleFactor = Math.min(3.5, Math.max(1.15, Math.sqrt(targetBytes / selectedFiles[0].size)));
+      // CASE 1: Target size is larger than source (e.g. 90 KB up to 500 MB)
+      if (selectedFiles[0].size < targetBytes * 0.90) {
+        setProgress(35, `Scaling to ${valInput} ${unit}...`);
+        
+        // Scale canvas safely to enhance quality without memory exhaustion
+        const scaleFactor = Math.min(2.5, Math.max(1.0, Math.sqrt(targetBytes / (selectedFiles[0].size * 4))));
         canvas.width = Math.round(img.width * scaleFactor);
         canvas.height = Math.round(img.height * scaleFactor);
         ctx.fillStyle = '#ffffff';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
         ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
 
-        bestBlob = await new Promise(r => canvas.toBlob(r, 'image/jpeg', 0.98));
+        let baseBlob = await new Promise(r => canvas.toBlob(r, 'image/jpeg', 0.95));
+        
+        // Chunk-based safe padding to accurately reach exact target (10 KB to 500 MB)
+        if (baseBlob && baseBlob.size < targetBytes) {
+          setProgress(65, 'Building target size...');
+          const diff = targetBytes - baseBlob.size;
+          const chunkSize = 10 * 1024 * 1024; // 10MB safe memory chunk
+          const parts = [baseBlob];
+          let remaining = diff;
 
-        // সুনির্দিষ্ট টার্গেট সাইজে ম্যাচ করাতে নিরাপদ প্যাডিং
-        if (bestBlob && bestBlob.size < targetBytes) {
-          const diff = targetBytes - bestBlob.size;
-          if (diff > 0 && diff <= 5 * 1024 * 1024) {
-            const padArray = new Uint8Array(diff);
-            bestBlob = new Blob([bestBlob, padArray], { type: 'image/jpeg' });
+          while (remaining > 0) {
+            const currentChunk = Math.min(remaining, chunkSize);
+            parts.push(new Uint8Array(currentChunk));
+            remaining -= currentChunk;
           }
-        }
-      } else {
-        // যদি আসল ছবির সাইজ বেশি হয় এবং ইউজার কম্প্রেস করতে চায়
-        setProgress(40, 'Compressing image...');
-        let scale = 1.0;
-        const minBytes = targetBytes * 0.90;
 
-        for (let attempt = 0; attempt < 6; attempt++) {
+          bestBlob = new Blob(parts, { type: 'image/jpeg' });
+        } else {
+          bestBlob = baseBlob;
+        }
+      } 
+      // CASE 2: Target size is smaller than source (Compress from large source down to 10 KB - 500 KB)
+      else {
+        setProgress(35, 'Compressing to target size...');
+        let scale = 1.0;
+        const minBytes = targetBytes * 0.88;
+
+        for (let attempt = 0; attempt < 7; attempt++) {
           canvas.width = Math.round(img.width * scale);
           canvas.height = Math.round(img.height * scale);
           ctx.fillStyle = '#ffffff';
           ctx.fillRect(0, 0, canvas.width, canvas.height);
           ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
 
-          let low = 0.05, high = 0.95;
-          for (let i = 0; i < 7; i++) {
+          let low = 0.03, high = 0.95;
+          for (let i = 0; i < 8; i++) {
             const q = (low + high) / 2;
             const blob = await new Promise(r => canvas.toBlob(r, 'image/jpeg', q));
             if (blob.size <= targetBytes) {
@@ -777,7 +794,7 @@ async function executeToolAction() {
           }
 
           if (bestBlob && bestBlob.size <= targetBytes) break;
-          scale *= 0.75;
+          scale *= 0.70;
         }
       }
 
@@ -789,7 +806,7 @@ async function executeToolAction() {
       const finalFileName = `${customName}_${valInput}${unit}.jpg`;
       downloadBlob(bestBlob, finalFileName, 'image/jpeg');
 
-      // ডাইনামিক ইউনিট ডিসপ্লে (KB হলে KB দেখাবে, MB হলে MB দেখাবে)
+      // Accurate unit formatting
       const sizeDisplay = bestBlob.size >= (1024 * 1024)
         ? (bestBlob.size / (1024 * 1024)).toFixed(2) + ' MB'
         : (bestBlob.size / 1024).toFixed(1) + ' KB';
