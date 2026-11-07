@@ -1,10 +1,10 @@
-// DocuCraft AI - Fully Fixed, Optimized & Cross-Platform Execution Script (iOS & Desktop Ready)
+// DocuCraft AI - Fully Fixed, Robust & Cross-Platform Execution Script
 
 let activeTool = '';
 let selectedFiles = [];
 let sigCanvasInstance = null;
 
-// Helper to load external scripts dynamically without blocking HTML head
+// Dynamic Script Loader
 function loadScript(url) {
   return new Promise((resolve, reject) => {
     if (document.querySelector(`script[src="${url}"]`)) {
@@ -78,7 +78,6 @@ function filterCategory(cat, btn) {
   });
 }
 
-// Universal helper to open any modal/calculator with history state so Back button closes it
 function openCustomModal(modalId) {
   const modal = document.getElementById(modalId);
   if (!modal) return;
@@ -91,7 +90,6 @@ function openCustomModal(modalId) {
 }
 
 function launchTool(toolKey) {
-  // Support both 'rot' and 'rotate' aliases
   if (toolKey === 'rot') toolKey = 'rotate';
 
   if (typeof checkUserAccess === 'function' && !checkUserAccess(toolKey)) {
@@ -116,7 +114,6 @@ function launchTool(toolKey) {
   
   if (fileInput) {
     fileInput.value = '';
-    // Strict file type restriction per tool
     if (['merge', 'split', 'compress', 'organize', 'rotate', 'removePages', 'watermark', 'protect', 'unlock', 'pdfToJpg', 'pdfToWord', 'pdfToExcel', 'editPdf'].includes(toolKey)) {
       fileInput.accept = 'application/pdf';
     } else if (['jpgToPdf', 'pngToPdf', 'kbResizer', 'examResizer', 'ocr', 'passportGrid'].includes(toolKey)) {
@@ -143,12 +140,10 @@ function launchTool(toolKey) {
   if (dropzone) dropzone.style.display = 'block';
   if (overlay) {
     overlay.style.display = 'flex';
-    document.body.style.overflow = 'hidden'; // iOS Safe Lock
+    document.body.style.overflow = 'hidden';
     
-    // FIX: Perfect history state push with unique tool hash so back button always stays inside the site
     try {
-      const toolStateUrl = window.location.pathname + '#tool-' + toolKey;
-      history.pushState({ modalOpen: true, tool: toolKey }, '', toolStateUrl);
+      history.pushState({ modalOpen: true, tool: toolKey }, '', window.location.pathname + '#tool-' + toolKey);
     } catch(e) {
       history.pushState({ modalOpen: true }, '', window.location.href);
     }
@@ -187,7 +182,7 @@ function launchTool(toolKey) {
           </div>
           <label style="font-weight:600; font-size:13px; display:block; margin-bottom:6px;">Draw Signature Below:</label>
           <div style="border: 2px solid #cbd5e1; border-radius: 8px; background: #ffffff; touch-action: none; position: relative;">
-            <canvas id="sigCanvas" width="480" height="180" style="width: 100%; height: 180px; display: block; cursor: crosshair;"></canvas>
+            <canvas id="sigCanvas" style="width: 100%; height: 180px; display: block; cursor: crosshair; touch-action: none;"></canvas>
           </div>
           <button type="button" onclick="clearSigCanvas()" style="margin-top: 8px; background: #64748b; color: #fff; border: none; padding: 6px 14px; border-radius: 6px; font-size: 12px; cursor: pointer;">Clear Canvas</button>
         </div>`;
@@ -256,7 +251,7 @@ function launchTool(toolKey) {
     }
   } else if (toolKey === 'passportGrid') {
     if (title) title.innerText = 'Smart Passport Photo Studio';
-    if (desc) desc.innerText = 'Upload any photo: clean background selection (White/Blue), perfect body & print-ready grid.';
+    if (desc) desc.innerText = 'Upload photo: clean background (White/Blue) & print-ready sheet.';
     if (dropText) dropText.innerText = 'Tap to select photo';
     if (customUI) {
       customUI.innerHTML = `
@@ -295,7 +290,7 @@ function launchTool(toolKey) {
     }
   } else if (toolKey === 'merge') {
     if (title) title.innerText = 'Merge PDF';
-    if (desc) desc.innerText = 'Select multiple PDF files to combine. You can reorder them below.';
+    if (desc) desc.innerText = 'Select multiple PDF files to combine. Order can be rearranged.';
     if (dropText) dropText.innerText = 'Tap to select PDF files';
     if (customUI) {
       customUI.innerHTML = `
@@ -316,21 +311,11 @@ function launchTool(toolKey) {
         </div>`;
     }
   } else if (toolKey === 'compress') {
-    if (title) title.innerText = 'Compress PDF to Target Size';
-    if (desc) desc.innerText = 'Reduce PDF file size to your exact desired KB or MB.';
-    if (dropText) dropText.innerText = 'Tap to select PDF to compress';
+    if (title) title.innerText = 'Optimize / Compact PDF';
+    if (desc) desc.innerText = 'Streamline document data and remove redundant streams.';
+    if (dropText) dropText.innerText = 'Tap to select PDF';
     if (customUI) {
       customUI.innerHTML = `
-        <div class="form-group" style="margin-top:10px;">
-          <label style="font-weight:600; font-size:13px; display:block; margin-bottom:6px;">Select Target PDF Size & Unit:</label>
-          <div style="display: flex; gap: 8px;">
-            <input type="number" id="optCompressTargetSize" class="form-control" value="100" style="flex: 2; padding:10px; border:1px solid #d1d5db; border-radius:8px;" placeholder="e.g. 100">
-            <select id="optCompressUnit" class="form-control" style="flex: 1; padding:10px; border:1px solid #d1d5db; border-radius:8px;">
-              <option value="KB" selected>KB</option>
-              <option value="MB">MB</option>
-            </select>
-          </div>
-        </div>
         <div class="form-group" style="margin-top:10px;">
           <label style="font-weight:600; font-size:13px; display:block; margin-bottom:6px;">Save File Name:</label>
           <input type="text" id="optCompressFileName" class="form-control" value="Compressed_Document" style="width:100%; padding:10px; border:1px solid #d1d5db; border-radius:8px;">
@@ -338,7 +323,7 @@ function launchTool(toolKey) {
     }
   } else if (toolKey === 'organize') {
     if (title) title.innerText = 'Organize / Reorder Pages';
-    if (desc) desc.innerText = 'Rearrange, reverse, or reorder the page sequence.';
+    if (desc) desc.innerText = 'Rearrange or change the sequence of pages.';
     if (dropText) dropText.innerText = 'Tap to select a PDF';
     if (customUI) {
       customUI.innerHTML = `
@@ -375,7 +360,7 @@ function launchTool(toolKey) {
     }
   } else if (toolKey === 'jpgToPdf' || toolKey === 'pngToPdf') {
     if (title) title.innerText = 'Image to PDF Converter';
-    if (desc) desc.innerText = 'Convert your image files into a clean, standard PDF document with perfect centering.';
+    if (desc) desc.innerText = 'Convert your image files into a clean PDF with proper sizing.';
     if (dropText) dropText.innerText = 'Tap to select image file(s)';
     if (customUI) {
       customUI.innerHTML = `
@@ -407,19 +392,7 @@ function launchTool(toolKey) {
           <input type="text" id="optWatermark" class="form-control" value="CONFIDENTIAL" style="width:100%; padding:10px; border:1px solid #d1d5db; border-radius:8px;">
         </div>`;
     }
-  } else if (toolKey === 'protect') {
-    if (title) title.innerText = 'Protect / Lock PDF';
-    if (desc) desc.innerText = 'Encrypt your PDF with a secret password.';
-    if (dropText) dropText.innerText = 'Tap to select PDF';
-    if (customUI) {
-      customUI.innerHTML = `
-        <div class="form-group">
-          <label style="font-weight:600; font-size:13px; display:block; margin-bottom:6px;">Enter Password:</label>
-          <input type="password" id="optPdfPassword" class="form-control" placeholder="Enter password" style="width:100%; padding:10px; border:1px solid #d1d5db; border-radius:8px;">
-        </div>`;
-    }
   } else {
-    // Format toolKey nicely with spaces/To if missing
     let formattedTitle = toolKey;
     const lowerKey = toolKey.toLowerCase();
     if (lowerKey === 'pdfexcel') formattedTitle = 'PDF to Excel';
@@ -479,76 +452,67 @@ function setSigColor(color, btn) {
     b.style.borderColor = 'transparent';
   });
   if (btn) btn.style.borderColor = '#2563eb';
-  if (sigCanvasInstance) {
-    const ctx = sigCanvasInstance.getContext('2d');
-    ctx.strokeStyle = currentSigColor;
-  }
 }
 
 function initSignaturePad() {
   const canvas = document.getElementById('sigCanvas');
   if (!canvas) return;
   const ctx = canvas.getContext('2d');
+  
+  // Retina / High-DPI Display Scaling
+  const dpr = window.devicePixelRatio || 1;
+  const rect = canvas.getBoundingClientRect();
+  canvas.width = rect.width * dpr;
+  canvas.height = rect.height * dpr;
+  ctx.scale(dpr, dpr);
+
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(0, 0, rect.width, rect.height);
+
+  ctx.lineWidth = 2.5;
+  ctx.lineCap = 'round';
+  ctx.lineJoin = 'round';
+
   let drawing = false;
   let lastX = 0;
   let lastY = 0;
 
-  ctx.fillStyle = '#ffffff';
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-  ctx.strokeStyle = currentSigColor;
-  ctx.lineWidth = 3.5;
-  ctx.lineCap = 'round';
-  ctx.lineJoin = 'round';
-
   function getPos(e) {
-    const rect = canvas.getBoundingClientRect();
-    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+    const r = canvas.getBoundingClientRect();
     return {
-      x: (clientX - rect.left) * (canvas.width / rect.width),
-      y: (clientY - rect.top) * (canvas.height / rect.height)
+      x: e.clientX - r.left,
+      y: e.clientY - r.top
     };
   }
 
-  canvas.onmousedown = (e) => { 
-    drawing = true; 
-    const p = getPos(e); 
-    lastX = p.x; lastY = p.y; 
+  canvas.onpointerdown = (e) => {
+    drawing = true;
+    canvas.setPointerCapture(e.pointerId);
+    const p = getPos(e);
+    lastX = p.x;
+    lastY = p.y;
+    ctx.strokeStyle = currentSigColor;
     ctx.beginPath();
     ctx.moveTo(lastX, lastY);
+    e.preventDefault();
   };
-  
-  canvas.onmousemove = (e) => { 
-    if (!drawing) return; 
-    const p = getPos(e); 
-    ctx.lineTo(p.x, p.y); 
-    ctx.stroke(); 
-    lastX = p.x; lastY = p.y;
-  };
-  
-  canvas.onmouseup = () => { drawing = false; };
-  canvas.onmouseleave = () => { drawing = false; };
 
-  canvas.ontouchstart = (e) => { 
-    drawing = true; 
-    const p = getPos(e); 
-    lastX = p.x; lastY = p.y; 
-    ctx.beginPath();
-    ctx.moveTo(lastX, lastY); 
-    e.preventDefault(); 
+  canvas.onpointermove = (e) => {
+    if (!drawing) return;
+    const p = getPos(e);
+    ctx.strokeStyle = currentSigColor;
+    ctx.lineTo(p.x, p.y);
+    ctx.stroke();
+    lastX = p.x;
+    lastY = p.y;
+    e.preventDefault();
   };
-  
-  canvas.ontouchmove = (e) => { 
-    if (!drawing) return; 
-    const p = getPos(e); 
-    ctx.lineTo(p.x, p.y); 
-    ctx.stroke(); 
-    lastX = p.x; lastY = p.y;
-    e.preventDefault(); 
+
+  canvas.onpointerup = (e) => {
+    drawing = false;
+    try { canvas.releasePointerCapture(e.pointerId); } catch(err) {}
   };
-  
-  canvas.ontouchend = () => { drawing = false; };
+  canvas.onpointercancel = canvas.onpointerup;
 
   sigCanvasInstance = canvas;
 }
@@ -556,8 +520,13 @@ function initSignaturePad() {
 function clearSigCanvas() {
   if (!sigCanvasInstance) return;
   const ctx = sigCanvasInstance.getContext('2d');
+  const rect = sigCanvasInstance.getBoundingClientRect();
+  ctx.save();
+  ctx.setTransform(1, 0, 0, 1, 0, 0);
+  ctx.clearRect(0, 0, sigCanvasInstance.width, sigCanvasInstance.height);
+  ctx.restore();
   ctx.fillStyle = '#ffffff';
-  ctx.fillRect(0, 0, sigCanvasInstance.width, sigCanvasInstance.height);
+  ctx.fillRect(0, 0, rect.width, rect.height);
 }
 
 function closeWorkspace() {
@@ -594,16 +563,6 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
   }
-
-  // Intercept all clicks on Calculator, Translator, ZIP or other modal openers to push history state automatically
-  document.addEventListener('click', function(e) {
-    const trigger = e.target.closest('[onclick*="open"], [onclick*="Modal"], [onclick*="Calculator"], [onclick*="Translator"], [onclick*="Zip"]');
-    if (trigger) {
-      try {
-        history.pushState({ modalOpen: true }, '', window.location.pathname + '#modal-popup');
-      } catch(e) {}
-    }
-  });
 });
 
 function escapeHtml(value) {
@@ -680,9 +639,10 @@ async function executeToolAction() {
   if (activeTool === 'sigPad') {
     if (!sigCanvasInstance) return;
     const format = document.getElementById('sigFormat')?.value || 'image/png';
-    let ext = format === 'image/jpeg' ? 'jpg' : 'png';
-    sigCanvasInstance.toBlob((blob) => {
-      downloadBlob(blob, `Digital_Signature.${ext}`, format);
+    const ext = format === 'image/jpeg' ? 'jpg' : 'png';
+    
+    sigCanvasInstance.toBlob(async (blob) => {
+      await downloadBlob(blob, `Digital_Signature.${ext}`, format);
       showSuccessPopup('Digital Signature Downloaded Successfully!');
       closeWorkspace();
     }, format, 0.95);
@@ -695,7 +655,7 @@ async function executeToolAction() {
     try {
       const response = await fetch(qrUrl);
       const blob = await response.blob();
-      downloadBlob(blob, 'QRCode.png', 'image/png');
+      await downloadBlob(blob, 'QRCode.png', 'image/png');
       showSuccessPopup('QR Code Generated Successfully!');
     } catch {
       window.open(qrUrl, '_blank');
@@ -704,7 +664,7 @@ async function executeToolAction() {
     return;
   }
 
-  const fileNeeded = ['kbResizer', 'passportGrid', 'merge', 'split', 'compress', 'organize', 'rotate', 'removePages', 'jpgToPdf', 'pngToPdf', 'watermark', 'protect'];
+  const fileNeeded = ['kbResizer', 'examResizer', 'passportGrid', 'merge', 'split', 'compress', 'organize', 'rotate', 'removePages', 'jpgToPdf', 'pngToPdf', 'watermark'];
   if (fileNeeded.includes(activeTool) && selectedFiles.length === 0) {
     alert('Please select the required file(s).');
     return;
@@ -728,22 +688,128 @@ async function executeToolAction() {
       await new Promise((res, rej) => { img.onload = res; img.onerror = rej; img.src = rawData; });
 
       const canvas = document.createElement('canvas');
-      canvas.width = img.width; canvas.height = img.height;
+      canvas.width = img.width; 
+      canvas.height = img.height;
       const ctx = canvas.getContext('2d');
-      ctx.fillStyle = '#ffffff'; ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = '#ffffff'; 
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
       ctx.drawImage(img, 0, 0);
 
       let low = 0.05, high = 0.95, bestBlob = null;
       for (let i = 0; i < 10; i++) {
         const quality = (low + high) / 2;
         const blob = await new Promise(r => canvas.toBlob(r, 'image/jpeg', quality));
-        if (blob.size <= targetBytes) { bestBlob = blob; low = quality; }
-        else { high = quality; }
+        if (blob.size <= targetBytes) { 
+          bestBlob = blob; 
+          low = quality; 
+        } else { 
+          high = quality; 
+        }
       }
       if (!bestBlob) bestBlob = await new Promise(r => canvas.toBlob(r, 'image/jpeg', 0.1));
 
-      downloadBlob(bestBlob, `${customName}_${valInput}${unit}.jpg`, 'image/jpeg');
+      await downloadBlob(bestBlob, `${customName}_${valInput}${unit}.jpg`, 'image/jpeg');
       showSuccessPopup('Photo Resized Successfully!');
+
+    } else if (activeTool === 'passportGrid') {
+      setProgress(30, 'Generating Passport Photo Grid...');
+      const copies = parseInt(document.getElementById('optPassportCopies')?.value) || 8;
+      const bgColor = document.getElementById('optPassportBgColor')?.value || 'white';
+      const borderType = document.getElementById('optPassportBorder')?.value || 'thin';
+      const fileName = document.getElementById('optPassportFileName')?.value?.trim() || 'Smart_Passport_Sheet';
+
+      const rawData = await readFileAsDataURL(selectedFiles[0]);
+      const img = new Image();
+      await new Promise((res, rej) => { img.onload = res; img.onerror = rej; img.src = rawData; });
+
+      const sheetCanvas = document.createElement('canvas');
+      sheetCanvas.width = 2480;
+      sheetCanvas.height = 3508;
+      const sheetCtx = sheetCanvas.getContext('2d');
+
+      sheetCtx.fillStyle = '#ffffff';
+      sheetCtx.fillRect(0, 0, sheetCanvas.width, sheetCanvas.height);
+
+      let cols = 2, rows = 2;
+      if (copies === 8) { cols = 2; rows = 4; }
+      else if (copies === 12) { cols = 3; rows = 4; }
+      else if (copies === 20) { cols = 4; rows = 5; }
+
+      const pw = 413, ph = 531, gapX = 60, gapY = 60;
+      const totalGridW = (cols * pw) + ((cols - 1) * gapX);
+      const totalGridH = (rows * ph) + ((rows - 1) * gapY);
+      const startX = (sheetCanvas.width - totalGridW) / 2;
+      const startY = (sheetCanvas.height - totalGridH) / 2;
+
+      for (let r = 0; r < rows; r++) {
+        for (let c = 0; c < cols; c++) {
+          const x = startX + c * (pw + gapX);
+          const y = startY + r * (ph + gapY);
+
+          sheetCtx.fillStyle = bgColor === 'blue' ? '#1d4ed8' : '#ffffff';
+          sheetCtx.fillRect(x, y, pw, ph);
+
+          const aspectImg = img.width / img.height;
+          const aspectPass = pw / ph;
+          let sx = 0, sy = 0, sw = img.width, sh = img.height;
+
+          if (aspectImg > aspectPass) {
+            sw = img.height * aspectPass;
+            sx = (img.width - sw) / 2;
+          } else {
+            sh = img.width / aspectPass;
+            sy = (img.height - sh) / 2;
+          }
+          sheetCtx.drawImage(img, sx, sy, sw, sh, x, y, pw, ph);
+
+          if (borderType === 'thin') {
+            sheetCtx.strokeStyle = '#cbd5e1';
+            sheetCtx.lineWidth = 4;
+            sheetCtx.strokeRect(x, y, pw, ph);
+          } else if (borderType === 'black') {
+            sheetCtx.strokeStyle = '#000000';
+            sheetCtx.lineWidth = 6;
+            sheetCtx.strokeRect(x, y, pw, ph);
+          }
+        }
+      }
+
+      const sheetBlob = await new Promise(r => sheetCanvas.toBlob(r, 'image/jpeg', 0.95));
+      await downloadBlob(sheetBlob, `${fileName}.jpg`, 'image/jpeg');
+      showSuccessPopup('Passport Photo Sheet Generated Successfully!');
+
+    } else if (activeTool === 'examResizer') {
+      setProgress(30, 'Formatting Exam Photo/Signature...');
+      const examType = document.getElementById('optExamType')?.value || 'photo';
+      const fileName = document.getElementById('optExamFileName')?.value?.trim() || 'Exam_Document';
+      
+      const targetW = examType === 'photo' ? 200 : 140;
+      const targetH = examType === 'photo' ? 230 : 60;
+      const targetMaxBytes = examType === 'photo' ? 50 * 1024 : 20 * 1024;
+
+      const rawData = await readFileAsDataURL(selectedFiles[0]);
+      const img = new Image();
+      await new Promise((res, rej) => { img.onload = res; img.onerror = rej; img.src = rawData; });
+
+      const canvas = document.createElement('canvas');
+      canvas.width = targetW;
+      canvas.height = targetH;
+      const ctx = canvas.getContext('2d');
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, targetW, targetH);
+      ctx.drawImage(img, 0, 0, targetW, targetH);
+
+      let low = 0.1, high = 0.95, bestBlob = null;
+      for (let i = 0; i < 8; i++) {
+        const quality = (low + high) / 2;
+        const b = await new Promise(r => canvas.toBlob(r, 'image/jpeg', quality));
+        if (b.size <= targetMaxBytes) { bestBlob = b; low = quality; }
+        else { high = quality; }
+      }
+      if (!bestBlob) bestBlob = await new Promise(r => canvas.toBlob(r, 'image/jpeg', 0.3));
+
+      await downloadBlob(bestBlob, `${fileName}.jpg`, 'image/jpeg');
+      showSuccessPopup('Exam Photo/Sign Resized Successfully!');
 
     } else if (activeTool === 'merge' && PDFLibObj) {
       setProgress(20, 'Combining PDF files...');
@@ -758,33 +824,34 @@ async function executeToolAction() {
       }
       
       const mergedPdfBytes = await mergedPdf.save();
-      downloadBlob(mergedPdfBytes, `${customName}.pdf`, 'application/pdf');
+      await downloadBlob(mergedPdfBytes, `${customName}.pdf`, 'application/pdf');
       showSuccessPopup('PDFs Merged Successfully!');
 
     } else if (activeTool === 'compress' && PDFLibObj) {
-      setProgress(30, 'Compressing PDF...');
+      setProgress(30, 'Optimizing PDF streams...');
       const customName = document.getElementById('optCompressFileName')?.value?.trim() || 'Compressed_Document';
       const fileBuffer = await selectedFiles[0].arrayBuffer();
       const doc = await PDFLibObj.PDFDocument.load(fileBuffer);
       const compressedBytes = await doc.save({ useObjectStreams: true });
-      downloadBlob(compressedBytes, `${customName}.pdf`, 'application/pdf');
-      showSuccessPopup('PDF Compressed Successfully!');
+      await downloadBlob(compressedBytes, `${customName}.pdf`, 'application/pdf');
+      showSuccessPopup('PDF Optimized Successfully!');
 
     } else if (activeTool === 'split' && PDFLibObj) {
       const range = document.getElementById('optRange')?.value.trim();
       const doc = await PDFLibObj.PDFDocument.load(await selectedFiles[0].arrayBuffer(), { ignoreEncryption: true });
       const indices = parseRange(range, doc.getPageCount());
+      if (indices.length === 0) { alert('Invalid page range selected.'); return; }
       const newDoc = await PDFLibObj.PDFDocument.create();
       const pages = await newDoc.copyPages(doc, indices);
       pages.forEach(p => newDoc.addPage(p));
-      downloadBlob(await newDoc.save(), 'Split_Document.pdf', 'application/pdf');
+      await downloadBlob(await newDoc.save(), 'Split_Document.pdf', 'application/pdf');
       showSuccessPopup('PDF Split Successfully!');
 
     } else if (activeTool === 'rotate' && PDFLibObj) {
       const angle = parseInt(document.getElementById('optAngle')?.value) || 90;
       const doc = await PDFLibObj.PDFDocument.load(await selectedFiles[0].arrayBuffer(), { ignoreEncryption: true });
       doc.getPages().forEach(p => p.setRotation(PDFLibObj.degrees(p.getRotation().angle + angle)));
-      downloadBlob(await doc.save(), 'Rotated_Document.pdf', 'application/pdf');
+      await downloadBlob(await doc.save(), 'Rotated_Document.pdf', 'application/pdf');
       showSuccessPopup('PDF Rotated Successfully!');
 
     } else if (activeTool === 'removePages' && PDFLibObj) {
@@ -796,10 +863,11 @@ async function executeToolAction() {
       for (let i = 0; i < totalPages; i++) {
         if (!delIndices.has(i)) keepIndices.push(i);
       }
+      if (keepIndices.length === 0) { alert('Cannot delete all pages.'); return; }
       const newDoc = await PDFLibObj.PDFDocument.create();
       const pages = await newDoc.copyPages(doc, keepIndices);
       pages.forEach(p => newDoc.addPage(p));
-      downloadBlob(await newDoc.save(), 'Cleaned_Document.pdf', 'application/pdf');
+      await downloadBlob(await newDoc.save(), 'Cleaned_Document.pdf', 'application/pdf');
       showSuccessPopup('Pages Deleted Successfully!');
 
     } else if (activeTool === 'watermark' && PDFLibObj) {
@@ -808,34 +876,58 @@ async function executeToolAction() {
       doc.getPages().forEach(page => {
         const { width, height } = page.getSize();
         page.drawText(wmText, {
-          x: width / 4,
+          x: width / 6,
           y: height / 2,
-          size: 40,
+          size: 36,
           color: PDFLibObj.rgb(0.75, 0.75, 0.75),
           rotate: PDFLibObj.degrees(45),
         });
       });
-      downloadBlob(await doc.save(), 'Watermarked_Document.pdf', 'application/pdf');
+      await downloadBlob(await doc.save(), 'Watermarked_Document.pdf', 'application/pdf');
       showSuccessPopup('Watermark Added Successfully!');
-
-    } else if (activeTool === 'protect' && PDFLibObj) {
-      const password = document.getElementById('optPdfPassword')?.value;
-      if (!password) { alert('Please enter password.'); return; }
-      const doc = await PDFLibObj.PDFDocument.load(await selectedFiles[0].arrayBuffer(), { ignoreEncryption: true });
-      const encryptedBytes = await doc.save({ userPassword: password, ownerPassword: password });
-      downloadBlob(encryptedBytes, 'Protected_Document.pdf', 'application/pdf');
-      showSuccessPopup('PDF Protected Successfully!');
 
     } else if (activeTool === 'jpgToPdf' || activeTool === 'pngToPdf') {
       const jsPdfLib = await ensureJsPdfLoaded();
       const { jsPDF } = jsPdfLib || window.jspdf;
-      const pdf = new jsPDF();
+      
+      const orientation = document.getElementById('optImgPdfOrientation')?.value || 'portrait';
+      const pageSize = document.getElementById('optImgPdfPageSize')?.value || 'a4';
+
+      const pdf = new jsPDF({
+        orientation: orientation,
+        unit: 'mm',
+        format: pageSize
+      });
+
+      const pageWidth = pdf.internal.pageSize.getWidth();
+      const pageHeight = pdf.internal.pageSize.getHeight();
+      const margin = 10;
+
       for (let i = 0; i < selectedFiles.length; i++) {
         const rawData = await readFileAsDataURL(selectedFiles[i]);
-        if (i > 0) pdf.addPage();
-        pdf.addImage(rawData, 'JPEG', 10, 10, 190, 260);
+        const img = new Image();
+        await new Promise((res, rej) => { img.onload = res; img.onerror = rej; img.src = rawData; });
+
+        if (i > 0) pdf.addPage(pageSize, orientation);
+
+        const maxW = pageWidth - (margin * 2);
+        const maxH = pageHeight - (margin * 2);
+        let renderW = maxW;
+        let renderH = (img.height * renderW) / img.width;
+
+        if (renderH > maxH) {
+          renderH = maxH;
+          renderW = (img.width * renderH) / img.height;
+        }
+
+        const x = margin + (maxW - renderW) / 2;
+        const y = margin + (maxH - renderH) / 2;
+
+        pdf.addImage(rawData, 'JPEG', x, y, renderW, renderH);
       }
-      downloadBlob(pdf.output('blob'), 'Images_Converted.pdf', 'application/pdf');
+      
+      const pdfBlob = pdf.output('blob');
+      await downloadBlob(pdfBlob, 'Images_Converted.pdf', 'application/pdf');
       showSuccessPopup('Images Converted to PDF!');
     }
 
@@ -864,7 +956,9 @@ function parseRange(str, total) {
     const trimmed = p.trim();
     if (trimmed.includes('-')) {
       const [s, e] = trimmed.split('-').map(Number);
-      for (let i = s; i <= e; i++) if (i >= 1 && i <= total) indices.add(i - 1);
+      if (!isNaN(s) && !isNaN(e)) {
+        for (let i = s; i <= e; i++) if (i >= 1 && i <= total) indices.add(i - 1);
+      }
     } else {
       const n = Number(trimmed);
       if (!isNaN(n) && n >= 1 && n <= total) indices.add(n - 1);
@@ -882,9 +976,28 @@ function readFileAsDataURL(file) {
   });
 }
 
-function downloadBlob(content, name, type, mimeType) {
+// Universal Cross-Platform Downloader (Supports iOS/Android Native Share Sheet + Desktop Anchor)
+async function downloadBlob(content, name, mimeType = 'application/octet-stream') {
   if (!content) return;
-  const blob = content instanceof Blob ? content : new Blob([content], { type: mimeType || 'application/octet-stream' });
+  const blob = content instanceof Blob ? content : new Blob([content], { type: mimeType });
+
+  // Native mobile sharing if supported
+  if (navigator.canShare) {
+    try {
+      const testFile = new File([blob], name, { type: mimeType });
+      if (navigator.canShare({ files: [testFile] })) {
+        await navigator.share({
+          files: [testFile],
+          title: name
+        });
+        return;
+      }
+    } catch (e) {
+      if (e.name !== 'AbortError') console.warn('Native share failed, using fallback:', e);
+    }
+  }
+
+  // Anchor download fallback
   const url = window.URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.style.display = 'none';
@@ -895,5 +1008,5 @@ function downloadBlob(content, name, type, mimeType) {
   setTimeout(() => {
     if (a.parentNode) a.parentNode.removeChild(a);
     window.URL.revokeObjectURL(url);
-  }, 1000);
+  }, 1500);
 }
