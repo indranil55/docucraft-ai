@@ -74,7 +74,7 @@ function openAuthModal() {
           <div id="authToggleContainer" style="text-align: center; margin: 0 !important; padding: 0 !important; font-size: 12px; opacity: 0.85;">
             Don't have an account? <a href="javascript:void(0)" onclick="toggleAuthMode()" style="color: #e5322d; font-weight: 700; text-decoration: none;">Sign Up</a>
             <div style="margin-top: 6px;">
-              <a href="javascript:void(0)" onclick="toggleResetMode()" style="font-size: 11px; font-weight: 600; text-decoration: none; opacity: 0.8;">Forgot Password?</a>
+              <a href="javascript:void(0)" onclick="toggleResetMode()" style="font-size: 11px; font-weight: 600; text-decoration: none; color: #ffffff; opacity: 0.9;">Forgot Password?</a>
             </div>
           </div>
 
@@ -135,7 +135,7 @@ function updateAuthModalUI() {
       toggleContainer.innerHTML = `
         Don't have an account? <a href="javascript:void(0)" onclick="toggleAuthMode()" style="color: #e5322d; font-weight: 700; text-decoration: none;">Sign Up</a>
         <div style="margin-top: 6px;">
-          <a href="javascript:void(0)" onclick="toggleResetMode()" style="font-size: 11px; font-weight: 600; text-decoration: none; opacity: 0.8;">Forgot Password?</a>
+          <a href="javascript:void(0)" onclick="toggleResetMode()" style="font-size: 11px; font-weight: 600; text-decoration: none; color: #ffffff; opacity: 0.9;">Forgot Password?</a>
         </div>
       `;
     }
