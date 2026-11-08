@@ -352,9 +352,30 @@ function filterCategory(category, buttonElement) {
 }
 
 // ==========================================
-// 2. Recently Used Tools (LocalStorage)
+// 2. Safe URL Helper (Fix for Incomplete URL scheme check)
+// ==========================================
+function isSafeUrl(url) {
+  if (!url) return false;
+  const trimmed = url.trim();
+  // Safe relative paths
+  if (trimmed.startsWith('/') || trimmed.startsWith('./') || trimmed.endsWith('.html')) {
+    return true;
+  }
+  // Safe absolute URLs
+  try {
+    const parsed = new URL(trimmed, window.location.origin);
+    return parsed.protocol === 'http:' || parsed.protocol === 'https:';
+  } catch (e) {
+    return false;
+  }
+}
+
+// ==========================================
+// 3. Recently Used Tools (LocalStorage & Safe DOM Insertion)
 // ==========================================
 function trackToolUsage(toolName, toolUrl) {
+  if (!isSafeUrl(toolUrl)) return;
+
   let recent = JSON.parse(localStorage.getItem('docucraft_recent_tools') || '[]');
   recent = recent.filter(t => t.name !== toolName);
   recent.unshift({ name: toolName, url: toolUrl });
@@ -375,22 +396,36 @@ function renderRecentTools() {
   }
 
   container.style.display = 'block';
-  grid.innerHTML = recent.map(tool => `
-    <a href="${tool.url}" class="recent-chip" style="
-      display: flex; 
-      align-items: center; 
-      gap: 8px; 
-      padding: 10px 14px; 
-      background: rgba(255,255,255,0.06); 
-      border: 1px solid rgba(255,255,255,0.1); 
-      border-radius: 12px; 
-      text-decoration: none; 
-      color: #fff; 
-      font-size: 13px;
-      transition: all 0.2s ease;">
-      ⚡ <span>${tool.name}</span>
-    </a>
-  `).join('');
+  grid.replaceChildren(); // Safely clear child nodes without innerHTML
+
+  recent.forEach(tool => {
+    if (!isSafeUrl(tool.url)) return;
+
+    const link = document.createElement('a');
+    link.href = tool.url;
+    link.className = 'recent-chip';
+    link.style.display = 'flex';
+    link.style.alignItems = 'center';
+    link.style.gap = '8px';
+    link.style.padding = '10px 14px';
+    link.style.background = 'rgba(255,255,255,0.06)';
+    link.style.border = '1px solid rgba(255,255,255,0.1)';
+    link.style.borderRadius = '12px';
+    link.style.textDecoration = 'none';
+    link.style.color = '#fff';
+    link.style.fontSize = '13px';
+    link.style.transition = 'all 0.2s ease';
+
+    const iconSpan = document.createElement('span');
+    iconSpan.textContent = '⚡ ';
+
+    const titleSpan = document.createElement('span');
+    titleSpan.textContent = tool.name;
+
+    link.appendChild(iconSpan);
+    link.appendChild(titleSpan);
+    grid.appendChild(link);
+  });
 }
 
 function clearRecentTools() {
@@ -405,9 +440,9 @@ document.addEventListener('DOMContentLoaded', () => {
   document.querySelectorAll('a[href*=".html"], .tool-card, .popular-card').forEach(link => {
     link.addEventListener('click', function() {
       const toolName = this.querySelector('h3, h4, .tool-title')?.innerText || this.innerText.split('\n')[0];
-      const toolUrl = this.getAttribute('href') || (this.querySelector('a') ? this.querySelector('a').getAttribute('href') : null);
-      if (toolName && toolUrl && toolUrl !== '#' && !toolUrl.startsWith('javascript:')) {
-        trackToolUsage(toolName.trim(), toolUrl);
+      const rawUrl = this.getAttribute('href') || (this.querySelector('a') ? this.querySelector('a').getAttribute('href') : null);
+      if (toolName && rawUrl && isSafeUrl(rawUrl)) {
+        trackToolUsage(toolName.trim(), rawUrl);
       }
     });
   });
