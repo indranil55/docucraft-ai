@@ -449,13 +449,68 @@
   </section>
 
   <!-- Search Bar -->
-  <div class="search-wrapper">
-    <div class="search-box-inner">
-      <i class="fa-solid fa-magnifying-glass"></i>
-      <input type="text" id="toolSearchInput" class="search-input" placeholder="Search any tool (e.g. Merge PDF, KB Resizer, Govt Jobs)..." onkeyup="filterToolsBySearch()">
+<div class="search-wrapper">
+  <div class="search-box-inner">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <input type="text" id="toolSearchInput" class="search-input" placeholder="Search any tool (e.g. Merge PDF, KB Resizer, Govt Jobs)..." onkeyup="filterToolsBySearch()">
+    
+    <!-- Voice Search Button (Positioned on the right side) -->
+    <div class="voice-assistant-container">
+      <button type="button" id="voiceSearchBtn" class="voice-btn" onclick="startVoice()" title="Search by voice">
+        <i class="fa-solid fa-microphone"></i>
+      </button>
+      <span id="voice-status" class="voice-tooltip"></span>
     </div>
   </div>
+</div>
+  
+/* Container alignment */
+.search-box-inner {
+  display: flex;
+  align-items: center;
+  position: relative;
+  width: 100%;
+}
 
+/* Ensure text does not overlap with the microphone icon */
+.search-input {
+  flex: 1;
+  padding-right: 45px; 
+}
+
+/* Voice button positioning */
+.voice-assistant-container {
+  display: flex;
+  align-items: center;
+  position: absolute;
+  right: 12px;
+}
+
+/* Voice button design */
+.voice-btn {
+  background: transparent;
+  border: none;
+  color: #3b82f6;
+  font-size: 1.1rem;
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.voice-btn:hover {
+  background-color: rgba(59, 130, 246, 0.1);
+  transform: scale(1.1);
+}
+
+/* Hide default status text to maintain a clean layout */
+.voice-tooltip {
+  display: none;
+}
+</style>
   <!-- Retention & Quick Access Bar -->
   <div class="retention-bar">
     <div class="streak-pill" id="userStreakBadge">
