@@ -164,47 +164,63 @@ function scrollToMatchedTool(query) {
   if (!query) return;
 
   const cleanQuery = query.toLowerCase()
-    .replace(/^(open|show|find|go to|launch|cholo|dekhao|kholo|please)\s+/i, '')
+    .replace(/^(open|show|find|go to|launch|cholo|dekhao|kholo|please|tool|khol)\s+/i, '')
     .trim();
 
-  const candidates = Array.from(document.querySelectorAll('.tool-card, .popular-card, [data-tool], .tool-item, a[href*=".html"], [class*="card"]'));
+  if (cleanQuery.length < 2) return;
+
+  // Search only specific tool cards to avoid matching header menus or full containers
+  let candidates = Array.from(document.querySelectorAll('.tool-card, .popular-card, [data-tool], .tool-item'));
+  if (candidates.length === 0) {
+    candidates = Array.from(document.querySelectorAll('.tools-grid a, .grid-container a'));
+  }
+
   let bestTarget = null;
+  let highestScore = 0;
+  const tokens = cleanQuery.split(/\s+/).filter(w => w.length >= 2);
 
-  for (const el of candidates) {
-    if (el.offsetParent === null) continue;
-    const elText = (el.innerText || el.textContent || '').toLowerCase();
-    if (cleanQuery.length >= 2 && elText.includes(cleanQuery)) {
+  candidates.forEach(el => {
+    if (el.offsetParent === null) return; // ignore hidden elements
+
+    const titleEl = el.querySelector('h3, h4, .tool-title, strong, b');
+    const titleText = (titleEl ? (titleEl.innerText || titleEl.textContent) : '').toLowerCase();
+    const fullText = (el.innerText || el.textContent || '').toLowerCase();
+
+    let score = 0;
+
+    // Exact or partial match with the tool title
+    if (titleText && titleText.includes(cleanQuery)) {
+      score += 100;
+    }
+
+    // Individual word matching in title
+    tokens.forEach(tok => {
+      if (titleText.includes(tok)) score += 30;
+      else if (fullText.includes(tok)) score += 5;
+    });
+
+    if (score > highestScore) {
+      highestScore = score;
       bestTarget = el;
-      break;
     }
-  }
+  });
 
-  if (!bestTarget) {
-    const tokens = cleanQuery.split(/\s+/).filter(w => w.length > 2);
-    for (const el of candidates) {
-      if (el.offsetParent === null) continue;
-      const elText = (el.innerText || el.textContent || '').toLowerCase();
-      if (tokens.some(t => elText.includes(t))) {
-        bestTarget = el;
-        break;
-      }
-    }
-  }
-
-  if (bestTarget) {
+  if (bestTarget && highestScore > 0) {
     bestTarget.scrollIntoView({ behavior: 'smooth', block: 'center' });
     bestTarget.style.transition = 'transform 0.3s ease, box-shadow 0.3s ease';
-    bestTarget.style.boxShadow = '0 0 18px rgba(0, 150, 255, 0.7)';
-    bestTarget.style.transform = 'scale(1.03)';
+    bestTarget.style.boxShadow = '0 0 20px rgba(0, 150, 255, 0.8)';
+    bestTarget.style.transform = 'scale(1.04)';
 
     setTimeout(() => {
-      bestTarget.click();
-    }, 450);
+      // Find direct clickable anchor or click the element itself
+      const clickable = bestTarget.tagName === 'A' ? bestTarget : (bestTarget.querySelector('a') || bestTarget);
+      clickable.click();
+    }, 500);
 
     setTimeout(() => {
       bestTarget.style.boxShadow = '';
       bestTarget.style.transform = '';
-    }, 1800);
+    }, 2000);
   }
 }
 
@@ -360,7 +376,6 @@ function getCleanSafeHref(rawUrl) {
   try {
     const parsed = new URL(trimmed, window.location.origin);
     if (parsed.protocol === 'http:' || parsed.protocol === 'https:') {
-      // Must be same origin or standard safe web URL
       return parsed.href;
     }
   } catch (e) {
