@@ -3,7 +3,7 @@
    ========================================================= */
 
 let availableVoices = [];
-let isVoiceOutputEnabled = true;
+let isVoiceOutputEnabled = false; // Voice speech output disabled
 let globalRecognition = null;
 let isListening = false;
 
@@ -154,63 +154,10 @@ function speakResponseInNativeLanguage(text, langCode) {
   window.speechSynthesis.speak(utterance);
 }
 
-// Generate the core assistant response based on the query
-function generateCoreResponse(englishQuery) {
-  const q = englishQuery.toLowerCase().trim();
-
-  if (/^(hi|hello|hey|greetings|namaste|nomoshkar)/i.test(q)) {
-    return "Hello! I am DocuCraft AI Smart Assistant. We have over 50 free web tools including PDF editors, image resizers, and financial calculators. Which tool do you need help with?";
-  }
-
-  if (q.includes('all tools') || q.includes('how many') || q.includes('list') || q.includes('total')) {
-    return `DocuCraft AI provides ${siteKnowledgeBase.length} browser-based tools across PDF editing, exam photo/sign resizing, financial calculators, and utility converters.`;
-  }
-
-  const matched = siteKnowledgeBase.find(tool => 
-    q.includes(tool.name.toLowerCase()) || 
-    tool.desc.toLowerCase().includes(q)
-  );
-
-  if (matched) {
-    return `${matched.name}: ${matched.desc}. You can find and open this tool directly from our homepage.`;
-  }
-
-  if (q.includes('pdf')) {
-    return "DocuCraft AI offers Merge PDF, Compress PDF, Split, Repair corrupted PDF, Word to PDF, Excel to PDF, OCR Extractor, Sign, and Protect PDF.";
-  }
-  if (q.includes('photo') || q.includes('image') || q.includes('sign') || q.includes('kb') || q.includes('chobi')) {
-    return "For images, we have Photo & Sign KB Resizer, Exam Resizer (SSC/UPSC), Passport Photo Sheet Maker, and Digital Signature Pad.";
-  }
-  if (q.includes('calculator') || q.includes('loan') || q.includes('money') || q.includes('tax') || q.includes('hisab')) {
-    return "For finance, you can use our Scientific Calculator, Loan EMI, Prepayment Saver, GST, SIP, PPF, and Salary Calculators.";
-  }
-
-  return "I can guide you to any tool on DocuCraft AI. Let me know what you want to do (such as PDF editing, photo resizing, or calculating loan EMI).";
-}
-
 // Process incoming user messages in any language
 async function processSmartAssistantMessage(userMessage) {
   if (!userMessage || !userMessage.trim()) return "";
-
-  // 1. Detect user language and translate input to English
-  const translatedInput = await translateUniversal(userMessage, 'en', 'auto');
-  const userLang = translatedInput.detected || 'en';
-  const englishQuery = translatedInput.text;
-
-  // 2. Generate the base reply
-  const englishReply = generateCoreResponse(englishQuery);
-
-  // 3. Translate the reply back to the user's native language
-  let finalReply = englishReply;
-  if (userLang !== 'en') {
-    const translatedOutput = await translateUniversal(englishReply, userLang, 'en');
-    finalReply = translatedOutput.text;
-  }
-
-  // 4. Speak the final reply in the user's native tongue
-  speakResponseInNativeLanguage(finalReply, userLang);
-
-  return finalReply;
+  return "";
 }
 
 // Global voice input (Microphone / Speech Recognition)
@@ -236,7 +183,7 @@ function toggleVoiceInput(inputElementId = 'toolSearchInput', callback) {
   globalRecognition.continuous = false;
   globalRecognition.interimResults = false;
 
-  // Set preferred language (e.g. bn-IN for Bengali support, or user browser locale)
+  // ব্রাউজার বা ডিভাইসের ভাষা অনুযায়ী সেট করা
   const userPreferredLang = navigator.language || 'bn-IN';
   globalRecognition.lang = userPreferredLang.startsWith('bn') ? 'bn-IN' : userPreferredLang;
 
@@ -246,26 +193,21 @@ function toggleVoiceInput(inputElementId = 'toolSearchInput', callback) {
     if (statusElem) statusElem.innerText = "Listening...";
   };
 
-  globalRecognition.onresult = async function(event) {
+  globalRecognition.onresult = function(event) {
     const spokenTranscript = event.results[0][0].transcript;
 
     const inputField = document.getElementById(inputElementId);
     if (inputField) {
       inputField.value = spokenTranscript;
-      // Trigger live search filters
+      // সার্চ বক্সে লেখা বসার সাথে সাথে লাইভ ফিল্টারিং চালু করা
       inputField.dispatchEvent(new Event('input', { bubbles: true }));
       inputField.dispatchEvent(new Event('keyup', { bubbles: true }));
     }
 
-    if (statusElem) statusElem.innerText = "Processing...";
-
-    // Generate assistant response and speak back
-    const reply = await processSmartAssistantMessage(spokenTranscript);
-
     if (statusElem) statusElem.innerText = "";
 
     if (typeof callback === 'function') {
-      callback(spokenTranscript, reply);
+      callback(spokenTranscript);
     }
   };
 
@@ -289,7 +231,7 @@ function toggleVoiceInput(inputElementId = 'toolSearchInput', callback) {
   }
 }
 
-// Global hook for index.html onclick="startVoice()"
+// index.html এ বোতামে onclick="startVoice()" কাজ করার জন্য লিঙ্ক
 function startVoice() {
   toggleVoiceInput('toolSearchInput');
 }
