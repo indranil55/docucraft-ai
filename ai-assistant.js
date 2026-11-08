@@ -3,7 +3,7 @@
    ========================================================= */
 
 let availableVoices = [];
-let isVoiceOutputEnabled = false; // Voice speech output disabled
+let isVoiceOutputEnabled = true;
 let globalRecognition = null;
 let isListening = false;
 
@@ -101,21 +101,7 @@ if ('speechSynthesis' in window) {
   loadSystemVoices();
 }
 
-// Toggle voice output on/off
-function toggleVoiceOutput() {
-  isVoiceOutputEnabled = !isVoiceOutputEnabled;
-  const btn = document.getElementById('voiceToggleBtn');
-  if (btn) {
-    btn.innerHTML = isVoiceOutputEnabled 
-      ? '<i class="fa-solid fa-volume-high"></i> Voice ON' 
-      : '<i class="fa-solid fa-volume-xmark"></i> Voice OFF';
-  }
-  if (!isVoiceOutputEnabled && 'speechSynthesis' in window) {
-    window.speechSynthesis.cancel();
-  }
-}
-
-// Automatically detect source language and translate text globally
+// Automatically detect language and translate text
 async function translateUniversal(text, targetLang, sourceLang = 'auto') {
   if (!text || targetLang === sourceLang) return { text, detected: sourceLang };
   try {
@@ -126,25 +112,25 @@ async function translateUniversal(text, targetLang, sourceLang = 'auto') {
     const detectedLang = data[2] || 'en';
     return { text: translatedText, detected: detectedLang };
   } catch (err) {
-    console.error("Translation Error:", err);
     return { text: text, detected: 'en' };
   }
 }
 
-// Speak response aloud using native voice matching the query language
+// Speak greeting or response aloud in matching user voice
 function speakResponseInNativeLanguage(text, langCode) {
   if (!isVoiceOutputEnabled || !('speechSynthesis' in window)) return;
   window.speechSynthesis.cancel();
 
   const utterance = new SpeechSynthesisUtterance(text);
-  utterance.rate = 0.95;
+  utterance.rate = 1.0;
   utterance.pitch = 1.0;
   utterance.lang = langCode || 'en-US';
 
   if (availableVoices.length > 0) {
+    const target = langCode.toLowerCase().split('-')[0];
     const matchedVoice = availableVoices.find(v => 
       v.lang.toLowerCase() === langCode.toLowerCase() ||
-      v.lang.toLowerCase().startsWith(langCode.toLowerCase().split('-')[0])
+      v.lang.toLowerCase().startsWith(target)
     );
     if (matchedVoice) {
       utterance.voice = matchedVoice;
@@ -154,10 +140,22 @@ function speakResponseInNativeLanguage(text, langCode) {
   window.speechSynthesis.speak(utterance);
 }
 
-// Process incoming user messages in any language
-async function processSmartAssistantMessage(userMessage) {
-  if (!userMessage || !userMessage.trim()) return "";
-  return "";
+// Greet user in their native language
+async function playIndranilGreeting(userLangCode) {
+  const baseGreeting = "I am Indranil, how can I help you?";
+  const targetShort = userLangCode.split('-')[0];
+
+  if (targetShort === 'en') {
+    speakResponseInNativeLanguage(baseGreeting, 'en-US');
+    return;
+  }
+
+  try {
+    const res = await translateUniversal(baseGreeting, targetShort, 'en');
+    speakResponseInNativeLanguage(res.text, userLangCode);
+  } catch (e) {
+    speakResponseInNativeLanguage(baseGreeting, 'en-US');
+  }
 }
 
 // Global voice input (Microphone / Speech Recognition)
@@ -176,6 +174,7 @@ function toggleVoiceInput(inputElementId = 'toolSearchInput', callback) {
     isListening = false;
     if (micBtn) micBtn.classList.remove('listening');
     if (statusElem) statusElem.innerText = "";
+    if ('speechSynthesis' in window) window.speechSynthesis.cancel();
     return;
   }
 
@@ -183,14 +182,22 @@ function toggleVoiceInput(inputElementId = 'toolSearchInput', callback) {
   globalRecognition.continuous = false;
   globalRecognition.interimResults = false;
 
-  // ব্রাউজার বা ডিভাইসের ভাষা অনুযায়ী সেট করা
-  const userPreferredLang = navigator.language || 'bn-IN';
-  globalRecognition.lang = userPreferredLang.startsWith('bn') ? 'bn-IN' : userPreferredLang;
+  // Set recognition language based on user's device/browser settings
+  const userPreferredLang = navigator.language || 'en-US';
+  globalRecognition.lang = userPreferredLang;
+
+  let hasGreeted = false;
 
   globalRecognition.onstart = function() {
     isListening = true;
     if (micBtn) micBtn.classList.add('listening');
     if (statusElem) statusElem.innerText = "Listening...";
+
+    // Speak initial greeting once per mic activation
+    if (!hasGreeted) {
+      hasGreeted = true;
+      playIndranilGreeting(userPreferredLang);
+    }
   };
 
   globalRecognition.onresult = function(event) {
@@ -199,7 +206,7 @@ function toggleVoiceInput(inputElementId = 'toolSearchInput', callback) {
     const inputField = document.getElementById(inputElementId);
     if (inputField) {
       inputField.value = spokenTranscript;
-      // সার্চ বক্সে লেখা বসার সাথে সাথে লাইভ ফিল্টারিং চালু করা
+      // Trigger live search filters
       inputField.dispatchEvent(new Event('input', { bubbles: true }));
       inputField.dispatchEvent(new Event('keyup', { bubbles: true }));
     }
@@ -231,7 +238,7 @@ function toggleVoiceInput(inputElementId = 'toolSearchInput', callback) {
   }
 }
 
-// index.html এ বোতামে onclick="startVoice()" কাজ করার জন্য লিঙ্ক
+// Hook for index.html onclick="startVoice()"
 function startVoice() {
   toggleVoiceInput('toolSearchInput');
 }
