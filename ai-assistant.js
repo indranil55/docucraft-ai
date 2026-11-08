@@ -159,6 +159,57 @@ async function playIndranilGreeting(userLangCode) {
   }
 }
 
+// Scrolls the best-matching tool card to the center of the viewport
+function scrollToMatchedTool(query) {
+  if (!query) return;
+
+  // Clean voice prompt by removing command filler words
+  const cleanQuery = query.toLowerCase()
+    .replace(/^(open|show|find|go to|launch|cholo|dekhao|kholo)\s+/i, '')
+    .trim();
+
+  // Query all potential tool cards and visible tool items
+  const candidates = Array.from(document.querySelectorAll('.tool-card, .popular-card, [data-tool], .tool-item, a[href*=".html"]'));
+  let bestTarget = null;
+
+  for (const el of candidates) {
+    // Only check visible elements
+    if (el.offsetParent === null) continue;
+
+    const elText = (el.innerText || el.textContent || '').toLowerCase();
+    if (cleanQuery.length >= 2 && elText.includes(cleanQuery)) {
+      bestTarget = el;
+      break;
+    }
+  }
+
+  // Fallback: search individual word tokens if full phrase match isn't found
+  if (!bestTarget) {
+    const tokens = cleanQuery.split(/\s+/).filter(w => w.length > 2);
+    for (const el of candidates) {
+      if (el.offsetParent === null) continue;
+      const elText = (el.innerText || el.textContent || '').toLowerCase();
+      if (tokens.some(t => elText.includes(t))) {
+        bestTarget = el;
+        break;
+      }
+    }
+  }
+
+  // Smoothly center the element on screen and highlight it briefly
+  if (bestTarget) {
+    bestTarget.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    bestTarget.style.transition = 'transform 0.3s ease, box-shadow 0.3s ease';
+    bestTarget.style.boxShadow = '0 0 18px rgba(0, 150, 255, 0.7)';
+    bestTarget.style.transform = 'scale(1.03)';
+
+    setTimeout(() => {
+      bestTarget.style.boxShadow = '';
+      bestTarget.style.transform = '';
+    }, 1800);
+  }
+}
+
 // Global voice input (Microphone / Speech Recognition)
 function toggleVoiceInput(inputElementId = 'toolSearchInput', callback) {
   const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -183,8 +234,8 @@ function toggleVoiceInput(inputElementId = 'toolSearchInput', callback) {
 
   shouldRestart = true;
   globalRecognition = new SpeechRecognition();
-  globalRecognition.continuous = true; // Keep listening continuously
-  globalRecognition.interimResults = true; // Capture intermediate speech results
+  globalRecognition.continuous = true;
+  globalRecognition.interimResults = true;
 
   // Set recognition language based on user's device/browser settings
   const userPreferredLang = navigator.language || 'en-US';
@@ -213,16 +264,23 @@ function toggleVoiceInput(inputElementId = 'toolSearchInput', callback) {
     }
 
     if (finalTranscript) {
+      const cleanTranscript = finalTranscript.trim();
       const inputField = document.getElementById(inputElementId);
+
       if (inputField) {
-        inputField.value = finalTranscript.trim();
+        inputField.value = cleanTranscript;
         // Trigger live search filters
         inputField.dispatchEvent(new Event('input', { bubbles: true }));
         inputField.dispatchEvent(new Event('keyup', { bubbles: true }));
       }
 
+      // Smoothly scroll the matching tool card directly to the center of the screen
+      setTimeout(() => {
+        scrollToMatchedTool(cleanTranscript);
+      }, 150);
+
       if (typeof callback === 'function') {
-        callback(finalTranscript.trim());
+        callback(cleanTranscript);
       }
     }
   };
