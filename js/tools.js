@@ -211,7 +211,7 @@ function launchTool(toolKey) {
     }
   } else if (toolKey === 'kbResizer') {
     if (title) title.innerText = 'Photo & Sign KB / MB Resizer';
-    if (desc) desc.innerText = 'Compress or expand image precisely to target KB or MB without exceeding limits or losing clarity.';
+    if (desc) desc.innerText = 'Compress or resize image precisely to target KB or MB without exceeding limits or losing clarity.';
     if (dropText) dropText.innerText = 'Tap to select photo/signature';
     if (customUI) {
       customUI.innerHTML = `
@@ -721,12 +721,12 @@ async function executeToolAction() {
       const customName = document.getElementById('optCustomFileName')?.value?.trim() || 'Resized_Photo';
       const isMB = (unit === 'MB');
 
-      // Strict decimal & binary compliant ceiling (guarantees Chrome/Android never shows 51 MB or 51 KB)
-      // 50 MB -> 48,000,000 Bytes (Shows 48.0 MB in Chrome SI display)
-      // 50 KB -> 48,500 Bytes (Shows 48.5 KB in Chrome SI display)
+      // Strict decimal ceiling to match mobile Android/Chrome OS display exactly
+      // 50 MB -> 48,000,000 bytes max (Shows ~48.0 MB, never 51 MB)
+      // 50 KB -> 48,000 bytes max (Shows ~48.0 KB, never 51 KB)
       const maxAllowedBytes = isMB
         ? Math.floor(valInput * 1000 * 1000 * 0.96)
-        : Math.floor(valInput * 1000 * 0.97);
+        : Math.floor(valInput * 1000 * 0.96);
 
       const rawData = await readFileAsDataURL(selectedFiles[0]);
       const img = new Image();
@@ -751,42 +751,32 @@ async function executeToolAction() {
         return cv;
       }
 
-      // Zero-RAM fast expanding: Memory-safe padding without crash up to 500 MB
-      function createPaddedBlob(baseBlob, targetBytes) {
-        const diff = targetBytes - baseBlob.size;
-        if (diff <= 0) return baseBlob;
-
-        const baseUnit = new Uint8Array(Math.min(diff, 64 * 1024));
-        const parts = [baseBlob];
-        let remaining = diff;
-
-        const seedBlob = new Blob([baseUnit]);
-        const numBlocks = Math.floor(remaining / seedBlob.size);
-        for (let i = 0; i < numBlocks; i++) {
-          parts.push(seedBlob);
-        }
-        remaining -= numBlocks * seedBlob.size;
-
-        if (remaining > 0) {
-          parts.push(new Uint8Array(remaining));
-        }
-
-        return new Blob(parts, { type: 'image/jpeg' });
-      }
-
       let bestBlob = null;
 
-      // STEP 1: Test at 100% original dimensions with crisp quality (0.95)
-      const fullCv = drawCleanCanvas(origW, origH);
-      const highQBlob = await new Promise(r => fullCv.toBlob(r, 'image/jpeg', 0.95));
+      // STEP 1: If target is MB or large size, maintain original dimensions & high quality
+      if (isMB) {
+        setProgress(60, 'Processing high quality image...');
+        const fullCv = drawCleanCanvas(origW, origH);
+        
+        // Try highest quality JPEG
+        let q = 0.98;
+        bestBlob = await new Promise(r => fullCv.toBlob(r, 'image/jpeg', q));
 
-      // CASE 1: Image naturally compresses to less than target (e.g. KB to MB)
-      if (highQBlob && highQBlob.size <= maxAllowedBytes) {
-        setProgress(65, isMB ? `Expanding to ${valInput} MB...` : 'Fine-tuning target size...');
-        bestBlob = createPaddedBlob(highQBlob, maxAllowedBytes);
+        // If high quality still fits within max allowed MB, download cleanly (no file corruption)
+        if (bestBlob && bestBlob.size > maxAllowedBytes) {
+          // In case of huge image exceeding target MB, scale gently
+          let curW = origW;
+          while (bestBlob && bestBlob.size > maxAllowedBytes && curW > 800) {
+            curW = Math.round(curW * 0.85);
+            const curH = Math.round(curW / aspect);
+            const cv = drawCleanCanvas(curW, curH);
+            bestBlob = await new Promise(r => cv.toBlob(r, 'image/jpeg', 0.90));
+          }
+        }
       } 
-      // CASE 2: Image is larger than target (Clean multi-step downscaling, MB to KB)
+      // STEP 2: Target is KB (Needs strict compression without fracturing or exceeding limit)
       else {
+        // Step-down widths to maintain crisp sharpness without pixelating
         let candidateWidths = [origW];
         if (origW > 1600) candidateWidths.push(1600);
         if (origW > 1280) candidateWidths.push(1280);
@@ -800,6 +790,7 @@ async function executeToolAction() {
           const h = Math.round(w / aspect);
           const cv = drawCleanCanvas(w, h);
 
+          // Binary search for optimal JPEG quality (0.35 to 0.95)
           let lowQ = 0.35;
           let highQ = 0.95;
           let localBest = null;
@@ -821,38 +812,29 @@ async function executeToolAction() {
           }
         }
 
-        // Emergency fallback if target is very small (10 KB / 20 KB)
+        // Fallback for very small sizes (10 KB / 20 KB)
         if (!bestBlob) {
-          let fbW = Math.min(origW, 440);
-          while (!bestBlob && fbW >= 200) {
+          let fbW = Math.min(origW, 400);
+          while (!bestBlob && fbW >= 180) {
             const fbH = Math.round(fbW / aspect);
             const cv = drawCleanCanvas(fbW, fbH);
-            let q = 0.50;
-            while (q >= 0.12) {
+            let q = 0.45;
+            while (q >= 0.10) {
               const b = await new Promise(r => cv.toBlob(r, 'image/jpeg', q));
               if (b && b.size <= maxAllowedBytes) {
                 bestBlob = b;
                 break;
               }
-              q -= 0.06;
+              q -= 0.05;
             }
             fbW = Math.round(fbW * 0.80);
-          }
-        }
-
-        // Precise byte alignment
-        if (bestBlob && bestBlob.size < maxAllowedBytes) {
-          const diff = maxAllowedBytes - bestBlob.size;
-          if (isMB && diff > 1000 * 50) {
-            bestBlob = createPaddedBlob(bestBlob, maxAllowedBytes);
-          } else if (!isMB && bestBlob.size < maxAllowedBytes * 0.85) {
-            bestBlob = createPaddedBlob(bestBlob, maxAllowedBytes);
           }
         }
       }
 
       if (!bestBlob) {
-        bestBlob = highQBlob;
+        const fullCv = drawCleanCanvas(origW, origH);
+        bestBlob = await new Promise(r => fullCv.toBlob(r, 'image/jpeg', 0.85));
       }
 
       setProgress(90, 'Preparing download...');
