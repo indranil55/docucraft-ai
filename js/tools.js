@@ -659,30 +659,97 @@ function setProgress(percent, text) {
   if (pct) pct.textContent = Math.round(safe) + '%';
 }
 
-// Memory-Safe, 100% Non-Corrupting Safe Padding
-// Appends clean, compliant trailing padding after JPEG EOI (FF D9).
-// Android ImageDecoder reads the pristine JPEG to EOI and renders immediately without any torn-image error.
-function padAfterEoi(baseBlob, targetBytes) {
-  const diff = targetBytes - baseBlob.size;
-  if (diff <= 0) return baseBlob;
+// 100% Valid Single JPEG Inflator with Exact Standard Length Encoding
+// Injects compliant COM markers strictly BEFORE Start of Scan (0xFF, 0xDA).
+// Ensures zero bytes after EOI (0xFF, 0xD9) so Chrome renders thumbnails instantly and Gallery opens with zero delay.
+async function padJpegSafely(blob, targetBytes) {
+  if (blob.size >= targetBytes) return blob;
+  const buffer = await blob.arrayBuffer();
+  const bytes = new Uint8Array(buffer);
 
-  // Single shared 1MB template buffer of safe ASCII spaces (0x20)
-  const chunkSize = Math.min(diff, 1024 * 1024);
-  const chunk = new Uint8Array(chunkSize);
-  chunk.fill(0x20);
-  const chunkBlob = new Blob([chunk]);
+  if (bytes.length < 4 || bytes[0] !== 0xFF || bytes[1] !== 0xD8) {
+    return blob;
+  }
 
-  const parts = [baseBlob];
-  let remaining = diff;
-  while (remaining >= chunkSize) {
-    parts.push(chunkBlob);
-    remaining -= chunkSize;
+  // Locate Start of Scan (0xFF, 0xDA)
+  let sosIdx = -1;
+  let i = 2;
+  while (i < bytes.length - 1) {
+    if (bytes[i] === 0xFF) {
+      let m = bytes[i + 1];
+      while (m === 0xFF && i < bytes.length - 2) {
+        i++;
+        m = bytes[i + 1];
+      }
+      if (m === 0xDA) {
+        sosIdx = i;
+        break;
+      }
+      if (m === 0xD9) break;
+      if (m >= 0xD0 && m <= 0xD7) {
+        i += 2;
+        continue;
+      }
+      if (m === 0x00) {
+        i += 2;
+        continue;
+      }
+      if (i + 3 < bytes.length) {
+        const len = (bytes[i + 2] << 8) | bytes[i + 3];
+        if (len < 2) { i++; continue; }
+        i += 2 + len;
+      } else {
+        break;
+      }
+    } else {
+      i++;
+    }
   }
-  if (remaining > 0) {
-    const lastChunk = new Uint8Array(remaining);
-    lastChunk.fill(0x20);
-    parts.push(lastChunk);
+
+  if (sosIdx === -1) {
+    sosIdx = 2;
   }
+
+  let diff = targetBytes - bytes.length;
+  if (diff < 5) return blob;
+
+  // Each COM marker segment:
+  // Marker = 2 bytes (0xFF, 0xFE)
+  // Lc (Length parameter) = chunkLen - 2 bytes
+  // Payload = chunkLen - 4 bytes
+  // Total segment bytes = chunkLen
+  const fullChunkSize = 65535;
+  const fullLc = fullChunkSize - 2; // 65533
+
+  const fullChunk = new Uint8Array(fullChunkSize);
+  fullChunk[0] = 0xFF;
+  fullChunk[1] = 0xFE;
+  fullChunk[2] = (fullLc >> 8) & 0xFF; // 0xFF
+  fullChunk[3] = fullLc & 0xFF;        // 0xFD
+  fullChunk.fill(0x20, 4);
+
+  const fullBlob = new Blob([fullChunk]);
+  const parts = [bytes.subarray(0, sosIdx)];
+
+  while (diff >= fullChunkSize) {
+    parts.push(fullBlob);
+    diff -= fullChunkSize;
+  }
+
+  if (diff >= 5) {
+    const remChunkSize = diff;
+    const remLc = remChunkSize - 2;
+    const remChunk = new Uint8Array(remChunkSize);
+    remChunk[0] = 0xFF;
+    remChunk[1] = 0xFE;
+    remChunk[2] = (remLc >> 8) & 0xFF;
+    remChunk[3] = remLc & 0xFF;
+    remChunk.fill(0x20, 4);
+    parts.push(remChunk);
+  }
+
+  // Append remaining original JPEG cleanly to End of Image (0xFF, 0xD9)
+  parts.push(bytes.subarray(sosIdx));
   return new Blob(parts, { type: 'image/jpeg' });
 }
 
@@ -748,12 +815,10 @@ async function executeToolAction() {
       const customName = document.getElementById('optCustomFileName')?.value?.trim() || 'Resized_Photo';
       const isMB = (unit === 'MB');
 
-      // Strict standard target bytes to guarantee output size NEVER exceeds user selected limit
-      // 50 MB -> 48,000,000 bytes (Displays 48.0 MB in Chrome/Android, never 51 MB)
-      // 50 KB -> 48,000 bytes (Displays 48.0 KB in Chrome/Android, never 51 KB)
+      // Strict standard ceiling to prevent Android/Chrome boundary display issues (e.g. 51 MB)
       const maxAllowedBytes = isMB
-        ? Math.floor(valInput * 1000 * 1000 * 0.96)
-        : Math.floor(valInput * 1000 * 0.96);
+        ? Math.floor(valInput * 1000 * 1000 * 0.98)
+        : Math.floor(valInput * 1000 * 0.98);
 
       const rawData = await readFileAsDataURL(selectedFiles[0]);
       const img = new Image();
@@ -780,15 +845,14 @@ async function executeToolAction() {
 
       let bestBlob = null;
 
-      // CASE A: User selected MB (Clean upscaling + Safe non-corrupting padding)
+      // CASE A: User selected MB (Clean HD upscaling + Safe standard COM padding)
       if (isMB) {
-        setProgress(45, 'Enhancing image for target MB...');
+        setProgress(50, 'Enhancing image for target MB...');
         let renderW = origW;
         let renderH = origH;
 
-        // Upscale small image cleanly so the photo looks HD and sharp
         if (Math.max(origW, origH) < 2048) {
-          const scale = Math.min(3, 2048 / Math.max(origW, origH));
+          const scale = Math.min(2.5, 2048 / Math.max(origW, origH));
           renderW = Math.round(origW * scale);
           renderH = Math.round(origH * scale);
         }
@@ -796,8 +860,8 @@ async function executeToolAction() {
         const cv = drawCleanCanvas(renderW, renderH);
         const baseBlob = await new Promise(r => cv.toBlob(r, 'image/jpeg', 0.96));
 
-        setProgress(75, `Padding to exact ${valInput} MB...`);
-        bestBlob = padAfterEoi(baseBlob, maxAllowedBytes);
+        setProgress(75, `Padding safely to ${valInput} MB...`);
+        bestBlob = await padJpegSafely(baseBlob, maxAllowedBytes);
       }
       // CASE B: User selected KB (MB to KB or KB to KB)
       else {
@@ -805,7 +869,7 @@ async function executeToolAction() {
         const testBlob = await new Promise(r => fullCv.toBlob(r, 'image/jpeg', 0.95));
 
         if (testBlob && testBlob.size <= maxAllowedBytes) {
-          bestBlob = padAfterEoi(testBlob, maxAllowedBytes);
+          bestBlob = await padJpegSafely(testBlob, maxAllowedBytes);
         } else {
           let candidateWidths = [origW];
           if (origW > 1600) candidateWidths.push(1600);
