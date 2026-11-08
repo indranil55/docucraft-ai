@@ -721,11 +721,12 @@ async function executeToolAction() {
       const customName = document.getElementById('optCustomFileName')?.value?.trim() || 'Resized_Photo';
       const isMB = (unit === 'MB');
 
-      // Strict standard target bytes: 1 KB = 1024 Bytes, 1 MB = 1024 * 1024 Bytes
-      // Set to 98% of target to guarantee output size NEVER exceeds user selected limit
+      // Strict decimal & binary compliant ceiling (guarantees Chrome/Android never shows 51 MB or 51 KB)
+      // 50 MB -> 48,000,000 Bytes (Shows 48.0 MB in Chrome SI display)
+      // 50 KB -> 48,500 Bytes (Shows 48.5 KB in Chrome SI display)
       const maxAllowedBytes = isMB
-        ? Math.floor(valInput * 1024 * 1024 * 0.98)
-        : Math.floor(valInput * 1024 * 0.97);
+        ? Math.floor(valInput * 1000 * 1000 * 0.96)
+        : Math.floor(valInput * 1000 * 0.97);
 
       const rawData = await readFileAsDataURL(selectedFiles[0]);
       const img = new Image();
@@ -737,7 +738,6 @@ async function executeToolAction() {
 
       setProgress(30, 'Optimizing clarity...');
 
-      // High quality canvas with smooth scaling
       function drawCleanCanvas(w, h) {
         const cv = document.createElement('canvas');
         cv.width = w;
@@ -751,17 +751,15 @@ async function executeToolAction() {
         return cv;
       }
 
-      // Zero-RAM allocation fast expanding: Works smoothly up to 500 MB without browser memory crashes
+      // Zero-RAM fast expanding: Memory-safe padding without crash up to 500 MB
       function createPaddedBlob(baseBlob, targetBytes) {
         const diff = targetBytes - baseBlob.size;
         if (diff <= 0) return baseBlob;
 
-        // Build composite blob using slice doubling technique (O(1) memory, instant execution)
-        const baseUnit = new Uint8Array(Math.min(diff, 64 * 1024)); // 64 KB seed
+        const baseUnit = new Uint8Array(Math.min(diff, 64 * 1024));
         const parts = [baseBlob];
         let remaining = diff;
 
-        // Add 64KB chunks efficiently
         const seedBlob = new Blob([baseUnit]);
         const numBlocks = Math.floor(remaining / seedBlob.size);
         for (let i = 0; i < numBlocks; i++) {
@@ -778,18 +776,17 @@ async function executeToolAction() {
 
       let bestBlob = null;
 
-      // STEP 1: Test at 100% original dimensions with high quality (0.95)
+      // STEP 1: Test at 100% original dimensions with crisp quality (0.95)
       const fullCv = drawCleanCanvas(origW, origH);
       const highQBlob = await new Promise(r => fullCv.toBlob(r, 'image/jpeg', 0.95));
 
-      // CASE 1: Image naturally compresses to less than target (e.g. KB to MB, or upscaling KB)
+      // CASE 1: Image naturally compresses to less than target (e.g. KB to MB)
       if (highQBlob && highQBlob.size <= maxAllowedBytes) {
         setProgress(65, isMB ? `Expanding to ${valInput} MB...` : 'Fine-tuning target size...');
         bestBlob = createPaddedBlob(highQBlob, maxAllowedBytes);
       } 
       // CASE 2: Image is larger than target (Clean multi-step downscaling, MB to KB)
       else {
-        // Step-down widths to maintain crisp facial sharpness without pixelating
         let candidateWidths = [origW];
         if (origW > 1600) candidateWidths.push(1600);
         if (origW > 1280) candidateWidths.push(1280);
@@ -803,7 +800,6 @@ async function executeToolAction() {
           const h = Math.round(w / aspect);
           const cv = drawCleanCanvas(w, h);
 
-          // Binary search for optimal JPEG quality (0.35 to 0.95)
           let lowQ = 0.35;
           let highQ = 0.95;
           let localBest = null;
@@ -813,7 +809,7 @@ async function executeToolAction() {
             const b = await new Promise(r => cv.toBlob(r, 'image/jpeg', midQ));
             if (b && b.size <= maxAllowedBytes) {
               localBest = b;
-              lowQ = midQ; // Try to keep quality higher
+              lowQ = midQ;
             } else {
               highQ = midQ;
             }
@@ -821,7 +817,7 @@ async function executeToolAction() {
 
           if (localBest && localBest.size <= maxAllowedBytes) {
             bestBlob = localBest;
-            break; // Found crisp result within target budget
+            break;
           }
         }
 
@@ -847,9 +843,9 @@ async function executeToolAction() {
         // Precise byte alignment
         if (bestBlob && bestBlob.size < maxAllowedBytes) {
           const diff = maxAllowedBytes - bestBlob.size;
-          if (isMB && diff > 1024 * 50) {
+          if (isMB && diff > 1000 * 50) {
             bestBlob = createPaddedBlob(bestBlob, maxAllowedBytes);
-          } else if (!isMB && bestBlob.size < maxAllowedBytes * 0.82) {
+          } else if (!isMB && bestBlob.size < maxAllowedBytes * 0.85) {
             bestBlob = createPaddedBlob(bestBlob, maxAllowedBytes);
           }
         }
@@ -863,9 +859,9 @@ async function executeToolAction() {
       const finalFileName = `${customName}_${valInput}${unit}.jpg`;
       downloadBlob(bestBlob, finalFileName, 'image/jpeg');
 
-      const sizeDisplay = bestBlob.size >= (1024 * 1024)
-        ? (bestBlob.size / (1024 * 1024)).toFixed(2) + ' MB'
-        : (bestBlob.size / 1024).toFixed(1) + ' KB';
+      const sizeDisplay = isMB
+        ? (bestBlob.size / (1000 * 1000)).toFixed(1) + ' MB'
+        : (bestBlob.size / 1000).toFixed(1) + ' KB';
 
       closeWorkspace();
       setTimeout(() => {
