@@ -839,3 +839,70 @@ footer {
   grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
   gap: 12px;
 }
+/* ==========================================
+   1. Search Bar & Chips Size Fix
+   ========================================== */
+.search-wrapper {
+    width: 90%;
+    max-width: 650px;
+    margin: 20px auto 10px auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.search-box-inner {
+    width: 100%;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    position: relative;
+}
+
+.search-input {
+    width: 100%;
+    box-sizing: border-box;
+    padding-right: 45px; /* Leaves room for the microphone icon */
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+.filter-chips-container {
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 15px;
+}
+
+.filter-chips-container .chip {
+    white-space: nowrap;
+    font-size: 13px;
+    padding: 6px 14px;
+    border-radius: 50px;
+    cursor: pointer;
+}
+
+/* ==========================================
+   2. Card Click & Shrink Fix
+   ========================================== */
+/* Disables the shrinking/stuck effect when tapping a card */
+.tool-card:active,
+.popular-card:active,
+.grid-item:active {
+    transform: none !important;
+}
+
+/* Ensures the entire card acts as a clickable link */
+.tool-card a,
+.popular-card a,
+.grid-item a {
+    display: block;
+    width: 100%;
+    height: 100%;
+    text-decoration: none;
+    color: inherit;
+    cursor: pointer;
+}
