@@ -3962,7 +3962,40 @@ function startVoice() {
       alert("Browser-e Web Speech API support kore na. Google Chrome use korun.");
       return;
     }
+function startVoice() {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    const status = document.getElementById("voice-status");
 
+    if (!SpeechRecognition) {
+        alert("Browser-e Web Speech API support kore na. Google Chrome use korun.");
+        return;
+    }
+
+    const recognition = new SpeechRecognition();
+    recognition.continuous = true;
+    recognition.interimResults = false;
+    recognition.lang = 'en-US';
+
+    if (status) status.innerText = "Listening... Bolun...";
+
+    recognition.onresult = function(event) {
+        const lastIndex = event.results.length - 1;
+        const cmd = event.results[lastIndex][0].transcript.toLowerCase();
+        if (status) status.innerText = "Bolechen: " + cmd + "";
+        executeVoiceCommand(cmd);
+    };
+
+    recognition.onerror = function(event) {
+        if (status) status.innerText = "Error: " + event.error;
+    };
+
+    recognition.onend = function() {
+        // Continuous mode thakleo connection kete gele auto-restart hobe jate bondho na hoy
+        recognition.start();
+    };
+
+    recognition.start();
+}
     const recognition = new SpeechRecognition();
     recognition.lang = 'en-US';
 
