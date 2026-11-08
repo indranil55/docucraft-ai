@@ -448,28 +448,30 @@
     <p>Advanced Photo KB Resizer, Unlimited Notepad, Docx to PDF, Govt Job Alerts & Utilities.</p>
   </section>
 
-<!-- Search Bar -->
+<!-- Search & Filter Section -->
 <div class="search-wrapper">
-  <div class="search-box-inner">
-    <i class="fa-solid fa-magnifying-glass search-icon"></i>
-    <input type="text" id="toolSearchInput" class="search-input" placeholder="Search any tool (e.g. Merge PDF, KB Resizer, Govt Jobs)..." onkeyup="filterToolsBySearch()">
-    
-    <!-- Voice Search Button (Positioned on the right side) -->
-    <div class="voice-assistant-container">
-      <button type="button" id="voiceSearchBtn" class="voice-btn" onclick="startVoice()" title="Search by voice">
-        <i class="fa-solid fa-microphone"></i>
-      </button>
-      <span id="voice-status" class="voice-tooltip"></span>
+    <!-- Search Bar Inner Box -->
+    <div class="search-box-inner">
+        <i class="fa-solid fa-magnifying-glass search-icon"></i>
+        <input type="text" id="toolSearchInput" class="search-input" placeholder="Search any tool (e.g. Merge PDF, KB Resizer, Govt Jobs)...">
+        
+        <div class="voice-assistant-container">
+            <button type="button" id="voiceSearchBtn" class="voice-btn" onclick="startVoiceSearch()" title="Search by voice">
+                <i class="fa-solid fa-microphone"></i>
+            </button>
+            <span id="voice-status" class="voice-tooltip"></span>
+        </div>
     </div>
-  </div>
-  <!-- Category Filter Chips -->
-<div class="filter-chips-container">
-  <button class="chip active" onclick="filterCategory('all', this)">All Tools</button>
-  <button class="chip" onclick="filterCategory('PDF', this)">📄 PDF Tools</button>
-  <button class="chip" onclick="filterCategory('Cyber', this)">🖼️ Photo & Cyber</button>
-  <button class="chip" onclick="filterCategory('Finance', this)">💰 Finance</button>
-  <button class="chip" onclick="filterCategory('Utility', this)">⚡ Utilities</button>
-  <button class="chip" onclick="filterCategory('Jobs', this)">📢 Govt Jobs</button>
+
+    <!-- Category Filter Chips (Placed directly below search bar) -->
+    <div class="filter-chips-container">
+        <button class="chip active" onclick="filterCategory('all', this)">✨ All Tools</button>
+        <button class="chip" onclick="filterCategory('pdf', this)">📄 PDF Tools</button>
+        <button class="chip" onclick="filterCategory('photo', this)">🖼️ Photo & Cyber</button>
+        <button class="chip" onclick="filterCategory('finance', this)">💰 Finance & Utility</button>
+        <button class="chip" onclick="filterCategory('utility', this)">🛠️ Utilities</button>
+        <button class="chip" onclick="filterCategory('jobs', this)">📢 Govt Jobs</button>
+    </div>
 </div>
 
 <!-- Recently Used Tools Section -->
