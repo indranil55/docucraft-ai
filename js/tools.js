@@ -720,10 +720,13 @@ async function executeToolAction() {
       const unit = document.getElementById('optTargetUnit')?.value || 'KB';
       const customName = document.getElementById('optCustomFileName')?.value?.trim() || 'Resized_Photo';
 
-      // Strict maximum byte ceiling (1 KB = 1024 Bytes, 1 MB = 1024 * 1024 Bytes)
-      const maxAllowedBytes = unit === 'MB'
+      // Strict limit: 1 KB = 1024 Bytes, 1 MB = 1024 * 1024 Bytes
+      const absoluteMaxBytes = unit === 'MB'
         ? Math.floor(valInput * 1024 * 1024)
         : Math.floor(valInput * 1024);
+
+      // 98% safe ceiling to absorb browser metadata variations
+      const safeCeilingBytes = Math.floor(absoluteMaxBytes * 0.98);
 
       const rawData = await readFileAsDataURL(selectedFiles[0]);
       const img = new Image();
@@ -737,88 +740,86 @@ async function executeToolAction() {
 
       let bestBlob = null;
 
-      // STEP 1: Attempt to compress at 100% ORIGINAL resolution first (Preserves maximum clarity)
-      const fullCanvas = document.createElement('canvas');
-      fullCanvas.width = origW;
-      fullCanvas.height = origH;
-      const fullCtx = fullCanvas.getContext('2d');
-      fullCtx.imageSmoothingEnabled = true;
-      fullCtx.imageSmoothingQuality = 'high';
-      fullCtx.fillStyle = '#ffffff';
-      fullCtx.fillRect(0, 0, origW, origH);
-      fullCtx.drawImage(img, 0, 0, origW, origH);
+      // Helper function to create high-quality canvas
+      function drawCleanCanvas(w, h) {
+        const cv = document.createElement('canvas');
+        cv.width = w;
+        cv.height = h;
+        const cx = cv.getContext('2d');
+        cx.imageSmoothingEnabled = true;
+        cx.imageSmoothingQuality = 'high';
+        cx.fillStyle = '#ffffff';
+        cx.fillRect(0, 0, w, h);
+        cx.drawImage(img, 0, 0, w, h);
+        return cv;
+      }
 
-      let lowQ = 0.35;
-      let highQ = 0.98;
-      for (let step = 0; step < 7; step++) {
-        const midQ = Number(((lowQ + highQ) / 2).toFixed(4));
-        const b = await new Promise(r => fullCanvas.toBlob(r, 'image/jpeg', midQ));
-        if (b && b.size <= maxAllowedBytes) {
-          bestBlob = b;
-          lowQ = midQ; // Try to keep quality as high as possible
-        } else {
-          highQ = midQ;
+      // Helper function to search optimal quality on canvas
+      async function findOptimalQuality(cv, minQ, maxQ, maxBytes) {
+        let low = minQ;
+        let high = maxQ;
+        let winner = null;
+        for (let s = 0; s < 7; s++) {
+          const mid = Number(((low + high) / 2).toFixed(3));
+          const b = await new Promise(r => cv.toBlob(r, 'image/jpeg', mid));
+          if (b && b.size <= maxBytes) {
+            winner = b;
+            low = mid;
+          } else {
+            high = mid;
+          }
+        }
+        return winner;
+      }
+
+      // STEP 1: Try at 100% full original resolution (Zero blur guarantee)
+      const fullCv = drawCleanCanvas(origW, origH);
+      bestBlob = await findOptimalQuality(fullCv, 0.40, 0.98, safeCeilingBytes);
+
+      // STEP 2: Progressive downscaling (Preserves crisp face details and sharp edges)
+      if (!bestBlob) {
+        setProgress(50, 'Smart scaling details...');
+        let curW = origW;
+
+        // Never let dimension drop below 720px unless the original was smaller
+        const minAllowedW = Math.min(origW, 720);
+
+        while (!bestBlob && curW > minAllowedW) {
+          curW = Math.max(minAllowedW, Math.round(curW * 0.88));
+          const curH = Math.round(curW / aspect);
+          const scaledCv = drawCleanCanvas(curW, curH);
+          bestBlob = await findOptimalQuality(scaledCv, 0.45, 0.92, safeCeilingBytes);
+          if (curW === minAllowedW) break;
         }
       }
 
-      // STEP 2: Only scale dimensions if full resolution cannot reach target even at quality 0.35
+      // STEP 3: Controlled scale-down if image is massive (e.g. 4K+) to guarantee <= target limit
       if (!bestBlob) {
-        setProgress(50, 'Fine-tuning dimensions cleanly...');
-        let currentW = origW;
-        let currentH = origH;
+        setProgress(70, 'Finalizing strict size...');
+        let stepW = Math.min(origW, 640);
+        while (!bestBlob && stepW >= 280) {
+          const stepH = Math.round(stepW / aspect);
+          const cv = drawCleanCanvas(stepW, stepH);
+          bestBlob = await findOptimalQuality(cv, 0.35, 0.85, safeCeilingBytes);
+          if (bestBlob) break;
+          stepW = Math.round(stepW * 0.80);
+        }
+      }
 
-        for (let iter = 0; iter < 7; iter++) {
-          // Gentle scaling (92%) to prevent aggressive blurring and fracturing
-          currentW = Math.max(300, Math.round(currentW * 0.92));
-          currentH = Math.max(300, Math.round(currentW / aspect));
-
-          const iterCanvas = document.createElement('canvas');
-          iterCanvas.width = currentW;
-          iterCanvas.height = currentH;
-          const iterCtx = iterCanvas.getContext('2d');
-          iterCtx.imageSmoothingEnabled = true;
-          iterCtx.imageSmoothingQuality = 'high';
-          iterCtx.fillStyle = '#ffffff';
-          iterCtx.fillRect(0, 0, currentW, currentH);
-          iterCtx.drawImage(img, 0, 0, currentW, currentH);
-
-          // Test with sharp visual quality (0.50 - 0.90)
-          let qLow = 0.45;
-          let qHigh = 0.90;
-          let candidateBlob = null;
-
-          for (let s = 0; s < 6; s++) {
-            const midQ = Number(((qLow + qHigh) / 2).toFixed(4));
-            const b = await new Promise(r => iterCanvas.toBlob(r, 'image/jpeg', midQ));
-            if (b && b.size <= maxAllowedBytes) {
-              candidateBlob = b;
-              qLow = midQ;
-            } else {
-              qHigh = midQ;
-            }
-          }
-
-          if (candidateBlob && candidateBlob.size <= maxAllowedBytes) {
-            bestBlob = candidateBlob;
+      // FINAL SAFETY NET: Hard guarantee that file NEVER exceeds requested bytes
+      if (!bestBlob || bestBlob.size > absoluteMaxBytes) {
+        let hardW = Math.min(origW, 500);
+        let hardH = Math.round(hardW / aspect);
+        let hardCv = drawCleanCanvas(hardW, hardH);
+        let q = 0.50;
+        while (q >= 0.10) {
+          const b = await new Promise(r => hardCv.toBlob(r, 'image/jpeg', q));
+          if (b && b.size <= absoluteMaxBytes) {
+            bestBlob = b;
             break;
           }
+          q -= 0.08;
         }
-      }
-
-      // STEP 3: Fallback safety net (ensures strict size ceiling without breaking)
-      if (!bestBlob || bestBlob.size > maxAllowedBytes) {
-        const fbCanvas = document.createElement('canvas');
-        const fbW = Math.min(600, origW);
-        const fbH = Math.round(fbW / aspect);
-        fbCanvas.width = fbW;
-        fbCanvas.height = fbH;
-        const fbCtx = fbCanvas.getContext('2d');
-        fbCtx.imageSmoothingEnabled = true;
-        fbCtx.imageSmoothingQuality = 'high';
-        fbCtx.fillStyle = '#ffffff';
-        fbCtx.fillRect(0, 0, fbW, fbH);
-        fbCtx.drawImage(img, 0, 0, fbW, fbH);
-        bestBlob = await new Promise(r => fbCanvas.toBlob(r, 'image/jpeg', 0.40));
       }
 
       setProgress(90, 'Preparing download...');
