@@ -448,10 +448,10 @@
     <p>Advanced Photo KB Resizer, Unlimited Notepad, Docx to PDF, Govt Job Alerts & Utilities.</p>
   </section>
 
-  <!-- Search Bar -->
+<!-- Search Bar -->
 <div class="search-wrapper">
   <div class="search-box-inner">
-    <i class="fa-solid fa-magnifying-glass"></i>
+    <i class="fa-solid fa-magnifying-glass search-icon"></i>
     <input type="text" id="toolSearchInput" class="search-input" placeholder="Search any tool (e.g. Merge PDF, KB Resizer, Govt Jobs)..." onkeyup="filterToolsBySearch()">
     
     <!-- Voice Search Button (Positioned on the right side) -->
@@ -463,7 +463,7 @@
     </div>
   </div>
 </div>
- <style> 
+<style> 
 /* Container alignment */
 .search-box-inner {
   display: flex;
@@ -478,7 +478,7 @@
   padding-right: 45px; 
 }
 
-/* Voice button positioning */
+/* Voice button container positioning */
 .voice-assistant-container {
   display: flex;
   align-items: center;
@@ -506,9 +506,26 @@
   transform: scale(1.1);
 }
 
-/* Hide default status text to maintain a clean layout */
-.voice-tooltip {
+/* Floating Voice Status Tooltip - avoids layout shift by floating above the button */
+#voice-status.voice-tooltip {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  right: 0;
+  background: rgba(17, 24, 39, 0.95);
+  color: #ffffff;
+  font-size: 12px;
+  padding: 5px 10px;
+  border-radius: 6px;
+  white-space: nowrap;
+  pointer-events: none;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+  z-index: 100;
   display: none;
+}
+
+/* Display tooltip only when text/message is active */
+#voice-status.voice-tooltip:not(:empty) {
+  display: block;
 }
 </style>
   <!-- Retention & Quick Access Bar -->
@@ -2509,6 +2526,102 @@
   <script src="js/main.js"></script>
 
   <!-- Master JavaScript Application Logic with Apple Safari & Mobile Touch Adaptations -->
+  <script>
+// --- Page Scroll Lock Helpers ---
+function lockPageScroll() {
+  document.body.style.overflow = 'hidden';
+}
+
+function unlockPageScroll() {
+  document.body.style.overflow = '';
+}
+
+// --- Voice Command Execution Logic ---
+function executeVoiceCommand(transcript) {
+  if (!transcript) return;
+  const query = transcript.toLowerCase().trim();
+
+  // 1. Direct tool click mappings based on spoken input
+  if (query.includes("merge pdf")) {
+    document.querySelector('[data-tool="merge-pdf"]')?.click();
+  } else if (query.includes("compress pdf")) {
+    document.querySelector('[data-tool="compress-pdf"]')?.click();
+  } else if (query.includes("scientific calculator") || query.includes("calculator")) {
+    document.querySelector('[data-tool="calculator"]')?.click();
+  } else if (query.includes("barcode")) {
+    document.querySelector('[onclick*="openBarcodeModal"]')?.click();
+  } else if (query.includes("color picker") || query.includes("hex")) {
+    document.querySelector('[onclick*="openColorPickerModal"]')?.click();
+  } else if (query.includes("ppf calculator") || query.includes("ppf")) {
+    document.querySelector('[onclick*="openPpfModal"]')?.click();
+  } else if (query.includes("salary")) {
+    document.querySelector('[onclick*="openSalaryModal"]')?.click();
+  } else {
+    // 2. Fallback: Type voice input into the search bar and filter automatically
+    const searchInput = document.getElementById("toolSearchInput");
+    if (searchInput) {
+      searchInput.value = transcript;
+      if (typeof filterToolsBySearch === "function") {
+        filterToolsBySearch();
+      }
+    }
+  }
+}
+
+// --- Voice Recognition Setup ---
+function startVoice() {
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  
+  if (!SpeechRecognition) {
+    alert("Speech recognition is not supported in this browser. Please use Chrome or Edge.");
+    return;
+  }
+
+  const recognition = new SpeechRecognition();
+  recognition.lang = 'en-US'; // Or 'bn-IN' / 'en-IN' as per preference
+  recognition.interimResults = false;
+  recognition.maxAlternatives = 1;
+
+  const statusEl = document.getElementById("voice-status");
+
+  // Recognition started
+  recognition.onstart = function() {
+    if (statusEl) {
+      statusEl.innerText = "Listening...";
+    }
+  };
+
+  // Recognition error
+  recognition.onerror = function(event) {
+    if (statusEl) {
+      statusEl.innerText = "Could not hear, try again";
+      setTimeout(() => { statusEl.innerText = ""; }, 3000);
+    }
+  };
+
+  // Recognition finished / stopped
+  recognition.onend = function() {
+    // Automatically clear status tooltip after a short delay
+    setTimeout(() => {
+      if (statusEl) statusEl.innerText = "";
+    }, 2500);
+  };
+
+  // Result received
+  recognition.onresult = function(event) {
+    const transcript = event.results[0][0].transcript;
+    
+    if (statusEl) {
+      statusEl.innerText = `"${transcript}"`;
+    }
+
+    // Trigger tool click or filter automatically
+    executeVoiceCommand(transcript);
+  };
+
+  recognition.start();
+}
+</script>
   <script>
     function lockPageScroll() {
       document.body.style.overflow = 'hidden';
