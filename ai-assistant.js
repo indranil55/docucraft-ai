@@ -163,18 +163,15 @@ async function playIndranilGreeting(userLangCode) {
 function scrollToMatchedTool(query) {
   if (!query) return;
 
-  // Clean voice prompt by removing common command filler words
   const cleanQuery = query.toLowerCase()
     .replace(/^(open|show|find|go to|launch|cholo|dekhao|kholo|please)\s+/i, '')
     .trim();
 
-  // Query all potential tool cards and visible tool items
   const candidates = Array.from(document.querySelectorAll('.tool-card, .popular-card, [data-tool], .tool-item, a[href*=".html"], [class*="card"]'));
   let bestTarget = null;
 
-  // 1. Check visible elements for full match
   for (const el of candidates) {
-    if (el.offsetParent === null) continue; // Skip hidden elements
+    if (el.offsetParent === null) continue;
     const elText = (el.innerText || el.textContent || '').toLowerCase();
     if (cleanQuery.length >= 2 && elText.includes(cleanQuery)) {
       bestTarget = el;
@@ -182,7 +179,6 @@ function scrollToMatchedTool(query) {
     }
   }
 
-  // 2. Token-based match fallback if full phrase isn't matched
   if (!bestTarget) {
     const tokens = cleanQuery.split(/\s+/).filter(w => w.length > 2);
     for (const el of candidates) {
@@ -195,19 +191,16 @@ function scrollToMatchedTool(query) {
     }
   }
 
-  // Smoothly center the element on screen, highlight it, and auto-open it
   if (bestTarget) {
     bestTarget.scrollIntoView({ behavior: 'smooth', block: 'center' });
     bestTarget.style.transition = 'transform 0.3s ease, box-shadow 0.3s ease';
     bestTarget.style.boxShadow = '0 0 18px rgba(0, 150, 255, 0.7)';
     bestTarget.style.transform = 'scale(1.03)';
 
-    // Automatically click and open the tool after smooth scroll completes
     setTimeout(() => {
       bestTarget.click();
     }, 450);
 
-    // Remove focus styles smoothly
     setTimeout(() => {
       bestTarget.style.boxShadow = '';
       bestTarget.style.transform = '';
@@ -226,9 +219,8 @@ function toggleVoiceInput(inputElementId = 'toolSearchInput', callback) {
   const micBtn = document.getElementById('voiceSearchBtn');
   const statusElem = document.getElementById('voice-status');
 
-  // Handle user manual toggle off
   if (isListening && globalRecognition) {
-    shouldRestart = false; // Disable auto-restart
+    shouldRestart = false;
     globalRecognition.stop();
     isListening = false;
     if (micBtn) micBtn.classList.remove('listening');
@@ -242,7 +234,6 @@ function toggleVoiceInput(inputElementId = 'toolSearchInput', callback) {
   globalRecognition.continuous = true;
   globalRecognition.interimResults = true;
 
-  // Set recognition language based on user's device/browser settings
   const userPreferredLang = navigator.language || 'en-US';
   globalRecognition.lang = userPreferredLang;
 
@@ -253,7 +244,6 @@ function toggleVoiceInput(inputElementId = 'toolSearchInput', callback) {
     if (micBtn) micBtn.classList.add('listening');
     if (statusElem) statusElem.innerText = "Listening...";
 
-    // Speak initial greeting once per mic activation
     if (!hasGreeted) {
       hasGreeted = true;
       playIndranilGreeting(userPreferredLang);
@@ -276,7 +266,6 @@ function toggleVoiceInput(inputElementId = 'toolSearchInput', callback) {
         inputField.value = cleanTranscript;
       }
 
-      // Smoothly scroll and auto-open matched tool
       scrollToMatchedTool(cleanTranscript);
 
       if (typeof callback === 'function') {
@@ -296,7 +285,6 @@ function toggleVoiceInput(inputElementId = 'toolSearchInput', callback) {
   };
 
   globalRecognition.onend = function() {
-    // Automatically restart recognition unless explicitly stopped by the user
     if (shouldRestart) {
       try {
         globalRecognition.start();
@@ -325,27 +313,41 @@ function toggleVoiceInput(inputElementId = 'toolSearchInput', callback) {
 function startVoice() {
   toggleVoiceInput('toolSearchInput');
 }
+
 // ==========================================
-// 1. Category Filter Logic
+// 1. Unified Category Filter Logic
 // ==========================================
 function filterCategory(category, buttonElement) {
   // Update active chip state
-  document.querySelectorAll('.filter-chips-container .chip').forEach(btn => btn.classList.remove('active'));
+  document.querySelectorAll('.filter-chips-container .chip, .category-chip, .filter-chip').forEach(btn => {
+    btn.classList.remove('active');
+  });
   if (buttonElement) buttonElement.classList.add('active');
 
-  const cards = document.querySelectorAll('.tool-card, .popular-card, [data-tool]');
-  cards.forEach(card => {
-    const cardText = (card.innerText || card.textContent || '').toLowerCase();
-    const cardCat = (card.getAttribute('data-cat') || '').toLowerCase();
-    const targetCat = category.toLowerCase();
+  const cards = document.querySelectorAll('.tool-card, .popular-card, [data-tool], .grid-item');
+  const target = category.toLowerCase().trim();
 
-    if (targetCat === 'all') {
+  cards.forEach(card => {
+    if (target === 'all') {
       card.style.display = '';
-    } else {
-      // Matches either data-cat attribute or category in text
-      const isMatch = cardCat.includes(targetCat) || cardText.includes(targetCat);
-      card.style.display = isMatch ? '' : 'none';
+      return;
     }
+
+    const cardCat = (card.getAttribute('data-category') || card.getAttribute('data-cat') || '').toLowerCase();
+    const cardText = (card.innerText || card.textContent || '').toLowerCase();
+
+    // Map common keywords to ensure correct tools match even if markup uses aliases
+    let isMatch = false;
+    if (target === 'pdf' && (cardCat.includes('pdf') || cardText.includes('pdf'))) isMatch = true;
+    else if (target === 'photo' && (cardCat.includes('photo') || cardCat.includes('cyber') || cardText.includes('photo') || cardText.includes('image') || cardText.includes('resizer'))) isMatch = true;
+    else if (target === 'finance' && (cardCat.includes('finance') || cardCat.includes('calc') || cardText.includes('calculator') || cardText.includes('loan') || cardText.includes('gst') || cardText.includes('sip') || cardText.includes('emi'))) isMatch = true;
+    else if (target === 'utility' && (cardCat.includes('utility') || cardCat.includes('generator') || cardText.includes('converter') || cardText.includes('typing') || cardText.includes('translator'))) isMatch = true;
+    else if (target === 'jobs' && (cardCat.includes('job') || cardText.includes('job') || cardText.includes('sarkari'))) isMatch = true;
+    else {
+      isMatch = cardCat.includes(target) || cardText.includes(target);
+    }
+
+    card.style.display = isMatch ? '' : 'none';
   });
 }
 
@@ -354,9 +356,9 @@ function filterCategory(category, buttonElement) {
 // ==========================================
 function trackToolUsage(toolName, toolUrl) {
   let recent = JSON.parse(localStorage.getItem('docucraft_recent_tools') || '[]');
-  recent = recent.filter(t => t.name !== toolName); // Remove duplicates
-  recent.unshift({ name: toolName, url: toolUrl }); // Add to front
-  if (recent.length > 4) recent.pop(); // Keep top 4
+  recent = recent.filter(t => t.name !== toolName);
+  recent.unshift({ name: toolName, url: toolUrl });
+  if (recent.length > 4) recent.pop();
   localStorage.setItem('docucraft_recent_tools', JSON.stringify(recent));
   renderRecentTools();
 }
@@ -400,32 +402,13 @@ function clearRecentTools() {
 document.addEventListener('DOMContentLoaded', () => {
   renderRecentTools();
 
-  document.querySelectorAll('a[href*=".html"], .tool-card').forEach(link => {
+  document.querySelectorAll('a[href*=".html"], .tool-card, .popular-card').forEach(link => {
     link.addEventListener('click', function() {
       const toolName = this.querySelector('h3, h4, .tool-title')?.innerText || this.innerText.split('\n')[0];
-      const toolUrl = this.getAttribute('href') || window.location.href;
-      if (toolName && toolUrl && toolUrl !== '#') {
+      const toolUrl = this.getAttribute('href') || (this.querySelector('a') ? this.querySelector('a').getAttribute('href') : null);
+      if (toolName && toolUrl && toolUrl !== '#' && !toolUrl.startsWith('javascript:')) {
         trackToolUsage(toolName.trim(), toolUrl);
       }
     });
   });
 });
-// Category Filter Logic
-function filterCategory(category, element) {
-    // Update active state on buttons
-    document.querySelectorAll('.filter-chips-container .chip').forEach(btn => {
-        btn.classList.remove('active');
-    });
-    if (element) element.classList.add('active');
-
-    // Filter tool cards
-    const cards = document.querySelectorAll('.tool-card, .popular-card');
-    cards.forEach(card => {
-        const cardCategory = card.getAttribute('data-category') || '';
-        if (category === 'all' || cardCategory.toLowerCase().includes(category.toLowerCase())) {
-            card.style.display = '';
-        } else {
-            card.style.display = 'none';
-        }
-    });
-}
