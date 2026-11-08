@@ -3998,7 +3998,126 @@ function startVoice() {
 }
     const recognition = new SpeechRecognition();
     recognition.lang = 'en-US';
+// ==========================================
+// 1. Voice Command Execution Logic
+// ==========================================
+function executeVoiceCommand(transcript) {
+    if (!transcript) return;
+    const query = transcript.toLowerCase().trim();
 
+    // Helper function to click and scroll smoothly into view
+    function triggerTool(selector) {
+        const el = document.querySelector(selector);
+        if (el) {
+            el.click();
+            el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            return true;
+        }
+        return false;
+    }
+
+    // Direct Tool Matchings
+    if (query.includes("merge pdf")) {
+        triggerTool('[data-tool="merge-pdf"]') || triggerTool('#merge-pdf');
+    } else if (query.includes("compress pdf")) {
+        triggerTool('[data-tool="compress-pdf"]') || triggerTool('#compress-pdf');
+    } else if (query.includes("split pdf")) {
+        triggerTool('[data-tool="split-pdf"]') || triggerTool('#split-pdf');
+    } else if (query.includes("pdf to word") || query.includes("pdf word")) {
+        triggerTool('[data-tool="pdf-to-word"]');
+    } else if (query.includes("word to pdf")) {
+        triggerTool('[data-tool="word-to-pdf"]');
+    } else if (query.includes("image to pdf") || query.includes("jpg to pdf")) {
+        triggerTool('[data-tool="image-to-pdf"]');
+    } else if (query.includes("calculator") || query.includes("scientific")) {
+        triggerTool('[data-tool="calculator"]') || triggerTool('#calculator');
+    } else if (query.includes("barcode")) {
+        triggerTool('[onclick*="openBarcodeModal"]');
+    } else if (query.includes("qr code") || query.includes("qr")) {
+        triggerTool('[onclick*="openQrModal"]');
+    } else if (query.includes("color picker") || query.includes("hex")) {
+        triggerTool('[onclick*="openColorPickerModal"]');
+    } else if (query.includes("ppf")) {
+        triggerTool('[onclick*="openPpfModal"]');
+    } else if (query.includes("salary")) {
+        triggerTool('[onclick*="openSalaryModal"]');
+    } else if (query.includes("typing") || query.includes("speed test")) {
+        triggerTool('[data-tool="typing-test"]') || triggerTool('#typing-test');
+    } else {
+        // Fallback: If no direct match, search automatically in the search bar
+        const searchInput = document.getElementById("toolSearchInput");
+        if (searchInput) {
+            searchInput.value = transcript;
+            if (typeof filterToolsBySearch === "function") {
+                filterToolsBySearch();
+            }
+            // Auto click the first visible card result
+            setTimeout(() => {
+                const firstResult = document.querySelector(".tool-card:not([style*='display: none'])");
+                if (firstResult) {
+                    firstResult.click();
+                    firstResult.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+            }, 300);
+        }
+    }
+}
+
+// ==========================================
+// 2. Continuous Voice Recognition Setup
+// ==========================================
+function startVoice() {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    const statusEl = document.getElementById("voice-status");
+
+    if (!SpeechRecognition) {
+        alert("Speech recognition is not supported in this browser. Please use Chrome or Edge.");
+        return;
+    }
+
+    const recognition = new SpeechRecognition();
+    recognition.continuous = true;
+    recognition.interimResults = false;
+    recognition.lang = 'en-US';
+    recognition.maxAlternatives = 1;
+
+    // When mic turns on
+    recognition.onstart = function() {
+        if (statusEl) {
+            statusEl.innerText = "Listening...";
+        }
+    };
+
+    // When voice command is captured
+    recognition.onresult = function(event) {
+        const lastIndex = event.results.length - 1;
+        const cmd = event.results[lastIndex][0].transcript.toLowerCase().trim();
+        
+        if (statusEl) {
+            statusEl.innerText = "Command: " + cmd;
+        }
+        
+        executeVoiceCommand(cmd);
+    };
+
+    // Error handling
+    recognition.onerror = function(event) {
+        if (statusEl) {
+            statusEl.innerText = "Error: " + event.error;
+        }
+    };
+
+    // Auto restart if disconnected to keep it running
+    recognition.onend = function() {
+        try {
+            recognition.start();
+        } catch (e) {
+            // Already started or restarting
+        }
+    };
+
+    recognition.start();
+}
     if (status) status.innerText = "Listening... Bolun...";
 
     recognition.onresult = function(event) {
