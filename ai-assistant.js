@@ -159,7 +159,7 @@ async function playIndranilGreeting(userLangCode) {
   }
 }
 
-// Scrolls the best-matching tool card to the center of the viewport
+// Scrolls the best-matching tool card to center, highlights, and auto-opens
 function scrollToMatchedTool(query) {
   if (!query) return;
 
@@ -172,8 +172,9 @@ function scrollToMatchedTool(query) {
   const candidates = Array.from(document.querySelectorAll('.tool-card, .popular-card, [data-tool], .tool-item, a[href*=".html"], [class*="card"]'));
   let bestTarget = null;
 
-  // 1. Direct full match
+  // 1. Check visible elements for full match
   for (const el of candidates) {
+    if (el.offsetParent === null) continue; // Skip hidden elements
     const elText = (el.innerText || el.textContent || '').toLowerCase();
     if (cleanQuery.length >= 2 && elText.includes(cleanQuery)) {
       bestTarget = el;
@@ -181,10 +182,11 @@ function scrollToMatchedTool(query) {
     }
   }
 
-  // 2. Token-based match fallback
+  // 2. Token-based match fallback if full phrase isn't matched
   if (!bestTarget) {
     const tokens = cleanQuery.split(/\s+/).filter(w => w.length > 2);
     for (const el of candidates) {
+      if (el.offsetParent === null) continue;
       const elText = (el.innerText || el.textContent || '').toLowerCase();
       if (tokens.some(t => elText.includes(t))) {
         bestTarget = el;
@@ -193,24 +195,23 @@ function scrollToMatchedTool(query) {
     }
   }
 
-  // Smoothly center the element on screen and keep it highlighted
+  // Smoothly center the element on screen, highlight it, and auto-open it
   if (bestTarget) {
-    // If hidden by search filter, unhide it immediately
-    if (bestTarget.style.display === 'none') {
-      bestTarget.style.display = '';
-    }
-
     bestTarget.scrollIntoView({ behavior: 'smooth', block: 'center' });
     bestTarget.style.transition = 'transform 0.3s ease, box-shadow 0.3s ease';
-    bestTarget.style.boxShadow = '0 0 20px rgba(0, 150, 255, 0.85)';
+    bestTarget.style.boxShadow = '0 0 18px rgba(0, 150, 255, 0.7)';
     bestTarget.style.transform = 'scale(1.03)';
-    bestTarget.style.borderRadius = '12px';
 
-    // Keep highlight visible long enough without auto-disappearing abruptly
+    // Automatically click and open the tool after smooth scroll completes
+    setTimeout(() => {
+      bestTarget.click();
+    }, 450);
+
+    // Remove focus styles smoothly
     setTimeout(() => {
       bestTarget.style.boxShadow = '';
       bestTarget.style.transform = '';
-    }, 4000);
+    }, 1800);
   }
 }
 
@@ -275,7 +276,7 @@ function toggleVoiceInput(inputElementId = 'toolSearchInput', callback) {
         inputField.value = cleanTranscript;
       }
 
-      // Smoothly scroll the matching tool card directly to the center of the screen
+      // Smoothly scroll and auto-open matched tool
       scrollToMatchedTool(cleanTranscript);
 
       if (typeof callback === 'function') {
@@ -286,7 +287,6 @@ function toggleVoiceInput(inputElementId = 'toolSearchInput', callback) {
 
   globalRecognition.onerror = function(event) {
     console.warn("Speech Recognition notice/error:", event.error);
-    // Halt auto-restart only on permission denials
     if (event.error === 'not-allowed' || event.error === 'service-not-allowed') {
       shouldRestart = false;
       isListening = false;
