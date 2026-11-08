@@ -3780,6 +3780,77 @@
     function showTermsModal() { showModal('infoModal'); document.getElementById('infoModalTitle').textContent = 'Terms & Conditions'; document.getElementById('infoModalContent').textContent = 'Provided as is for informational purposes.'; }
     function showDisclaimerModal() { showModal('infoModal'); document.getElementById('infoModalTitle').textContent = 'Disclaimer'; document.getElementById('infoModalContent').textContent = 'Calculators provide estimates for general guidance only.'; }
   </script>
+<!-- Voice Assistant Button -->
+<div style="display: inline-flex; align-items: center; gap: 8px; margin: 10px 0;">
+  <button type="button" onclick="startVoice()" style="background: #2563eb; color: white; border: none; padding: 8px 16px; border-radius: 20px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 6px;">
+    🎙️ <span>Voice Command</span>
+  </button>
+  <span id="voice-status" style="font-size: 13px; color: #4b5563;">Click to speak...</span>
+</div>
+<script>
+  function startVoice() {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    const status = document.getElementById("voice-status");
 
+    if (!SpeechRecognition) {
+      alert("Browser-e Web Speech API support kore na. Google Chrome use korun.");
+      return;
+    }
+
+    const recognition = new SpeechRecognition();
+    recognition.lang = 'en-US';
+
+    if (status) status.innerText = "Listening... Bolun...";
+
+    recognition.onresult = function(event) {
+      const cmd = event.results[0][0].transcript.toLowerCase();
+      if (status) status.innerText = 'Bolechen: "' + cmd + '"';
+      executeVoiceCommand(cmd);
+    };
+
+    recognition.onerror = function(event) {
+      if (status) status.innerText = "Error: " + event.error;
+    };
+
+    recognition.start();
+  }
+
+  function executeVoiceCommand(cmd) {
+    // PDF Tools
+    if (cmd.includes("merge") || (cmd.includes("pdf") && cmd.includes("combine"))) {
+      if (typeof launchTool === 'function') launchTool('merge');
+    } else if (cmd.includes("compress") || (cmd.includes("pdf") && cmd.includes("reduce"))) {
+      if (typeof launchTool === 'function') launchTool('compress');
+    } else if (cmd.includes("split")) {
+      if (typeof launchTool === 'function') launchTool('split');
+    } else if (cmd.includes("pdf to word") || cmd.includes("word")) {
+      if (typeof launchTool === 'function') launchTool('pdfToWord');
+    } else if (cmd.includes("pdf to jpg") || cmd.includes("pdf to image")) {
+      if (typeof launchTool === 'function') launchTool('pdfToJpg');
+
+    // Image & Photo Tools
+    } else if (cmd.includes("resize") || cmd.includes("kb") || cmd.includes("photo")) {
+      if (typeof launchTool === 'function') launchTool('kbResizer');
+    } else if (cmd.includes("signature") || cmd.includes("sign")) {
+      if (typeof launchTool === 'function') launchTool('signPad');
+    } else if (cmd.includes("passport")) {
+      if (typeof launchTool === 'function') launchTool('passportPhoto');
+    } else if (cmd.includes("qr")) {
+      if (typeof launchTool === 'function') launchTool('qrGen');
+
+    // Modals & Popups
+    } else if (cmd.includes("notepad") || cmd.includes("note")) {
+      if (typeof openNotepadModal === 'function') openNotepadModal();
+    } else if (cmd.includes("calculator") || cmd.includes("calc")) {
+      if (typeof openScientificCalc === 'function') openScientificCalc();
+    } else if (cmd.includes("job") || cmd.includes("alert")) {
+      if (typeof openGovtJobModal === 'function') openGovtJobModal();
+    } else if (cmd.includes("translator") || cmd.includes("translate")) {
+      if (typeof openTranslator === 'function') openTranslator();
+    } else {
+      alert("Command bujhte parini: " + cmd);
+    }
+  }
+</script>
 </body>
 </html>
