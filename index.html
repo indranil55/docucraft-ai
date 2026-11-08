@@ -3850,5 +3850,109 @@
     }
   }
 </script>
+<script>
+// Text to Speech Function
+function speakResponse(text) {
+  if ('speechSynthesis' in window) {
+    window.speechSynthesis.cancel();
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = 'en-US';
+    utterance.rate = 1.0;
+    utterance.pitch = 1.0;
+    window.speechSynthesis.speak(utterance);
+  }
+}
+
+// Voice Recognition Setup
+function startVoice() {
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  const statusEl = document.getElementById("voice-status");
+
+  if (!SpeechRecognition) {
+    alert("Speech Recognition is not supported in this browser. Please use Google Chrome.");
+    return;
+  }
+
+  const recognition = new SpeechRecognition();
+  recognition.lang = 'en-US';
+  recognition.interimResults = false;
+
+  if (statusEl) statusEl.innerText = "Listening...";
+
+  recognition.onresult = function(event) {
+    const cmd = event.results[0][0].transcript.toLowerCase();
+    if (statusEl) statusEl.innerText = 'Heard: "' + cmd + '"';
+    executeVoiceCommand(cmd);
+  };
+
+  recognition.onerror = function() {
+    if (statusEl) statusEl.innerText = "Error or no speech detected.";
+  };
+
+  recognition.onend = function() {
+    setTimeout(() => {
+      if (statusEl) statusEl.innerText = "Click to speak...";
+    }, 3000);
+  };
+
+  recognition.start();
+}
+
+// Command Execution & Voice Response
+function executeVoiceCommand(cmd) {
+  cmd = cmd.toLowerCase().trim();
+
+  // PDF Tools
+  if (cmd.includes("merge")) {
+    speakResponse("Opening Merge PDF");
+    if (typeof launchTool === "function") launchTool("mergePdf");
+  } 
+  else if (cmd.includes("pdf to word") || cmd.includes("word")) {
+    speakResponse("Opening PDF to Word");
+    if (typeof launchTool === "function") launchTool("pdfToWord");
+  }
+  else if (cmd.includes("pdf to jpg") || cmd.includes("jpg")) {
+    speakResponse("Opening PDF to JPG");
+    if (typeof launchTool === "function") launchTool("pdfToJpg");
+  }
+  // Image & Photo Tools
+  else if (cmd.includes("resize") || cmd.includes("kb") || cmd.includes("photo")) {
+    speakResponse("Opening Image Resizer");
+    if (typeof launchTool === "function") launchTool("kbResizer");
+  } 
+  else if (cmd.includes("signature") || cmd.includes("sign")) {
+    speakResponse("Opening Signature Pad");
+    if (typeof launchTool === "function") launchTool("signPad");
+  }
+  else if (cmd.includes("passport")) {
+    speakResponse("Opening Passport Photo Tool");
+    if (typeof launchTool === "function") launchTool("passportPhoto");
+  }
+  else if (cmd.includes("qr")) {
+    speakResponse("Opening QR Code Generator");
+    if (typeof launchTool === "function") launchTool("qrGen");
+  }
+  // Modals & Popups
+  else if (cmd.includes("notepad") || cmd.includes("note")) {
+    speakResponse("Opening Notepad");
+    if (typeof openNotepadModal === "function") openNotepadModal();
+  }
+  else if (cmd.includes("calculator") || cmd.includes("calc")) {
+    speakResponse("Opening Calculator");
+    if (typeof openScientificCalc === "function") openScientificCalc();
+  }
+  else if (cmd.includes("job") || cmd.includes("alert")) {
+    speakResponse("Opening Job Alerts");
+    if (typeof openGovtJobModal === "function") openGovtJobModal();
+  }
+  else if (cmd.includes("translate") || cmd.includes("translator")) {
+    speakResponse("Opening Translator");
+    if (typeof openTranslator === "function") openTranslator();
+  }
+  else {
+    speakResponse("Command not recognized: " + cmd);
+  }
+}
+</script>
 </body>
 </html>
