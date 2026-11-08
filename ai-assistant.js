@@ -325,3 +325,88 @@ function toggleVoiceInput(inputElementId = 'toolSearchInput', callback) {
 function startVoice() {
   toggleVoiceInput('toolSearchInput');
 }
+// ==========================================
+// 1. Category Filter Logic
+// ==========================================
+function filterCategory(category, buttonElement) {
+  // Update active chip state
+  document.querySelectorAll('.filter-chips-container .chip').forEach(btn => btn.classList.remove('active'));
+  if (buttonElement) buttonElement.classList.add('active');
+
+  const cards = document.querySelectorAll('.tool-card, .popular-card, [data-tool]');
+  cards.forEach(card => {
+    const cardText = (card.innerText || card.textContent || '').toLowerCase();
+    const cardCat = (card.getAttribute('data-cat') || '').toLowerCase();
+    const targetCat = category.toLowerCase();
+
+    if (targetCat === 'all') {
+      card.style.display = '';
+    } else {
+      // Matches either data-cat attribute or category in text
+      const isMatch = cardCat.includes(targetCat) || cardText.includes(targetCat);
+      card.style.display = isMatch ? '' : 'none';
+    }
+  });
+}
+
+// ==========================================
+// 2. Recently Used Tools (LocalStorage)
+// ==========================================
+function trackToolUsage(toolName, toolUrl) {
+  let recent = JSON.parse(localStorage.getItem('docucraft_recent_tools') || '[]');
+  recent = recent.filter(t => t.name !== toolName); // Remove duplicates
+  recent.unshift({ name: toolName, url: toolUrl }); // Add to front
+  if (recent.length > 4) recent.pop(); // Keep top 4
+  localStorage.setItem('docucraft_recent_tools', JSON.stringify(recent));
+  renderRecentTools();
+}
+
+function renderRecentTools() {
+  const container = document.getElementById('recentToolsSection');
+  const grid = document.getElementById('recentToolsGrid');
+  if (!container || !grid) return;
+
+  const recent = JSON.parse(localStorage.getItem('docucraft_recent_tools') || '[]');
+  if (recent.length === 0) {
+    container.style.display = 'none';
+    return;
+  }
+
+  container.style.display = 'block';
+  grid.innerHTML = recent.map(tool => `
+    <a href="${tool.url}" class="recent-chip" style="
+      display: flex; 
+      align-items: center; 
+      gap: 8px; 
+      padding: 10px 14px; 
+      background: rgba(255,255,255,0.06); 
+      border: 1px solid rgba(255,255,255,0.1); 
+      border-radius: 12px; 
+      text-decoration: none; 
+      color: #fff; 
+      font-size: 13px;
+      transition: all 0.2s ease;">
+      ⚡ <span>${tool.name}</span>
+    </a>
+  `).join('');
+}
+
+function clearRecentTools() {
+  localStorage.removeItem('docucraft_recent_tools');
+  renderRecentTools();
+}
+
+// Listen to all tool clicks automatically to update Recent list
+document.addEventListener('DOMContentLoaded', () => {
+  renderRecentTools();
+
+  document.querySelectorAll('a[href*=".html"], .tool-card').forEach(link => {
+    link.addEventListener('click', function() {
+      const toolName = this.querySelector('h3, h4, .tool-title')?.innerText || this.innerText.split('\n')[0];
+      const toolUrl = this.getAttribute('href') || window.location.href;
+      if (toolName && toolUrl && toolUrl !== '#') {
+        trackToolUsage(toolName.trim(), toolUrl);
+      }
+    });
+  });
+});
