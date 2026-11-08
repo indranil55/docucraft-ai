@@ -352,33 +352,33 @@ function filterCategory(category, buttonElement) {
 }
 
 // ==========================================
-// 2. Safe URL Helper (Fix for Incomplete URL scheme check)
+// 2. Strict Safe URL Resolver (Fix for Incomplete URL scheme check & DOM XSS)
 // ==========================================
-function isSafeUrl(url) {
-  if (!url) return false;
-  const trimmed = url.trim();
-  // Safe relative paths
-  if (trimmed.startsWith('/') || trimmed.startsWith('./') || trimmed.endsWith('.html')) {
-    return true;
-  }
-  // Safe absolute URLs
+function getCleanSafeHref(rawUrl) {
+  if (!rawUrl || typeof rawUrl !== 'string') return null;
+  const trimmed = rawUrl.trim();
   try {
     const parsed = new URL(trimmed, window.location.origin);
-    return parsed.protocol === 'http:' || parsed.protocol === 'https:';
+    if (parsed.protocol === 'http:' || parsed.protocol === 'https:') {
+      // Must be same origin or standard safe web URL
+      return parsed.href;
+    }
   } catch (e) {
-    return false;
+    return null;
   }
+  return null;
 }
 
 // ==========================================
 // 3. Recently Used Tools (LocalStorage & Safe DOM Insertion)
 // ==========================================
 function trackToolUsage(toolName, toolUrl) {
-  if (!isSafeUrl(toolUrl)) return;
+  const safeUrl = getCleanSafeHref(toolUrl);
+  if (!safeUrl) return;
 
   let recent = JSON.parse(localStorage.getItem('docucraft_recent_tools') || '[]');
   recent = recent.filter(t => t.name !== toolName);
-  recent.unshift({ name: toolName, url: toolUrl });
+  recent.unshift({ name: String(toolName).slice(0, 80), url: safeUrl });
   if (recent.length > 4) recent.pop();
   localStorage.setItem('docucraft_recent_tools', JSON.stringify(recent));
   renderRecentTools();
@@ -389,20 +389,27 @@ function renderRecentTools() {
   const grid = document.getElementById('recentToolsGrid');
   if (!container || !grid) return;
 
-  const recent = JSON.parse(localStorage.getItem('docucraft_recent_tools') || '[]');
-  if (recent.length === 0) {
+  let recent = [];
+  try {
+    recent = JSON.parse(localStorage.getItem('docucraft_recent_tools') || '[]');
+  } catch (e) {
+    recent = [];
+  }
+
+  if (!Array.isArray(recent) || recent.length === 0) {
     container.style.display = 'none';
     return;
   }
 
   container.style.display = 'block';
-  grid.replaceChildren(); // Safely clear child nodes without innerHTML
+  grid.replaceChildren();
 
   recent.forEach(tool => {
-    if (!isSafeUrl(tool.url)) return;
+    const safeHref = getCleanSafeHref(tool.url);
+    if (!safeHref) return;
 
     const link = document.createElement('a');
-    link.href = tool.url;
+    link.setAttribute('href', safeHref);
     link.className = 'recent-chip';
     link.style.display = 'flex';
     link.style.alignItems = 'center';
@@ -420,7 +427,7 @@ function renderRecentTools() {
     iconSpan.textContent = '⚡ ';
 
     const titleSpan = document.createElement('span');
-    titleSpan.textContent = tool.name;
+    titleSpan.textContent = tool.name || 'Tool';
 
     link.appendChild(iconSpan);
     link.appendChild(titleSpan);
@@ -441,8 +448,9 @@ document.addEventListener('DOMContentLoaded', () => {
     link.addEventListener('click', function() {
       const toolName = this.querySelector('h3, h4, .tool-title')?.innerText || this.innerText.split('\n')[0];
       const rawUrl = this.getAttribute('href') || (this.querySelector('a') ? this.querySelector('a').getAttribute('href') : null);
-      if (toolName && rawUrl && isSafeUrl(rawUrl)) {
-        trackToolUsage(toolName.trim(), rawUrl);
+      const safeUrl = getCleanSafeHref(rawUrl);
+      if (toolName && safeUrl) {
+        trackToolUsage(toolName.trim(), safeUrl);
       }
     });
   });
