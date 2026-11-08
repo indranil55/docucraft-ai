@@ -462,6 +462,24 @@
       <span id="voice-status" class="voice-tooltip"></span>
     </div>
   </div>
+  <!-- Category Filter Chips -->
+<div class="filter-chips-container">
+  <button class="chip active" onclick="filterCategory('all', this)">All Tools</button>
+  <button class="chip" onclick="filterCategory('PDF', this)">📄 PDF Tools</button>
+  <button class="chip" onclick="filterCategory('Cyber', this)">🖼️ Photo & Cyber</button>
+  <button class="chip" onclick="filterCategory('Finance', this)">💰 Finance</button>
+  <button class="chip" onclick="filterCategory('Utility', this)">⚡ Utilities</button>
+  <button class="chip" onclick="filterCategory('Jobs', this)">📢 Govt Jobs</button>
+</div>
+
+<!-- Recently Used Tools Section -->
+<section id="recentToolsSection" class="recent-tools-section" style="display: none;">
+  <div class="section-header">
+    <h3>🕒 Recently Used</h3>
+    <button class="clear-recent-btn" onclick="clearRecentTools()">Clear</button>
+  </div>
+  <div id="recentToolsGrid" class="recent-tools-grid"></div>
+</section>
 </div>
 <style> 
 /* Container alignment */
