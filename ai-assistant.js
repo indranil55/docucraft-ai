@@ -139,10 +139,9 @@ function speakResponseInNativeLanguage(text, langCode) {
   const utterance = new SpeechSynthesisUtterance(text);
   utterance.rate = 0.95;
   utterance.pitch = 1.0;
-  utterance.lang = langCode;
+  utterance.lang = langCode || 'en-US';
 
   if (availableVoices.length > 0) {
-    // Select the best matching voice for the target language code (e.g., bn, hi, en, es, ar, fr)
     const matchedVoice = availableVoices.find(v => 
       v.lang.toLowerCase() === langCode.toLowerCase() ||
       v.lang.toLowerCase().startsWith(langCode.toLowerCase().split('-')[0])
@@ -159,7 +158,7 @@ function speakResponseInNativeLanguage(text, langCode) {
 function generateCoreResponse(englishQuery) {
   const q = englishQuery.toLowerCase().trim();
 
-  if (/^(hi|hello|hey|greetings|namaste)/i.test(q)) {
+  if (/^(hi|hello|hey|greetings|namaste|nomoshkar)/i.test(q)) {
     return "Hello! I am DocuCraft AI Smart Assistant. We have over 50 free web tools including PDF editors, image resizers, and financial calculators. Which tool do you need help with?";
   }
 
@@ -179,10 +178,10 @@ function generateCoreResponse(englishQuery) {
   if (q.includes('pdf')) {
     return "DocuCraft AI offers Merge PDF, Compress PDF, Split, Repair corrupted PDF, Word to PDF, Excel to PDF, OCR Extractor, Sign, and Protect PDF.";
   }
-  if (q.includes('photo') || q.includes('image') || q.includes('sign') || q.includes('kb')) {
+  if (q.includes('photo') || q.includes('image') || q.includes('sign') || q.includes('kb') || q.includes('chobi')) {
     return "For images, we have Photo & Sign KB Resizer, Exam Resizer (SSC/UPSC), Passport Photo Sheet Maker, and Digital Signature Pad.";
   }
-  if (q.includes('calculator') || q.includes('loan') || q.includes('money') || q.includes('tax')) {
+  if (q.includes('calculator') || q.includes('loan') || q.includes('money') || q.includes('tax') || q.includes('hisab')) {
     return "For finance, you can use our Scientific Calculator, Loan EMI, Prepayment Saver, GST, SIP, PPF, and Salary Calculators.";
   }
 
@@ -215,49 +214,82 @@ async function processSmartAssistantMessage(userMessage) {
 }
 
 // Global voice input (Microphone / Speech Recognition)
-function toggleVoiceInput(inputElementId, callback) {
+function toggleVoiceInput(inputElementId = 'toolSearchInput', callback) {
   const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
   if (!SpeechRecognition) {
     alert("Speech Recognition is not supported in this browser. Please use Google Chrome.");
     return;
   }
 
+  const micBtn = document.getElementById('voiceSearchBtn');
+  const statusElem = document.getElementById('voice-status');
+
   if (isListening && globalRecognition) {
     globalRecognition.stop();
     isListening = false;
+    if (micBtn) micBtn.classList.remove('listening');
+    if (statusElem) statusElem.innerText = "";
     return;
   }
 
   globalRecognition = new SpeechRecognition();
   globalRecognition.continuous = false;
   globalRecognition.interimResults = false;
-  // Automatically set speech recognition language to device locale
-  globalRecognition.lang = navigator.language || 'en-US';
+
+  // Set preferred language (e.g. bn-IN for Bengali support, or user browser locale)
+  const userPreferredLang = navigator.language || 'bn-IN';
+  globalRecognition.lang = userPreferredLang.startsWith('bn') ? 'bn-IN' : userPreferredLang;
 
   globalRecognition.onstart = function() {
     isListening = true;
-    console.log("Listening in native tongue...");
+    if (micBtn) micBtn.classList.add('listening');
+    if (statusElem) statusElem.innerText = "Listening...";
   };
 
-  globalRecognition.onresult = function(event) {
+  globalRecognition.onresult = async function(event) {
     const spokenTranscript = event.results[0][0].transcript;
+
     const inputField = document.getElementById(inputElementId);
     if (inputField) {
       inputField.value = spokenTranscript;
+      // Trigger live search filters
+      inputField.dispatchEvent(new Event('input', { bubbles: true }));
+      inputField.dispatchEvent(new Event('keyup', { bubbles: true }));
     }
+
+    if (statusElem) statusElem.innerText = "Processing...";
+
+    // Generate assistant response and speak back
+    const reply = await processSmartAssistantMessage(spokenTranscript);
+
+    if (statusElem) statusElem.innerText = "";
+
     if (typeof callback === 'function') {
-      callback(spokenTranscript);
+      callback(spokenTranscript, reply);
     }
   };
 
   globalRecognition.onerror = function(event) {
-    console.error("Speech Recognition Error:", event.error);
+    console.warn("Speech Recognition notice/error:", event.error);
     isListening = false;
+    if (micBtn) micBtn.classList.remove('listening');
+    if (statusElem) statusElem.innerText = "";
   };
 
   globalRecognition.onend = function() {
     isListening = false;
+    if (micBtn) micBtn.classList.remove('listening');
+    if (statusElem) statusElem.innerText = "";
   };
 
-  globalRecognition.start();
+  try {
+    globalRecognition.start();
+  } catch (err) {
+    console.error("Start error:", err);
+  }
+}
+
+// Global hook for index.html onclick="startVoice()"
+function startVoice() {
+  toggleVoiceInput('toolSearchInput');
 }
