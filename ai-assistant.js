@@ -163,19 +163,17 @@ async function playIndranilGreeting(userLangCode) {
 function scrollToMatchedTool(query) {
   if (!query) return;
 
-  // Clean voice prompt by removing command filler words
+  // Clean voice prompt by removing common command filler words
   const cleanQuery = query.toLowerCase()
-    .replace(/^(open|show|find|go to|launch|cholo|dekhao|kholo)\s+/i, '')
+    .replace(/^(open|show|find|go to|launch|cholo|dekhao|kholo|please)\s+/i, '')
     .trim();
 
   // Query all potential tool cards and visible tool items
-  const candidates = Array.from(document.querySelectorAll('.tool-card, .popular-card, [data-tool], .tool-item, a[href*=".html"]'));
+  const candidates = Array.from(document.querySelectorAll('.tool-card, .popular-card, [data-tool], .tool-item, a[href*=".html"], [class*="card"]'));
   let bestTarget = null;
 
+  // 1. Direct full match
   for (const el of candidates) {
-    // Only check visible elements
-    if (el.offsetParent === null) continue;
-
     const elText = (el.innerText || el.textContent || '').toLowerCase();
     if (cleanQuery.length >= 2 && elText.includes(cleanQuery)) {
       bestTarget = el;
@@ -183,11 +181,10 @@ function scrollToMatchedTool(query) {
     }
   }
 
-  // Fallback: search individual word tokens if full phrase match isn't found
+  // 2. Token-based match fallback
   if (!bestTarget) {
     const tokens = cleanQuery.split(/\s+/).filter(w => w.length > 2);
     for (const el of candidates) {
-      if (el.offsetParent === null) continue;
       const elText = (el.innerText || el.textContent || '').toLowerCase();
       if (tokens.some(t => elText.includes(t))) {
         bestTarget = el;
@@ -196,17 +193,24 @@ function scrollToMatchedTool(query) {
     }
   }
 
-  // Smoothly center the element on screen and highlight it briefly
+  // Smoothly center the element on screen and keep it highlighted
   if (bestTarget) {
+    // If hidden by search filter, unhide it immediately
+    if (bestTarget.style.display === 'none') {
+      bestTarget.style.display = '';
+    }
+
     bestTarget.scrollIntoView({ behavior: 'smooth', block: 'center' });
     bestTarget.style.transition = 'transform 0.3s ease, box-shadow 0.3s ease';
-    bestTarget.style.boxShadow = '0 0 18px rgba(0, 150, 255, 0.7)';
+    bestTarget.style.boxShadow = '0 0 20px rgba(0, 150, 255, 0.85)';
     bestTarget.style.transform = 'scale(1.03)';
+    bestTarget.style.borderRadius = '12px';
 
+    // Keep highlight visible long enough without auto-disappearing abruptly
     setTimeout(() => {
       bestTarget.style.boxShadow = '';
       bestTarget.style.transform = '';
-    }, 1800);
+    }, 4000);
   }
 }
 
@@ -269,15 +273,10 @@ function toggleVoiceInput(inputElementId = 'toolSearchInput', callback) {
 
       if (inputField) {
         inputField.value = cleanTranscript;
-        // Trigger live search filters
-        inputField.dispatchEvent(new Event('input', { bubbles: true }));
-        inputField.dispatchEvent(new Event('keyup', { bubbles: true }));
       }
 
       // Smoothly scroll the matching tool card directly to the center of the screen
-      setTimeout(() => {
-        scrollToMatchedTool(cleanTranscript);
-      }, 150);
+      scrollToMatchedTool(cleanTranscript);
 
       if (typeof callback === 'function') {
         callback(cleanTranscript);
