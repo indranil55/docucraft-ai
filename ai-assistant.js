@@ -6,6 +6,7 @@ let availableVoices = [];
 let isVoiceOutputEnabled = true;
 let globalRecognition = null;
 let isListening = false;
+let shouldRestart = false; // Flag to maintain continuous listening state
 
 // Knowledge base of all tools available on the site
 const siteKnowledgeBase = [
@@ -169,7 +170,9 @@ function toggleVoiceInput(inputElementId = 'toolSearchInput', callback) {
   const micBtn = document.getElementById('voiceSearchBtn');
   const statusElem = document.getElementById('voice-status');
 
+  // Handle user manual toggle off
   if (isListening && globalRecognition) {
+    shouldRestart = false; // Disable auto-restart
     globalRecognition.stop();
     isListening = false;
     if (micBtn) micBtn.classList.remove('listening');
@@ -178,9 +181,10 @@ function toggleVoiceInput(inputElementId = 'toolSearchInput', callback) {
     return;
   }
 
+  shouldRestart = true;
   globalRecognition = new SpeechRecognition();
-  globalRecognition.continuous = false;
-  globalRecognition.interimResults = false;
+  globalRecognition.continuous = true; // Keep listening continuously
+  globalRecognition.interimResults = true; // Capture intermediate speech results
 
   // Set recognition language based on user's device/browser settings
   const userPreferredLang = navigator.language || 'en-US';
@@ -201,34 +205,56 @@ function toggleVoiceInput(inputElementId = 'toolSearchInput', callback) {
   };
 
   globalRecognition.onresult = function(event) {
-    const spokenTranscript = event.results[0][0].transcript;
-
-    const inputField = document.getElementById(inputElementId);
-    if (inputField) {
-      inputField.value = spokenTranscript;
-      // Trigger live search filters
-      inputField.dispatchEvent(new Event('input', { bubbles: true }));
-      inputField.dispatchEvent(new Event('keyup', { bubbles: true }));
+    let finalTranscript = '';
+    for (let i = event.resultIndex; i < event.results.length; ++i) {
+      if (event.results[i].isFinal) {
+        finalTranscript += event.results[i][0].transcript;
+      }
     }
 
-    if (statusElem) statusElem.innerText = "";
+    if (finalTranscript) {
+      const inputField = document.getElementById(inputElementId);
+      if (inputField) {
+        inputField.value = finalTranscript.trim();
+        // Trigger live search filters
+        inputField.dispatchEvent(new Event('input', { bubbles: true }));
+        inputField.dispatchEvent(new Event('keyup', { bubbles: true }));
+      }
 
-    if (typeof callback === 'function') {
-      callback(spokenTranscript);
+      if (typeof callback === 'function') {
+        callback(finalTranscript.trim());
+      }
     }
   };
 
   globalRecognition.onerror = function(event) {
     console.warn("Speech Recognition notice/error:", event.error);
-    isListening = false;
-    if (micBtn) micBtn.classList.remove('listening');
-    if (statusElem) statusElem.innerText = "";
+    // Halt auto-restart only on permission denials
+    if (event.error === 'not-allowed' || event.error === 'service-not-allowed') {
+      shouldRestart = false;
+      isListening = false;
+      if (micBtn) micBtn.classList.remove('listening');
+      if (statusElem) statusElem.innerText = "";
+    }
   };
 
   globalRecognition.onend = function() {
-    isListening = false;
-    if (micBtn) micBtn.classList.remove('listening');
-    if (statusElem) statusElem.innerText = "";
+    // Automatically restart recognition unless explicitly stopped by the user
+    if (shouldRestart) {
+      try {
+        globalRecognition.start();
+      } catch (err) {
+        setTimeout(() => {
+          if (shouldRestart) {
+            try { globalRecognition.start(); } catch (e) {}
+          }
+        }, 300);
+      }
+    } else {
+      isListening = false;
+      if (micBtn) micBtn.classList.remove('listening');
+      if (statusElem) statusElem.innerText = "";
+    }
   };
 
   try {
