@@ -450,11 +450,10 @@
 
   <!-- Search Bar -->
   <div class="search-wrapper">
-    <div class="voice-assistant-container">
-  <button type="button" onclick="startVoice()">🎤 </button>
-  <span id="voice-status">Click to speak...</span>
-</div>
     <div class="search-box-inner">
+      <div class="voice-assistant-container">
+  <button type="button" onclick="startVoice()">🎤</button>
+  <span id="voice-status"></span>
       <i class="fa-solid fa-magnifying-glass"></i>
       <input type="text" id="toolSearchInput" class="search-input" placeholder="Search any tool (e.g. Merge PDF, KB Resizer, Govt Jobs)..." onkeyup="filterToolsBySearch()">
     </div>
