@@ -410,3 +410,22 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 });
+// Category Filter Logic
+function filterCategory(category, element) {
+    // Update active state on buttons
+    document.querySelectorAll('.filter-chips-container .chip').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    if (element) element.classList.add('active');
+
+    // Filter tool cards
+    const cards = document.querySelectorAll('.tool-card, .popular-card');
+    cards.forEach(card => {
+        const cardCategory = card.getAttribute('data-category') || '';
+        if (category === 'all' || cardCategory.toLowerCase().includes(category.toLowerCase())) {
+            card.style.display = '';
+        } else {
+            card.style.display = 'none';
+        }
+    });
+}
