@@ -435,6 +435,9 @@
 
       <div class="nav-actions" style="display: flex; gap: 10px; align-items: center;">
         <button onclick="openDonateModal()" style="background: linear-gradient(135deg, #3b82f6, #ec4899); color: #fff; border: none; padding: 6px 14px; border-radius: 20px; font-weight: 700; font-size: 12px; cursor: pointer; display: flex; align-items: center; gap: 6px; box-shadow: 0 3px 8px rgba(59, 130, 246, 0.4);">
+         <button id="pwaInstallBtn" style="display: none; background: #2563eb; color: #ffffff; border: none; padding: 8px 16px; border-radius: 8px; font-weight: 600; cursor: pointer; align-items: center; gap: 8px;">
+  <i class="fa-solid fa-download"></i> Install App
+</button> 
           <i class="fa-solid fa-heart" style="color: #ffffff;"></i> Love India
         </button>
         <button class="auth-icon-btn" id="authNavBtn" onclick="openAuthModal()" title="Login / Sign Up">
@@ -4332,5 +4335,89 @@ function executeVoiceCommand(cmd) {
     });
   }
 </script>
+let deferredPrompt;
+const installBtn = document.getElementById('pwaInstallBtn');
+
+window.addEventListener('beforeinstallprompt', (e) => {
+  // Prevent the default mini-infobar from appearing on mobile
+  e.preventDefault();
+  deferredPrompt = e;
+  // Show the custom install button
+  if (installBtn) {
+    installBtn.style.display = 'inline-flex';
+  }
+});
+
+if (installBtn) {
+  installBtn.addEventListener('click', async () => {
+    if (!deferredPrompt) return;
+    deferredPrompt.prompt();
+    const { outcome } = await deferredPrompt.userChoice;
+    console.log(`User response to install prompt: ${outcome}`);
+    deferredPrompt = null;
+    installBtn.style.display = 'none';
+  });
+}
+
+window.addEventListener('appinstalled', () => {
+  console.log('PWA installed successfully');
+  if (installBtn) installBtn.style.display = 'none';
+});
+<div id="networkStatusBanner" style="display: none; position: fixed; top: 0; left: 0; width: 100%; text-align: center; padding: 10px; font-size: 14px; font-weight: 600; z-index: 99999; transition: all 0.3s ease;"></div>
+const banner = document.getElementById('networkStatusBanner');
+
+function updateOnlineStatus() {
+  if (!navigator.onLine) {
+    banner.textContent = "⚡ You are offline. Client-side tools are fully operational!";
+    banner.style.background = "#f59e0b";
+    banner.style.color = "#000000";
+    banner.style.display = "block";
+  } else {
+    if (banner.style.display === "block") {
+      banner.textContent = "✓ Back online!";
+      banner.style.background = "#10b981";
+      banner.style.color = "#ffffff";
+      setTimeout(() => {
+        banner.style.display = "none";
+      }, 2500);
+    }
+  }
+}
+
+window.addEventListener('online', updateOnlineStatus);
+window.addEventListener('offline', updateOnlineStatus);
+  // Function to record a used tool into localStorage
+function recordRecentTool(toolName, modalId) {
+  let recents = JSON.parse(localStorage.getItem('docucraft_recents')) || [];
+  // Remove existing entry to avoid duplicates
+  recents = recents.filter(item => item.name !== toolName);
+  // Add new tool to the front
+  recents.unshift({ name: toolName, id: modalId, timestamp: Date.now() });
+  // Keep up to 5 items
+  if (recents.length > 5) recents.pop();
+  localStorage.setItem('docucraft_recents', JSON.stringify(recents));
+  renderRecentTools();
+}
+
+// Function to render recent items into the grid
+function renderRecentTools() {
+  const container = document.getElementById('recentToolsGrid');
+  if (!container) return;
+
+  const recents = JSON.parse(localStorage.getItem('docucraft_recents')) || [];
+  if (recents.length === 0) {
+    container.innerHTML = '<p style="color: #64748b; font-size: 13px;">No recent tools used yet.</p>';
+    return;
+  }
+
+  container.innerHTML = recents.map(tool => `
+    <button class="quick-pin-pill" onclick="document.getElementById('${tool.id}')?.click()" style="cursor: pointer;">
+      <i class="fa-solid fa-clock-rotate-left"></i> ${tool.name}
+    </button>
+  `).join('');
+}
+
+// Render on page load
+document.addEventListener('DOMContentLoaded', renderRecentTools);
 </body>
 </html>
