@@ -1,0 +1,21 @@
+{
+  "name": "DocuCraft AI",
+  "short_name": "DocuCraft",
+  "description": "All-in-one Client-side Web Utility & Document Tools",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0f172a",
+  "theme_color": "#2563eb",
+  "icons": [
+    {
+      "src": "banner.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "banner.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
