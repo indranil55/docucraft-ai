@@ -490,3 +490,69 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 });
+// Smart Tool Navigation with Safe DOM-Only URL Extraction
+function scrollToMatchedTool(query) {
+  if (!query) return;
+
+  const raw = query.toLowerCase().trim();
+  const cleanQuery = raw
+    .replace(/^(open|show|find|go to|launch|cholo|dekhao|kholo|please|tool|khol|kholo ji|chalu karo|চালু করো|খুলুন|খোল|দেখাও)\s+/i, '')
+    .trim();
+
+  if (cleanQuery.length < 2) return;
+
+  // 1. All tool cards and clickable tool links on page
+  const cards = Array.from(document.querySelectorAll('.tool-card, .popular-card, [data-tool], .grid-item, a[href*=".html"]'));
+  if (cards.length === 0) return;
+
+  let bestTarget = null;
+  let highestScore = 0;
+  const tokens = cleanQuery.split(/\s+/).filter(w => w.length >= 2);
+
+  // 2. Score exclusively against elements already existing on the DOM
+  cards.forEach(card => {
+    const titleElem = card.querySelector('h3, h4, .tool-title, strong, b');
+    const titleText = (titleElem ? (titleElem.innerText || titleElem.textContent) : '').toLowerCase();
+    const fullText = (card.innerText || card.textContent || '').toLowerCase();
+    const href = (card.getAttribute('href') || card.querySelector('a')?.getAttribute('href') || '').toLowerCase();
+
+    let score = 0;
+
+    // Check title match
+    if (titleText && titleText.includes(cleanQuery)) score += 100;
+    // Check href match
+    if (href && href.includes(cleanQuery.replace(/\s+/g, '-'))) score += 80;
+
+    // Word by word matching
+    tokens.forEach(tok => {
+      if (titleText.includes(tok)) score += 30;
+      else if (href.includes(tok)) score += 20;
+      else if (fullText.includes(tok)) score += 5;
+    });
+
+    if (score > highestScore) {
+      highestScore = score;
+      bestTarget = card;
+    }
+  });
+
+  // 3. Highlight and Navigate ONLY using the real link present on the page
+  if (bestTarget && highestScore > 0) {
+    bestTarget.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    bestTarget.style.transition = 'transform 0.3s ease, box-shadow 0.3s ease';
+    bestTarget.style.boxShadow = '0 0 25px rgba(0, 150, 255, 0.9)';
+    bestTarget.style.transform = 'scale(1.05)';
+
+    setTimeout(() => {
+      // Extract the real valid URL from the card
+      const linkElem = bestTarget.tagName === 'A' ? bestTarget : bestTarget.querySelector('a');
+      const realUrl = linkElem?.getAttribute('href') || bestTarget.getAttribute('href');
+
+      if (realUrl && realUrl !== '#' && !realUrl.startsWith('javascript:')) {
+        window.location.href = realUrl;
+      } else {
+        bestTarget.click();
+      }
+    }, 600);
+  }
+}
