@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#2563eb">
   <!-- ==========================================================================
        DocuCraft AI - Advanced Multi-Utility Web Studio & Productivity Suite
        ========================================================================== -->
@@ -4320,5 +4322,15 @@ function executeVoiceCommand(cmd) {
 </script>
 <script src="ai-assistant.js"></script>
 <script type="module" src="./js/auth-ui.js"></script>
+<script type="module" src="js/user-prefs.js"></script>
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('/service-worker.js')
+        .then(() => console.log('Service Worker registered.'))
+        .catch((err) => console.log('Service Worker registration failed:', err));
+    });
+  }
+</script>
 </body>
 </html>
