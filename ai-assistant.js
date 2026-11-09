@@ -548,7 +548,7 @@ function scrollToMatchedTool(query) {
       const linkElem = bestTarget.tagName === 'A' ? bestTarget : bestTarget.querySelector('a');
       const realUrl = linkElem?.getAttribute('href') || bestTarget.getAttribute('href');
 
-      if (realUrl && realUrl !== '#' && !realUrl.startsWith('javascript:')) {
+      if (realUrl && realUrl !== '#' && (realUrl.startsWith('http://') || realUrl.startsWith('https://') || realUrl.startsWith('/'))) {
         window.location.href = realUrl;
       } else {
         bestTarget.click();
