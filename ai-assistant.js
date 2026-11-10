@@ -9,15 +9,15 @@ let isListening = false;
 let currentUtterance = null;
 let autoRedirectTimer = null;
 
-// URL Validator to resolve CodeQL Security Incomplete URL scheme check
+// URL Validator to resolve CodeQL Security Incomplete URL scheme check (Whitelist-based)
 function isSafeUrl(rawUrl) {
   if (!rawUrl || typeof rawUrl !== 'string') return false;
   const trimmed = rawUrl.trim();
-  if (trimmed === '' || trimmed === '#' || trimmed.toLowerCase().startsWith('javascript:')) {
-    return false;
-  }
+  if (!trimmed || trimmed === '#') return false;
+
   try {
     const parsed = new URL(trimmed, window.location.origin);
+    // Allow only http: and https: protocols to prevent script execution vulnerabilities
     return parsed.protocol === 'http:' || parsed.protocol === 'https:';
   } catch (e) {
     return false;
@@ -170,6 +170,7 @@ function detectLanguage(text) {
 
 // 5. Complete Tool Catalog
 const siteKnowledgeBase = [
+  // --- Section A: Document & PDF Tools ---
   { 
     name: "Merge PDF", 
     desc_bn: "এটি পিডিএফ মার্জার। এখানে একাধিক পিডিএফ ফাইল জোড়া দিয়ে একটি ফাইল করতে পারবেন।",
@@ -362,6 +363,8 @@ const siteKnowledgeBase = [
     keywords: ["page numbers", "page number", "पेज नंबर", "পেজ নম্বর"], 
     url: "add-page-numbers.html" 
   },
+
+  // --- Section B: Cyber & Photo Tools ---
   { 
     name: "Photo & Sign KB / MB Resizer", 
     desc_bn: "এটি ফটো ও সাইন রিসাইজার। সরকারি চাকরির ফর্মের জন্য নির্দিষ্ট কেবি বা এমবি সাইজ করতে পারেন।",
@@ -418,6 +421,8 @@ const siteKnowledgeBase = [
     keywords: ["thumbnail", "youtube thumbnail", "yt thumbnail", "থাম্বনেইল"], 
     url: "youtube-thumbnail.html" 
   },
+
+  // --- Section C: Finance & Calculator Tools ---
   { 
     name: "DocuCraft AI Scientific Calculator", 
     desc_bn: "এটি সায়েন্টিফিক ক্যালকুলেটর। জটিল গাণিতিক ও বৈজ্ঞানিক হিসাব-নিকাশ করার জন্য এটি ব্যবহার করুন।",
@@ -562,6 +567,8 @@ const siteKnowledgeBase = [
     keywords: ["land area converter", "land converter", "bigha", "katha", "জমির মাপ", "বিঘা", "কাঠা"], 
     url: "land-converter.html" 
   },
+
+  // --- Section D: Utilities & Productivity Tools ---
   { 
     name: "DocuCraft AI Translator", 
     desc_bn: "এটি এআই ট্রান্সলেটর। যেকোনো ভাষার লেখাকে অন্য ভাষায় অনুবাদ করার জন্য এটি ব্যবহার করুন।",
@@ -717,7 +724,7 @@ const siteKnowledgeBase = [
   { 
     name: "Invoice / Bill Generator", 
     desc_bn: "এটি ইনভয়েস ও বিল জেনারেটর। ব্যবসার জন্য প্রফেশনাল ক্যাশ মেমো বা জিএসটি বিল তৈরি করুন।",
-    desc_hi: "দुकान और व्यापार के लिए पेशेवर बिल या इनवॉइस बनाएं।",
+    desc_hi: "দুকান और व्यापार के लिए पेशेवर बिल या इनवॉइस बनाएं।",
     desc_en: "Generate printable invoices and billing receipts with auto tax.",
     keywords: ["invoice generator", "bill generator", "বিল জনरेटर", "বিল মেকার"], 
     url: "invoice-generator.html" 
@@ -733,7 +740,7 @@ const siteKnowledgeBase = [
   { 
     name: "Prescription / Memo Maker", 
     desc_bn: "এটি প্রেসক্রিপশন ও মেমো মেকার। ডাক্তার ও ফার্মেসির জন্য প্রেসক্রিপশন স্লিপ বানান।",
-    desc_hi: "क्लिनिक और डॉक्टर के लिए डिजिटल प्रिस्क्रिप्शन पर्ची बनाएं।",
+    desc_hi: "क्लिनিক এবং ডাক্তারদের জন্য ডিজিটাল প্রেসক্রিপশন पर्ची তৈরি করুন।",
     desc_en: "Create clinical doctor prescriptions and medical memos cleanly.",
     keywords: ["prescription maker", "memo maker", "প্রেসক্রিপশন"], 
     url: "prescription-maker.html" 
