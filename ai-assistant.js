@@ -97,7 +97,7 @@ function hideCenterAICard() {
   }
 }
 
-// 3. Reliable Multi-Device Speech Function
+// 3. Multi-Device Speech Function
 function speakAndDisplay(userQuery, text, langCode = 'en-US', toolName = '', targetUrl = '') {
   if (!isVoiceOutputEnabled || !('speechSynthesis' in window)) {
     if (targetUrl) window.location.href = targetUrl;
@@ -126,14 +126,14 @@ function speakAndDisplay(userQuery, text, langCode = 'en-US', toolName = '', tar
     }
   }
 
-  // Auto redirect after speech ends
+  // Voice completion triggers seamless navigation
   currentUtterance.onend = function() {
     autoRedirectTimer = setTimeout(() => {
       hideCenterAICard();
       if (targetUrl) {
         window.location.href = targetUrl;
       }
-    }, 800);
+    }, 600);
   };
 
   currentUtterance.onerror = function() {
@@ -154,7 +154,7 @@ function detectLanguage(text) {
   return 'en-US';
 }
 
-// 5. Complete Tool Catalog (All 72+ Tools of DocuCraft AI)
+// 5. Complete Tool Catalog (All DocuCraft AI Tools)
 const siteKnowledgeBase = [
   // --- Document & PDF Tools ---
   { 
@@ -162,7 +162,7 @@ const siteKnowledgeBase = [
     desc_bn: "এটি পিডিএফ মার্জার। এখানে একাধিক পিডিএফ ফাইল জোড়া দিয়ে একটি ফাইল করতে পারবেন।",
     desc_hi: "यह पीडीएफ मर्ज टूल है। यहाँ कई पीडीएफ फाइलों को एक साथ जोड़ सकते हैं।",
     desc_en: "This is Merge PDF. Combine multiple PDF documents into a single file.",
-    keywords: ["merge", "scanner", "merger", "pdf jodo", "পিডিএফ জোড়া", "যুক্ত", "jodo"], 
+    keywords: ["merge", "scanner", "merger", "pdf jodo", "পিডিএফ জোড়া", "যুক্ত", "jodo", "combine files"], 
     url: "merge-pdf.html" 
   },
   { 
@@ -178,7 +178,7 @@ const siteKnowledgeBase = [
     desc_bn: "এটি পিডিএফ কম্প্রেসার। ফাইল কোয়ালিটি ঠিক রেখে সাইজ খুব সহজেই কমিয়ে নিতে পারবেন।",
     desc_hi: "यह पीडीएफ कंप्रेस टूल है। क्वालिटी ठीक रखकर फाइल साइज छोटा करें।",
     desc_en: "This is Compress PDF. Reduce file size while keeping visual quality intact.",
-    keywords: ["compress", "reduce size", "chota karna", "সাইজ কমানো", "কম্প্রেস"], 
+    keywords: ["compress", "reduce size", "chota karna", "সাইজ কমানো", "কম্প্রেস", "reduce file size"], 
     url: "compress-pdf.html" 
   },
   { 
@@ -186,7 +186,7 @@ const siteKnowledgeBase = [
     desc_bn: "এটি পিডিএফ স্ক্যানার। ডকুমেন্টের ছবি তুলে পরিষ্কার ও স্পষ্ট পিডিএফে রূপান্তর করুন।",
     desc_hi: "यह पीडीएफ स्कैनर है। दस्तावेज़ साफ़ और स्पष्ट स्कैन करें।",
     desc_en: "This is PDF Scanner & Enhancer to scan and sharpen documents.",
-    keywords: ["scanner", "scan", "enhance", "स्कैनर", "স্ক্যানার"], 
+    keywords: ["scanner", "scan", "enhance", "स्कैनर", "স্ক্যানার", "scan documents"], 
     url: "pdf-scanner.html" 
   },
   { 
@@ -410,11 +410,11 @@ const siteKnowledgeBase = [
 
   // --- Finance & Calculator Tools ---
   { 
-    name: "Scientific Calculator", 
+    name: "DocuCraft AI Scientific Calculator", 
     desc_bn: "এটি সায়েন্টিফিক ক্যালকুলেটর। জটিল গাণিতিক ও বৈজ্ঞানিক হিসাব-নিকাশ করার জন্য এটি ব্যবহার করুন।",
     desc_hi: "जटिल वैज्ञानिक और गणितीय गणनाओं के लिए।",
     desc_en: "Full featured scientific calculator for advanced mathematics.",
-    keywords: ["scientific calculator", "calculator", "math", "हिसाब", "ক্যালকুলেটর"], 
+    keywords: ["scientific calculator", "calculator", "math", "calculator open", "হিচাব", "হিসাব", "ক্যালকুলেটর", "সায়েন্টিফিক ক্যালকুলেটর"], 
     url: "calculator.html" 
   },
   { 
@@ -560,7 +560,7 @@ const siteKnowledgeBase = [
     desc_bn: "এটি এআই ট্রান্সলেটর। যেকোনো ভাষার লেখাকে অন্য ভাষায় অনুবাদ করার জন্য এটি ব্যবহার করুন।",
     desc_hi: "किसी भी भाषा का अन्य भाषाओं में सटीक अनुवाद करें।",
     desc_en: "Translate paragraphs and phrases across multiple global languages.",
-    keywords: ["translator", "translate", "translation", "অনুবাদ", "अनुवाद", "dokocraft translator", "docucraft translator"], 
+    keywords: ["translator", "translate", "translation", "অনুবাদ", "अनुवाद", "dokocraft translator", "docucraft translator", "translator open"], 
     url: "translator.html" 
   },
   { 
@@ -616,7 +616,7 @@ const siteKnowledgeBase = [
     desc_bn: "এটি টাইপিং স্পিড টেস্ট। ১ মিনিটে কতগুলো শব্দ নির্ভুল টাইপ করতে পারেন তা পরীক্ষা করুন।",
     desc_hi: "1 मिनट में अपनी टाइपिंग स्पीड और सटीकता की जांच करें।",
     desc_en: "Test words per minute speed and accuracy in a 60-second test.",
-    keywords: ["typing speed test", "typing test", "speed test", "টাইপিং টেস্ট"], 
+    keywords: ["typing speed test", "typing test", "speed test", "টাইপিং টেস্ট", "typing text", "typing test open", "typing text open"], 
     url: "typing-test.html" 
   },
   { 
@@ -632,7 +632,7 @@ const siteKnowledgeBase = [
     desc_bn: "এটি জল ট্র্যাকার। স্বাস্থ্য ভালো রাখতে সারাদিনে কত লিটার জল খাওয়া উচিত তা নির্ধারণ করুন।",
     desc_hi: "वजन के अनुसार प्रतिदिन पानी पीने का सही लक्ष्य जानें।",
     desc_en: "Determine your optimal daily water hydration requirements.",
-    keywords: ["water intake", "water goal", "पानी খাওয়ার লক্ষ্য", "জল"], 
+    keywords: ["water intake", "water goal", "पानी খাওয়ার लक्ष्य", "জল"], 
     url: "water-intake.html" 
   },
   { 
@@ -654,7 +654,7 @@ const siteKnowledgeBase = [
   { 
     name: "Base64 Encoder & Decoder", 
     desc_bn: "এটি বেস৬৪ এনকোডার ও ডিকোডার। যেকোনো টেক্সট বা ছবিকে বেস৬৪ কোডে রূপান্তর করুন।",
-    desc_hi: "टेक्स्ट और फाइलों को बेस64 में एनकोड और डिकोड करें।",
+    desc_hi: "টেক্সট এবং ফাইलों को बेस64 में एनकोड और डिकोड करें।",
     desc_en: "Encode and decode raw strings and binary assets into Base64.",
     keywords: ["base64", "base64 encoder", "base64 decoder"], 
     url: "base64.html" 
@@ -678,7 +678,7 @@ const siteKnowledgeBase = [
   { 
     name: "Duplicate Line Remover", 
     desc_bn: "এটি ডুপ্লিকেট লাইন রিমুভার। টেক্সটের তালিকা থেকে একই রকম ডুপ্লিকেট লাইনগুলো মুছে দিন।",
-    desc_hi: "टेक्स्ट लिस्ट से डुप्लिकेट पंक्तियाँ हटाएं।",
+    desc_hi: "টেক্সট লিস্ট থেকে ডুপ্লিকেট पंक्तियाँ हटाएं।",
     desc_en: "Remove repeated and duplicate lines from raw text blocks.",
     keywords: ["duplicate line remover", "remove duplicates"], 
     url: "duplicate-remover.html" 
@@ -710,9 +710,9 @@ const siteKnowledgeBase = [
   { 
     name: "Invoice / Bill Generator", 
     desc_bn: "এটি ইনভয়েস ও বিল জেনারেটর। ব্যবসার জন্য প্রফেশনাল ক্যাশ মেমো বা জিএসটি বিল তৈরি করুন।",
-    desc_hi: "दुकान और व्यापार के लिए पेशेवर बिल या इनवॉइस बनाएं।",
+    desc_hi: "দुकान और व्यापार के लिए पेशेवर बिल या इनवॉइस बनाएं।",
     desc_en: "Generate printable invoices and billing receipts with auto tax.",
-    keywords: ["invoice generator", "bill generator", "बिल जनरेटर", "বিল মেকার"], 
+    keywords: ["invoice generator", "bill generator", "বিল জনरेटर", "বিল মেকার"], 
     url: "invoice-generator.html" 
   },
   { 
@@ -740,6 +740,16 @@ const siteKnowledgeBase = [
     url: "contact.html" 
   }
 ];
+
+// Helper to determine exact destination URL
+function resolveTargetUrl(rawUrl, matchedItem) {
+  let url = rawUrl;
+  if (!url && matchedItem && matchedItem.url) {
+    url = matchedItem.url;
+  }
+  if (!url) return '';
+  return url;
+}
 
 // 6. Matching & Responding when User Speaks
 function handleUserQuery(query) {
@@ -783,7 +793,8 @@ function handleUserQuery(query) {
     } else if (lang === 'hi-IN' && bestMatchedItem.desc_hi) {
       message = bestMatchedItem.desc_hi;
     }
-    speakAndDisplay(raw, message, lang, bestMatchedItem.name, bestMatchedItem.url);
+    const finalUrl = resolveTargetUrl(bestMatchedItem.url, bestMatchedItem);
+    speakAndDisplay(raw, message, lang, bestMatchedItem.name, finalUrl);
   } else {
     let notFoundMsg = "Sorry, I couldn't find that specific tool. Please tell me what you need.";
     if (lang === 'bn-IN') {
@@ -795,7 +806,7 @@ function handleUserQuery(query) {
   }
 }
 
-// 7. Microphone Input Handler (Starts ONLY when user clicks and speaks)
+// 7. Microphone Input Handler
 function toggleVoiceInput(inputElementId = 'toolSearchInput') {
   const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
   if (!SpeechRecognition) {
@@ -865,29 +876,26 @@ function toggleVoiceInput(inputElementId = 'toolSearchInput') {
   }
 }
 
-// 8. Card Click Interaction
+// 8. Direct Seamless Card Navigation (No unwanted voice popups on touch/click)
 function handleCardClick(element) {
   if (!element) return;
   
-  // Extract title cleanly
-  const titleElem = element.querySelector('h3, h4, .tool-title');
-  const title = (titleElem ? titleElem.innerText : element.innerText.split('\n')[0] || '').trim();
-
-  // Robust URL extraction: from element attribute, child link, or knowledge base
+  // 1. Direct href extraction
   let url = element.getAttribute('href') || element.querySelector('a')?.getAttribute('href') || '';
+  
+  // 2. Fallback to knowledge base matching if href is missing or hash
+  if (!url || url === '#' || url.startsWith('javascript:')) {
+    const titleElem = element.querySelector('h3, h4, .tool-title');
+    const title = (titleElem ? titleElem.innerText : element.innerText.split('\n')[0] || '').trim();
+    const match = siteKnowledgeBase.find(item => item.name.toLowerCase() === title.toLowerCase());
+    if (match && match.url) {
+      url = match.url;
+    }
+  }
 
-  // Match against Knowledge Base
-  const match = siteKnowledgeBase.find(item => 
-    item.name.toLowerCase() === title.toLowerCase() ||
-    (item.url && url && (item.url === url || url.includes(item.url)))
-  );
-
-  const targetUrl = (match && match.url) ? match.url : url;
-
-  if (targetUrl) {
-    const lang = detectLanguage(title);
-    let desc = match ? (lang === 'bn-IN' && match.desc_bn ? match.desc_bn : match.desc_en) : `Opening ${title}`;
-    speakAndDisplay(title, desc, lang, match ? match.name : title, targetUrl);
+  // 3. Instant clean navigation
+  if (url && url !== '#' && !url.startsWith('javascript:')) {
+    window.location.href = url;
   }
 }
 
@@ -895,14 +903,10 @@ function startVoice() {
   toggleVoiceInput('toolSearchInput');
 }
 
-// Global click event delegation for all cards
+// 9. Delegated Click Listener
 document.addEventListener('click', (e) => {
   const card = e.target.closest('.popular-card, .tool-card');
   if (card) {
-    // If the card is an anchor link, prevent instant page jump so assistant can speak and display
-    if (card.tagName.toLowerCase() === 'a' || e.target.tagName.toLowerCase() === 'a') {
-      e.preventDefault();
-    }
     handleCardClick(card);
   }
 });
