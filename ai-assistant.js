@@ -1,17 +1,17 @@
 /* =========================================================
-   DocuCraft AI - Advanced Multi-Language Voice AI Engine
+   DocuCraft AI - Advanced Autonomous Voice Assistant & Navigator
    Developer: Indranil Ruidas
-   Full 75+ Tools Knowledge Base & Autonomous Voice Assistant
+   Full 75+ Tools, Working 'Clear' Button for Recently Used,
+   Filter Non-Tools, Live DOM Focusing & Zero-404 Navigation
    ========================================================= */
 
 let availableVoices = [];
 let isVoiceOutputEnabled = true;
 let globalRecognition = null;
 let isListening = false;
-let shouldRestart = false;
 let isAssistantSpeaking = false;
 
-// Selected Gender State ('female' by default)
+// Selected Voice Gender ('female' by default)
 let selectedVoiceGender = localStorage.getItem('docucraft_voice_gender') || 'female';
 
 // 1. System Voices Loader
@@ -25,10 +25,10 @@ if ('speechSynthesis' in window) {
   loadSystemVoices();
 }
 
-// 2. Multi-Device Voice Synthesis with Callback
+// 2. Reliable Speech Synthesis with Callback & State Protection
 function speakText(text, langCode = 'en-US', onComplete = null) {
   if (!isVoiceOutputEnabled || !('speechSynthesis' in window)) {
-    if (onComplete) onComplete();
+    if (typeof onComplete === 'function') onComplete();
     return;
   }
   window.speechSynthesis.cancel();
@@ -85,16 +85,16 @@ function playSiteInitialGreeting() {
   if (sessionStorage.getItem('docucraft_greeted')) return;
   sessionStorage.setItem('docucraft_greeted', 'true');
 
-  const greetingText = "Hi, welcome to DocuCraft AI! How can I help you today?";
+  const greetingText = "Hi, welcome to DocuCraft AI! What tool do you need today? Just say it, and I will open it for you.";
   speakText(greetingText, 'en-US');
 }
 
 document.addEventListener('click', () => playSiteInitialGreeting(), { once: true });
 document.addEventListener('touchstart', () => playSiteInitialGreeting(), { once: true });
 
-// 4. Microphone Assistant Welcome
+// 4. Microphone Assistant Welcome Prompt
 function playIndranilGreeting(onFinished) {
-  const greeting = "I am Indranil. How can I help you today?";
+  const greeting = "I am listening. Which tool do you want to open?";
   speakText(greeting, 'en-US', onFinished);
 }
 
@@ -104,10 +104,10 @@ function detectLanguage(text) {
   return 'en-US';
 }
 
-// 5. Creator Biography & Interactive Knowledge Base
+// 5. Creator Biography & Knowledge
 const creatorBio = {
   name: "Indranil Ruidas",
-  fullStory: "DocuCraft AI was developed and architected by Indranil Ruidas, a tech professional and frontend developer from Ajhapur, Purba Bardhaman, West Bengal[cite: 2]. Indranil holds a Diploma in Computer Science and Technology from Sylvan Polytechnic College with 80% marks, an ITI in Computer Science from Sathish Chandra ITI, and a Certificate in Communication and IT from Anudip Foundation[cite: 2]. He has over 3 years of hands-on experience working across digital services, CCTV operations, customer assistance, and marketing with organizations like Jus Jumpin, Ezeepay Digital Services, Bharti AXA, and Bajaj Allianz[cite: 2]. He created DocuCraft AI as a free, powerful client-side utility hub for everyone."
+  fullStory: "DocuCraft AI was developed and architected by Indranil Ruidas, a tech professional and frontend developer from Ajhapur, Purba Bardhaman, West Bengal[cite: 2]. Indranil holds a Diploma in Computer Science and Technology from Sylvan Polytechnic College with 80% marks, an ITI in Computer Science from Sathish Chandra ITI, and a Certificate in Communication and IT from Anudip Foundation[cite: 2]. He has over 3 years of hands-on experience across digital services, CCTV operations, customer assistance, and marketing with organizations like Jus Jumpin, Ezeepay Digital Services, Bharti AXA, and Bajaj Allianz[cite: 2]. He created DocuCraft AI as a free, powerful client-side utility hub for everyone."
 };
 
 const entertainingStories = [
@@ -179,8 +179,8 @@ const siteKnowledgeBase = [
   // Productivity & Utility Tools
   { name: "DocuCraft AI Translator", bn: "ডকুক্ল্যাফট অনুবাদক", hi: "अनुवादक टूल", keywords: ["translator", "translate", "translation", "অনুবাদ", "dokocraft translator"], url: "translator.html" },
   { name: "Pitch to Text (Voice Typing)", bn: "ভয়েস টাইপিং টুল", hi: "बोलकर लिखने का टूल", keywords: ["pitch to text", "voice typing", "speech to text", "ভয়েস টাইপিং"], url: "voice-typing.html" },
-  { name: "Text-to-Speech Converter", bn: "টেক্সট টু স্পিচ অডিও টুল", hi: "टेक्स्ट टू स्पीच टूल", keywords: ["text to speech", "tts", "speak text", "টেক্সট টু স্পিচ"], url: "text-to-speech.html" },
-  { name: "Unlimited Text Notepad", bn: "আনলিমিটেড নোটপ্যাড", hi: "टेक्स्ट नोटपैड", keywords: ["notepad", "notebook", "text notepad", "নোটপ্যাড"], url: "notepad.html" },
+  { name: "Text-to-Speech Converter", bn: "টেক্সট টু স্পিচ অডিও টুল", hi: "টেক্সট টু স্পিচ টুল", keywords: ["text to speech", "tts", "speak text", "টেক্সট টু স্পিচ"], url: "text-to-speech.html" },
+  { name: "Unlimited Text Notepad", bn: "আনলিমিটেড নোটপ্যাড", hi: "টেক্সট নোটপ্যাড", keywords: ["notepad", "notebook", "text notepad", "নোটপ্যাড"], url: "notepad.html" },
   { name: "Govt Job Alerts & Results", bn: "সরকারি চাকরির খবর", hi: "सरकारी नौकरी अलर्ट", keywords: ["govt job", "job alert", "sarkari result", "চাকরি"], url: "job-alerts.html" },
   { name: "Age Calculator (Exam DOB)", bn: "বয়স ক্যালকুলেটর", hi: "उम्र कैलकुलेटर", keywords: ["age calculator", "calculate age", "বয়স ক্যালকুলেটর", "বয়স"], url: "age-calculator.html" },
   { name: "Exam Age Eligibility Checker", bn: "পরীক্ষার বয়স যোগ্যতা যাচাই", hi: "एग्जाम आयु पात्रता", keywords: ["age eligibility", "eligibility checker", "যোগ্যতা"], url: "exam-eligibility.html" },
@@ -191,10 +191,10 @@ const siteKnowledgeBase = [
   { name: "Random Password & PIN Generator", bn: "পাসওয়ার্ড ও পিন জেনারেটর", hi: "पासवर्ड जनरेटर", keywords: ["password generator", "pin generator", "random password", "পাসওয়ার্ড জেনারেটর"], url: "password-generator.html" },
   { name: "Universal Unit Converter", bn: "ইউনিট কনভার্টার", hi: "यूनिट कनवर्टर", keywords: ["unit converter", "universal converter", "একক রূপান্তর"], url: "unit-converter.html" },
   { name: "Duplicate Line Remover", bn: "ডুপ্লিকেট লাইন রিমুভার", hi: "डुप्लिकेट लाइन रिमूवर", keywords: ["duplicate line remover", "remove duplicates"], url: "duplicate-remover.html" },
-  { name: "Text Reverse & Flip Tool", bn: "টেক্সট উল্টানোর টুল", hi: "टेक्स्ट रिवर्स टूल", keywords: ["text reverse", "flip text", "লেখা উল্টানো"], url: "text-reverse.html" },
+  { name: "Text Reverse & Flip Tool", bn: "টেক্সট উল্টানোর টুল", hi: "টেক্সট রিভার্স টুল", keywords: ["text reverse", "flip text", "লেখা উল্টানো"], url: "text-reverse.html" },
   { name: "Marks to Percentage & CGPA", bn: "নম্বর থেকে শতাংশ ও সিজিপিএ", hi: "मार्क्स टू प्रतिशत", keywords: ["marks to percentage", "cgpa calculator", "cgpa"], url: "marks-calculator.html" },
   { name: "Average & Grade Calculator", bn: "গ্রেড ক্যালকুলেটর", hi: "ग्रेड कैलकुलेटर", keywords: ["average calculator", "grade calculator"], url: "grade-calculator.html" },
-  { name: "Invoice / Bill Generator", bn: "বিল ও ইনভয়েস জেনারেটর", hi: "बिल जनरेटर", keywords: ["invoice generator", "bill generator", "বিল মেকার"], url: "invoice-generator.html" },
+  { name: "Invoice / Bill Generator", bn: "বিল ও ইনভয়েস জেনারেটর", hi: "বিল जनरेटर", keywords: ["invoice generator", "bill generator", "বিল মেকার"], url: "invoice-generator.html" },
   { name: "Resume / CV Maker to PDF", bn: "রিজিউমে ও সিভি মেকার", hi: "बायोडाटा मेकर", keywords: ["resume maker", "cv maker", "biodata", "রিজিউমে", "সিভি"], url: "resume-maker.html" },
   { name: "Prescription / Memo Maker", bn: "প্রেসক্রিপশন মেকার", hi: "प्रिस्क्रिप्शन मेकर", keywords: ["prescription maker", "memo maker", "প্রেসক্রিপশন"], url: "prescription-maker.html" },
   { name: "Contact & Support Desk", bn: "যোগাযোগ ও হেল্প ডেস্ক", hi: "संपर्क और सहायता", keywords: ["contact us", "support desk", "helpline", "যোগাযোগ করো"], url: "contact.html" }
@@ -217,14 +217,14 @@ function handleSpecialAIQueries(query) {
     return true;
   }
 
-  // 75+ Tools Info
+  // 75+ Tools Overview
   if (q.includes("how many tools") || q.includes("75") || q.includes("what can you do") || q.includes("features") || q.includes("কাজ")) {
     speakText("DocuCraft AI provides over 75 tools for PDF operations, image compression, financial calculations, unit conversions, and everyday office utilities.", 'en-US');
     return true;
   }
 
-  // Direct Math Evaluation
-  const mathRegex = /^(what is|calculate|solve|হিসাব করো|কত)?\s*([0-9\.\s\+\-\*\/\(\)\^%]+)$/i;
+  // Math Evaluation
+  const mathRegex = /^(what is|calculate|solve|হিসাব করো|কত)?\s*([0-9\.\s\+\-\*/\(\)\^%]+)$/i;
   const match = q.match(mathRegex);
   if (match && match[2] && match[2].length > 1) {
     try {
@@ -240,7 +240,7 @@ function handleSpecialAIQueries(query) {
   return false;
 }
 
-// 8. Voice Matching & Navigation (High Precision)
+// 8. Intent Resolver & Live Target Navigation (Highlights Card on Screen & Opens Real URL)
 function scrollToMatchedTool(query) {
   if (!query) return;
 
@@ -249,53 +249,103 @@ function scrollToMatchedTool(query) {
 
   if (handleSpecialAIQueries(raw)) return;
 
+  if (raw.includes("how can i help") || raw.includes("i am indranil") || raw.includes("which tool")) {
+    return;
+  }
+
   const cleanQuery = raw
-    .replace(/^(open|show|find|go to|launch|cholo|dekhao|kholo|please|tool|khol|chalu karo|চালু করো|খুলুন|খোল|দেখাও|খোলো|দিখাও)\s+/i, '')
+    .replace(/^(open|show|find|go to|launch|cholo|dekhao|kholo|please|tool|khol|chalu karo|চালু করো|খুলুন|খোল|দেখাও|খোলো|দিখাও|আমি|আমার|দরকার|লাগে|খুলতে চাই|kholna hai|dikhaye)\s+/i, '')
+    .replace(/\s+(open|kholo|khol|খুলুন|খোল|দেখাও|চাই|দাও|dikhaye)$/i, '')
     .trim();
 
-  if (cleanQuery.length < 3) return;
+  if (cleanQuery.length < 2) return;
 
-  let bestMatchedItem = null;
-  let maxScore = 0;
+  const allCards = Array.from(document.querySelectorAll('.tool-card, .popular-card, [data-tool], .grid-item, a[href*=".html"]'));
+  
+  let bestCard = null;
+  let bestKnowledgeItem = null;
+  let highestScore = 0;
 
+  // Search KnowledgeBase
   siteKnowledgeBase.forEach(item => {
     let score = 0;
     const nameLower = item.name.toLowerCase();
 
-    if (cleanQuery === nameLower) score += 120;
-    else if (nameLower.includes(cleanQuery)) score += 80;
+    if (cleanQuery === nameLower) score += 150;
+    else if (nameLower.includes(cleanQuery)) score += 90;
+    else if (cleanQuery.includes(nameLower)) score += 60;
 
     item.keywords.forEach(kw => {
       const kwLower = kw.toLowerCase();
-      if (cleanQuery === kwLower) score += 100;
-      else if (cleanQuery.includes(kwLower)) score += 70;
+      if (cleanQuery === kwLower) score += 140;
+      else if (cleanQuery.includes(kwLower)) score += 100;
+      else if (kwLower.includes(cleanQuery)) score += 50;
     });
 
-    if (score > maxScore) {
-      maxScore = score;
-      bestMatchedItem = item;
+    if (score > highestScore) {
+      highestScore = score;
+      bestKnowledgeItem = item;
     }
   });
 
-  if (bestMatchedItem && maxScore >= 60) {
-    let toolName = bestMatchedItem.name;
-    let speakMessage = `Opening ${toolName}`;
+  // Verify against actual visible cards in DOM
+  allCards.forEach(card => {
+    const titleElem = card.querySelector('h3, h4, .tool-title, strong, b');
+    const cardText = (titleElem ? (titleElem.innerText || titleElem.textContent) : (card.innerText || '')).toLowerCase();
+    const cardHref = (card.getAttribute('href') || card.querySelector('a')?.getAttribute('href') || '').toLowerCase();
 
-    if (lang === 'bn-IN') {
-      speakMessage = `${bestMatchedItem.bn || toolName} খোলা হচ্ছে...`;
-    } else if (lang === 'hi-IN') {
-      speakMessage = `${bestMatchedItem.hi || toolName} खोला जा रहा है...`;
+    if (bestKnowledgeItem) {
+      const targetSlug = bestKnowledgeItem.url.toLowerCase().replace('.html', '');
+      if (cardHref.includes(targetSlug) || cardText.includes(bestKnowledgeItem.name.toLowerCase())) {
+        bestCard = card;
+      }
     }
 
+    if (!bestCard && cardText.includes(cleanQuery)) {
+      bestCard = card;
+    }
+  });
+
+  // Execute Action: Bring directly in front of mobile screen & Navigate safely
+  if (bestCard || (bestKnowledgeItem && highestScore >= 50)) {
+    const finalToolName = bestKnowledgeItem ? bestKnowledgeItem.name : (bestCard.querySelector('h3, h4')?.innerText || "Tool");
+    
+    let speakMessage = `Opening ${finalToolName}`;
+    if (lang === 'bn-IN') {
+      speakMessage = `${bestKnowledgeItem?.bn || finalToolName} খোলা হচ্ছে...`;
+    } else if (lang === 'hi-IN') {
+      speakMessage = `${bestKnowledgeItem?.hi || finalToolName} खोला जा रहा है...`;
+    }
     speakText(speakMessage, lang);
 
-    setTimeout(() => {
-      window.location.href = bestMatchedItem.url;
-    }, 900);
+    if (bestCard) {
+      bestCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      bestCard.style.transition = 'transform 0.3s ease, box-shadow 0.3s ease, border 0.3s ease';
+      bestCard.style.boxShadow = '0 0 25px rgba(56, 189, 248, 0.9)';
+      bestCard.style.transform = 'scale(1.04)';
+      bestCard.style.border = '2px solid #38bdf8';
+
+      setTimeout(() => {
+        const linkTag = bestCard.tagName === 'A' ? bestCard : bestCard.querySelector('a');
+        const exactHref = linkTag?.getAttribute('href') || bestCard.getAttribute('href');
+
+        if (exactHref && exactHref !== '#' && !exactHref.startsWith('javascript:')) {
+          window.location.href = exactHref;
+        } else if (bestKnowledgeItem && bestKnowledgeItem.url) {
+          window.location.href = bestKnowledgeItem.url;
+        } else {
+          bestCard.click();
+        }
+      }, 750);
+    } else if (bestKnowledgeItem && bestKnowledgeItem.url) {
+      setTimeout(() => {
+        window.location.href = bestKnowledgeItem.url;
+      }, 750);
+    }
   }
 }
 
-// 9. Speech Recognition Controller
+// 9. Speech Recognition Controller (Anti-Echo Loop Protection)
 function toggleVoiceInput(inputElementId = 'toolSearchInput') {
   const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
   if (!SpeechRecognition) {
@@ -316,7 +366,6 @@ function toggleVoiceInput(inputElementId = 'toolSearchInput') {
     return;
   }
 
-  shouldRestart = true;
   globalRecognition = new SpeechRecognition();
   globalRecognition.continuous = false;
   globalRecognition.interimResults = false;
@@ -358,17 +407,19 @@ function toggleVoiceInput(inputElementId = 'toolSearchInput') {
     if (statusElem) statusElem.innerText = "";
   };
 
-  // Speaks welcome prompt first, then mic activates
+  // Assistant prompt completes first, then mic captures user speech
   playIndranilGreeting(() => {
     try {
-      globalRecognition.start();
+      setTimeout(() => {
+        globalRecognition.start();
+      }, 350);
     } catch (err) {
       console.warn("Recognition delay:", err);
     }
   });
 }
 
-// 10. Voice Gender Switcher & UI Injection
+// 10. Voice Gender Switcher & UI Injection (Clean Alignment)
 function injectVoiceGenderSwitcher() {
   const micElement = document.getElementById('voiceSearchBtn') || document.querySelector('.search-bar svg, .search-box svg');
   if (!micElement) return;
@@ -404,7 +455,7 @@ function injectVoiceGenderSwitcher() {
   switcher.title = 'Switch Voice (Female / Male)';
   switcher.innerText = selectedVoiceGender === 'female' ? '👩 Female' : '👨 Male';
   switcher.style.position = 'absolute';
-  switcher.style.top = '-28px';
+  switcher.style.top = '-26px';
   switcher.style.right = '0';
   switcher.style.background = 'rgba(15, 23, 42, 0.9)';
   switcher.style.color = '#38bdf8';
@@ -448,22 +499,60 @@ function getCleanSafeHref(rawUrl) {
   return null;
 }
 
-// 12. Recent Tools Tracker
+// 12. Robust Recently Used Tracker & Instant Working Clear Feature
 function trackToolUsage(toolName, toolUrl) {
+  if (!toolName || typeof toolName !== 'string') return;
+  const cleanName = toolName.replace(/^⚡\s*/, '').replace(/\s*⚡$/, '').trim();
+  
+  // Ignore empty titles, lightning symbols, or static policy pages
+  if (cleanName.length < 2 || cleanName === '⚡' || cleanName === '⚡ ⚡') return;
+  
+  const ignoredWords = ['privacy policy', 'terms', 'disclaimer', 'contact us', 'about us', 'about', 'clear'];
+  if (ignoredWords.includes(cleanName.toLowerCase())) return;
+
   const safeUrl = getCleanSafeHref(toolUrl);
   if (!safeUrl) return;
 
-  let recent = JSON.parse(localStorage.getItem('docucraft_recent_tools') || '[]');
-  recent = recent.filter(t => t.name !== toolName);
-  recent.unshift({ name: String(toolName).slice(0, 80), url: safeUrl });
+  let recent = [];
+  try {
+    recent = JSON.parse(localStorage.getItem('docucraft_recent_tools') || '[]');
+  } catch (e) {
+    recent = [];
+  }
+
+  // Filter out any previous corrupt or matching entries
+  recent = recent.filter(t => t && t.name && t.name.trim() !== cleanName && !t.name.includes('Privacy Policy'));
+  recent.unshift({ name: cleanName.slice(0, 60), url: safeUrl });
+  
   if (recent.length > 4) recent.pop();
   localStorage.setItem('docucraft_recent_tools', JSON.stringify(recent));
   renderRecentTools();
 }
 
+function clearRecentTools() {
+  localStorage.removeItem('docucraft_recent_tools');
+  const container = document.getElementById('recentToolsSection') || document.querySelector('.recently-used, [data-section="recent"]');
+  const grid = document.getElementById('recentToolsGrid') || document.querySelector('.recently-used-grid, .recent-tools-grid');
+  
+  if (grid) grid.innerHTML = '';
+  if (container) container.style.display = 'none';
+}
+
 function renderRecentTools() {
-  const container = document.getElementById('recentToolsSection');
-  const grid = document.getElementById('recentToolsGrid');
+  const container = document.getElementById('recentToolsSection') || document.querySelector('.recently-used, [data-section="recent"]');
+  const grid = document.getElementById('recentToolsGrid') || document.querySelector('.recently-used-grid, .recent-tools-grid');
+  
+  // Attach Clear Button Listener explicitly (Touch & Click Support)
+  const clearBtn = document.getElementById('clearRecentBtn') || document.querySelector('.recently-used .clear, .recent-clear, [data-clear-recent]');
+  if (clearBtn) {
+    clearBtn.style.cursor = 'pointer';
+    clearBtn.onclick = (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      clearRecentTools();
+    };
+  }
+
   if (!container || !grid) return;
 
   let recent = [];
@@ -473,13 +562,16 @@ function renderRecentTools() {
     recent = [];
   }
 
+  // Clean up any corrupt entries stored earlier
+  recent = recent.filter(t => t && t.name && t.name.trim().length >= 2 && !t.name.includes('⚡ ⚡') && !t.name.toLowerCase().includes('privacy policy'));
+
   if (!Array.isArray(recent) || recent.length === 0) {
     container.style.display = 'none';
     return;
   }
 
   container.style.display = 'block';
-  grid.replaceChildren();
+  grid.innerHTML = '';
 
   recent.forEach(tool => {
     const safeHref = getCleanSafeHref(tool.url);
@@ -488,42 +580,54 @@ function renderRecentTools() {
     const link = document.createElement('a');
     link.setAttribute('href', safeHref);
     link.className = 'recent-chip';
-    link.style.display = 'flex';
+    link.style.display = 'inline-flex';
     link.style.alignItems = 'center';
     link.style.gap = '8px';
-    link.style.padding = '10px 14px';
+    link.style.padding = '8px 14px';
     link.style.background = 'rgba(255,255,255,0.06)';
-    link.style.border = '1px solid rgba(255,255,255,0.1)';
+    link.style.border = '1px solid rgba(255,255,255,0.12)';
     link.style.borderRadius = '12px';
     link.style.textDecoration = 'none';
     link.style.color = '#fff';
     link.style.fontSize = '13px';
-    link.style.transition = 'all 0.2s ease';
+    link.style.margin = '4px';
 
-    const iconSpan = document.createElement('span');
-    iconSpan.textContent = '⚡ ';
+    const cleanTitle = tool.name.replace(/^⚡\s*/, '').trim();
+    link.innerHTML = `<span>⚡</span><span>${cleanTitle}</span>`;
 
-    const titleSpan = document.createElement('span');
-    titleSpan.textContent = tool.name || 'Tool';
-
-    link.appendChild(iconSpan);
-    link.appendChild(titleSpan);
     grid.appendChild(link);
   });
 }
 
-// 13. DOM Initializer
+// 13. DOM Initializer & Safe Tracking Filters
 document.addEventListener('DOMContentLoaded', () => {
   injectVoiceGenderSwitcher();
   renderRecentTools();
 
+  // Global delegation for 'Clear' button tap on mobile
+  document.addEventListener('click', (e) => {
+    if (e.target && (e.target.matches('#clearRecentBtn, .recent-clear, [data-clear-recent]') || e.target.innerText?.trim().toLowerCase() === 'clear')) {
+      const isInsideRecent = e.target.closest('#recentToolsSection, .recently-used');
+      if (isInsideRecent) {
+        e.preventDefault();
+        clearRecentTools();
+      }
+    }
+  });
+
+  // Track only tool cards, ignore footer or policy links
   document.querySelectorAll('a[href*=".html"], .tool-card, .popular-card').forEach(link => {
     link.addEventListener('click', function() {
-      const toolName = this.querySelector('h3, h4, .tool-title')?.innerText || this.innerText.split('\n')[0];
+      // Ignore footer, privacy policy, contact, and header links
+      if (this.closest('footer, .footer, nav, .navbar, .legal-links')) return;
+      
+      const titleEl = this.querySelector('h3, h4, .tool-title, strong, b');
+      const toolName = (titleEl ? titleEl.innerText : this.innerText.split('\n')[0] || '').trim();
       const rawUrl = this.getAttribute('href') || (this.querySelector('a') ? this.querySelector('a').getAttribute('href') : null);
+      
       const safeUrl = getCleanSafeHref(rawUrl);
       if (toolName && safeUrl) {
-        trackToolUsage(toolName.trim(), safeUrl);
+        trackToolUsage(toolName, safeUrl);
       }
     });
   });
