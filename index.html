@@ -4425,5 +4425,128 @@ function shareWebsite() {
   }
 }
   </script>
+  <!-- Draggable Floating Share Button -->
+<button id="floatingShareBtn" title="Share DocuCraft AI" style="
+  position: fixed;
+  bottom: 25px;
+  right: 25px;
+  width: 50px;
+  height: 50px;
+  background: linear-gradient(135deg, #6366f1, #4f46e5);
+  color: #ffffff;
+  border: none;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
+  cursor: grab;
+  z-index: 99999;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: none;
+">
+  <i class="fa-solid fa-share-nodes" style="font-size: 20px; pointer-events: none;"></i>
+</button>
+
+<script>
+(function() {
+  const btn = document.getElementById('floatingShareBtn');
+  let isDragging = false;
+  let hasMoved = false;
+  let startX, startY, initialLeft, initialTop;
+
+  // Pointer Down (Handles both Mouse and Touch inputs)
+  btn.addEventListener('pointerdown', (e) => {
+    isDragging = true;
+    hasMoved = false;
+    startX = e.clientX;
+    startY = e.clientY;
+
+    const rect = btn.getBoundingClientRect();
+    initialLeft = rect.left;
+    initialTop = rect.top;
+
+    // Convert fixed bottom/right positioning to absolute top/left coordinates
+    btn.style.bottom = 'auto';
+    btn.style.right = 'auto';
+    btn.style.left = `${initialLeft}px`;
+    btn.style.top = `${initialTop}px`;
+    btn.style.cursor = 'grabbing';
+    btn.setPointerCapture(e.pointerId);
+  });
+
+  // Pointer Move (Dragging)
+  btn.addEventListener('pointermove', (e) => {
+    if (!isDragging) return;
+
+    const deltaX = e.clientX - startX;
+    const deltaY = e.clientY - startY;
+
+    // Consider it a drag if moved more than 5 pixels
+    if (Math.abs(deltaX) > 5 || Math.abs(deltaY) > 5) {
+      hasMoved = true;
+    }
+
+    let newLeft = initialLeft + deltaX;
+    let newTop = initialTop + deltaY;
+
+    // Prevent dragging outside viewport boundaries
+    const btnWidth = btn.offsetWidth;
+    const btnHeight = btn.offsetHeight;
+    const maxLeft = window.innerWidth - btnWidth - 10;
+    const maxTop = window.innerHeight - btnHeight - 10;
+
+    newLeft = Math.max(10, Math.min(newLeft, maxLeft));
+    newTop = Math.max(10, Math.min(newTop, maxTop));
+
+    btn.style.left = `${newLeft}px`;
+    btn.style.top = `${newTop}px`;
+  });
+
+  // Pointer Up (Release)
+  btn.addEventListener('pointerup', (e) => {
+    if (!isDragging) return;
+    isDragging = false;
+    btn.style.cursor = 'grab';
+    btn.releasePointerCapture(e.pointerId);
+
+    // Trigger share action only on a clean tap/click, not when dragged
+    if (!hasMoved) {
+      if (typeof shareWebsite === 'function') {
+        shareWebsite();
+      } else {
+        defaultShareFallback();
+      }
+    }
+  });
+
+  // Fallback share functionality using Web Share API or Clipboard Copy
+  function defaultShareFallback() {
+    if (navigator.share) {
+      navigator.share({
+        title: document.title || 'DocuCraft AI',
+        text: 'Check out DocuCraft AI - Smart Online Tools!',
+        url: window.location.href
+      }).catch((err) => console.log('Share dismissed', err));
+    } else {
+      // Copy URL to clipboard if Web Share API is unsupported
+      navigator.clipboard.writeText(window.location.href).then(() => {
+        alert('Link copied to clipboard!');
+      });
+    }
+  }
+
+  // Adjust button position if viewport resizes or orientation changes
+  window.addEventListener('resize', () => {
+    const rect = btn.getBoundingClientRect();
+    const maxLeft = window.innerWidth - btn.offsetWidth - 10;
+    const maxTop = window.innerHeight - btn.offsetHeight - 10;
+
+    if (rect.left > maxLeft) btn.style.left = `${Math.max(10, maxLeft)}px`;
+    if (rect.top > maxTop) btn.style.top = `${Math.max(10, maxTop)}px`;
+  });
+})();
+</script>
   </body>
 </html>
