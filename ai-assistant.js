@@ -9,6 +9,21 @@ let isListening = false;
 let currentUtterance = null;
 let autoRedirectTimer = null;
 
+// URL Validator to resolve CodeQL Security Incomplete URL scheme check
+function isSafeUrl(rawUrl) {
+  if (!rawUrl || typeof rawUrl !== 'string') return false;
+  const trimmed = rawUrl.trim();
+  if (trimmed === '' || trimmed === '#' || trimmed.toLowerCase().startsWith('javascript:')) {
+    return false;
+  }
+  try {
+    const parsed = new URL(trimmed, window.location.origin);
+    return parsed.protocol === 'http:' || parsed.protocol === 'https:';
+  } catch (e) {
+    return false;
+  }
+}
+
 // 1. System Voices Loader
 function loadSystemVoices() {
   if ('speechSynthesis' in window) {
@@ -75,7 +90,7 @@ function showCenterAICard(userQuery, aiReply, toolName = '', targetUrl = '') {
   toolElem.innerText = toolName || "DocuCraft AI";
   replyElem.innerText = aiReply;
 
-  if (targetUrl) {
+  if (isSafeUrl(targetUrl)) {
     btnContainer.innerHTML = `
       <a href="${targetUrl}" style="display: inline-block; padding: 8px 18px; background: linear-gradient(135deg, #2563eb, #3b82f6); color: #fff; text-decoration: none; border-radius: 20px; font-size: 13px; font-weight: 600; box-shadow: 0 4px 12px rgba(37,99,235,0.4);">
         Open Tool →
@@ -100,7 +115,7 @@ function hideCenterAICard() {
 // 3. Multi-Device Speech Function
 function speakAndDisplay(userQuery, text, langCode = 'en-US', toolName = '', targetUrl = '') {
   if (!isVoiceOutputEnabled || !('speechSynthesis' in window)) {
-    if (targetUrl) window.location.href = targetUrl;
+    if (isSafeUrl(targetUrl)) window.location.href = targetUrl;
     return;
   }
   
@@ -126,11 +141,10 @@ function speakAndDisplay(userQuery, text, langCode = 'en-US', toolName = '', tar
     }
   }
 
-  // Voice completion triggers seamless navigation
   currentUtterance.onend = function() {
     autoRedirectTimer = setTimeout(() => {
       hideCenterAICard();
-      if (targetUrl) {
+      if (isSafeUrl(targetUrl)) {
         window.location.href = targetUrl;
       }
     }, 600);
@@ -138,7 +152,7 @@ function speakAndDisplay(userQuery, text, langCode = 'en-US', toolName = '', tar
 
   currentUtterance.onerror = function() {
     hideCenterAICard();
-    if (targetUrl) {
+    if (isSafeUrl(targetUrl)) {
       window.location.href = targetUrl;
     }
   };
@@ -154,9 +168,8 @@ function detectLanguage(text) {
   return 'en-US';
 }
 
-// 5. Complete Tool Catalog (All DocuCraft AI Tools)
+// 5. Complete Tool Catalog
 const siteKnowledgeBase = [
-  // --- Document & PDF Tools ---
   { 
     name: "Merge PDF", 
     desc_bn: "এটি পিডিএফ মার্জার। এখানে একাধিক পিডিএফ ফাইল জোড়া দিয়ে একটি ফাইল করতে পারবেন।",
@@ -349,8 +362,6 @@ const siteKnowledgeBase = [
     keywords: ["page numbers", "page number", "पेज नंबर", "পেজ নম্বর"], 
     url: "add-page-numbers.html" 
   },
-
-  // --- Cyber & Photo Tools ---
   { 
     name: "Photo & Sign KB / MB Resizer", 
     desc_bn: "এটি ফটো ও সাইন রিসাইজার। সরকারি চাকরির ফর্মের জন্য নির্দিষ্ট কেবি বা এমবি সাইজ করতে পারেন।",
@@ -407,14 +418,12 @@ const siteKnowledgeBase = [
     keywords: ["thumbnail", "youtube thumbnail", "yt thumbnail", "থাম্বনেইল"], 
     url: "youtube-thumbnail.html" 
   },
-
-  // --- Finance & Calculator Tools ---
   { 
     name: "DocuCraft AI Scientific Calculator", 
     desc_bn: "এটি সায়েন্টিফিক ক্যালকুলেটর। জটিল গাণিতিক ও বৈজ্ঞানিক হিসাব-নিকাশ করার জন্য এটি ব্যবহার করুন।",
     desc_hi: "जटिल वैज्ञानिक और गणितीय गणनाओं के लिए।",
     desc_en: "Full featured scientific calculator for advanced mathematics.",
-    keywords: ["scientific calculator", "calculator", "math", "calculator open", "হিচাব", "হিসাব", "ক্যালকুলেটর", "সায়েন্টিফিক ক্যালকুলেটর"], 
+    keywords: ["scientific calculator", "calculator", "math", "calculator open", "হিচাব", "হিসাব", "ক্যালকুলেটর", "সায়েন্টিফিক ক্যালকুলেটর", "calculate"], 
     url: "calculator.html" 
   },
   { 
@@ -553,8 +562,6 @@ const siteKnowledgeBase = [
     keywords: ["land area converter", "land converter", "bigha", "katha", "জমির মাপ", "বিঘা", "কাঠা"], 
     url: "land-converter.html" 
   },
-
-  // --- Utilities & Productivity Tools ---
   { 
     name: "DocuCraft AI Translator", 
     desc_bn: "এটি এআই ট্রান্সলেটর। যেকোনো ভাষার লেখাকে অন্য ভাষায় অনুবাদ করার জন্য এটি ব্যবহার করুন।",
@@ -741,14 +748,13 @@ const siteKnowledgeBase = [
   }
 ];
 
-// Helper to determine exact destination URL
+// Helper to determine destination URL
 function resolveTargetUrl(rawUrl, matchedItem) {
   let url = rawUrl;
   if (!url && matchedItem && matchedItem.url) {
     url = matchedItem.url;
   }
-  if (!url) return '';
-  return url;
+  return url || '';
 }
 
 // 6. Matching & Responding when User Speaks
@@ -758,8 +764,9 @@ function handleUserQuery(query) {
   const raw = query.toLowerCase().trim();
   const lang = detectLanguage(raw);
 
+  // Cleans stop words and command prefixes/suffixes
   const cleanQuery = raw
-    .replace(/^(open|show|find|go to|launch|cholo|dekhao|kholo|please|tool|khol|kholo ji|chalu karo|চালু করো|খুলুন|খোল|দেখাও|খুলবে|খোলো|দাও|আমাকে|হিসাব)\s+/i, '')
+    .replace(/(open|show|find|go to|launch|cholo|dekhao|kholo|please|tool|khol|kholo ji|chalu karo|চালু করো|খুলুন|খোল|দেখাও|খুলবে|খোলো|দাও|আমাকে|হিসাব)/gi, '')
     .trim();
 
   let bestMatchedItem = null;
@@ -769,15 +776,13 @@ function handleUserQuery(query) {
     let score = 0;
     const nameLower = item.name.toLowerCase();
 
-    if (cleanQuery === nameLower) score += 120;
-    else if (nameLower.includes(cleanQuery)) score += 80;
-    else if (cleanQuery.includes(nameLower)) score += 60;
+    if (raw.includes(nameLower) || (cleanQuery && nameLower.includes(cleanQuery))) score += 80;
 
     item.keywords.forEach(kw => {
       const kwLower = kw.toLowerCase();
-      if (cleanQuery === kwLower) score += 100;
-      else if (cleanQuery.includes(kwLower)) score += 70;
-      else if (kwLower.includes(cleanQuery)) score += 50;
+      if (raw.includes(kwLower) || (cleanQuery && cleanQuery.includes(kwLower))) {
+        score += 60;
+      }
     });
 
     if (score > maxScore) {
@@ -876,15 +881,13 @@ function toggleVoiceInput(inputElementId = 'toolSearchInput') {
   }
 }
 
-// 8. Direct Seamless Card Navigation (No unwanted voice popups on touch/click)
+// 8. Direct Seamless Card Navigation
 function handleCardClick(element) {
   if (!element) return;
   
-  // 1. Direct href extraction
   let url = element.getAttribute('href') || element.querySelector('a')?.getAttribute('href') || '';
   
-  // 2. Fallback to knowledge base matching if href is missing or hash
-  if (!url || url === '#' || url.startsWith('javascript:')) {
+  if (!isSafeUrl(url)) {
     const titleElem = element.querySelector('h3, h4, .tool-title');
     const title = (titleElem ? titleElem.innerText : element.innerText.split('\n')[0] || '').trim();
     const match = siteKnowledgeBase.find(item => item.name.toLowerCase() === title.toLowerCase());
@@ -893,8 +896,7 @@ function handleCardClick(element) {
     }
   }
 
-  // 3. Instant clean navigation
-  if (url && url !== '#' && !url.startsWith('javascript:')) {
+  if (isSafeUrl(url)) {
     window.location.href = url;
   }
 }
