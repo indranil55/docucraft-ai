@@ -874,3 +874,15 @@ function handleCardClick(element) {
 function startVoice() {
   toggleVoiceInput('toolSearchInput');
 }
+// Global event listener for all tool and popular cards
+document.addEventListener('DOMContentLoaded', () => {
+  const cards = document.querySelectorAll('.popular-card, .tool-card');
+  
+  cards.forEach(card => {
+    card.addEventListener('click', function(e) {
+      if (typeof handleCardClick === 'function') {
+        handleCardClick(this);
+      }
+    });
+  });
+});
