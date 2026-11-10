@@ -4433,30 +4433,5 @@ function shareWebsite() {
   }
 }
   </script>
-  <script>
-  function filterCategory(category, element) {
-  // 1. Remove active class from all chips and add to the clicked one
-  const allChips = document.querySelectorAll('.filter-chips-container .chip');
-  allChips.forEach(chip => chip.classList.remove('active'));
-  if (element) {
-    element.classList.add('active');
-  }
-
-  // 2. Filter tool and popular cards based on category
-  const cards = document.querySelectorAll('.tool-card, .popular-card');
-  cards.forEach(card => {
-    // Check data-category attribute first, then fallback to class names
-    const cardCat = (card.getAttribute('data-category') || card.className || '').toLowerCase();
-    
-    if (category === 'all') {
-      card.style.display = '';
-    } else if (cardCat.includes(category.toLowerCase())) {
-      card.style.display = '';
-    } else {
-      card.style.display = 'none';
-    }
-  });
-}
-  </script>
   </body>
 </html>
