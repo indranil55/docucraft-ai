@@ -857,7 +857,20 @@ function toggleVoiceInput(inputElementId = 'toolSearchInput') {
     console.error("Start error:", err);
   }
 }
-
+function handleCardClick(element) {
+  const title = element.querySelector('h3, h4, .tool-title')?.innerText || element.innerText.split('\n')[0];
+  const url = element.getAttribute('href');
+  const match = siteKnowledgeBase.find(item => item.name.toLowerCase() === title.toLowerCase().trim());
+  if (match) {
+    const lang = detectLanguage(navigator.language);
+    let desc = match.desc_en;
+    if (lang === 'bn-IN' && match.desc_bn) desc = match.desc_bn;
+    else if (lang === 'hi-IN' && match.desc_hi) desc = match.desc_hi;
+    speakAndDisplay(title, desc, lang, match.name, url);
+  } else {
+    speakAndDisplay(title, `Opening ${title}`, 'en-US', title, url);
+  }
+}
 function startVoice() {
   toggleVoiceInput('toolSearchInput');
 }
