@@ -1,6 +1,6 @@
 /* =========================================================
    DocuCraft AI - Complete 100% Tools Multilingual Assistant
-   Developer: Indranil Ruidas
+   Creator & Developer: Indranil Ruidas
    ========================================================= */
 
 let availableVoices = [];
@@ -9,6 +9,7 @@ let globalRecognition = null;
 let isListening = false;
 let currentUtterance = null;
 let autoRedirectTimer = null;
+let isAssistantSpeaking = false;
 
 // 1. System Voices Loader
 function loadSystemVoices() {
@@ -146,7 +147,6 @@ function hideCenterAICard() {
 
 // 4. Highlight & Open Card Directly on Page
 function focusAndOpenTool(element, targetUrl = '') {
-  // Switch to 'All' category tab so hidden items appear
   const allTab = document.querySelector('.filter-btn[onclick*="all"], button[onclick*="all"]');
   if (allTab && !allTab.classList.contains('active')) {
     allTab.click();
@@ -175,51 +175,65 @@ function focusAndOpenTool(element, targetUrl = '') {
   }
 }
 
-// 5. Speech Output Function
-function speakAndDisplay(userQuery, text, langCode = 'en-US', toolName = '', targetUrl = '') {
-  if (!isVoiceOutputEnabled || !('speechSynthesis' in window)) return;
-
-  window.speechSynthesis.cancel();
-  if (autoRedirectTimer) clearTimeout(autoRedirectTimer);
-
-  showCenterAICard(userQuery, text, toolName, targetUrl);
-
-  currentUtterance = new SpeechSynthesisUtterance(text);
-  currentUtterance.rate = 0.95;
-  currentUtterance.pitch = 1.0;
-  currentUtterance.lang = langCode;
-
-  const voices = availableVoices.length > 0 ? availableVoices : window.speechSynthesis.getVoices();
-  if (voices.length > 0) {
-    const target = (langCode || 'en').toLowerCase().split('-')[0];
-    const matchedVoice = voices.find(v => 
-      v.lang.toLowerCase() === langCode.toLowerCase() ||
-      v.lang.toLowerCase().startsWith(target)
-    );
-    if (matchedVoice) {
-      currentUtterance.voice = matchedVoice;
-    }
+// 5. Speech Output Function with Callback
+function speakVoice(text, langCode = 'bn-IN', callback = null) {
+  if (!isVoiceOutputEnabled || !('speechSynthesis' in window)) {
+    if (callback) callback();
+    return;
   }
 
-  currentUtterance.onend = function() {
-    autoRedirectTimer = setTimeout(() => {
-      hideCenterAICard();
-      if (targetUrl) {
+  try {
+    isAssistantSpeaking = true;
+    window.speechSynthesis.cancel();
+
+    currentUtterance = new SpeechSynthesisUtterance(text);
+    currentUtterance.rate = 1.0;
+    currentUtterance.pitch = 1.0;
+    currentUtterance.lang = langCode;
+
+    const voices = availableVoices.length > 0 ? availableVoices : window.speechSynthesis.getVoices();
+    if (voices.length > 0) {
+      const prefix = langCode.slice(0, 2).toLowerCase();
+      const matched = voices.find(v => v.lang.toLowerCase().startsWith(prefix));
+      if (matched) currentUtterance.voice = matched;
+    }
+
+    currentUtterance.onend = function() {
+      setTimeout(() => {
+        isAssistantSpeaking = false;
+        if (callback) callback();
+      }, 250);
+    };
+
+    currentUtterance.onerror = function() {
+      isAssistantSpeaking = false;
+      if (callback) callback();
+    };
+
+    window.speechSynthesis.speak(currentUtterance);
+  } catch (e) {
+    isAssistantSpeaking = false;
+    if (callback) callback();
+  }
+}
+
+function speakAndDisplay(userQuery, text, langCode = 'bn-IN', toolName = '', targetUrl = '') {
+  if (autoRedirectTimer) clearTimeout(autoRedirectTimer);
+  showCenterAICard(userQuery, text, toolName, targetUrl);
+
+  speakVoice(text, langCode, () => {
+    if (targetUrl) {
+      autoRedirectTimer = setTimeout(() => {
+        hideCenterAICard();
         const cardMatch = document.querySelector(`a[href*="${targetUrl}"], [data-tool*="${targetUrl.replace('.html','')}"]`);
         if (cardMatch) {
           focusAndOpenTool(cardMatch, targetUrl);
         } else {
           window.location.href = targetUrl;
         }
-      }
-    }, 1000);
-  };
-
-  currentUtterance.onerror = function() {
-    hideCenterAICard();
-  };
-
-  window.speechSynthesis.speak(currentUtterance);
+      }, 900);
+    }
+  });
 }
 
 // 6. Language Detection
@@ -697,7 +711,7 @@ const siteKnowledgeBase = [
   { 
     name: "Daily Calorie & BMR Calculator", 
     desc_bn: "এটি ক্যালোরি ক্যালকুলেটর। প্রতিদিন কত ক্যালোরি খাবার প্রয়োজন তা জানুন।",
-    desc_hi: "दैनिक कैलोरी की जरूरत और बीएमआर का हिसाब लगाएं।",
+    desc_hi: "दैनिक कैलोरी की जरूरत और बीএমআর का हिसाब लगाएं।",
     desc_en: "Compute daily caloric needs and Basal Metabolic Rate.",
     keywords: ["calorie calculator", "bmr calculator", "daily calorie", "ক্যালোরি"], 
     url: "calorie-calculator.html" 
@@ -823,25 +837,27 @@ function handleUserQuery(query) {
   const raw = query.toLowerCase().trim();
   const lang = detectLanguage(raw);
 
-  // Clean colloquial Bangla, Hindi & English prefixes/suffixes
+  // 1. Check Developer / Creator intent
+  const devKeywords = [
+    'who made', 'developer', 'creator', 'owner', 'banieche', 'banayche', 'toiri koreche',
+    'তৈরি করেছে', 'বানিয়েছে', 'ডেভেলপার', 'মালিক', 'কে বানিয়েছে', 'কে তৈরি করেছে', 'কার প্রজেক্ট'
+  ];
+  const isDevQuery = devKeywords.some(kw => raw.includes(kw));
+
+  if (isDevQuery) {
+    let creatorMsg = "ডকুক্র্যাফ্ট এআই তৈরি ও ডেভেলপ করেছেন ইন্দ্রনীল রুইদাস।";
+    if (lang === 'en-US') creatorMsg = "DocuCraft AI was developed and created by Indranil Ruidas.";
+    else if (lang === 'hi-IN') creatorMsg = "डॉक्यूक्राफ्ट एआई को इंद्रनील रुईदास ने बनाया और विकसित किया है।";
+
+    speakAndDisplay(raw, creatorMsg, lang, "ইন্দ্রনীল রুইদাস (Developer)", "https://docucraftai.website");
+    return;
+  }
+
+  // 2. Clean colloquial Bangla, Hindi & English prefixes/suffixes
   let cleanQuery = raw
     .replace(/(open|show|find|go to|launch|cholo|dekhao|kholo|please|tool|khol|kholo ji|chalu karo|চালু করো|খুলুন|খোল|দেখাও|খুলবে|খোলো|দাও|আমাকে|হিসাব|টা|টি|করো|করুন)/gi, ' ')
     .trim()
     .replace(/\s+/g, ' ');
-
-  // Creator Attribution
-  if (
-    cleanQuery.includes('who made') ||
-    cleanQuery.includes('developer') ||
-    cleanQuery.includes('creator') ||
-    cleanQuery.includes('indranil') ||
-    raw.includes('কে বানিয়েছে') ||
-    raw.includes('কে তৈরি করেছে')
-  ) {
-    const creatorMsg = "DocuCraft AI was developed and created by Indranil Ruidas.";
-    speakAndDisplay(raw, creatorMsg, 'en-US', "Indranil Ruidas", "");
-    return;
-  }
 
   let bestMatchedItem = null;
   let maxScore = 0;
@@ -876,7 +892,7 @@ function handleUserQuery(query) {
     }
     speakAndDisplay(raw, message, lang, bestMatchedItem.name, bestMatchedItem.url);
   } else {
-    // Fallback: Trigger instant live search in existing DocuCraft search box
+    // Fallback: Trigger instant live search in search box
     const searchInput = document.getElementById('toolSearchInput') || document.querySelector('#toolSearch, input[type="search"]');
     if (searchInput) {
       searchInput.value = cleanQuery;
@@ -884,17 +900,28 @@ function handleUserQuery(query) {
       searchInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
 
-    let notFoundMsg = "Opening search results for you.";
-    if (lang === 'bn-IN') notFoundMsg = "আপনার জন্য টুলটি খুঁজে বের করছি।";
+    let notFoundMsg = "আপনার জন্য টুলটি খুঁজে বের করছি।";
+    if (lang === 'en-US') notFoundMsg = "Searching for relevant tools for you.";
+    else if (lang === 'hi-IN') notFoundMsg = "आपके लिए सही टूल खोज रहा हूँ।";
+
     speakAndDisplay(raw, notFoundMsg, lang, "DocuCraft AI", "");
   }
 }
 
-// 9. Microphone Input Controller (Without Self-Listening Loop)
+// 9. Microphone Input Controller (All Browser Fallback Supported)
 function toggleVoiceInput(inputElementId = 'toolSearchInput') {
   const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+  // Fallback for browsers without Web Speech Recognition (like Firefox / older Safari)
   if (!SpeechRecognition) {
-    alert("Speech Recognition is not supported in this browser. Please use Google Chrome.");
+    speakVoice("আমি ইন্দ্রনীল, আপনার কী টুল প্রয়োজন এখানে লিখুন।", 'bn-IN', () => {
+      const fallbackQuery = prompt("আমি ইন্দ্রনীল, আপনার কী টুল প্রয়োজন লিখুন:");
+      if (fallbackQuery) {
+        const inputField = document.getElementById(inputElementId) || document.querySelector('#toolSearchInput, input[type="search"]');
+        if (inputField) inputField.value = fallbackQuery;
+        handleUserQuery(fallbackQuery);
+      }
+    });
     return;
   }
 
@@ -916,48 +943,50 @@ function toggleVoiceInput(inputElementId = 'toolSearchInput') {
   if (autoRedirectTimer) clearTimeout(autoRedirectTimer);
   hideCenterAICard();
 
-  globalRecognition = new SpeechRecognition();
-  globalRecognition.continuous = false;
-  globalRecognition.interimResults = false;
+  // Welcome greeting first, then start listening
+  speakVoice("আমি ইন্দ্রনীল, আপনাকে কীভাবে সাহায্য করতে পারি?", 'bn-IN', () => {
+    try {
+      globalRecognition = new SpeechRecognition();
+      globalRecognition.continuous = false;
+      globalRecognition.interimResults = false;
+      globalRecognition.lang = 'bn-IN'; // Default to Bengali, detects mixed inputs naturally
 
-  const userPreferredLang = navigator.language || 'en-US';
-  globalRecognition.lang = userPreferredLang;
+      globalRecognition.onstart = function() {
+        isListening = true;
+        if (micBtn) micBtn.classList.add('listening');
+        if (statusElem) statusElem.innerText = "বলুন, শুনছি...";
+      };
 
-  globalRecognition.onstart = function() {
-    isListening = true;
-    if (micBtn) micBtn.classList.add('listening');
-    if (statusElem) statusElem.innerText = "Listening...";
-  };
+      globalRecognition.onresult = function(event) {
+        const transcript = event.results[0][0].transcript;
+        if (transcript) {
+          const cleanTranscript = transcript.trim();
+          const inputField = document.getElementById(inputElementId) || document.querySelector('#toolSearchInput, input[type="search"]');
+          if (inputField) {
+            inputField.value = cleanTranscript;
+          }
+          handleUserQuery(cleanTranscript);
+        }
+      };
 
-  globalRecognition.onresult = function(event) {
-    const transcript = event.results[0][0].transcript;
-    if (transcript) {
-      const cleanTranscript = transcript.trim();
-      const inputField = document.getElementById(inputElementId) || document.querySelector('#toolSearchInput, input[type="search"]');
-      if (inputField) {
-        inputField.value = cleanTranscript;
-      }
-      handleUserQuery(cleanTranscript);
+      globalRecognition.onerror = function() {
+        isListening = false;
+        if (micBtn) micBtn.classList.remove('listening');
+        if (statusElem) statusElem.innerText = "";
+      };
+
+      globalRecognition.onend = function() {
+        isListening = false;
+        if (micBtn) micBtn.classList.remove('listening');
+        if (statusElem) statusElem.innerText = "";
+      };
+
+      globalRecognition.start();
+    } catch (err) {
+      console.error("Start error:", err);
+      isListening = false;
     }
-  };
-
-  globalRecognition.onerror = function() {
-    isListening = false;
-    if (micBtn) micBtn.classList.remove('listening');
-    if (statusElem) statusElem.innerText = "";
-  };
-
-  globalRecognition.onend = function() {
-    isListening = false;
-    if (micBtn) micBtn.classList.remove('listening');
-    if (statusElem) statusElem.innerText = "";
-  };
-
-  try {
-    globalRecognition.start();
-  } catch (err) {
-    console.error("Start error:", err);
-  }
+  });
 }
 
 function handleCardClick(element) {
