@@ -1,5 +1,5 @@
 /* =========================================================
-   DocuCraft AI - Ultra-Fast Universal Voice Assistant
+   DocuCraft AI - Smart Voice Assistant (Auto-Echo Fixed)
    Developer: Indranil Ruidas
    ========================================================= */
 
@@ -7,6 +7,7 @@ let availableVoices = [];
 let isVoiceOutputEnabled = true;
 let globalRecognition = null;
 let isListening = false;
+let isSpeaking = false;
 
 function loadSystemVoices() {
   if ('speechSynthesis' in window) {
@@ -18,10 +19,13 @@ if ('speechSynthesis' in window) {
   loadSystemVoices();
 }
 
+// Speak response without triggering self-mic loop
 function speakVoiceResponse(text, lang = 'en-US') {
   if (!isVoiceOutputEnabled || !('speechSynthesis' in window)) return;
   try {
+    isSpeaking = true;
     window.speechSynthesis.cancel();
+
     const utterance = new SpeechSynthesisUtterance(text);
     utterance.rate = 1.05;
     utterance.pitch = 1.0;
@@ -32,53 +36,62 @@ function speakVoiceResponse(text, lang = 'en-US') {
       const matched = availableVoices.find(v => v.lang.toLowerCase().startsWith(prefix));
       if (matched) utterance.voice = matched;
     }
+
+    utterance.onend = () => {
+      setTimeout(() => { isSpeaking = false; }, 400);
+    };
+    utterance.onerror = () => { isSpeaking = false; };
+
     window.speechSynthesis.speak(utterance);
   } catch (e) {
-    console.error(e);
+    isSpeaking = false;
   }
 }
 
-// Element-ke center-e scroll kore highlight o direct open kora
+// Bring element to center & trigger click safely
 function focusAndActivateElement(el) {
   if (!el) return;
-  
-  // Jodi kono category filter hidden kore rakhe, 'All' tab trigger kora
+
+  // Make sure 'All' tab is triggered so hidden category tools become visible
   const allTabBtn = document.querySelector('.filter-btn[onclick*="all"], button[onclick*="all"]');
   if (allTabBtn && !allTabBtn.classList.contains('active')) {
     allTabBtn.click();
   }
 
-  el.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'center' });
-  
-  el.style.transition = 'all 0.25s ease';
-  el.style.outline = '4px solid #6366f1';
-  el.style.transform = 'scale(1.03)';
-  
   setTimeout(() => {
-    // Card-er bhetore thaka actual link ba button click kora
-    const actionTarget = el.querySelector('a, button, [onclick]') || el;
-    if (actionTarget.tagName === 'A' && actionTarget.href) {
-      actionTarget.click();
-      if (!actionTarget.getAttribute('onclick')) {
-        window.location.href = actionTarget.href;
-      }
-    } else {
-      actionTarget.click();
-    }
+    el.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'center' });
+    
+    el.style.transition = 'all 0.25s ease';
+    el.style.outline = '4px solid #6366f1';
+    el.style.transform = 'scale(1.04)';
     
     setTimeout(() => {
-      el.style.outline = '';
-      el.style.transform = '';
-    }, 1200);
-  }, 200);
+      const targetAction = el.querySelector('a, button, [onclick]') || el;
+      if (targetAction.tagName === 'A' && targetAction.href && !targetAction.getAttribute('onclick')) {
+        window.location.href = targetAction.href;
+      } else {
+        targetAction.click();
+      }
+      
+      setTimeout(() => {
+        el.style.outline = '';
+        el.style.transform = '';
+      }, 1200);
+    }, 250);
+  }, 100);
 }
 
-// Multilingual keywords normalizer (Bengali, Hindi, English)
-function normalizeVoiceQuery(query) {
+// Clean command stop-words & normalize multilingual queries
+function cleanAndNormalizeQuery(query) {
   let q = query.toLowerCase().trim();
 
+  // Strip common command phrases & affixes
+  q = q.replace(/(open|opening|kholo|koro|chalu|start|show|dekhao|please|টা|টি|দাও)/gi, ' ').trim();
+  q = q.replace(/\s+/g, ' ');
+
+  // Multi-language synonyms mapping
   const translations = [
-    { regex: /(typing|type|টাইপিং|টাইপ|স্পিড টেস্ট)/gi, val: 'typing test' },
+    { regex: /(typing|type|টাইপিং|টাইপ|স্পিড টেস্ট)/gi, val: 'typing' },
     { regex: /(মার্জ|যুক্ত|একসাথে|জোড়া|জোড়া|merge)/gi, val: 'merge' },
     { regex: /(কম্প্রেস|ছোট|সাইজ কমা|সংকুচিত|compress)/gi, val: 'compress' },
     { regex: /(পিডিএফ|ডকুমেন্ট|pdf)/gi, val: 'pdf' },
@@ -102,17 +115,20 @@ function normalizeVoiceQuery(query) {
     q = q.replace(t.regex, t.val);
   });
 
-  return q;
+  return q.trim();
 }
 
 function openSiteToolDirectly(toolQuery) {
+  if (isSpeaking) return false;
+
   const rawQ = toolQuery.trim();
-  const q = normalizeVoiceQuery(toolQuery);
+  const q = cleanAndNormalizeQuery(toolQuery);
+
+  if (!q || q.length < 2) return false;
 
   // Creator & Developer Information
   if (
-    q.includes('who made you') || 
-    q.includes('who created you') || 
+    q.includes('who made') || 
     q.includes('developer') || 
     q.includes('creator') || 
     q.includes('indranil') ||
@@ -124,8 +140,23 @@ function openSiteToolDirectly(toolQuery) {
     return true;
   }
 
-  // Modals check (Direct popup)
-  if (q.includes('calculator') && !q.includes('gst') && !q.includes('emi') && !q.includes('sip') && !q.includes('bmr')) {
+  // 1. Typing Test Specific Match
+  if (q.includes('typing') || q.includes('type')) {
+    if (typeof openTypingModal === 'function') {
+      openTypingModal();
+      speakVoiceResponse("Opening Typing Test.", 'en-US');
+      return true;
+    }
+    const typingCard = document.querySelector('[data-tool*="typing"], a[href*="typing"], [onclick*="typing"], [onclick*="Typing"]');
+    if (typingCard) {
+      focusAndActivateElement(typingCard);
+      speakVoiceResponse("Opening Typing Test.", 'en-US');
+      return true;
+    }
+  }
+
+  // 2. Modals Direct Match
+  if (q.includes('calculator') && !q.includes('gst') && !q.includes('emi') && !q.includes('sip') && !q.includes('bmr') && !q.includes('age')) {
     if (typeof openCalculatorModal === 'function') openCalculatorModal();
     else {
       const el = document.querySelector('#calculatorModalBtn, [data-tool="calculator"], #calculator-tool');
@@ -175,8 +206,8 @@ function openSiteToolDirectly(toolQuery) {
     return true;
   }
 
-  // 75-ti Tool Cards scan (Matching title, card, text, links)
-  const allCards = Array.from(document.querySelectorAll('.tool-card, .popular-card, [data-tool], .card, div[class*="card"]'));
+  // 3. Scan all 75 tool cards & interactive elements
+  const allCards = Array.from(document.querySelectorAll('.tool-card, .popular-card, [data-tool], .card, div[class*="card"], .tool-item, a[class*="card"]'));
   const searchWords = q.split(/\s+/).filter(w => w.length > 2);
   let bestMatch = null;
   let highestScore = 0;
@@ -184,7 +215,7 @@ function openSiteToolDirectly(toolQuery) {
   allCards.forEach(card => {
     const cardText = (
       (card.getAttribute('data-tool') || '') + ' ' +
-      (card.querySelector('h3, h4, h5, h2, a')?.innerText || '') + ' ' +
+      (card.querySelector('h3, h4, h5, h2, a, span')?.innerText || '') + ' ' +
       (card.innerText || '')
     ).toLowerCase();
 
@@ -207,19 +238,20 @@ function openSiteToolDirectly(toolQuery) {
     return true;
   }
 
-  // Fallback to Search Input
+  // 4. Fallback to Search Input (Triggers DocuCraft AI Live Search)
   const searchInput = document.querySelector('#toolSearch, #searchInput, input[type="search"]');
   if (searchInput) {
-    searchInput.value = rawQ;
+    searchInput.value = q;
     searchInput.dispatchEvent(new Event('input', { bubbles: true }));
     searchInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    speakVoiceResponse(`Searching for ${q}.`, 'en-US');
+    return true;
   }
 
-  speakVoiceResponse(`Searching for ${rawQ}.`, 'en-US');
   return false;
 }
 
-// Instant Voice Input (Zero Delay)
+// Instant Voice Input
 function toggleVoiceInput(inputElementId, callback) {
   const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
   if (!SpeechRecognition) {
@@ -248,6 +280,7 @@ function toggleVoiceInput(inputElementId, callback) {
     };
 
     globalRecognition.onresult = function(event) {
+      if (isSpeaking) return; // Prevent mic from acting on assistant's own voice
       const spokenTranscript = event.results[0][0].transcript;
       if (inputField) inputField.value = spokenTranscript;
       openSiteToolDirectly(spokenTranscript);
@@ -255,7 +288,6 @@ function toggleVoiceInput(inputElementId, callback) {
     };
 
     globalRecognition.onerror = function(event) {
-      console.error("Speech Recognition Error:", event.error);
       isListening = false;
       if (inputField) inputField.placeholder = "Search any tool...";
     };
@@ -265,9 +297,7 @@ function toggleVoiceInput(inputElementId, callback) {
       if (inputField) inputField.placeholder = "Search any tool (e.g. Merge PDF, Typing Test)...";
     };
 
-    // Instant Start without any delay
     globalRecognition.start();
-
   } catch (e) {
     console.error("Recognition start error:", e);
     isListening = false;
