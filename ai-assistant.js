@@ -1,5 +1,6 @@
 /* =========================================================
    DocuCraft AI - Complete 100% Tools Multilingual Assistant
+   Developer: Indranil Ruidas
    ========================================================= */
 
 let availableVoices = [];
@@ -20,7 +21,53 @@ if ('speechSynthesis' in window) {
   loadSystemVoices();
 }
 
-// 2. Center Floating AI Card UI (Mobile & Laptop)
+// 2. Fix Mic Layout Jitter & Auto-Inject 'AI' Badge Beside Mic
+function initMicAndAiBadge() {
+  const micBtn = document.getElementById('voiceSearchBtn') || document.querySelector('button[onclick*="startVoice"], button[onclick*="toggleVoice"]');
+  if (micBtn) {
+    micBtn.style.display = 'inline-flex';
+    micBtn.style.alignItems = 'center';
+    micBtn.style.justifyContent = 'center';
+    micBtn.style.flexShrink = '0';
+    micBtn.style.minWidth = '38px';
+    micBtn.style.height = '38px';
+    micBtn.style.position = 'relative';
+
+    // Insert AI Badge if not already added
+    if (!document.getElementById('docucraft-ai-badge')) {
+      const aiBadge = document.createElement('span');
+      aiBadge.id = 'docucraft-ai-badge';
+      aiBadge.innerText = 'AI';
+      aiBadge.style.display = 'inline-flex';
+      aiBadge.style.alignItems = 'center';
+      aiBadge.style.justifyContent = 'center';
+      aiBadge.style.fontSize = '10px';
+      aiBadge.style.fontWeight = '800';
+      aiBadge.style.letterSpacing = '0.5px';
+      aiBadge.style.color = '#ffffff';
+      aiBadge.style.background = 'linear-gradient(135deg, #3b82f6, #8b5cf6)';
+      aiBadge.style.padding = '2px 6px';
+      aiBadge.style.borderRadius = '6px';
+      aiBadge.style.marginLeft = '6px';
+      aiBadge.style.boxShadow = '0 0 10px rgba(59, 130, 246, 0.4)';
+      aiBadge.style.userSelect = 'none';
+      aiBadge.style.pointerEvents = 'none';
+
+      micBtn.parentNode.insertBefore(aiBadge, micBtn.nextSibling);
+    }
+  }
+
+  // Ensure fixed height for voice status so text change does not shake input bar
+  const statusElem = document.getElementById('voice-status');
+  if (statusElem) {
+    statusElem.style.display = 'inline-block';
+    statusElem.style.minHeight = '18px';
+    statusElem.style.lineHeight = '18px';
+    statusElem.style.verticalAlign = 'middle';
+  }
+}
+
+// 3. Center Floating AI Card UI (Mobile & Laptop)
 function showCenterAICard(userQuery, aiReply, toolName = '', targetUrl = '') {
   let modal = document.getElementById('aiCenterModal');
   if (!modal) {
@@ -77,7 +124,7 @@ function showCenterAICard(userQuery, aiReply, toolName = '', targetUrl = '') {
 
   if (targetUrl) {
     btnContainer.innerHTML = `
-      <a href="${targetUrl}" style="display: inline-block; padding: 8px 18px; background: linear-gradient(135deg, #2563eb, #3b82f6); color: #fff; text-decoration: none; border-radius: 20px; font-size: 13px; font-weight: 600; box-shadow: 0 4px 12px rgba(37,99,235,0.4);">
+      <a href="${targetUrl}" style="display: inline-block; padding: 8px 20px; background: linear-gradient(135deg, #2563eb, #3b82f6); color: #fff; text-decoration: none; border-radius: 20px; font-size: 13px; font-weight: 600; box-shadow: 0 4px 12px rgba(37,99,235,0.4);">
         এখনই খুলুন →
       </a>
     `;
@@ -97,10 +144,41 @@ function hideCenterAICard() {
   }
 }
 
-// 3. Reliable Multi-Device Speech Function
+// 4. Highlight & Open Card Directly on Page
+function focusAndOpenTool(element, targetUrl = '') {
+  // Switch to 'All' category tab so hidden items appear
+  const allTab = document.querySelector('.filter-btn[onclick*="all"], button[onclick*="all"]');
+  if (allTab && !allTab.classList.contains('active')) {
+    allTab.click();
+  }
+
+  if (element) {
+    element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    element.style.transition = 'all 0.3s ease';
+    element.style.outline = '4px solid #38bdf8';
+    element.style.transform = 'scale(1.04)';
+
+    setTimeout(() => {
+      const clickable = element.querySelector('a, button, [onclick]') || element;
+      if (clickable.tagName === 'A' && clickable.href && !clickable.getAttribute('onclick')) {
+        window.location.href = clickable.href;
+      } else {
+        clickable.click();
+      }
+      setTimeout(() => {
+        element.style.outline = '';
+        element.style.transform = '';
+      }, 1500);
+    }, 400);
+  } else if (targetUrl) {
+    window.location.href = targetUrl;
+  }
+}
+
+// 5. Speech Output Function
 function speakAndDisplay(userQuery, text, langCode = 'en-US', toolName = '', targetUrl = '') {
   if (!isVoiceOutputEnabled || !('speechSynthesis' in window)) return;
-  
+
   window.speechSynthesis.cancel();
   if (autoRedirectTimer) clearTimeout(autoRedirectTimer);
 
@@ -123,14 +201,18 @@ function speakAndDisplay(userQuery, text, langCode = 'en-US', toolName = '', tar
     }
   }
 
-  // কথা বলা শেষ হলে কার্ড স্টপ হবে এবং স্বয়ংক্রিয়ভাবে টুলে নিয়ে যাবে
   currentUtterance.onend = function() {
     autoRedirectTimer = setTimeout(() => {
       hideCenterAICard();
       if (targetUrl) {
-        window.location.href = targetUrl;
+        const cardMatch = document.querySelector(`a[href*="${targetUrl}"], [data-tool*="${targetUrl.replace('.html','')}"]`);
+        if (cardMatch) {
+          focusAndOpenTool(cardMatch, targetUrl);
+        } else {
+          window.location.href = targetUrl;
+        }
       }
-    }, 1200);
+    }, 1000);
   };
 
   currentUtterance.onerror = function() {
@@ -140,44 +222,44 @@ function speakAndDisplay(userQuery, text, langCode = 'en-US', toolName = '', tar
   window.speechSynthesis.speak(currentUtterance);
 }
 
-// 4. Language Detection
+// 6. Language Detection
 function detectLanguage(text) {
   if (/[\u0980-\u09FF]/.test(text)) return 'bn-IN';
   if (/[\u0900-\u097F]/.test(text)) return 'hi-IN';
   return 'en-US';
 }
 
-// 5. Complete Tool Catalog (All 72+ Tools of DocuCraft AI)
+// 7. Complete Tool Catalog
 const siteKnowledgeBase = [
   // --- Document & PDF Tools ---
   { 
     name: "Merge PDF", 
-    desc_bn: "এটি পিডিএফ মার্জার। এখানে একাধিক পিডিএফ ফাইল জোড়া দিয়ে একটি ফাইল করতে পারবেন।",
-    desc_hi: "यह पीडीएफ मर्ज टूल है। यहाँ कई पीडीएफ फाइलों को एक साथ जोड़ सकते हैं।",
+    desc_bn: "এটি পিডিএফ মার্জার। এখানে একাধিক পিডিএফ ফাইল জোড়া দিয়ে একটি ফাইল করতে পারবেন।",
+    desc_hi: "यह पीडीएफ मर्ज टूल है। यहाँ कई पीडीएफ फाइलों को एक साथ जोड़ सकते हैं।",
     desc_en: "This is Merge PDF. Combine multiple PDF documents into a single file.",
-    keywords: ["merge", "scanner", "merger", "pdf jodo", "পিডিএফ জোড়া", "যুক্ত", "jodo"], 
+    keywords: ["merge", "merger", "pdf jodo", "পিডিএফ জোড়া", "যুক্ত", "jodo", "merge pdf"], 
     url: "merge-pdf.html" 
   },
   { 
     name: "Split PDF", 
-    desc_bn: "এটি পিডিএফ স্প্লিট টুল। বড় পিডিএফ থেকে নির্দিষ্ট পেজ কেটে আলাদা করে নিতে পারেন।",
+    desc_bn: "এটি পিডিএফ স্প্লিট টুল। বড় পিডিএফ থেকে নির্দিষ্ট পেজ কেটে আলাদা করে নিতে পারেন।",
     desc_hi: "यह पीडीएफ स्प्लिट टूल है। आप पीडीएफ फाइलों के पेजों को अलग कर सकते हैं।",
     desc_en: "This is Split PDF. Extract and separate specific pages easily.",
-    keywords: ["split", "separate", "tukde", "katna", "ভাগ", "কাটা", "splitter"], 
+    keywords: ["split", "separate", "tukde", "katna", "ভাগ", "কাটা", "splitter", "split pdf"], 
     url: "split-pdf.html" 
   },
   { 
     name: "Compress PDF", 
-    desc_bn: "এটি পিডিএফ কম্প্রেসার। ফাইল কোয়ালিটি ঠিক রেখে সাইজ খুব সহজেই কমিয়ে নিতে পারবেন।",
+    desc_bn: "এটি পিডিএফ কম্প্রেসার। ফাইল কোয়ালিটি ঠিক রেখে সাইজ খুব সহজেই কমিয়ে নিতে পারবেন।",
     desc_hi: "यह पीडीएफ कंप्रेस टूल है। क्वालिटी ठीक रखकर फाइल साइज छोटा करें।",
     desc_en: "This is Compress PDF. Reduce file size while keeping visual quality intact.",
-    keywords: ["compress", "reduce size", "chota karna", "সাইজ কমানো", "কম্প্রেস"], 
+    keywords: ["compress", "reduce size", "chota karna", "সাইজ কমানো", "কম্প্রেস", "compress pdf"], 
     url: "compress-pdf.html" 
   },
   { 
     name: "PDF Scanner & Enhancer", 
     desc_bn: "এটি পিডিএফ স্ক্যানার। ডকুমেন্টের ছবি তুলে পরিষ্কার ও স্পষ্ট পিডিএফে রূপান্তর করুন।",
-    desc_hi: "यह पीडीएफ स्कैनर है। दस्तावेज़ साफ़ और स्पष्ट स्कैन करें।",
+    desc_hi: "यह पीडीएफ स्कैनर है। दस्तावेज़ साफ़ और स्पष्ट स्कैन करें।",
     desc_en: "This is PDF Scanner & Enhancer to scan and sharpen documents.",
     keywords: ["scanner", "scan", "enhance", "स्कैनर", "স্ক্যানার"], 
     url: "pdf-scanner.html" 
@@ -192,7 +274,7 @@ const siteKnowledgeBase = [
   },
   { 
     name: "Repair PDF", 
-    desc_bn: "এটি পিডিএফ রিপেয়ার টুল। নষ্ট বা ওপেন না হওয়া ড্যামেজ পিডিএফ ঠিক করতে সাহায্য করে।",
+    desc_bn: "এটি পিডিএফ রিপেয়ার টুল। নষ্ট বা ওপেন না হওয়া ড্যামেজ পিডিএফ ঠিক করতে সাহায্য করে।",
     desc_hi: "यह पीडीएफ रिपेयर टूल है। खराब पीडीएफ फाइल को ठीक करें।",
     desc_en: "Repair and restore damaged or corrupted PDF documents.",
     keywords: ["repair", "fix", "theek karna", "মেরামত", "corrupt"], 
@@ -200,7 +282,7 @@ const siteKnowledgeBase = [
   },
   { 
     name: "Organize / Reorder Pages", 
-    desc_bn: "এটি পেজ অর্গানাইজার। পিডিএফের পেজগুলোর সিরিয়াল বা সাজানো নিজের ইচ্ছামতো বদলাতে পারেন।",
+    desc_bn: "এটি পেজ অর্গানাইজার। পিডিএফের পেজগুলোর সিরিয়াল নিজের ইচ্ছামতো বদলাতে পারেন।",
     desc_hi: "यह पेज रीऑर्डर टूल है। पीडीएफ पेजों का क्रम बदलें।",
     desc_en: "Rearrange, reorder, or sort PDF pages easily.",
     keywords: ["organize", "reorder", "pages sequence", "সাজানো"], 
@@ -208,7 +290,7 @@ const siteKnowledgeBase = [
   },
   { 
     name: "Rotate PDF", 
-    desc_bn: "এটি রোটেট পিডিএফ। উল্টো থাকা যেকোনো পিডিএফ পেজ ঘুরিয়ে সোজা করতে পারবেন।",
+    desc_bn: "এটি রোটেট পিডিএফ। উল্টো থাকা যেকোনো পিডিএফ পেজ ঘুরিয়ে সোজা করতে পারবেন।",
     desc_hi: "यह पीडीएफ रोटेट टूल है। उल्टे पेजों को घुमाकर सीधा करें।",
     desc_en: "Rotate PDF pages clockwise or counterclockwise.",
     keywords: ["rotate", "ghumaana", "ঘোরানো"], 
@@ -216,24 +298,24 @@ const siteKnowledgeBase = [
   },
   { 
     name: "Delete PDF Pages", 
-    desc_bn: "এটি ডিলিট পেজেস টুল। পিডিএফ থেকে অপ্রয়োজনীয় যেকোনো পেজ বাদ দিতে পারবেন।",
+    desc_bn: "এটি ডিলিট পেজেস টুল। পিডিএফ থেকে অপ্রয়োজনীয় যেকোনো পেজ বাদ দিতে পারবেন।",
     desc_hi: "यह पीडीएफ पेज रिमूवर है। गैर-जरूरी पेज हटाएं।",
     desc_en: "Permanently delete unwanted pages from PDF files.",
-    keywords: ["delete", "remove pages", "hatao", "বাদ দেওয়া", "মুছে ফেলা"], 
+    keywords: ["delete", "remove pages", "hatao", "বাদ দেওয়া", "মুছে ফেলা"], 
     url: "delete-pdf.html" 
   },
   { 
     name: "JPG / PNG to PDF", 
-    desc_bn: "এটি ছবি থেকে পিডিএফ কনভার্টার। যেকোনো ছবি বা ফটো এক ক্লিকে পিডিএফে বদলে নিতে পারবেন।",
-    desc_hi: "यह फोटो से पीडीएफ कनवर्टर है। तस्वीरों को आसानी से पीडीएफ में बदलें।",
+    desc_bn: "এটি ছবি থেকে পিডিএফ কনভার্টার। যেকোনো ছবি এক ক্লিকে পিডিএফে বদলে নিতে পারবেন।",
+    desc_hi: "यह फोटो से पीडीएफ कनवर्टर है।",
     desc_en: "Convert JPG and PNG images into high quality PDFs.",
-    keywords: ["jpg to pdf", "png to pdf", "image to pdf", "photo to pdf", "फोटो से पीडीएफ", "ছবি থেকে পিডিএফ"], 
+    keywords: ["jpg to pdf", "png to pdf", "image to pdf", "photo to pdf", "ছবি থেকে পিডিএফ"], 
     url: "jpg-to-pdf.html" 
   },
   { 
     name: "Word to PDF", 
-    desc_bn: "এটি ওয়ার্ড টু পিডিএফ কনভার্টার। ডক ফাইল সরাসরি পিডিএফে কনভার্ট করতে পারেন।",
-    desc_hi: "यह वर्ड टू पीडीएफ कनवर्टर है। वर्ड फाइल को सीधे पीडीएफ में बदलें।",
+    desc_bn: "এটি ওয়ার্ড টু পিডিএফ কনভার্টার। ডক ফাইল সরাসরি পিডিএফে কনভার্ট করতে পারেন।",
+    desc_hi: "यह वर्ड टू पीडीएफ कनवर्टर है।",
     desc_en: "Convert Word DOCX files directly into PDFs.",
     keywords: ["word to pdf", "docx to pdf", "word converter"], 
     url: "word-to-pdf.html" 
@@ -248,7 +330,7 @@ const siteKnowledgeBase = [
   },
   { 
     name: "PowerPoint to PDF", 
-    desc_bn: "এটি পাওয়ারপয়েন্ট টু পিডিএফ। প্রেজেন্টেশন স্লাইড পিডিএফে সেভ করতে ব্যবহার করুন।",
+    desc_bn: "এটি পাওয়ারপয়েন্ট টু পিডিএফ। প্রেজেন্টেশন স্লাইড পিডিএফে সেভ করতে ব্যবহার করুন।",
     desc_hi: "पावरपॉइंट स्लाइड्स को पीडीएफ में बदलें।",
     desc_en: "Convert PPT and PPTX presentation slides to PDF.",
     keywords: ["powerpoint to pdf", "ppt to pdf", "pptx to pdf", "slides"], 
@@ -256,7 +338,7 @@ const siteKnowledgeBase = [
   },
   { 
     name: "HTML to PDF Converter", 
-    desc_bn: "এটি এইচটিএমএল টু পিডিএফ। যেকোনো ওয়েব পেজ বা কোড পিডিএফে ডাউনলোড করুন।",
+    desc_bn: "এটি এইচটিএমএল টু পিডিএফ। যেকোনো ওয়েব পেজ পিডিএফে ডাউনলোড করুন।",
     desc_hi: "वेबपेज को सीधे पीडीएफ में सेव करें।",
     desc_en: "Convert HTML codes and web pages directly to PDF.",
     keywords: ["html to pdf", "web to pdf"], 
@@ -264,7 +346,7 @@ const siteKnowledgeBase = [
   },
   { 
     name: "PDF to JPG / PNG", 
-    desc_bn: "এটি পিডিএফ টু ফটো কনভার্টার। পিডিএফের পেজগুলোকে হাই রেজোলিউশন ছবিতে রূপান্তর করুন।",
+    desc_bn: "এটি পিডিএফ টু ফটো কনভার্টার। পিডিএফের পেজগুলোকে ছবিতে রূপান্তর করুন।",
     desc_hi: "पीडीएफ पेजों को हाई क्वालिटी फोटो में बदलें।",
     desc_en: "Extract and convert PDF pages into JPG or PNG pictures.",
     keywords: ["pdf to jpg", "pdf to image", "pdf to photo", "pdf to png"], 
@@ -272,7 +354,7 @@ const siteKnowledgeBase = [
   },
   { 
     name: "PDF to Word", 
-    desc_bn: "এটি পিডিএফ টু ওয়ার্ড। পিডিএফ ফাইল এডিট করার জন্য ডকে রূপান্তর করতে পারবেন।",
+    desc_bn: "এটি পিডিএফ টু ওয়ার্ড। পিডিএফ ফাইল এডিট করার জন্য ডকে রূপান্তর করতে পারবেন।",
     desc_hi: "पीडीएफ को एडिटेबल वर्ड फाइल में बदलें।",
     desc_en: "Convert PDF documents into editable Microsoft Word format.",
     keywords: ["pdf to word", "pdf to docx"], 
@@ -288,7 +370,7 @@ const siteKnowledgeBase = [
   },
   { 
     name: "PDF to Text (OCR Extractor)", 
-    desc_bn: "এটি ওসিআর টেক্সট এক্সট্রাক্টর। যেকোনো ডকুমেন্টের ছবি বা পিডিএফ থেকে ভেতরের লেখা কপি করুন।",
+    desc_bn: "এটি ওসিআর টেক্সট এক্সট্রাক্টর। ডকুমেন্টের ছবি থেকে ভেতরের লেখা কপি করুন।",
     desc_hi: "पीडीएफ या फोटो से सीधे लिखावट टेक्स्ट निकालें।",
     desc_en: "Extract plain editable text from scanned PDFs and photos.",
     keywords: ["ocr", "pdf to text", "extract text", "লেখা বের করা"], 
@@ -296,7 +378,7 @@ const siteKnowledgeBase = [
   },
   { 
     name: "Edit PDF", 
-    desc_bn: "এটি পিডিএফ এডিটর। ফাইলে নতুন লেখা যোগ করতে বা কোনো পরিবর্তন করতে এটি কাজে লাগবে।",
+    desc_bn: "এটি পিডিএফ এডিটর। ফাইলে নতুন লেখা যোগ করতে এটি কাজে লাগবে।",
     desc_hi: "पीडीएफ में नया टेक्स्ट लिखें और बदलाव करें।",
     desc_en: "Edit, annotate, and write text on your PDF documents.",
     keywords: ["edit pdf", "write on pdf", "এডিট"], 
@@ -304,31 +386,31 @@ const siteKnowledgeBase = [
   },
   { 
     name: "Sign PDF", 
-    desc_bn: "এটি সাইন পিডিএফ টুল। ডকুমেন্টের ওপর ডিজিটাল সই বসিয়ে নেওয়ার জন্য এটি ব্যবহার করুন।",
-    desc_hi: "दस्तावेज़ों पर डिजिटल हस्ताक्षर लगाने के लिए।",
+    desc_bn: "এটি সাইন পিডিএফ টুল। ডকুমেন্টের ওপর ডিজিটাল সই বসিয়ে নিন।",
+    desc_hi: "दस्तावेज़ों पर डिजिटल हस्ताक्षर लगाने के लिए।",
     desc_en: "Add your personal electronic and digital signatures to PDFs.",
     keywords: ["sign pdf", "signature on pdf", "হস্তাক্ষর", "সই"], 
     url: "sign-pdf.html" 
   },
   { 
     name: "Watermark PDF", 
-    desc_bn: "এটি ওয়াটারমার্ক টুল। ডকুমেন্টে আপনার নাম বা লোগোর জলছাপ যুক্ত করে সুরক্ষিত করুন।",
-    desc_hi: "पीडीएफ में अपना नाम या वॉटरमार्क जोड़ें।",
+    desc_bn: "এটি ওয়াটারমার্ক টুল। ডকুমেন্টে আপনার নাম বা লোগোর জলছাপ যুক্ত করুন।",
+    desc_hi: "पीडीएफ में अपना नाम या वॉटरमार्क जोड़ें।",
     desc_en: "Add custom text or image watermarks to protect your files.",
     keywords: ["watermark", "জলছাপ"], 
     url: "watermark-pdf.html" 
   },
   { 
     name: "Protect / Lock PDF", 
-    desc_bn: "এটি পিডিএফ লক টুল। ফাইলে পাসওয়ার্ড দিয়ে সুরক্ষিত রাখতে এটি ব্যবহার করুন।",
+    desc_bn: "এটি পিডিএফ লক টুল। ফাইলে পাসওয়ার্ড দিয়ে সুরক্ষিত রাখতে এটি ব্যবহার করুন।",
     desc_hi: "पीडीएफ फाइल पर पासवर्ड लगाकर सुरक्षित करें।",
     desc_en: "Encrypt and set strong passwords on your PDF documents.",
-    keywords: ["protect", "lock", "password", "পাসওয়ার্ড", "লক"], 
+    keywords: ["protect", "lock", "password", "পাসওয়ার্ড", "লক"], 
     url: "protect-pdf.html" 
   },
   { 
     name: "Unlock PDF", 
-    desc_bn: "এটি আনলক পিডিএফ। জানা পাসওয়ার্ড স্থায়ীভাবে সরিয়ে দিয়ে ফাইল মুক্ত করুন।",
+    desc_bn: "এটি আনলক পিডিএফ। জানা পাসওয়ার্ড সরিয়ে ফাইল মুক্ত করুন।",
     desc_hi: "पीडीएफ से पासवर्ड हटाएं।",
     desc_en: "Remove passwords and security restrictions from PDFs.",
     keywords: ["unlock", "remove password", "আনলক"], 
@@ -336,25 +418,25 @@ const siteKnowledgeBase = [
   },
   { 
     name: "Add Page Numbers", 
-    desc_bn: "এটি পেজ নম্বর টুল। পিডিএফের প্রতিটি পেজে স্বয়ংক্রিয়ভাবে নম্বর যুক্ত করুন।",
-    desc_hi: "पीडीएफ पेजों पर क्रम से पेज नंबर जोड़ें।",
+    desc_bn: "এটি পেজ নম্বর টুল। পিডিএফের প্রতিটি পেজে নম্বর যুক্ত করুন।",
+    desc_hi: "पीडीएफ पेजों पर क्रम से पेज नंबर जोड़ें।",
     desc_en: "Add customized page numbering headers or footers to PDFs.",
-    keywords: ["page numbers", "page number", "पेज नंबर", "পেজ নম্বর"], 
+    keywords: ["page numbers", "page number", "পেজ নম্বর"], 
     url: "add-page-numbers.html" 
   },
 
   // --- Cyber & Photo Tools ---
   { 
     name: "Photo & Sign KB / MB Resizer", 
-    desc_bn: "এটি ফটো ও সাইন রিসাইজার। সরকারি চাকরির ফর্মের জন্য নির্দিষ্ট কেবি বা এমবি সাইজ করতে পারেন।",
+    desc_bn: "এটি ফটো ও সাইন রিসাইজার। সরকারি ফর্মের জন্য নির্দিষ্ট কেবি বা এমবি সাইজ করতে পারেন।",
     desc_hi: "तय केबी साइज के अनुसार फोटो और साइन रीसाइज करें।",
     desc_en: "Compress and resize photo and signatures to exact KB file limits.",
-    keywords: ["resizer", "resize", "photo resizer", "sign resizer", "kb resizer", "mb resizer", "jb resizer", "फोटो रिसाइजर", "রিসাইজার", "ছবি রিসাইজ"], 
+    keywords: ["resizer", "resize", "photo resizer", "sign resizer", "kb resizer", "mb resizer", "রিসাইজার", "ছবি রিসাইজ"], 
     url: "photo-resizer.html" 
   },
   { 
     name: "Exam Photo & Signature Resizer", 
-    desc_bn: "এটি এক্সাম ফর্ম রিসাইজার। এসএসসি, রেল, টেট ও চাকরির পরীক্ষার সাইজ অনুযায়ী ফটো বানান।",
+    desc_bn: "এটি এক্সাম ফর্ম রিসাইজার। এসএসসি ও রেল পরীক্ষার সাইজ অনুযায়ী ফটো বানান।",
     desc_hi: "सरकारी परीक्षाओं के फॉर्म के लिए फोटो व साइन तैयार करें।",
     desc_en: "Pre-set dimensions and KB limits for SSC, UPSC, and exam forms.",
     keywords: ["exam photo", "exam signature", "ssc", "upsc", "neet", "exam form"], 
@@ -362,15 +444,15 @@ const siteKnowledgeBase = [
   },
   { 
     name: "Passport Photo Sheet Maker", 
-    desc_bn: "এটি পাসপোর্ট ফটো মেকার। সাধারণ ছবি দিয়ে এক ক্লিকে প্রিন্ট করার পাসপোর্ট সাইজ শিট তৈরি হবে।",
-    desc_hi: "प्रिंट करने योग्य पासपोर्ट साइज फोटो शीट बनाएं।",
+    desc_bn: "এটি পাসপোর্ট ফটো মেকার। ছবি দিয়ে পাসপোর্ট সাইজ শিট তৈরি করুন।",
+    desc_hi: "पासपोर्ट साइज फोटो शीट बनाएं।",
     desc_en: "Generate printable multi-grid passport photos in standard dimensions.",
-    keywords: ["passport photo", "passport", "पासपोर्ट फोटो", "পাসপোর্ট ছবি"], 
+    keywords: ["passport photo", "passport", "পাসপোর্ট ছবি"], 
     url: "passport-photo.html" 
   },
   { 
     name: "Digital Signature Maker (Sign Pad)", 
-    desc_bn: "এটি ডিজিটাল সিগনেচার প্যাড। স্ক্রিনে সই করে স্বচ্ছ ব্যাকগ্রাউন্ডে পিএনজি ডাউনলোড করুন।",
+    desc_bn: "এটি ডিজিটাল সিগনেচার প্যাড। স্ক্রিনে সই করে স্বচ্ছ পিএনজি ডাউনলোড করুন।",
     desc_hi: "स्क्रीन पर साइन बनाएं और पारदर्शी बैकग्राउंड में डाउनलोड करें।",
     desc_en: "Draw and generate transparent background signature PNGs.",
     keywords: ["digital signature", "sign pad", "draw sign", "ডিজিটাল সিগনেচার"], 
@@ -378,7 +460,7 @@ const siteKnowledgeBase = [
   },
   { 
     name: "QR Code & UPI Generator", 
-    desc_bn: "এটি কিউআর কোড জেনারেটর। পেমেন্টের জন্য বা যেকোনো ওয়েবসাইট লিঙ্কের কিউআর কোড বানাতে পারেন।",
+    desc_bn: "এটি কিউআর কোড জেনারেটর। পেমেন্টের জন্য বা ওয়েবসাইট লিঙ্কের কিউআর কোড বানাতে পারেন।",
     desc_hi: "यूपीआई पेमेंट और वेबसाइट के लिए तुरंत क्यूआर कोड बनाएं।",
     desc_en: "Generate custom QR codes for UPI payments, Wi-Fi, and URLs.",
     keywords: ["qr code", "qr", "upi qr", "কিউআর কোড"], 
@@ -386,15 +468,15 @@ const siteKnowledgeBase = [
   },
   { 
     name: "Color Picker & HEX Extractor", 
-    desc_bn: "এটি কালার পিকার। যেকোনো ডিজাইনের হেক্স কালার কোড সহজে বের করে নিন।",
-    desc_hi: "किसी भी रंग का हेक्स कोड और आरजीबी कोड प्राप्त करें।",
+    desc_bn: "এটি কালার পিকার। যেকোনো ডিজাইনের কালার কোড সহজে বের করে নিন।",
+    desc_hi: "किसी भी रंग का हेक्स कोड प्राप्त करें।",
     desc_en: "Pick colors and extract precise HEX and RGB color values.",
     keywords: ["color picker", "hex extractor", "color code", "কালার পিকার"], 
     url: "color-picker.html" 
   },
   { 
     name: "YouTube Thumbnail Downloader", 
-    desc_bn: "এটি থাম্বনেইল ডাউনলোডার। যেকোনো ইউটিউব ভিডিওর এইচডি থাম্বনেইল ডাউনলোড করতে পারেন।",
+    desc_bn: "এটি থাম্বনেইল ডাউনলোডার। যেকোনো ইউটিউব ভিডিওর থাম্বনেইল ডাউনলোড করতে পারেন।",
     desc_hi: "यूट्यूब वीडियो से एचडी थंबनेल डाउनलोड करें।",
     desc_en: "Download high definition thumbnails from YouTube video links.",
     keywords: ["thumbnail", "youtube thumbnail", "yt thumbnail", "থাম্বনেইল"], 
@@ -404,23 +486,23 @@ const siteKnowledgeBase = [
   // --- Finance & Calculator Tools ---
   { 
     name: "Scientific Calculator", 
-    desc_bn: "এটি সায়েন্টিফিক ক্যালকুলেটর। জটিল গাণিতিক ও বৈজ্ঞানিক হিসাব-নিকাশ করার জন্য এটি ব্যবহার করুন।",
+    desc_bn: "এটি সায়েন্টিফিক ক্যালকুলেটর। জটিল গাণিতিক হিসাব-নিকাশ করার জন্য এটি ব্যবহার করুন।",
     desc_hi: "जटिल वैज्ञानिक और गणितीय गणनाओं के लिए।",
     desc_en: "Full featured scientific calculator for advanced mathematics.",
-    keywords: ["scientific calculator", "calculator", "math", "हिसाब", "ক্যালকুলেটর"], 
+    keywords: ["scientific calculator", "calculator", "math", "হিসাব", "ক্যালকুলেটর", "calculate"], 
     url: "calculator.html" 
   },
   { 
     name: "Loan EMI Calculator", 
-    desc_bn: "এটি লোন ইএমআই ক্যালকুলেটর। যেকোনো লোনের মাসিক কিস্তি ও মোট সুদের হিসাব জানতে পারবেন।",
+    desc_bn: "এটি লোন ইএমআই ক্যালকুলেটর। লোনের মাসিক কিস্তি ও মোট সুদের হিসাব জানতে পারবেন।",
     desc_hi: "अपनी मासिक किस्त और कुल ब्याज का हिसाब लगाएं।",
     desc_en: "Compute monthly EMI, total interest, and loan amortization.",
-    keywords: ["loan emi", "emi calculator", "loan", "किस्त", "লোন", "ইএমআই"], 
+    keywords: ["loan emi", "emi calculator", "loan", "লোন", "ইএমআই"], 
     url: "loan-emi.html" 
   },
   { 
     name: "Loan Prepayment & Interest Saver", 
-    desc_bn: "এটি লোন প্রিপেমেন্ট ক্যালকুলেটর। আগাম কিস্তি দিলে কত টাকা সুদ বাঁচবে তা হিসাব করুন।",
+    desc_bn: "এটি লোন প্রিপেমেন্ট ক্যালকুলেটর। আগাম কিস্তি দিলে কত সুদ বাঁচবে তা হিসাব করুন।",
     desc_hi: "लोन प्रीपेमेंट करके ब्याज बचाने की गणना करें।",
     desc_en: "Calculate how much interest you save with loan prepayments.",
     keywords: ["prepayment", "interest saver", "loan prepayment"], 
@@ -428,15 +510,15 @@ const siteKnowledgeBase = [
   },
   { 
     name: "GST Calculator", 
-    desc_bn: "এটি জিএসটি ক্যালকুলেটর। মূল্যের ওপর জিএসটি ট্যাক্স যোগ বা বাদ দিয়ে দাম বের করতে পারবেন।",
-    desc_hi: "मूल्य पर जीएसटी टैक्स जोड़ने या हटाने की गणना करें।",
+    desc_bn: "এটি জিএসটি ক্যালকুলেটর। মূল্যের ওপর জিএসটি ট্যাক্স যোগ বা বাদ দিয়ে দাম বের করুন।",
+    desc_hi: "मूल्य पर जीएसटी टैक्स जोड़ने या हटाने की गणना करें।",
     desc_en: "Calculate inclusive and exclusive GST tax amounts instantly.",
-    keywords: ["gst calculator", "gst", "जीएसटी", "জিএসটি"], 
+    keywords: ["gst calculator", "gst", "জিএসটি"], 
     url: "gst-calculator.html" 
   },
   { 
     name: "SIP Calculator", 
-    desc_bn: "এটি এসআইপি ক্যালকুলেটর। প্রতি মাসে মিউচুয়াল ফান্ডে বিনিয়োগ করলে ভবিষ্যতে কত রিটার্ন পাবেন তা দেখুন।",
+    desc_bn: "এটি এসআইপি ক্যালকুলেটর। প্রতি মাসে মিউচুয়াল ফান্ডে বিনিয়োগ করলে কত রিটার্ন পাবেন তা দেখুন।",
     desc_hi: "म्यूचुअल फंड एसआईपी निवेश पर मिलने वाले रिटर्न का हिसाब लगाएं।",
     desc_en: "Calculate expected returns on monthly SIP mutual fund investments.",
     keywords: ["sip calculator", "sip", "mutual fund", "এসআইপি"], 
@@ -447,7 +529,7 @@ const siteKnowledgeBase = [
     desc_bn: "এটি সরল ও চক্রবৃদ্ধি সুদ ক্যালকুলেটর। সুদের নিখুঁত লাভ জানতে এটি কাজে লাগবে।",
     desc_hi: "साधारण और चक्रवृद्धि ब्याज की सही गणना करें।",
     desc_en: "Calculate simple and compound interest over specific periods.",
-    keywords: ["simple interest", "compound interest", "interest calculator", "ब्याज", "সুদ"], 
+    keywords: ["simple interest", "compound interest", "interest calculator", "সুদ"], 
     url: "interest-calculator.html" 
   },
   { 
@@ -468,10 +550,10 @@ const siteKnowledgeBase = [
   },
   { 
     name: "Inflation Calculator", 
-    desc_bn: "এটি মুদ্রাস্ফীতি ক্যালকুলেটর। ভবিষ্যৎ বা অতীতের টাকার ক্রয়ক্ষমতা যাচাই করুন।",
+    desc_bn: "এটি মুদ্রাস্ফীতি ক্যালকুলেটর। ভবিষ্যৎ বা অতীতের টাকার ক্রয়ক্ষমতা যাচাই করুন।",
     desc_hi: "महंगाई और पैसे की भविष्य की कीमत की गणना करें।",
     desc_en: "Estimate purchasing power changes and future inflation values.",
-    keywords: ["inflation calculator", "inflation", "মহঙ্গাই", "মুদ্রাস্ফীতি"], 
+    keywords: ["inflation calculator", "inflation", "মুদ্রাস্ফীতি"], 
     url: "inflation-calculator.html" 
   },
   { 
@@ -487,12 +569,12 @@ const siteKnowledgeBase = [
     desc_bn: "এটি বিদ্যুৎ বিল ক্যালকুলেটর। বৈদ্যুতিক সরঞ্জামগুলোর বিদ্যুৎ খরচ হিসাব করুন।",
     desc_hi: "घर के बिजली बिल और यूनिट खपत की गणना करें।",
     desc_en: "Calculate power consumption units and estimated electric bills.",
-    keywords: ["electricity bill", "power calculator", "electric bill", "बिजली बिल", "বিদ্যুৎ বিল"], 
+    keywords: ["electricity bill", "power calculator", "electric bill", "बिजली बिल", "বিদ্যুৎ বিল", "কারেন্ট বিল"], 
     url: "electricity-calculator.html" 
   },
   { 
     name: "Fuel Cost & Trip Mileage Calculator", 
-    desc_bn: "এটি ফুয়েল ও ট্রিপ ক্যালকুলেটর। ভ্রমণের দূরত্ব অনুযায়ী পেট্রোল বা ডিজেল খরচ বের করুন।",
+    desc_bn: "এটি ফুয়েল ও ট্রিপ ক্যালকুলেটর। ভ্রমণের দূরত্ব অনুযায়ী পেট্রোল বা ডিজেল খরচ বের করুন।",
     desc_hi: "यात्रा की दूरी के अनुसार पेट्रोल या डीजल खर्च का हिसाब निकालें।",
     desc_en: "Calculate fuel trip cost and vehicle mileage per kilometer.",
     keywords: ["fuel cost", "mileage calculator", "petrol", "diesel", "তেল খরচ"], 
@@ -516,10 +598,10 @@ const siteKnowledgeBase = [
   },
   { 
     name: "Discount & Sale Calculator", 
-    desc_bn: "এটি ডিসকাউন্ট ক্যালকুলেটর। কেনাকাটায় ছাড়ের পর আসল দাম কত হবে তা হিসাব করুন।",
+    desc_bn: "এটি ডিসকাউন্ট ক্যালকুলেটর। কেনাকাটায় ছাড়ের পর আসল দাম কত হবে তা হিসাব করুন।",
     desc_hi: "छूट के बाद सामान की अंतिम कीमत जानें।",
     desc_en: "Find final sale price and savings after percentage discounts.",
-    keywords: ["discount calculator", "sale calculator", "छूट", "ছাড়"], 
+    keywords: ["discount calculator", "sale calculator", "ছাড়", "ডিসকাউন্ট"], 
     url: "discount-calculator.html" 
   },
   { 
@@ -527,12 +609,12 @@ const siteKnowledgeBase = [
     desc_bn: "এটি শতকরা ক্যালকুলেটর। যেকোনো সংখ্যার শতাংশ খুব সহজে হিসাব করতে পারবেন।",
     desc_hi: "किसी भी संख्या का प्रतिशत तुरंत निकालें।",
     desc_en: "Quick percentage, increase, decrease, and difference calculator.",
-    keywords: ["percentage calculator", "percentage", "प्रतिशत", "শতকরা", "শতাংশ"], 
+    keywords: ["percentage calculator", "percentage", "শতকরা", "শতাংশ"], 
     url: "percentage-calculator.html" 
   },
   { 
     name: "Number to Words (Cheque Amount)", 
-    desc_bn: "এটি নম্বর থেকে কথায় রূপান্তরকারী। ব্যাংকের চেক লেখার জন্য সংখ্যাকে কথায় বদলান।",
+    desc_bn: "এটি নম্বর থেকে কথায় রূপান্তরকারী। ব্যাংকের চেক লেখার জন্য সংখ্যাকে কথায় বদলান।",
     desc_hi: "बैंक चेक भरने के लिए संख्याओं को शब्दों में बदलें।",
     desc_en: "Convert numbers and currency figures into written words.",
     keywords: ["number to words", "cheque amount", "কথায় রূপান্তর"], 
@@ -540,8 +622,8 @@ const siteKnowledgeBase = [
   },
   { 
     name: "Land Area Converter", 
-    desc_bn: "এটি জমির পরিমাপ কনভার্টার। বিঘা, কাঠা, একর, শতক ও স্কয়ার ফিটের নিখুঁত হিসাব পাবেন।",
-    desc_hi: "बीघा, कट्ठा, एकड़ और डिसमिल का सही क्षेत्रफल निकालें।",
+    desc_bn: "এটি জমির পরিমাপ কনভার্টার। বিঘা, কাঠা, একর, শতকের নিখুঁত হিসাব পাবেন।",
+    desc_hi: "बीघा, कट्ठा, एकड़ और डिसमिल का सही क्षेत्रफल निकालें।",
     desc_en: "Convert land units like bigha, katha, acre, and sqft.",
     keywords: ["land area converter", "land converter", "bigha", "katha", "জমির মাপ", "বিঘা", "কাঠা"], 
     url: "land-converter.html" 
@@ -550,23 +632,23 @@ const siteKnowledgeBase = [
   // --- Utilities & Productivity Tools ---
   { 
     name: "DocuCraft AI Translator", 
-    desc_bn: "এটি এআই ট্রান্সলেটর। যেকোনো ভাষার লেখাকে অন্য ভাষায় অনুবাদ করার জন্য এটি ব্যবহার করুন।",
+    desc_bn: "এটি এআই ট্রান্সলেটর। যেকোনো ভাষার লেখাকে অন্য ভাষায় অনুবাদ করুন।",
     desc_hi: "किसी भी भाषा का अन्य भाषाओं में सटीक अनुवाद करें।",
     desc_en: "Translate paragraphs and phrases across multiple global languages.",
-    keywords: ["translator", "translate", "translation", "অনুবাদ", "अनुवाद", "dokocraft translator", "docucraft translator"], 
+    keywords: ["translator", "translate", "translation", "অনুবাদ", "dokocraft translator", "docucraft translator"], 
     url: "translator.html" 
   },
   { 
     name: "Pitch to Text (Voice Typing)", 
-    desc_bn: "এটি ভয়েস টাইপিং টুল। মুখে যা বলবেন তা স্বয়ংক্রিয়ভাবে স্ক্রিনে টাইপ হয়ে যাবে।",
+    desc_bn: "এটি ভয়েস টাইপিং টুল। মুখে যা বলবেন তা স্ক্রিনে টাইপ হয়ে যাবে।",
     desc_hi: "बोलकर आसानी से स्क्रीन पर टाइप करें।",
     desc_en: "Convert spoken speech into accurate real-time text.",
-    keywords: ["pitch to text", "voice typing", "speech to text", "बोलकर लिखना", "ভয়েস টাইপিং"], 
+    keywords: ["pitch to text", "voice typing", "speech to text", "ভয়েস টাইপিং"], 
     url: "voice-typing.html" 
   },
   { 
     name: "Text-to-Speech Converter", 
-    desc_bn: "এটি টেক্সট টু স্পিচ টুল। যেকোনো লেখাকে স্পষ্ট অডিও ভয়েসে রূপান্তর করুন।",
+    desc_bn: "এটি টেক্সট টু স্পিচ টুল। যেকোনো লেখাকে স্পষ্ট অডিও ভয়েসে রূপান্তর করুন।",
     desc_hi: "लिखे हुए टेक्स्ट को ऑडियो आवाज में बदलें।",
     desc_en: "Synthesize written text into clear spoken voice audio.",
     keywords: ["text to speech", "tts", "speak text", "টেক্সট টু স্পিচ"], 
@@ -574,31 +656,31 @@ const siteKnowledgeBase = [
   },
   { 
     name: "Unlimited Text Notepad", 
-    desc_bn: "এটি আনলিমিটেড নোটপ্যাড। যেকোনো গুরুত্বপূর্ণ তথ্য লিখে সেভ করে রাখার জন্য ব্যবহার করুন।",
+    desc_bn: "এটি আনলিমিটেড নোটপ্যাড। যেকোনো গুরুত্বপূর্ণ তথ্য লিখে সেভ করে রাখুন।",
     desc_hi: "अपने जरूरी नोट्स लिखने और कॉपी करने के लिए नोटपैड।",
     desc_en: "Simple, fast, and unlimited browser notepad for your notes.",
-    keywords: ["notepad", "notebook", "text notepad", "unlimited notepad", "नोटपैड", "নোটপ্যাড", "নোটবুক"], 
+    keywords: ["notepad", "notebook", "text notepad", "নোটপ্যাড", "নোটবুক"], 
     url: "notepad.html" 
   },
   { 
     name: "Govt Job Alerts & Results", 
     desc_bn: "এটি চাকরির খবর পোর্টাল। সরকারি চাকরি ও পরীক্ষার রেজাল্টের আপডেট পান।",
-    desc_hi: "सरकारी नौकरियों और परीक्षाओं के ताज़ा परिणाम देखें।",
+    desc_hi: "सरकारी नौकरियों और परीक्षाओं के ताज़ा परिणाम देखें।",
     desc_en: "Find latest government recruitment alerts, exams, and results.",
-    keywords: ["govt job", "job alert", "sarkari result", "सरकारी नौकरी", "চাকরি"], 
+    keywords: ["govt job", "job alert", "sarkari result", "চাকরি", "job"], 
     url: "job-alerts.html" 
   },
   { 
     name: "Age Calculator (Exam DOB)", 
-    desc_bn: "এটি বয়স ক্যালকুলেটর। জন্মতারিখ দিলে আজকের দিনে কত বছর, মাস ও দিন বয়স হলো তা দেখতে পারবেন।",
+    desc_bn: "এটি বয়স ক্যালকুলেটর। জন্মতারিখ দিলে কত বছর, মাস ও দিন বয়স হলো তা দেখুন।",
     desc_hi: "जन्म तिथि से अपनी सटीक उम्र, महीने और दिन जानें।",
     desc_en: "Calculate exact age in years, months, and days from date of birth.",
-    keywords: ["age calculator", "calculate age", "उम्र", "বয়স ক্যালকুলেটর", "বয়স"], 
+    keywords: ["age calculator", "calculate age", "বয়স ক্যালকুলেটর", "বয়স"], 
     url: "age-calculator.html" 
   },
   { 
     name: "Exam Age Eligibility Checker", 
-    desc_bn: "এটি বয়স যোগ্যতা যাচাইকারী। সরকারি চাকরির পরীক্ষায় বসার বয়স আছে কিনা তা মিলিয়ে নিন।",
+    desc_bn: "এটি বয়স যোগ্যতা যাচাইকারী। সরকারি চাকরির পরীক্ষায় বসার বয়স আছে কিনা মিলিয়ে নিন।",
     desc_hi: "सरकारी परीक्षाओं के लिए अपनी आयु सीमा पात्रता जांचें।",
     desc_en: "Check if you satisfy official age eligibility criteria for jobs.",
     keywords: ["age eligibility", "eligibility checker", "যোগ্যতা"], 
@@ -606,15 +688,15 @@ const siteKnowledgeBase = [
   },
   { 
     name: "1-Minute Typing Speed Test", 
-    desc_bn: "এটি টাইপিং স্পিড টেস্ট। ১ মিনিটে কতগুলো শব্দ নির্ভুল টাইপ করতে পারেন তা পরীক্ষা করুন।",
+    desc_bn: "এটি টাইপিং স্পিড টেস্ট। ১ মিনিটে কতগুলো শব্দ নির্ভুল টাইপ করতে পারেন পরীক্ষা করুন।",
     desc_hi: "1 मिनट में अपनी टाइपिंग स्पीड और सटीकता की जांच करें।",
     desc_en: "Test words per minute speed and accuracy in a 60-second test.",
-    keywords: ["typing speed test", "typing test", "speed test", "টাইপিং টেস্ট"], 
+    keywords: ["typing speed test", "typing test", "speed test", "টাইপিং টেস্ট", "typing", "type"], 
     url: "typing-test.html" 
   },
   { 
     name: "Daily Calorie & BMR Calculator", 
-    desc_bn: "এটি ক্যালোরি ক্যালকুলেটর। ফিট থাকার জন্য প্রতিদিন কত ক্যালোরি খাবার প্রয়োজন তা জানুন।",
+    desc_bn: "এটি ক্যালোরি ক্যালকুলেটর। প্রতিদিন কত ক্যালোরি খাবার প্রয়োজন তা জানুন।",
     desc_hi: "दैनिक कैलोरी की जरूरत और बीएमआर का हिसाब लगाएं।",
     desc_en: "Compute daily caloric needs and Basal Metabolic Rate.",
     keywords: ["calorie calculator", "bmr calculator", "daily calorie", "ক্যালোরি"], 
@@ -622,15 +704,15 @@ const siteKnowledgeBase = [
   },
   { 
     name: "Daily Water Intake Goal", 
-    desc_bn: "এটি জল ট্র্যাকার। স্বাস্থ্য ভালো রাখতে সারাদিনে কত লিটার জল খাওয়া উচিত তা নির্ধারণ করুন।",
+    desc_bn: "এটি জল ট্র্যাকার। স্বাস্থ্য ভালো রাখতে সারাদিনে কত লিটার জল খাওয়া উচিত জানুন।",
     desc_hi: "वजन के अनुसार प्रतिदिन पानी पीने का सही लक्ष्य जानें।",
     desc_en: "Determine your optimal daily water hydration requirements.",
-    keywords: ["water intake", "water goal", "পানি খাওয়ার লক্ষ্য", "জল"], 
+    keywords: ["water intake", "water goal", "পানি খাওয়ার লক্ষ্য", "জল"], 
     url: "water-intake.html" 
   },
   { 
     name: "Sleep Calculator", 
-    desc_bn: "এটি ঘুমের হিসাব ক্যালকুলেটর। সতেজ ঘুম থেকে ওঠার জন্য কখন ঘুমাতে যাওয়া উচিত তা হিসাব করুন।",
+    desc_bn: "এটি ঘুমের হিসাব ক্যালকুলেটর। সতেজ ঘুম থেকে ওঠার জন্য ঘুমানোর সঠিক সময় নির্ধারণ করুন।",
     desc_hi: "सही समय पर जागने और सोने के चक्र की गणना करें।",
     desc_en: "Optimize your sleep cycles and wake up refreshed.",
     keywords: ["sleep calculator", "sleep cycle", "ঘুমের হিসাব", "ঘুম"], 
@@ -638,7 +720,7 @@ const siteKnowledgeBase = [
   },
   { 
     name: "Barcode Generator (Code 128)", 
-    desc_bn: "এটি বারকোড জেনারেটর। পণ্যের জন্য যেকোনো কোডের বারকোড বানিয়ে ডাউনলোড করুন।",
+    desc_bn: "এটি বারকোড জেনারেটর। পণ্যের জন্য যেকোনো কোডের বারকোড বানিয়ে নিন।",
     desc_hi: "उत्पादों और बिलिंग के लिए कस्टम बारकोड बनाएं।",
     desc_en: "Generate standard Code 128 barcodes for inventory and products.",
     keywords: ["barcode generator", "barcode", "বারকোড"], 
@@ -646,7 +728,7 @@ const siteKnowledgeBase = [
   },
   { 
     name: "Base64 Encoder & Decoder", 
-    desc_bn: "এটি বেস৬৪ এনকোডার ও ডিকোডার। যেকোনো টেক্সট বা ছবিকে বেস৬৪ কোডে রূপান্তর করুন।",
+    desc_bn: "এটি বেস৬৪ এনকোডার ও ডিকোডার। টেক্সট বা ছবিকে বেস৬৪ কোডে রূপান্তর করুন।",
     desc_hi: "टेक्स्ट और फाइलों को बेस64 में एनकोड और डिकोड करें।",
     desc_en: "Encode and decode raw strings and binary assets into Base64.",
     keywords: ["base64", "base64 encoder", "base64 decoder"], 
@@ -654,10 +736,10 @@ const siteKnowledgeBase = [
   },
   { 
     name: "Random Password & PIN Generator", 
-    desc_bn: "এটি পাসওয়ার্ড ও পিন জেনারেটর। সুরক্ষিত ও শক্তিশালী পাসওয়ার্ড স্বয়ংক্রিয়ভাবে তৈরি করুন।",
+    desc_bn: "এটি পাসওয়ার্ড ও পিন জেনারেটর। শক্তিশালী পাসওয়ার্ড স্বয়ংক্রিয়ভাবে তৈরি করুন।",
     desc_hi: "सुरक्षित और मजबूत पासवर्ड व पिन बनाएं।",
     desc_en: "Generate secure, random, cryptographically strong passwords.",
-    keywords: ["password generator", "pin generator", "random password", "পাসওয়ার্ড জেনারেটর"], 
+    keywords: ["password generator", "pin generator", "random password", "পাসওয়ার্ড জেনারেটর"], 
     url: "password-generator.html" 
   },
   { 
@@ -670,7 +752,7 @@ const siteKnowledgeBase = [
   },
   { 
     name: "Duplicate Line Remover", 
-    desc_bn: "এটি ডুপ্লিকেট লাইন রিমুভার। টেক্সটের তালিকা থেকে একই রকম ডুপ্লিকেট লাইনগুলো মুছে দিন।",
+    desc_bn: "এটি ডুপ্লিকেট লাইন রিমুভার। টেক্সটের তালিকা থেকে ডুপ্লিকেট লাইন মুছে দিন।",
     desc_hi: "टेक्स्ट लिस्ट से डुप्लिकेट पंक्तियाँ हटाएं।",
     desc_en: "Remove repeated and duplicate lines from raw text blocks.",
     keywords: ["duplicate line remover", "remove duplicates"], 
@@ -686,7 +768,7 @@ const siteKnowledgeBase = [
   },
   { 
     name: "Marks to Percentage & CGPA", 
-    desc_bn: "এটি নম্বর থেকে শতাংশ ও সিজিপিএ ক্যালকুলেটর। পরীক্ষার গ্রেড ও পার্সেন্টেজ হিসাব করুন।",
+    desc_bn: "এটি নম্বর থেকে শতাংশ ও সিজিপিএ ক্যালকুলেটর। পরীক্ষার গ্রেড হিসাব করুন।",
     desc_hi: "परीक्षा अंकों से प्रतिशत और सीजीपीए निकालें।",
     desc_en: "Convert academic marks into exact percentages and CGPA grades.",
     keywords: ["marks to percentage", "cgpa calculator", "cgpa"], 
@@ -694,7 +776,7 @@ const siteKnowledgeBase = [
   },
   { 
     name: "Average & Grade Calculator", 
-    desc_bn: "এটি গড় ও গ্রেড ক্যালকুলেটর। নম্বরের গড় ও লেটার গ্রেড বের করুন।",
+    desc_bn: "এটি গড় ও গ্রেড ক্যালকুলেটর। নম্বরের গড় ও লেটার গ্রেড বের করুন।",
     desc_hi: "अंकों का औसत और ग्रेड तय करें।",
     desc_en: "Calculate statistical weighted averages and final letter grades.",
     keywords: ["average calculator", "grade calculator"], 
@@ -702,18 +784,18 @@ const siteKnowledgeBase = [
   },
   { 
     name: "Invoice / Bill Generator", 
-    desc_bn: "এটি ইনভয়েস ও বিল জেনারেটর। ব্যবসার জন্য প্রফেশনাল ক্যাশ মেমো বা জিএসটি বিল তৈরি করুন।",
+    desc_bn: "এটি ইনভয়েস ও বিল জেনারেটর। ব্যবসার জন্য প্রফেশনাল ক্যাশ মেমো বা বিল তৈরি করুন।",
     desc_hi: "दुकान और व्यापार के लिए पेशेवर बिल या इनवॉइस बनाएं।",
     desc_en: "Generate printable invoices and billing receipts with auto tax.",
-    keywords: ["invoice generator", "bill generator", "बिल जनरेटर", "বিল মেকার"], 
+    keywords: ["invoice generator", "bill generator", "বিল জনरेटर", "বিল মেকার"], 
     url: "invoice-generator.html" 
   },
   { 
     name: "Resume / CV Maker to PDF", 
-    desc_bn: "এটি রিজিউমে মেকার। চাকরির জন্য প্রফেশনাল বায়োডাটা তৈরি করে পিডিএফে ডাউনলোড করুন।",
+    desc_bn: "এটি রিজিউমে মেকার। চাকরির জন্য বায়োডাটা তৈরি করে পিডিএফে ডাউনলোড করুন।",
     desc_hi: "नौकरी के लिए शानदार रिज्यूमे और बायोडाटा तैयार करें।",
     desc_en: "Build modern professional resumes and download directly in PDF.",
-    keywords: ["resume maker", "cv maker", "biodata", "बायोडाटा", "রিজিউমে", "সিভি"], 
+    keywords: ["resume maker", "cv maker", "biodata", "রিজিউমে", "সিভি", "resume"], 
     url: "resume-maker.html" 
   },
   { 
@@ -734,16 +816,32 @@ const siteKnowledgeBase = [
   }
 ];
 
-// 6. Matching & Responding when User Speaks
+// 8. Natural Language Processor & Smart Search
 function handleUserQuery(query) {
   if (!query) return;
 
   const raw = query.toLowerCase().trim();
   const lang = detectLanguage(raw);
 
-  const cleanQuery = raw
-    .replace(/^(open|show|find|go to|launch|cholo|dekhao|kholo|please|tool|khol|kholo ji|chalu karo|চালু করো|খুলুন|খোল|দেখাও|খুলবে|খোলো|দাও|আমাকে|হিসাব)\s+/i, '')
-    .trim();
+  // Clean colloquial Bangla, Hindi & English prefixes/suffixes
+  let cleanQuery = raw
+    .replace(/(open|show|find|go to|launch|cholo|dekhao|kholo|please|tool|khol|kholo ji|chalu karo|চালু করো|খুলুন|খোল|দেখাও|খুলবে|খোলো|দাও|আমাকে|হিসাব|টা|টি|করো|করুন)/gi, ' ')
+    .trim()
+    .replace(/\s+/g, ' ');
+
+  // Creator Attribution
+  if (
+    cleanQuery.includes('who made') ||
+    cleanQuery.includes('developer') ||
+    cleanQuery.includes('creator') ||
+    cleanQuery.includes('indranil') ||
+    raw.includes('কে বানিয়েছে') ||
+    raw.includes('কে তৈরি করেছে')
+  ) {
+    const creatorMsg = "DocuCraft AI was developed and created by Indranil Ruidas.";
+    speakAndDisplay(raw, creatorMsg, 'en-US', "Indranil Ruidas", "");
+    return;
+  }
 
   let bestMatchedItem = null;
   let maxScore = 0;
@@ -752,15 +850,15 @@ function handleUserQuery(query) {
     let score = 0;
     const nameLower = item.name.toLowerCase();
 
-    if (cleanQuery === nameLower) score += 120;
-    else if (nameLower.includes(cleanQuery)) score += 80;
-    else if (cleanQuery.includes(nameLower)) score += 60;
+    if (cleanQuery === nameLower) score += 150;
+    else if (nameLower.includes(cleanQuery)) score += 90;
+    else if (cleanQuery.includes(nameLower)) score += 70;
 
     item.keywords.forEach(kw => {
       const kwLower = kw.toLowerCase();
-      if (cleanQuery === kwLower) score += 100;
-      else if (cleanQuery.includes(kwLower)) score += 70;
-      else if (kwLower.includes(cleanQuery)) score += 50;
+      if (cleanQuery === kwLower) score += 120;
+      else if (cleanQuery.includes(kwLower)) score += 80;
+      else if (kwLower.includes(cleanQuery)) score += 60;
     });
 
     if (score > maxScore) {
@@ -778,17 +876,21 @@ function handleUserQuery(query) {
     }
     speakAndDisplay(raw, message, lang, bestMatchedItem.name, bestMatchedItem.url);
   } else {
-    let notFoundMsg = "Sorry, I couldn't find that specific tool. Please tell me what you need.";
-    if (lang === 'bn-IN') {
-      notFoundMsg = "দুঃখিত, এই টুলটি বুঝতে পারিনি। আপনার কী ধরনের কাজ দরকার তা আরেকবার বলুন।";
-    } else if (lang === 'hi-IN') {
-      notFoundMsg = "माफ़ कीजिए, यह टूल नहीं मिला। आपको किस काम के लिए टूल चाहिए कृपया दोबारा बोलें।";
+    // Fallback: Trigger instant live search in existing DocuCraft search box
+    const searchInput = document.getElementById('toolSearchInput') || document.querySelector('#toolSearch, input[type="search"]');
+    if (searchInput) {
+      searchInput.value = cleanQuery;
+      searchInput.dispatchEvent(new Event('input', { bubbles: true }));
+      searchInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
+
+    let notFoundMsg = "Opening search results for you.";
+    if (lang === 'bn-IN') notFoundMsg = "আপনার জন্য টুলটি খুঁজে বের করছি।";
     speakAndDisplay(raw, notFoundMsg, lang, "DocuCraft AI", "");
   }
 }
 
-// 7. Microphone Input Handler (Starts ONLY when user clicks and speaks)
+// 9. Microphone Input Controller (Without Self-Listening Loop)
 function toggleVoiceInput(inputElementId = 'toolSearchInput') {
   const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
   if (!SpeechRecognition) {
@@ -796,7 +898,7 @@ function toggleVoiceInput(inputElementId = 'toolSearchInput') {
     return;
   }
 
-  const micBtn = document.getElementById('voiceSearchBtn');
+  const micBtn = document.getElementById('voiceSearchBtn') || document.querySelector('button[onclick*="startVoice"], button[onclick*="toggleVoice"]');
   const statusElem = document.getElementById('voice-status');
 
   if (isListening && globalRecognition) {
@@ -831,7 +933,7 @@ function toggleVoiceInput(inputElementId = 'toolSearchInput') {
     const transcript = event.results[0][0].transcript;
     if (transcript) {
       const cleanTranscript = transcript.trim();
-      const inputField = document.getElementById(inputElementId);
+      const inputField = document.getElementById(inputElementId) || document.querySelector('#toolSearchInput, input[type="search"]');
       if (inputField) {
         inputField.value = cleanTranscript;
       }
@@ -857,6 +959,7 @@ function toggleVoiceInput(inputElementId = 'toolSearchInput') {
     console.error("Start error:", err);
   }
 }
+
 function handleCardClick(element) {
   const title = element.querySelector('h3, h4, .tool-title')?.innerText || element.innerText.split('\n')[0];
   const url = element.getAttribute('href');
@@ -871,13 +974,16 @@ function handleCardClick(element) {
     speakAndDisplay(title, `Opening ${title}`, 'en-US', title, url);
   }
 }
+
 function startVoice() {
   toggleVoiceInput('toolSearchInput');
 }
-// Global event listener for all tool and popular cards
+
+// 10. Initialization on DOM Load
 document.addEventListener('DOMContentLoaded', () => {
+  initMicAndAiBadge();
+
   const cards = document.querySelectorAll('.popular-card, .tool-card');
-  
   cards.forEach(card => {
     card.addEventListener('click', function(e) {
       if (typeof handleCardClick === 'function') {
