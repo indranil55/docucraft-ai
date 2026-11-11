@@ -1,4 +1,4 @@
-// DocuCraft AI - Production Ready & Bug-Free Script
+// DocuCraft AI - Production Ready & Fast High-Fidelity Script
 
 let activeTool = '';
 let selectedFiles = [];
@@ -211,7 +211,7 @@ function launchTool(toolKey) {
     }
   } else if (toolKey === 'kbResizer') {
     if (title) title.innerText = 'Photo & Sign KB / MB Resizer';
-    if (desc) desc.innerText = 'Resize image to exact KB or MB with 100% original frame, natural brightness & crystal clear quality.';
+    if (desc) desc.innerText = 'Resize image to exact KB or MB with 100% natural colors, zero blur & fast download.';
     if (dropText) dropText.innerText = 'Tap to select photo/signature';
     if (customUI) {
       customUI.innerHTML = `
@@ -224,7 +224,7 @@ function launchTool(toolKey) {
               <option value="MB">MB</option>
             </select>
           </div>
-          <small style="color:#64748b; font-size:11px; margin-top:4px; display:block;">Enter any target value from 1 to 500 (in KB or MB)</small>
+          <small style="color:#64748b; font-size:11px; margin-top:4px; display:block;">Enter size (e.g. 20, 50, 100 KB or 1, 2, 5 MB)</small>
         </div>
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px;">
           <div class="form-group">
@@ -630,7 +630,7 @@ function setProgress(percent, text) {
   if (pct) pct.textContent = Math.round(safe) + '%';
 }
 
-// 100% Reliable Metadata Inflator for Accurate Target Size without Pixel Quality Loss
+// Metadata Inflator for Accurate Target Size without Pixel Quality Degradation
 async function inflateImageToTarget(baseBlob, targetBytes) {
   if (baseBlob.size >= targetBytes) return baseBlob;
 
@@ -809,17 +809,15 @@ async function executeToolAction() {
   }
 
   if (btn) { btn.innerText = 'Processing...'; btn.disabled = true; }
-  setProgress(5, 'Starting...');
+  setProgress(10, 'Processing...');
 
   try {
     const PDFLibObj = await ensurePdfLibLoaded();
 
     // ========================================================
-    // KB & MB Resizer (100% Original Frame, Brightness, & BMP Support)
+    // KB & MB Resizer (Fast, True Color & Original Dimensions)
     // ========================================================
     if (activeTool === 'kbResizer') {
-      setProgress(15, 'Reading original camera picture...');
-      
       const sizeInput = document.getElementById('optTargetSizeVal') || document.getElementById('optPresetSize');
       const valInput = parseFloat(sizeInput?.value) || 50;
       const unit = document.getElementById('optTargetUnit')?.value || 'KB';
@@ -831,90 +829,93 @@ async function executeToolAction() {
         ? Math.floor(valInput * 1024 * 1024)
         : Math.floor(valInput * 1024);
 
-      const rawData = await readFileAsDataURL(selectedFiles[0]);
-      const img = new Image();
-      await new Promise((res, rej) => { img.onload = res; img.onerror = rej; img.src = rawData; });
-
-      // ১. আসল ছবির ডাইমেনশন ও অনুপাত ১০০% স্থির থাকবে (কোনো কাটছাঁট হবে না)
-      const naturalWidth = img.naturalWidth || img.width;
-      const naturalHeight = img.naturalHeight || img.height;
-
-      setProgress(30, 'Preserving natural brightness and original background...');
-
-      const cv = document.createElement('canvas');
-      cv.width = naturalWidth;
-      cv.height = naturalHeight;
-      const cx = cv.getContext('2d', { willReadFrequently: true });
-      
-      cx.imageSmoothingEnabled = true;
-      cx.imageSmoothingQuality = 'high';
-      cx.clearRect(0, 0, naturalWidth, naturalHeight);
-      cx.drawImage(img, 0, 0, naturalWidth, naturalHeight);
-
+      const rawFile = selectedFiles[0];
       let bestBlob = null;
       let finalExt = 'jpg';
 
-      // অপশন ১: BMP ফরম্যাট
-      if (selectedFormat === 'image/bmp') {
-        finalExt = 'bmp';
-        setProgress(60, 'Generating 24-bit clean BMP file...');
-        const baseBlob = canvasToBmpBlob(cv);
-        bestBlob = (baseBlob.size < targetBytes)
-          ? await inflateImageToTarget(baseBlob, targetBytes)
-          : baseBlob;
-      }
-      // অপশন ২: PNG ফরম্যাট (Lossless - কোনো দাগ বা পিক্সেল নষ্ট হবে না)
-      else if (selectedFormat === 'image/png') {
-        finalExt = 'png';
-        setProgress(60, 'Generating crisp PNG image...');
-        const baseBlob = await new Promise(r => cv.toBlob(r, 'image/png'));
-        bestBlob = (baseBlob.size < targetBytes)
-          ? await inflateImageToTarget(baseBlob, targetBytes)
-          : baseBlob;
-      }
-      // অপশন ৩: JPG / JPEG ফরম্যাট (উচ্চ কোয়ালিটি ও ব্যাকগ্রাউন্ড রক্ষা)
-      else {
+      // 1. Instant download if original file is already within target size
+      if (selectedFormat === 'image/jpeg' && rawFile.type === 'image/jpeg' && rawFile.size <= targetBytes && !isMB) {
+        bestBlob = rawFile;
         finalExt = 'jpg';
-        if (isMB) {
-          setProgress(50, `Rendering full frame for ${valInput} MB...`);
-          const baseBlob = await new Promise(r => cv.toBlob(r, 'image/jpeg', 0.98));
+      } else {
+        const rawData = await readFileAsDataURL(rawFile);
+        const img = new Image();
+        await new Promise((res, rej) => { img.onload = res; img.onerror = rej; img.src = rawData; });
 
+        // Maintain 100% original dimensions
+        const naturalWidth = img.naturalWidth || img.width;
+        const naturalHeight = img.naturalHeight || img.height;
+
+        const cv = document.createElement('canvas');
+        cv.width = naturalWidth;
+        cv.height = naturalHeight;
+        
+        // sRGB color space retains natural phone camera exposure and skin tones
+        const cx = cv.getContext('2d', { willReadFrequently: true, colorSpace: 'sRGB' });
+        cx.imageSmoothingEnabled = true;
+        cx.imageSmoothingQuality = 'high';
+        cx.drawImage(img, 0, 0, naturalWidth, naturalHeight);
+
+        // Format 1: BMP
+        if (selectedFormat === 'image/bmp') {
+          finalExt = 'bmp';
+          setProgress(50, 'Converting to BMP...');
+          const baseBlob = canvasToBmpBlob(cv);
           bestBlob = (baseBlob.size < targetBytes)
             ? await inflateImageToTarget(baseBlob, targetBytes)
             : baseBlob;
-        } else {
-          setProgress(50, `Balancing quality for ${valInput} KB...`);
-          
-          let minQ = 0.25; // ব্যাকগ্রাউন্ডের দেয়াল যেন চারকোনা ব্লকে না ফাটে
-          let maxQ = 0.98;
-          let loops = 0;
+        }
+        // Format 2: PNG (Lossless)
+        else if (selectedFormat === 'image/png') {
+          finalExt = 'png';
+          setProgress(50, 'Converting to PNG...');
+          const baseBlob = await new Promise(r => cv.toBlob(r, 'image/png'));
+          bestBlob = (baseBlob.size < targetBytes)
+            ? await inflateImageToTarget(baseBlob, targetBytes)
+            : baseBlob;
+        }
+        // Format 3: JPG / JPEG
+        else {
+          finalExt = 'jpg';
+          if (isMB) {
+            setProgress(60, `Scaling to ${valInput} MB...`);
+            const baseBlob = await new Promise(r => cv.toBlob(r, 'image/jpeg', 0.98));
+            bestBlob = (baseBlob.size < targetBytes)
+              ? await inflateImageToTarget(baseBlob, targetBytes)
+              : baseBlob;
+          } else {
+            setProgress(50, `Optimizing for ${valInput} KB...`);
+            
+            // Fast binary search: 4-5 steps max
+            let minQ = 0.35;
+            let maxQ = 0.98;
+            let currentBlob = null;
 
-          while (loops < 14) {
-            const midQ = Number(((minQ + maxQ) / 2).toFixed(3));
-            const b = await new Promise(r => cv.toBlob(r, 'image/jpeg', midQ));
+            for (let step = 0; step < 5; step++) {
+              const testQ = Number(((minQ + maxQ) / 2).toFixed(2));
+              const b = await new Promise(r => cv.toBlob(r, 'image/jpeg', testQ));
+              if (!b) break;
 
-            if (!b) break;
-
-            if (b.size <= targetBytes) {
-              bestBlob = b;
-              minQ = midQ;
-            } else {
-              maxQ = midQ;
+              if (b.size <= targetBytes) {
+                currentBlob = b;
+                minQ = testQ;
+              } else {
+                maxQ = testQ;
+              }
             }
-            loops++;
-          }
 
-          if (!bestBlob) {
-            bestBlob = await new Promise(r => cv.toBlob(r, 'image/jpeg', 0.45));
-          }
+            if (!currentBlob) {
+              currentBlob = await new Promise(r => cv.toBlob(r, 'image/jpeg', 0.50));
+            }
 
-          if (bestBlob && bestBlob.size < targetBytes) {
-            bestBlob = await inflateImageToTarget(bestBlob, targetBytes);
+            bestBlob = (currentBlob && currentBlob.size < targetBytes)
+              ? await inflateImageToTarget(currentBlob, targetBytes)
+              : currentBlob;
           }
         }
       }
 
-      setProgress(90, 'Preparing final download...');
+      setProgress(90, 'Ready to save...');
       const finalFileName = `${customName}_${valInput}${unit}.${finalExt}`;
       
       downloadBlob(bestBlob, finalFileName, selectedFormat);
@@ -925,8 +926,8 @@ async function executeToolAction() {
 
       closeWorkspace();
       setTimeout(() => {
-        showSuccessPopup(`Photo Resized Successfully (${sizeDisplay})! Frame, face, & natural background 100% intact.`);
-      }, 300);
+        showSuccessPopup(`Success! Downloaded (${sizeDisplay}). Original colors & frame 100% preserved.`);
+      }, 250);
       return;
 
     } else if (activeTool === 'passportGrid') {
@@ -947,7 +948,7 @@ async function executeToolAction() {
       const singleCanvas = document.createElement('canvas');
       singleCanvas.width = pw;
       singleCanvas.height = ph;
-      const sCtx = singleCanvas.getContext('2d');
+      const sCtx = singleCanvas.getContext('2d', { colorSpace: 'sRGB' });
       sCtx.imageSmoothingEnabled = true;
       sCtx.imageSmoothingQuality = 'high';
 
@@ -992,7 +993,7 @@ async function executeToolAction() {
         const gridCanvas = document.createElement('canvas');
         gridCanvas.width = (cols * pw) + ((cols - 1) * gap) + (padding * 2);
         gridCanvas.height = (rows * ph) + ((rows - 1) * gap) + (padding * 2);
-        const gCtx = gridCanvas.getContext('2d');
+        const gCtx = gridCanvas.getContext('2d', { colorSpace: 'sRGB' });
         gCtx.imageSmoothingEnabled = true;
         gCtx.imageSmoothingQuality = 'high';
 
@@ -1030,7 +1031,7 @@ async function executeToolAction() {
         const gridCanvas = document.createElement('canvas');
         gridCanvas.width = (cols * pw) + ((cols - 1) * gap) + (padding * 2);
         gridCanvas.height = (rows * ph) + ((rows - 1) * gap) + (padding * 2);
-        const gCtx = gridCanvas.getContext('2d');
+        const gCtx = gridCanvas.getContext('2d', { colorSpace: 'sRGB' });
         gCtx.imageSmoothingEnabled = true;
         gCtx.imageSmoothingQuality = 'high';
 
@@ -1073,7 +1074,7 @@ async function executeToolAction() {
       const canvas = document.createElement('canvas');
       canvas.width = targetW;
       canvas.height = targetH;
-      const ctx = canvas.getContext('2d');
+      const ctx = canvas.getContext('2d', { colorSpace: 'sRGB' });
       ctx.imageSmoothingEnabled = true;
       ctx.imageSmoothingQuality = 'high';
 
@@ -1082,7 +1083,7 @@ async function executeToolAction() {
       ctx.drawImage(img, 0, 0, targetW, targetH);
 
       let low = 0.40, high = 0.95, bestBlob = null;
-      for (let i = 0; i < 8; i++) {
+      for (let i = 0; i < 6; i++) {
         const quality = (low + high) / 2;
         const b = await new Promise(r => canvas.toBlob(r, 'image/jpeg', quality));
         if (b && b.size <= targetMaxBytes) { 
@@ -1277,5 +1278,5 @@ function downloadBlob(content, name, mimeType = 'application/octet-stream') {
   setTimeout(() => {
     if (a.parentNode) a.parentNode.removeChild(a);
     window.URL.revokeObjectURL(url);
-  }, 1200);
+  }, 1000);
 }
