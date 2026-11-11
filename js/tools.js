@@ -852,8 +852,8 @@ async function executeToolAction() {
         cv.width = naturalWidth;
         cv.height = naturalHeight;
         
-        // Exact pixel reproduction with lowercase srgb standard
-        const cx = cv.getContext('2d', { willReadFrequently: true, colorSpace: 'srgb' });
+        // Use universal standard context without unsupported colorSpace attributes to prevent mobile crash
+        const cx = cv.getContext('2d', { willReadFrequently: true });
         cx.imageSmoothingEnabled = true;
         cx.imageSmoothingQuality = 'high';
         cx.drawImage(img, 0, 0, naturalWidth, naturalHeight);
@@ -950,7 +950,7 @@ async function executeToolAction() {
       const singleCanvas = document.createElement('canvas');
       singleCanvas.width = pw;
       singleCanvas.height = ph;
-      const sCtx = singleCanvas.getContext('2d', { colorSpace: 'srgb' });
+      const sCtx = singleCanvas.getContext('2d');
       sCtx.imageSmoothingEnabled = true;
       sCtx.imageSmoothingQuality = 'high';
 
@@ -995,7 +995,7 @@ async function executeToolAction() {
         const gridCanvas = document.createElement('canvas');
         gridCanvas.width = (cols * pw) + ((cols - 1) * gap) + (padding * 2);
         gridCanvas.height = (rows * ph) + ((rows - 1) * gap) + (padding * 2);
-        const gCtx = gridCanvas.getContext('2d', { colorSpace: 'srgb' });
+        const gCtx = gridCanvas.getContext('2d');
         gCtx.imageSmoothingEnabled = true;
         gCtx.imageSmoothingQuality = 'high';
 
@@ -1033,7 +1033,7 @@ async function executeToolAction() {
         const gridCanvas = document.createElement('canvas');
         gridCanvas.width = (cols * pw) + ((cols - 1) * gap) + (padding * 2);
         gridCanvas.height = (rows * ph) + ((rows - 1) * gap) + (padding * 2);
-        const gCtx = gridCanvas.getContext('2d', { colorSpace: 'srgb' });
+        const gCtx = gridCanvas.getContext('2d');
         gCtx.imageSmoothingEnabled = true;
         gCtx.imageSmoothingQuality = 'high';
 
@@ -1076,7 +1076,7 @@ async function executeToolAction() {
       const canvas = document.createElement('canvas');
       canvas.width = targetW;
       canvas.height = targetH;
-      const ctx = canvas.getContext('2d', { colorSpace: 'srgb' });
+      const ctx = canvas.getContext('2d');
       ctx.imageSmoothingEnabled = true;
       ctx.imageSmoothingQuality = 'high';
 
@@ -1270,7 +1270,7 @@ function downloadBlob(content, name, mimeType = 'application/octet-stream') {
   if (!content) return;
   const blob = content instanceof Blob ? content : new Blob([content], { type: mimeType });
 
-  // CodeQL sink resolution: strict alphanumeric sanitization + URI encoding
+  // CodeQL XSS Warning Fix: Strict alphanumeric sanitization with direct encoded attribute
   const rawBase = String(name || 'downloaded_file').trim();
   const cleanedName = rawBase.replace(/[^a-zA-Z0-9._-]/g, '_').slice(0, 255);
   const safeDownloadName = encodeURIComponent(cleanedName).replace(/%2E/g, '.');
@@ -1280,7 +1280,7 @@ function downloadBlob(content, name, mimeType = 'application/octet-stream') {
   a.style.display = 'none';
   a.setAttribute('href', url);
   a.setAttribute('download', safeDownloadName);
-  
+
   document.body.appendChild(a);
   a.click();
 
