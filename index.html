@@ -4307,7 +4307,6 @@ function executeVoiceCommand(cmd) {
   }
 }
 </script>
-<script type="module" src="./js/auth-ui.js"></script>
 <script type="module" src="js/user-prefs.js"></script>
 <script>
   if ('serviceWorker' in navigator) {
@@ -4548,5 +4547,16 @@ function shareWebsite() {
 })();
 </script>
   <script src="ai-assistant?v=1"></script>
+  <script type="module" src="./js/auth-ui.js"></script>
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+  const micBtn = document.getElementById("micBtn");
+  if (micBtn) {
+    micBtn.addEventListener("click", () => {
+      toggleVoiceInput("toolSearchInput"); // Replace with your actual search input ID
+    });
+  }
+});
+</script>
   </body>
 </html>
