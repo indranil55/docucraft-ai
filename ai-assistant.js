@@ -1,6 +1,6 @@
 /* =========================================================
-   DocuCraft AI - Instant Visual Tool Focus & Center HUD
-   Responsive Across All Global Mobile & Laptop Devices
+   DocuCraft AI - Center Focus Voice Engine (No 404 Redirect)
+   Universal Mobile & Desktop Browser Compatibility
    ========================================================= */
 
 let availableVoices = [];
@@ -9,7 +9,7 @@ let globalRecognition = null;
 let isListening = false;
 let audioUnlocked = false;
 
-// 1. Center Floating AI Card HUD (Mobile & Desktop)
+// 1. Center Floating AI Card HUD
 function showCenterAICard(userQuery, aiReply, toolName = '') {
   let modal = document.getElementById('aiCenterModal');
   if (!modal) {
@@ -51,8 +51,8 @@ function showCenterAICard(userQuery, aiReply, toolName = '') {
         50% { transform: scale(1.1); box-shadow: 0 0 32px rgba(236, 72, 153, 0.8); }
       }
       .ai-focused-card {
-        transform: scale(1.06) !important;
-        box-shadow: 0 0 35px rgba(59, 130, 246, 0.95), 0 0 15px rgba(139, 92, 246, 0.8) !important;
+        transform: scale(1.05) !important;
+        box-shadow: 0 0 30px rgba(59, 130, 246, 0.95), 0 0 15px rgba(139, 92, 246, 0.8) !important;
         border: 2px solid #38bdf8 !important;
         transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1) !important;
         z-index: 9999 !important;
@@ -93,7 +93,6 @@ if ('speechSynthesis' in window) {
   loadSystemVoices();
 }
 
-// Mobile Audio Auto-Unlock on first touch
 function unlockAudioEngine() {
   if (audioUnlocked) return;
   audioUnlocked = true;
@@ -107,7 +106,7 @@ function unlockAudioEngine() {
 document.addEventListener('click', unlockAudioEngine, { once: true });
 document.addEventListener('touchstart', unlockAudioEngine, { once: true });
 
-// 3. Multi-Device Voice Output
+// 3. Multi-Device Voice Output Synthesizer
 function speakText(text, langCode = 'en-US', onComplete) {
   if (!isVoiceOutputEnabled || !('speechSynthesis' in window)) {
     if (typeof onComplete === 'function') onComplete();
@@ -142,99 +141,98 @@ function speakText(text, langCode = 'en-US', onComplete) {
   window.speechSynthesis.speak(utterance);
 }
 
-// Language Detector
-function detectLanguage(text) {
-  if (!text) return 'en-US';
-  if (/[\u0980-\u09FF]/.test(text)) return 'bn-IN';
-  if (/[\u0900-\u097F]/.test(text)) return 'hi-IN';
-  return 'en-US';
-}
-
-// 4. Knowledge Base with Keywords & Target Identifiers
+// 4. Complete Tool Catalog with Keywords and Target Slugs
 const siteKnowledgeBase = [
-  { name: "Merge PDF", keywords: ["merge", "pdf merge", "merge pdf", "মার্জ", "পিডিএফ জোড়া", "যুক্ত"], slug: "merge-pdf" },
-  { name: "Split PDF", keywords: ["split", "split pdf", "ভাগ", "কাটা", "স্প্লিট"], slug: "split-pdf" },
-  { name: "Compress PDF", keywords: ["compress", "compress pdf", "কম্প্রেস", "সাইজ কমানো"], slug: "compress-pdf" },
-  { name: "PDF Scanner & Enhancer", keywords: ["scanner", "scan", "enhance", "স্ক্যানার", "স্ক্যান"], slug: "pdf-scanner" },
-  { name: "ZIP to PDF Converter", keywords: ["zip to pdf", "zip", "জিপ"], slug: "zip-to-pdf" },
-  { name: "Repair PDF", keywords: ["repair", "fix", "মেরামত", "corrupt"], slug: "repair-pdf" },
-  { name: "Organize / Reorder Pages", keywords: ["organize", "reorder", "সাজানো"], slug: "organize-pdf" },
-  { name: "Rotate PDF", keywords: ["rotate", "ঘোরানো"], slug: "rotate-pdf" },
-  { name: "Delete PDF Pages", keywords: ["delete", "remove pages", "বাদ দেওয়া"], slug: "delete-pdf" },
-  { name: "JPG / PNG to PDF", keywords: ["jpg to pdf", "png to pdf", "image to pdf", "ছবি থেকে পিডিএফ"], slug: "jpg-to-pdf" },
-  { name: "Word to PDF", keywords: ["word to pdf", "docx to pdf", "ওয়ার্ড টু পিডিএফ"], slug: "word-to-pdf" },
-  { name: "Excel to PDF", keywords: ["excel to pdf", "xls to pdf", "এক্সেল টু পিডিএফ"], slug: "excel-to-pdf" },
-  { name: "PowerPoint to PDF", keywords: ["powerpoint to pdf", "ppt to pdf", "পাওয়ারপয়েন্ট"], slug: "powerpoint-to-pdf" },
+  // Document & PDF Tools
+  { name: "Merge PDF", keywords: ["merge", "pdf merge", "merge pdf", "combine pdf", "join pdf"], slug: "merge-pdf" },
+  { name: "Split PDF", keywords: ["split", "split pdf", "separate pdf", "extract pages"], slug: "split-pdf" },
+  { name: "Compress PDF", keywords: ["compress", "compress pdf", "reduce size", "shrink pdf"], slug: "compress-pdf" },
+  { name: "PDF Scanner & Enhancer", keywords: ["scanner", "scan", "enhance", "pdf scanner", "document scanner"], slug: "pdf-scanner" },
+  { name: "ZIP to PDF Converter", keywords: ["zip to pdf", "zip", "zip converter"], slug: "zip-to-pdf" },
+  { name: "Repair PDF", keywords: ["repair", "fix", "repair pdf", "corrupt pdf fix"], slug: "repair-pdf" },
+  { name: "Organize / Reorder Pages", keywords: ["organize", "reorder", "sort pages", "rearrange"], slug: "organize-pdf" },
+  { name: "Rotate PDF", keywords: ["rotate", "rotate pdf", "turn pages"], slug: "rotate-pdf" },
+  { name: "Delete PDF Pages", keywords: ["delete", "remove pages", "delete pdf pages"], slug: "delete-pdf" },
+  { name: "JPG / PNG to PDF", keywords: ["jpg to pdf", "png to pdf", "image to pdf", "photo to pdf"], slug: "jpg-to-pdf" },
+  { name: "Word to PDF", keywords: ["word to pdf", "docx to pdf", "doc to pdf"], slug: "word-to-pdf" },
+  { name: "Excel to PDF", keywords: ["excel to pdf", "xls to pdf", "xlsx to pdf"], slug: "excel-to-pdf" },
+  { name: "PowerPoint to PDF", keywords: ["powerpoint to pdf", "ppt to pdf", "slides"], slug: "powerpoint-to-pdf" },
   { name: "HTML to PDF Converter", keywords: ["html to pdf", "web to pdf"], slug: "html-to-pdf" },
-  { name: "PDF to JPG / PNG", keywords: ["pdf to jpg", "pdf to image", "পিডিএফ থেকে ছবি"], slug: "pdf-to-jpg" },
+  { name: "PDF to JPG / PNG", keywords: ["pdf to jpg", "pdf to image", "pdf to png"], slug: "pdf-to-jpg" },
   { name: "PDF to Word", keywords: ["pdf to word", "pdf to docx"], slug: "pdf-to-word" },
   { name: "PDF to Excel", keywords: ["pdf to excel", "pdf to xlsx"], slug: "pdf-to-excel" },
-  { name: "PDF to Text (OCR Extractor)", keywords: ["ocr", "pdf to text", "extract text", "লেখা বের করা"], slug: "pdf-to-text" },
-  { name: "Edit PDF", keywords: ["edit pdf", "write on pdf", "এডিট"], slug: "edit-pdf" },
-  { name: "Sign PDF", keywords: ["sign pdf", "signature on pdf", "সই"], slug: "sign-pdf" },
-  { name: "Watermark PDF", keywords: ["watermark", "জলছাপ"], slug: "watermark-pdf" },
-  { name: "Protect / Lock PDF", keywords: ["protect", "lock", "password", "পাসওয়ার্ড", "লক"], slug: "protect-pdf" },
-  { name: "Unlock PDF", keywords: ["unlock", "remove password", "আনলক"], slug: "unlock-pdf" },
-  { name: "Add Page Numbers", keywords: ["page numbers", "পেজ নম্বর"], slug: "add-page-numbers" },
-  { name: "Photo & Sign KB / MB Resizer", keywords: ["resizer", "resize", "photo resizer", "sign resizer", "kb resizer", "mb resizer", "রিসাইজার", "ছবি রিসাইজ"], slug: "photo-resizer" },
-  { name: "Exam Photo & Signature Resizer", keywords: ["exam photo", "exam signature", "ssc", "upsc", "চাকরির ছবি"], slug: "exam-resizer" },
-  { name: "Passport Photo Sheet Maker", keywords: ["passport photo", "passport", "পাসপোর্ট ছবি"], slug: "passport-photo" },
-  { name: "Digital Signature Maker (Sign Pad)", keywords: ["digital signature", "sign pad", "ডিজিটাল সই"], slug: "signature-maker" },
-  { name: "QR Code & UPI Generator", keywords: ["qr code", "qr", "upi qr", "কিউআর কোড"], slug: "qr-generator" },
-  { name: "Color Picker & HEX Extractor", keywords: ["color picker", "hex extractor", "কালার পিকার"], slug: "color-picker" },
-  { name: "YouTube Thumbnail Downloader", keywords: ["thumbnail", "youtube thumbnail", "থাম্বনেইল"], slug: "youtube-thumbnail" },
-  { name: "Scientific Calculator", keywords: ["scientific calculator", "calculator", "math", "ক্যালকুলেটর", "হিসাব", "calculate"], slug: "calculator" },
-  { name: "Loan EMI Calculator", keywords: ["loan emi", "emi calculator", "loan", "কিস্তি", "লোন"], slug: "loan-emi" },
-  { name: "Loan Prepayment & Interest Saver", keywords: ["prepayment", "interest saver", "প্রিপেমেন্ট"], slug: "loan-prepayment" },
-  { name: "GST Calculator", keywords: ["gst calculator", "gst", "জিএসটি"], slug: "gst-calculator" },
-  { name: "SIP Calculator", keywords: ["sip calculator", "sip", "mutual fund", "এসআইপি"], slug: "sip-calculator" },
-  { name: "Simple & Compound Interest", keywords: ["simple interest", "compound interest", "সুদ"], slug: "interest-calculator" },
-  { name: "FD & RD Maturity Calculator", keywords: ["fd calculator", "rd calculator", "এফডি"], slug: "fd-rd-calculator" },
-  { name: "Gold & Jewellery Price Calculator", keywords: ["gold calculator", "gold price", "সোনার দাম"], slug: "gold-calculator" },
-  { name: "Inflation Calculator", keywords: ["inflation calculator", "inflation", "মুদ্রাস্ফীতি"], slug: "inflation-calculator" },
-  { name: "PPF Calculator", keywords: ["ppf calculator", "ppf", "পিপিএফ"], slug: "ppf-calculator" },
-  { name: "Electricity Bill & Power Calculator", keywords: ["electricity bill", "power calculator", "বিদ্যুৎ বিল"], slug: "electricity-calculator" },
-  { name: "Fuel Cost & Trip Mileage Calculator", keywords: ["fuel cost", "mileage calculator", "তেল খরচ"], slug: "fuel-calculator" },
-  { name: "Take-Home Salary & CTC Calculator", keywords: ["salary calculator", "ctc calculator", "বেতন", "স্যালারি"], slug: "salary-calculator" },
-  { name: "Friend Bill Split & Tip Calculator", keywords: ["bill split", "tip calculator", "বিল ভাগ"], slug: "bill-split" },
-  { name: "Discount & Sale Calculator", keywords: ["discount calculator", "sale calculator", "ছাড়"], slug: "discount-calculator" },
-  { name: "Percentage Calculator", keywords: ["percentage calculator", "percentage", "শতকরা", "শতাংশ"], slug: "percentage-calculator" },
-  { name: "Number to Words (Cheque Amount)", keywords: ["number to words", "cheque amount", "কথায় রূপান্তর"], slug: "number-to-words" },
-  { name: "Land Area Converter", keywords: ["land area converter", "land converter", "bigha", "katha", "জমির মাপ", "বিঘা", "কাঠা"], slug: "land-converter" },
-  { name: "DocuCraft AI Translator", keywords: ["translator", "translate", "translation", "অনুবাদ", "dokocraft translator"], slug: "translator" },
-  { name: "Pitch to Text (Voice Typing)", keywords: ["pitch to text", "voice typing", "speech to text", "ভয়েস টাইপিং"], slug: "voice-typing" },
-  { name: "Text-to-Speech Converter", keywords: ["text to speech", "tts", "টেক্সট টু স্পিচ"], slug: "text-to-speech" },
-  { name: "Unlimited Text Notepad", keywords: ["notepad", "notebook", "নোটপ্যাড"], slug: "notepad" },
-  { name: "Govt Job Alerts & Results", keywords: ["govt job", "job alert", "sarkari result", "চাকরি"], slug: "job-alerts" },
-  { name: "Age Calculator (Exam DOB)", keywords: ["age calculator", "calculate age", "বয়স ক্যালকুলেটর", "বয়স"], slug: "age-calculator" },
-  { name: "Exam Age Eligibility Checker", keywords: ["age eligibility", "eligibility checker", "যোগ্যতা"], slug: "exam-eligibility" },
-  { name: "1-Minute Typing Speed Test", keywords: ["typing speed test", "typing test", "টাইপিং টেস্ট"], slug: "typing-test" },
-  { name: "Daily Calorie & BMR Calculator", keywords: ["calorie calculator", "bmr calculator", "ক্যালোরি"], slug: "calorie-calculator" },
-  { name: "Daily Water Intake Goal", keywords: ["water intake", "water goal", "জল"], slug: "water-intake" },
-  { name: "Sleep Calculator", keywords: ["sleep calculator", "sleep cycle", "ঘুম"], slug: "sleep-calculator" },
-  { name: "Barcode Generator (Code 128)", keywords: ["barcode generator", "barcode", "বারকোড"], slug: "barcode-generator" },
-  { name: "Base64 Encoder & Decoder", keywords: ["base64", "base64 encoder"], slug: "base64" },
-  { name: "Random Password & PIN Generator", keywords: ["password generator", "pin generator", "পাসওয়ার্ড জেনারেটর"], slug: "password-generator" },
-  { name: "Universal Unit Converter", keywords: ["unit converter", "একক রূপান্তর"], slug: "unit-converter" },
+  { name: "PDF to Text (OCR Extractor)", keywords: ["ocr", "pdf to text", "extract text", "text extractor"], slug: "pdf-to-text" },
+  { name: "Edit PDF", keywords: ["edit pdf", "write on pdf", "modify pdf"], slug: "edit-pdf" },
+  { name: "Sign PDF", keywords: ["sign pdf", "signature on pdf", "digital signature"], slug: "sign-pdf" },
+  { name: "Watermark PDF", keywords: ["watermark", "watermark pdf"], slug: "watermark-pdf" },
+  { name: "Protect / Lock PDF", keywords: ["protect", "lock", "password", "lock pdf", "password pdf"], slug: "protect-pdf" },
+  { name: "Unlock PDF", keywords: ["unlock", "remove password", "unlock pdf"], slug: "unlock-pdf" },
+  { name: "Add Page Numbers", keywords: ["page numbers", "page numbering", "add page numbers"], slug: "add-page-numbers" },
+
+  // Cyber & Photo Tools
+  { name: "Photo & Sign KB / MB Resizer", keywords: ["resizer", "resize", "photo resizer", "sign resizer", "kb resizer", "mb resizer"], slug: "photo-resizer" },
+  { name: "Exam Photo & Signature Resizer", keywords: ["exam photo", "exam signature", "ssc", "upsc", "exam form"], slug: "exam-resizer" },
+  { name: "Passport Photo Sheet Maker", keywords: ["passport photo", "passport", "passport size photo", "photo sheet"], slug: "passport-photo" },
+  { name: "Digital Signature Maker (Sign Pad)", keywords: ["digital signature", "sign pad", "draw sign", "signature maker"], slug: "signature-maker" },
+  { name: "QR Code & UPI Generator", keywords: ["qr code", "qr", "upi qr", "qr generator"], slug: "qr-generator" },
+  { name: "Color Picker & HEX Extractor", keywords: ["color picker", "hex extractor", "color code"], slug: "color-picker" },
+  { name: "YouTube Thumbnail Downloader", keywords: ["thumbnail", "youtube thumbnail", "yt thumbnail"], slug: "youtube-thumbnail" },
+
+  // Finance & Calculator Tools
+  { name: "Scientific Calculator", keywords: ["scientific calculator", "calculator", "math", "calculate"], slug: "calculator" },
+  { name: "Loan EMI Calculator", keywords: ["loan emi", "emi calculator", "loan", "installment"], slug: "loan-emi" },
+  { name: "Loan Prepayment & Interest Saver", keywords: ["prepayment", "interest saver", "loan prepayment"], slug: "loan-prepayment" },
+  { name: "GST Calculator", keywords: ["gst calculator", "gst", "tax calculator"], slug: "gst-calculator" },
+  { name: "SIP Calculator", keywords: ["sip calculator", "sip", "mutual fund"], slug: "sip-calculator" },
+  { name: "Simple & Compound Interest", keywords: ["simple interest", "compound interest", "interest calculator"], slug: "interest-calculator" },
+  { name: "FD & RD Maturity Calculator", keywords: ["fd calculator", "rd calculator", "fixed deposit"], slug: "fd-rd-calculator" },
+  { name: "Gold & Jewellery Price Calculator", keywords: ["gold calculator", "gold price", "jewellery"], slug: "gold-calculator" },
+  { name: "Inflation Calculator", keywords: ["inflation calculator", "inflation"], slug: "inflation-calculator" },
+  { name: "PPF Calculator", keywords: ["ppf calculator", "ppf"], slug: "ppf-calculator" },
+  { name: "Electricity Bill & Power Calculator", keywords: ["electricity bill", "power calculator", "electric bill"], slug: "electricity-calculator" },
+  { name: "Fuel Cost & Trip Mileage Calculator", keywords: ["fuel cost", "mileage calculator", "petrol", "diesel"], slug: "fuel-calculator" },
+  { name: "Take-Home Salary & CTC Calculator", keywords: ["salary calculator", "ctc calculator", "in hand salary", "salary"], slug: "salary-calculator" },
+  { name: "Friend Bill Split & Tip Calculator", keywords: ["bill split", "tip calculator", "split bill"], slug: "bill-split" },
+  { name: "Discount & Sale Calculator", keywords: ["discount calculator", "sale calculator", "discount", "sale"], slug: "discount-calculator" },
+  { name: "Percentage Calculator", keywords: ["percentage calculator", "percentage", "percent"], slug: "percentage-calculator" },
+  { name: "Number to Words (Cheque Amount)", keywords: ["number to words", "cheque amount", "words converter"], slug: "number-to-words" },
+  { name: "Land Area Converter", keywords: ["land area converter", "land converter", "bigha", "katha", "acre", "land measure"], slug: "land-converter" },
+
+  // Utilities & Productivity Tools
+  { name: "DocuCraft AI Translator", keywords: ["translator", "translate", "translation", "docucraft translator"], slug: "translator" },
+  { name: "Pitch to Text (Voice Typing)", keywords: ["pitch to text", "voice typing", "speech to text", "voice type"], slug: "voice-typing" },
+  { name: "Text-to-Speech Converter", keywords: ["text to speech", "tts", "speak text"], slug: "text-to-speech" },
+  { name: "Unlimited Text Notepad", keywords: ["notepad", "notebook", "text notepad", "notes"], slug: "notepad" },
+  { name: "Govt Job Alerts & Results", keywords: ["govt job", "job alert", "sarkari result", "job notifications"], slug: "job-alerts" },
+  { name: "Age Calculator (Exam DOB)", keywords: ["age calculator", "calculate age", "age"], slug: "age-calculator" },
+  { name: "Exam Age Eligibility Checker", keywords: ["age eligibility", "eligibility checker", "eligibility"], slug: "exam-eligibility" },
+  { name: "1-Minute Typing Speed Test", keywords: ["typing speed test", "typing test", "speed test", "typing speed", "typing text"], slug: "typing-test" },
+  { name: "Daily Calorie & BMR Calculator", keywords: ["calorie calculator", "bmr calculator", "daily calorie", "calorie"], slug: "calorie-calculator" },
+  { name: "Daily Water Intake Goal", keywords: ["water intake", "water goal", "daily water"], slug: "water-intake" },
+  { name: "Sleep Calculator", keywords: ["sleep calculator", "sleep cycle", "sleep"], slug: "sleep-calculator" },
+  { name: "Barcode Generator (Code 128)", keywords: ["barcode generator", "barcode", "code 128"], slug: "barcode-generator" },
+  { name: "Base64 Encoder & Decoder", keywords: ["base64", "base64 encoder", "base64 decoder"], slug: "base64" },
+  { name: "Random Password & PIN Generator", keywords: ["password generator", "pin generator", "random password"], slug: "password-generator" },
+  { name: "Universal Unit Converter", keywords: ["unit converter", "universal converter", "convert units"], slug: "unit-converter" },
   { name: "Duplicate Line Remover", keywords: ["duplicate line remover", "remove duplicates"], slug: "duplicate-remover" },
-  { name: "Text Reverse & Flip Tool", keywords: ["text reverse", "flip text", "লেখা উল্টানো"], slug: "text-reverse" },
+  { name: "Text Reverse & Flip Tool", keywords: ["text reverse", "flip text", "reverse text"], slug: "text-reverse" },
   { name: "Marks to Percentage & CGPA", keywords: ["marks to percentage", "cgpa calculator", "cgpa"], slug: "marks-calculator" },
   { name: "Average & Grade Calculator", keywords: ["average calculator", "grade calculator"], slug: "grade-calculator" },
-  { name: "Invoice / Bill Generator", keywords: ["invoice generator", "bill generator", "বিল"], slug: "invoice-generator" },
-  { name: "Resume / CV Maker to PDF", keywords: ["resume maker", "cv maker", "biodata", "রিজিউমে", "সিভি"], slug: "resume-maker" },
-  { name: "Prescription / Memo Maker", keywords: ["prescription maker", "memo maker", "প্রেসক্রিপশন"], slug: "prescription-maker" },
-  { name: "Contact & Support Desk", keywords: ["contact", "support", "help", "সাহায্য", "যোগাযোগ"], slug: "contact" }
+  { name: "Invoice / Bill Generator", keywords: ["invoice generator", "bill generator", "invoice maker"], slug: "invoice-generator" },
+  { name: "Resume / CV Maker to PDF", keywords: ["resume maker", "cv maker", "biodata", "resume builder"], slug: "resume-maker" },
+  { name: "Prescription / Memo Maker", keywords: ["prescription maker", "memo maker", "rx maker"], slug: "prescription-maker" },
+  { name: "Contact & Support Desk", keywords: ["contact", "support", "help", "support desk"], slug: "contact" }
 ];
 
-// 5. Intelligent Match and Bring Directly in Front of Screen
+// 5. Intelligent Match & Bring to Center (Prevents 404 URL Redirects)
 function bringToolToFrontOfScreen(query) {
   if (!query) return;
 
   const raw = query.toLowerCase().trim();
-  const lang = detectLanguage(raw);
 
+  // Strip operational filler phrases
   const cleanQuery = raw
-    .replace(/(open|show|find|go to|launch|cholo|dekhao|kholo|please|tool|khol|kholo ji|chalu karo|চালু করো|খুলুন|খোল|দেখাও|দাও|আমাকে|হিসাব)/gi, ' ')
+    .replace(/(open|show|find|go to|launch|please|tool|bring|give me|calculate|start)/gi, ' ')
     .replace(/\s+/g, ' ')
     .trim();
 
@@ -245,9 +243,11 @@ function bringToolToFrontOfScreen(query) {
     let score = 0;
     const nameLower = item.name.toLowerCase();
 
+    // Exact name match
     if (cleanQuery && nameLower === cleanQuery) score += 200;
     else if (cleanQuery && nameLower.includes(cleanQuery)) score += 90;
 
+    // Keyword match
     item.keywords.forEach(kw => {
       const kwLower = kw.toLowerCase();
       if (cleanQuery && cleanQuery === kwLower) score += 150;
@@ -261,7 +261,6 @@ function bringToolToFrontOfScreen(query) {
     }
   });
 
-  // পেজে থাকা সমস্ত কার্ড সার্চ করা
   const allCards = Array.from(document.querySelectorAll('.tool-card, .popular-card, [data-tool], .grid-item, a'));
   let targetCard = null;
 
@@ -274,37 +273,31 @@ function bringToolToFrontOfScreen(query) {
     });
   }
 
-  // পূর্বের হাইলাইট মুছে ফেলা
+  // Remove existing highlight animations
   document.querySelectorAll('.ai-focused-card').forEach(el => el.classList.remove('ai-focused-card'));
 
   if (targetCard && bestMatchedItem) {
-    // ১. কার্ডটিকে স্ক্রিনের ঠিক মাঝখানে স্ক্রোল করে আনা
+    // Scroll tool card smoothly directly into viewport center
     targetCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
     targetCard.classList.add('ai-focused-card');
 
-    let replyMsg = `Here is your ${bestMatchedItem.name}.`;
-    if (lang === 'bn-IN') replyMsg = `এই যে আপনার ${bestMatchedItem.name}, স্ক্রিনের সামনে আনা হয়েছে।`;
-    else if (lang === 'hi-IN') replyMsg = `यह रहा आपका ${bestMatchedItem.name}, स्क्रीन के सामने आ गया है।`;
+    const replyMsg = `Here is your ${bestMatchedItem.name}. Ready to use.`;
 
-    // ২. সেন্টারে AI কার্ড দেখানো
     showCenterAICard(raw, replyMsg, bestMatchedItem.name);
-    speakText(replyMsg, lang, () => {
+    speakText(replyMsg, 'en-US', () => {
       setTimeout(hideCenterAICard, 2500);
     });
 
-    // ৫ সেকেন্ড পর হাইলাইট আস্তে আস্তে স্বাভাবিক হয়ে যাবে
+    // Remove glow effect after 5 seconds
     setTimeout(() => {
       targetCard.classList.remove('ai-focused-card');
     }, 5000);
 
   } else {
-    let notFound = "Sorry, I couldn't find that tool. Please say the tool name clearly.";
-    if (lang === 'bn-IN') notFound = "দুঃখিত, এই টুলটি বুঝতে পারিনি। দয়া করে টুলের নাম স্পষ্ট করে বলুন।";
-    else if (lang === 'hi-IN') notFound = "माफ़ कीजिए, यह टूल नहीं मिला। कृपया टूल का नाम साफ़ बोलें।";
-
+    const notFound = "Sorry, I couldn't find that tool. Please say the tool name clearly.";
     showCenterAICard(raw, notFound, "DocuCraft AI");
-    speakText(notFound, lang, () => {
-      setTimeout(hideCenterAICard, 3000);
+    speakText(notFound, 'en-US', () => {
+      setTimeout(hideCenterAICard, 2500);
     });
   }
 }
@@ -335,13 +328,11 @@ function toggleVoiceInput(inputElementId = 'toolSearchInput') {
   globalRecognition = new SpeechRecognition();
   globalRecognition.continuous = false;
   globalRecognition.interimResults = false;
+  globalRecognition.lang = 'en-US';
 
-  const userLang = navigator.language || 'en-US';
-  globalRecognition.lang = userLang;
-
-  const greeting = userLang.startsWith('bn') ? "বলুন, কোন টুলটি আপনার সামনে আনব?" : "Which tool would you like to open?";
+  const greeting = "Which tool would you like to find?";
   showCenterAICard('', greeting, 'Indranil AI');
-  speakText(greeting, userLang, () => {
+  speakText(greeting, 'en-US', () => {
     try {
       globalRecognition.start();
     } catch (e) {
@@ -362,6 +353,7 @@ function toggleVoiceInput(inputElementId = 'toolSearchInput') {
       const inputField = document.getElementById(inputElementId);
       if (inputField) inputField.value = cleanTranscript;
 
+      // Bring tool directly in front of the screen (no page redirection)
       bringToolToFrontOfScreen(cleanTranscript);
     }
   };
