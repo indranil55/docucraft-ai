@@ -1021,3 +1021,48 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 });
+// Add Enter key event listener to trigger tool search and focus
+document.addEventListener('DOMContentLoaded', () => {
+  const searchInput = document.getElementById('toolSearchInput') || 
+                      document.querySelector('#toolSearch, input[type="search"]');
+
+  if (searchInput) {
+    searchInput.addEventListener('keydown', function(event) {
+      if (event.key === 'Enter') {
+        event.preventDefault();
+        const query = this.value.trim();
+
+        if (query) {
+          // 1. Ensure 'All' category tab is active so all tools are visible
+          const allCategoryTab = document.querySelector('.filter-btn[onclick*="all"], button[onclick*="all"]');
+          if (allCategoryTab && !allCategoryTab.classList.contains('active')) {
+            allCategoryTab.click();
+          }
+
+          // 2. Trigger smart assistant search to focus and open matching tool
+          if (typeof handleUserQuery === 'function') {
+            handleUserQuery(query);
+          } else {
+            // Direct DOM fallback if assistant is not loaded
+            const queryLower = query.toLowerCase();
+            const cards = Array.from(document.querySelectorAll('.tool-card, .popular-card, [data-tool]'));
+            const matchedCard = cards.find(card => card.innerText.toLowerCase().includes(queryLower));
+
+            if (matchedCard) {
+              matchedCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+              matchedCard.style.outline = '4px solid #38bdf8';
+              setTimeout(() => {
+                const targetLink = matchedCard.querySelector('a') || matchedCard;
+                if (targetLink.href) {
+                  window.location.href = targetLink.href;
+                } else {
+                  targetLink.click();
+                }
+              }, 400);
+            }
+          }
+        }
+      }
+    });
+  }
+});
