@@ -121,7 +121,7 @@ function launchTool(toolKey) {
     if (['merge', 'split', 'compress', 'organize', 'rotate', 'removePages', 'watermark', 'protect', 'unlock', 'pdfToJpg', 'pdfToWord', 'pdfToExcel', 'editPdf'].includes(toolKey)) {
       fileInput.accept = 'application/pdf';
     } else if (['jpgToPdf', 'pngToPdf', 'kbResizer', 'examResizer', 'ocr', 'passportGrid'].includes(toolKey)) {
-      fileInput.accept = 'image/*,image/jpeg,image/png,image/webp,image/jpg';
+      fileInput.accept = 'image/*,image/jpeg,image/png,image/webp,image/jpg,image/bmp';
     } else if (toolKey === 'wordToPdf') {
       fileInput.accept = '.doc,.docx,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document';
     } else if (toolKey === 'excelToPdf') {
@@ -211,7 +211,7 @@ function launchTool(toolKey) {
     }
   } else if (toolKey === 'kbResizer') {
     if (title) title.innerText = 'Photo & Sign KB / MB Resizer';
-    if (desc) desc.innerText = 'Resize image to exact KB or MB with 100% original frame & crystal clear quality.';
+    if (desc) desc.innerText = 'Resize image to exact KB or MB with 100% original frame, natural brightness & crystal clear quality.';
     if (dropText) dropText.innerText = 'Tap to select photo/signature';
     if (customUI) {
       customUI.innerHTML = `
@@ -226,9 +226,19 @@ function launchTool(toolKey) {
           </div>
           <small style="color:#64748b; font-size:11px; margin-top:4px; display:block;">Enter any target value from 1 to 500 (in KB or MB)</small>
         </div>
-        <div class="form-group" style="margin-top:10px;">
-          <label style="font-weight:600; font-size:13px; display:block; margin-bottom:6px;">Save File Name:</label>
-          <input type="text" id="optCustomFileName" class="form-control" value="HD_Resized_Photo" style="width:100%; padding:10px; border:1px solid #d1d5db; border-radius:8px;">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px;">
+          <div class="form-group">
+            <label style="font-weight:600; font-size:13px; display:block; margin-bottom:6px;">Format:</label>
+            <select id="optResizerFormat" class="form-control" style="width:100%; padding:10px; border:1px solid #d1d5db; border-radius:8px; font-size:14px; font-weight:600;">
+              <option value="image/jpeg" selected>JPG / JPEG (Standard)</option>
+              <option value="image/png">PNG (Crystal Clear)</option>
+              <option value="image/bmp">BMP (Raw Bitmap)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label style="font-weight:600; font-size:13px; display:block; margin-bottom:6px;">Save File Name:</label>
+            <input type="text" id="optCustomFileName" class="form-control" value="Photo" style="width:100%; padding:10px; border:1px solid #d1d5db; border-radius:8px; font-size:14px;">
+          </div>
         </div>`;
     }
   } else if (toolKey === 'examResizer') {
@@ -698,6 +708,57 @@ async function inflateImageToTarget(baseBlob, targetBytes) {
   return new Blob(parts, { type: 'image/jpeg' });
 }
 
+// Convert HTML Canvas to 24-bit uncompressed clean BMP Blob
+function canvasToBmpBlob(canvas) {
+  const width = canvas.width;
+  const height = canvas.height;
+  const ctx = canvas.getContext('2d');
+  const imgData = ctx.getImageData(0, 0, width, height);
+  const data = imgData.data;
+
+  const rowSize = Math.floor((24 * width + 31) / 32) * 4;
+  const pixelArraySize = rowSize * height;
+  const fileSize = 54 + pixelArraySize;
+
+  const buffer = new ArrayBuffer(fileSize);
+  const view = new DataView(buffer);
+
+  view.setUint16(0, 0x4D42, false); // 'BM'
+  view.setUint32(2, fileSize, true);
+  view.setUint32(6, 0, true);
+  view.setUint32(10, 54, true);
+
+  view.setUint32(14, 40, true);
+  view.setInt32(18, width, true);
+  view.setInt32(22, height, true);
+  view.setUint16(26, 1, true);
+  view.setUint16(28, 24, true);
+  view.setUint32(30, 0, true);
+  view.setUint32(34, pixelArraySize, true);
+  view.setInt32(38, 2835, true);
+  view.setInt32(42, 2835, true);
+  view.setUint32(46, 0, true);
+  view.setUint32(50, 0, true);
+
+  const uint8 = new Uint8Array(buffer);
+  let pos = 54;
+
+  for (let y = height - 1; y >= 0; y--) {
+    const rowStart = y * width * 4;
+    for (let x = 0; x < width; x++) {
+      const p = rowStart + x * 4;
+      uint8[pos++] = data[p + 2]; // B
+      uint8[pos++] = data[p + 1]; // G
+      uint8[pos++] = data[p];     // R
+    }
+    for (let pad = 0; pad < rowSize - width * 3; pad++) {
+      uint8[pos++] = 0;
+    }
+  }
+
+  return new Blob([buffer], { type: 'image/bmp' });
+}
+
 async function executeToolAction() {
   const btn = document.getElementById('wsActionBtn');
   const originalText = btn ? btn.innerText : 'Process & Download';
@@ -754,15 +815,16 @@ async function executeToolAction() {
     const PDFLibObj = await ensurePdfLibLoaded();
 
     // ========================================================
-    // KB & MB Resizer (Zero Downscale / 100% Original Frame)
+    // KB & MB Resizer (100% Original Frame, Brightness, & BMP Support)
     // ========================================================
     if (activeTool === 'kbResizer') {
-      setProgress(15, 'Reading original HD image...');
+      setProgress(15, 'Reading original camera picture...');
       
       const sizeInput = document.getElementById('optTargetSizeVal') || document.getElementById('optPresetSize');
       const valInput = parseFloat(sizeInput?.value) || 50;
       const unit = document.getElementById('optTargetUnit')?.value || 'KB';
       const customName = document.getElementById('optCustomFileName')?.value?.trim() || 'Photo';
+      const selectedFormat = document.getElementById('optResizerFormat')?.value || 'image/jpeg';
       const isMB = (unit === 'MB');
 
       const targetBytes = isMB
@@ -773,74 +835,89 @@ async function executeToolAction() {
       const img = new Image();
       await new Promise((res, rej) => { img.onload = res; img.onerror = rej; img.src = rawData; });
 
-      // ছবির আসল দৈর্ঘ্য ও প্রস্থ সম্পূর্ণ অক্ষত থাকবে
-      const origW = img.naturalWidth || img.width;
-      const origH = img.naturalHeight || img.height;
+      // ১. আসল ছবির ডাইমেনশন ও অনুপাত ১০০% স্থির থাকবে (কোনো কাটছাঁট হবে না)
+      const naturalWidth = img.naturalWidth || img.width;
+      const naturalHeight = img.naturalHeight || img.height;
 
-      setProgress(30, 'Preserving original face & frame resolution...');
+      setProgress(30, 'Preserving natural brightness and original background...');
 
-      // ক্যানভাস সবসময় মূল রেজোলিউশনে রেন্ডার হবে (কোনো কাটছাঁট হবে না)
       const cv = document.createElement('canvas');
-      cv.width = origW;
-      cv.height = origH;
-      const cx = cv.getContext('2d');
+      cv.width = naturalWidth;
+      cv.height = naturalHeight;
+      const cx = cv.getContext('2d', { willReadFrequently: true });
+      
       cx.imageSmoothingEnabled = true;
       cx.imageSmoothingQuality = 'high';
-      cx.fillStyle = '#ffffff';
-      cx.fillRect(0, 0, origW, origH);
-      cx.drawImage(img, 0, 0, origW, origH);
+      cx.clearRect(0, 0, naturalWidth, naturalHeight);
+      cx.drawImage(img, 0, 0, naturalWidth, naturalHeight);
 
       let bestBlob = null;
+      let finalExt = 'jpg';
 
-      // CASE A: User requested MB (1 MB to 500 MB)
-      if (isMB) {
-        setProgress(50, `Rendering Full HD frame for ${valInput} MB...`);
-        const baseBlob = await new Promise(r => cv.toBlob(r, 'image/jpeg', 0.98));
-
-        if (baseBlob.size < targetBytes) {
-          setProgress(75, `Padding accurately to ${valInput} MB...`);
-          bestBlob = await inflateImageToTarget(baseBlob, targetBytes);
-        } else {
-          bestBlob = baseBlob;
-        }
-      } 
-      // CASE B: User requested KB (10 KB to 500 KB)
+      // অপশন ১: BMP ফরম্যাট
+      if (selectedFormat === 'image/bmp') {
+        finalExt = 'bmp';
+        setProgress(60, 'Generating 24-bit clean BMP file...');
+        const baseBlob = canvasToBmpBlob(cv);
+        bestBlob = (baseBlob.size < targetBytes)
+          ? await inflateImageToTarget(baseBlob, targetBytes)
+          : baseBlob;
+      }
+      // অপশন ২: PNG ফরম্যাট (Lossless - কোনো দাগ বা পিক্সেল নষ্ট হবে না)
+      else if (selectedFormat === 'image/png') {
+        finalExt = 'png';
+        setProgress(60, 'Generating crisp PNG image...');
+        const baseBlob = await new Promise(r => cv.toBlob(r, 'image/png'));
+        bestBlob = (baseBlob.size < targetBytes)
+          ? await inflateImageToTarget(baseBlob, targetBytes)
+          : baseBlob;
+      }
+      // অপশন ৩: JPG / JPEG ফরম্যাট (উচ্চ কোয়ালিটি ও ব্যাকগ্রাউন্ড রক্ষা)
       else {
-        setProgress(50, `Optimizing quality for ${valInput} KB...`);
-        
-        let minQ = 0.05;
-        let maxQ = 0.98;
-        let loops = 0;
+        finalExt = 'jpg';
+        if (isMB) {
+          setProgress(50, `Rendering full frame for ${valInput} MB...`);
+          const baseBlob = await new Promise(r => cv.toBlob(r, 'image/jpeg', 0.98));
 
-        // ছবির ফ্রেম বা সাইজ না কমিয়ে নিখুঁতভাবে কোয়ালিটি অপ্টিমাইজেশন
-        while (loops < 14) {
-          const midQ = Number(((minQ + maxQ) / 2).toFixed(3));
-          const b = await new Promise(r => cv.toBlob(r, 'image/jpeg', midQ));
+          bestBlob = (baseBlob.size < targetBytes)
+            ? await inflateImageToTarget(baseBlob, targetBytes)
+            : baseBlob;
+        } else {
+          setProgress(50, `Balancing quality for ${valInput} KB...`);
+          
+          let minQ = 0.25; // ব্যাকগ্রাউন্ডের দেয়াল যেন চারকোনা ব্লকে না ফাটে
+          let maxQ = 0.98;
+          let loops = 0;
 
-          if (!b) break;
+          while (loops < 14) {
+            const midQ = Number(((minQ + maxQ) / 2).toFixed(3));
+            const b = await new Promise(r => cv.toBlob(r, 'image/jpeg', midQ));
 
-          if (b.size <= targetBytes) {
-            bestBlob = b;
-            minQ = midQ;
-          } else {
-            maxQ = midQ;
+            if (!b) break;
+
+            if (b.size <= targetBytes) {
+              bestBlob = b;
+              minQ = midQ;
+            } else {
+              maxQ = midQ;
+            }
+            loops++;
           }
-          loops++;
-        }
 
-        if (!bestBlob) {
-          bestBlob = await new Promise(r => cv.toBlob(r, 'image/jpeg', 0.15));
-        }
+          if (!bestBlob) {
+            bestBlob = await new Promise(r => cv.toBlob(r, 'image/jpeg', 0.45));
+          }
 
-        if (bestBlob && bestBlob.size < targetBytes) {
-          bestBlob = await inflateImageToTarget(bestBlob, targetBytes);
+          if (bestBlob && bestBlob.size < targetBytes) {
+            bestBlob = await inflateImageToTarget(bestBlob, targetBytes);
+          }
         }
       }
 
       setProgress(90, 'Preparing final download...');
-      const finalFileName = `${customName}_${valInput}${unit}.jpg`;
+      const finalFileName = `${customName}_${valInput}${unit}.${finalExt}`;
       
-      downloadBlob(bestBlob, finalFileName, 'image/jpeg');
+      downloadBlob(bestBlob, finalFileName, selectedFormat);
 
       const sizeDisplay = (bestBlob.size >= 1024 * 1024)
         ? (bestBlob.size / (1024 * 1024)).toFixed(2) + ' MB'
@@ -848,7 +925,7 @@ async function executeToolAction() {
 
       closeWorkspace();
       setTimeout(() => {
-        showSuccessPopup(`Photo Resized Successfully (${sizeDisplay})! Resolution & frame remain 100% original.`);
+        showSuccessPopup(`Photo Resized Successfully (${sizeDisplay})! Frame, face, & natural background 100% intact.`);
       }, 300);
       return;
 
