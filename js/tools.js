@@ -211,30 +211,20 @@ function launchTool(toolKey) {
     }
   } else if (toolKey === 'kbResizer') {
     if (title) title.innerText = 'Photo & Sign KB / MB Resizer';
-    if (desc) desc.innerText = 'Compress or expand image precisely to target KB or MB without exceeding limits or losing clarity.';
+    if (desc) desc.innerText = 'Compress or expand image precisely to target KB or MB without losing visual clarity.';
     if (dropText) dropText.innerText = 'Tap to select photo/signature';
     if (customUI) {
       customUI.innerHTML = `
         <div class="form-group">
-          <label style="font-weight:600; font-size:13px; display:block; margin-bottom:6px;">Select Target Size & Unit:</label>
+          <label style="font-weight:600; font-size:13px; display:block; margin-bottom:6px;">Enter Target Size & Unit:</label>
           <div style="display: flex; gap: 8px;">
-            <select id="optPresetSize" class="form-control" style="flex: 2; padding:10px; border:1px solid #d1d5db; border-radius:8px;">
-              <option value="10">10 KB</option>
-              <option value="20">20 KB</option>
-              <option value="30">30 KB</option>
-              <option value="40">40 KB</option>
-              <option value="50" selected>50 KB</option>
-              <option value="100">100 KB</option>
-              <option value="200">200 KB</option>
-              <option value="300">300 KB</option>
-              <option value="400">400 KB</option>
-              <option value="500">500 KB</option>
-            </select>
-            <select id="optTargetUnit" class="form-control" style="flex: 1; padding:10px; border:1px solid #d1d5db; border-radius:8px;" onchange="updateResizerOptions()">
+            <input type="number" id="optTargetSizeVal" class="form-control" value="50" min="1" max="500" placeholder="e.g. 50" style="flex: 2; padding:10px; border:1px solid #d1d5db; border-radius:8px; font-size:14px; font-weight:600;">
+            <select id="optTargetUnit" class="form-control" style="flex: 1; padding:10px; border:1px solid #d1d5db; border-radius:8px; font-size:14px; font-weight:600;">
               <option value="KB" selected>KB</option>
               <option value="MB">MB</option>
             </select>
           </div>
+          <small style="color:#64748b; font-size:11px; margin-top:4px; display:block;">Enter any size from 1 to 500 (in KB or MB)</small>
         </div>
         <div class="form-group" style="margin-top:10px;">
           <label style="font-weight:600; font-size:13px; display:block; margin-bottom:6px;">Save File Name:</label>
@@ -430,32 +420,7 @@ function launchTool(toolKey) {
 }
 
 function updateResizerOptions() {
-  const unitSelect = document.getElementById('optTargetUnit');
-  const sizeSelect = document.getElementById('optPresetSize');
-  if (!unitSelect || !sizeSelect) return;
-
-  const unit = unitSelect.value;
-  sizeSelect.innerHTML = '';
-
-  if (unit === 'KB') {
-    const kbValues = [10, 20, 30, 40, 50, 100, 200, 300, 400, 500];
-    kbValues.forEach(val => {
-      const opt = document.createElement('option');
-      opt.value = val;
-      opt.text = val + ' KB';
-      if (val === 50) opt.selected = true;
-      sizeSelect.appendChild(opt);
-    });
-  } else {
-    const mbValues = [1, 2, 5, 10, 20, 50, 100, 200, 300, 400, 500];
-    mbValues.forEach(val => {
-      const opt = document.createElement('option');
-      opt.value = val;
-      opt.text = val + ' MB';
-      if (val === 1) opt.selected = true;
-      sizeSelect.appendChild(opt);
-    });
-  }
+  // Free manual input is supported directly
 }
 
 let currentSigColor = '#000000';
@@ -659,6 +624,88 @@ function setProgress(percent, text) {
   if (pct) pct.textContent = Math.round(safe) + '%';
 }
 
+// 100% Reliable Standard COM Marker Inflator for Targeted MB & KB Expansion
+async function inflateImageToTarget(baseBlob, targetBytes) {
+  if (baseBlob.size >= targetBytes) return baseBlob;
+
+  const buffer = await baseBlob.arrayBuffer();
+  const bytes = new Uint8Array(buffer);
+
+  // Check valid JPEG SOI
+  if (bytes.length < 4 || bytes[0] !== 0xFF || bytes[1] !== 0xD8) {
+    // If not standard JPEG, append zero byte padding safely
+    const diff = targetBytes - baseBlob.size;
+    return new Blob([baseBlob, new Uint8Array(diff)], { type: baseBlob.type });
+  }
+
+  // Find Start of Scan (0xFF, 0xDA)
+  let sosIdx = -1;
+  let i = 2;
+  while (i < bytes.length - 1) {
+    if (bytes[i] === 0xFF) {
+      let m = bytes[i + 1];
+      while (m === 0xFF && i < bytes.length - 2) {
+        i++;
+        m = bytes[i + 1];
+      }
+      if (m === 0xDA) {
+        sosIdx = i;
+        break;
+      }
+      if (m === 0xD9) break;
+      if (m >= 0xD0 && m <= 0xD7) { i += 2; continue; }
+      if (m === 0x00) { i += 2; continue; }
+      if (i + 3 < bytes.length) {
+        const len = (bytes[i + 2] << 8) | bytes[i + 3];
+        if (len < 2) { i++; continue; }
+        i += 2 + len;
+      } else {
+        break;
+      }
+    } else {
+      i++;
+    }
+  }
+
+  if (sosIdx === -1) sosIdx = 2;
+
+  let diff = targetBytes - bytes.length;
+  if (diff <= 4) return baseBlob;
+
+  const parts = [bytes.subarray(0, sosIdx)];
+
+  // Create 64 KB reusable comment segment
+  const fullChunkSize = 65535;
+  const fullLc = fullChunkSize - 2;
+  const fullChunk = new Uint8Array(fullChunkSize);
+  fullChunk[0] = 0xFF;
+  fullChunk[1] = 0xFE;
+  fullChunk[2] = (fullLc >> 8) & 0xFF;
+  fullChunk[3] = fullLc & 0xFF;
+  fullChunk.fill(0x20, 4);
+  const fullBlob = new Blob([fullChunk]);
+
+  while (diff >= fullChunkSize) {
+    parts.push(fullBlob);
+    diff -= fullChunkSize;
+  }
+
+  if (diff >= 5) {
+    const remChunkSize = diff;
+    const remLc = remChunkSize - 2;
+    const remChunk = new Uint8Array(remChunkSize);
+    remChunk[0] = 0xFF;
+    remChunk[1] = 0xFE;
+    remChunk[2] = (remLc >> 8) & 0xFF;
+    remChunk[3] = remLc & 0xFF;
+    remChunk.fill(0x20, 4);
+    parts.push(remChunk);
+  }
+
+  parts.push(bytes.subarray(sosIdx));
+  return new Blob(parts, { type: 'image/jpeg' });
+}
+
 async function executeToolAction() {
   const btn = document.getElementById('wsActionBtn');
   const originalText = btn ? btn.innerText : 'Process & Download';
@@ -715,16 +762,18 @@ async function executeToolAction() {
     const PDFLibObj = await ensurePdfLibLoaded();
 
     // ==========================================
-    // KB Resizer (100% Reliable & Accurate Size)
+    // KB & MB Resizer (1 to 500 KB and 1 to 500 MB)
     // ==========================================
     if (activeTool === 'kbResizer') {
       setProgress(15, 'Analyzing image...');
-      const valInput = parseFloat(document.getElementById('optPresetSize')?.value) || 50;
+      
+      const sizeInput = document.getElementById('optTargetSizeVal') || document.getElementById('optPresetSize');
+      const valInput = parseFloat(sizeInput?.value) || 50;
       const unit = document.getElementById('optTargetUnit')?.value || 'KB';
       const customName = document.getElementById('optCustomFileName')?.value?.trim() || 'Resized_Photo';
       const isMB = (unit === 'MB');
 
-      // 1. Standard binary byte target calculation
+      // Exact 1024-based binary calculation
       const targetBytes = isMB
         ? Math.floor(valInput * 1024 * 1024)
         : Math.floor(valInput * 1024);
@@ -737,7 +786,7 @@ async function executeToolAction() {
       let curH = img.naturalHeight || img.height;
       const aspect = curW / curH;
 
-      setProgress(30, 'Optimizing clarity...');
+      setProgress(30, 'Preparing high resolution canvas...');
 
       function renderCanvas(w, h) {
         const cv = document.createElement('canvas');
@@ -754,13 +803,35 @@ async function executeToolAction() {
 
       let bestBlob = null;
 
-      // If already within or smaller than target size (and not requesting upscale to MB)
-      if (selectedFiles[0].size <= targetBytes && !isMB) {
-        bestBlob = selectedFiles[0];
-      } else {
-        // Prevent unnecessary processing on overly large dimensions
-        if (curW > 2400) {
-          curW = 2400;
+      // CASE 1: টার্গেট MB (১ MB থেকে ৫০০ MB)
+      if (isMB) {
+        setProgress(50, `Rendering and scaling to target ${valInput} MB...`);
+        
+        let renderW = curW;
+        let renderH = curH;
+        if (Math.max(renderW, renderH) < 2400) {
+          const factor = Math.min(2.5, 2400 / Math.max(renderW, renderH));
+          renderW = Math.round(renderW * factor);
+          renderH = Math.round(renderW / aspect);
+        }
+
+        const cv = renderCanvas(renderW, renderH);
+        const baseBlob = await new Promise(r => cv.toBlob(r, 'image/jpeg', 0.98));
+
+        // যদি ছবির প্রাথমিক সাইজ টার্গেট MB-র চেয়ে ছোট হয়, স্বয়ংক্রিয়ভাবে এক্সপ্যান্ড করবে
+        if (baseBlob.size < targetBytes) {
+          setProgress(75, `Inflating smoothly to ${valInput} MB...`);
+          bestBlob = await inflateImageToTarget(baseBlob, targetBytes);
+        } else {
+          bestBlob = baseBlob;
+        }
+      } 
+      // CASE 2: টার্গেট KB (১ KB থেকে ৫০০ KB)
+      else {
+        setProgress(40, `Optimizing for ${valInput} KB...`);
+        
+        if (curW > 2000) {
+          curW = 2000;
           curH = Math.round(curW / aspect);
         }
 
@@ -768,7 +839,6 @@ async function executeToolAction() {
         let maxQ = 0.95;
         let loops = 0;
 
-        // Binary search for precise quality and auto-downscaling for small targets (e.g., 10-20 KB)
         while (loops < 14) {
           const midQ = Number(((minQ + maxQ) / 2).toFixed(3));
           const cv = renderCanvas(curW, curH);
@@ -783,26 +853,28 @@ async function executeToolAction() {
             maxQ = midQ;
           }
 
-          // When quality reaches lowest limit and size is still larger than target
           if ((maxQ - minQ) < 0.04 && (!bestBlob || b.size > targetBytes)) {
-            curW = Math.floor(curW * 0.80);
+            curW = Math.floor(curW * 0.82);
             curH = Math.round(curW / aspect);
             minQ = 0.05;
             maxQ = 0.95;
-
-            if (curW < 120) break;
+            if (curW < 100) break;
           }
-
           loops++;
+        }
+
+        if (!bestBlob) {
+          const fallbackCv = renderCanvas(Math.min(curW, 350), Math.round(Math.min(curW, 350) / aspect));
+          bestBlob = await new Promise(r => fallbackCv.toBlob(r, 'image/jpeg', 0.4));
+        }
+
+        // যদি সিলেক্ট করা KB-র চেয়ে ছবি ছোট হয়, টার্গেট অনুযায়ী ইনফ্লেট করবে
+        if (bestBlob && bestBlob.size < targetBytes) {
+          bestBlob = await inflateImageToTarget(bestBlob, targetBytes);
         }
       }
 
-      if (!bestBlob) {
-        const fallbackCv = renderCanvas(Math.min(curW, 400), Math.round(Math.min(curW, 400) / aspect));
-        bestBlob = await new Promise(r => fallbackCv.toBlob(r, 'image/jpeg', 0.5));
-      }
-
-      setProgress(90, 'Preparing download...');
+      setProgress(90, 'Generating final download...');
       const finalFileName = `${customName}_${valInput}${unit}.jpg`;
       
       downloadBlob(bestBlob, finalFileName, 'image/jpeg');
