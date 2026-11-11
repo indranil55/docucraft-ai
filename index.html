@@ -395,7 +395,49 @@
       transform: scale(1.15);
     }
   </style>
+<style>
+/* =========================================================
+   Quick Tools Infinite Marquee Scroll
+   ========================================================= */
+.quick-tools-wrapper {
+  width: 100%;
+  max-width: 760px;
+  margin: 14px auto 0 auto;
+  overflow: hidden;
+  position: relative;
+  mask-image: linear-gradient(to right, transparent 0%, black 10%, black 90%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to right, transparent 0%, black 10%, black 90%, transparent 100%);
+}
 
+.quick-tools-track {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: max-content;
+  animation: smoothMarquee 20s linear infinite;
+}
+
+.quick-tools-track:hover {
+  animation-play-state: paused;
+}
+
+@keyframes smoothMarquee {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+
+.quick-tools-track a,
+.quick-tools-track .quick-pin-pill {
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+</style>
+  
   <script>
     (function() {
       const ua = navigator.userAgent || navigator.vendor || window.opera;
@@ -409,7 +451,24 @@
   </script>
 </head>
 <body id="pageBody">
+<!-- Quick Tools Marquee Buttons -->
+<div class="quick-tools-wrapper">
+  <div class="quick-tools-track">
+    <!-- First Set -->
+    <a href="photo-resizer.html" class="quick-pin-pill">⚡ KB Resizer</a>
+    <a href="merge-pdf.html" class="quick-pin-pill">📑 Merge PDF</a>
+    <a href="notepad.html" class="quick-pin-pill">📝 Notepad</a>
+    <a href="job-alerts.html" class="quick-pin-pill">📢 Govt Jobs</a>
+    <a href="job-alerts.html" class="quick-pin-pill">🔔 Free Job Alert</a>
 
+    <!-- Second Set (Duplicate for seamless infinite loop) -->
+    <a href="photo-resizer.html" class="quick-pin-pill">⚡ KB Resizer</a>
+    <a href="merge-pdf.html" class="quick-pin-pill">📑 Merge PDF</a>
+    <a href="notepad.html" class="quick-pin-pill">📝 Notepad</a>
+    <a href="job-alerts.html" class="quick-pin-pill">📢 Govt Jobs</a>
+    <a href="job-alerts.html" class="quick-pin-pill">🔔 Free Job Alert</a>
+  </div>
+</div>
   <header>
     <div class="nav-container">
       <a href="#" class="brand-logo-svg" style="display: flex; align-items: center; gap: 8px; text-decoration: none;">
