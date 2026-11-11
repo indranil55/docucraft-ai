@@ -1152,12 +1152,6 @@ function downloadBlob(content, name, mimeType = 'application/octet-stream') {
         return;
     }
 
-   if (url && (url.startsWith('blob:') || url.startsWith('data:') || url.startsWith('http:') || url.startsWith('https:'))) {
-    const a = document.createElement('a');
-    a.style.display = 'none';
-    function downloadBlob(content, name, mimeType = 'application/octet-stream') {
-    if (!content) return;
-
     const blob = content instanceof Blob ? content : new Blob([content], { type: mimeType });
     const url = window.URL.createObjectURL(blob);
 
