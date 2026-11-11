@@ -1152,13 +1152,15 @@ function downloadBlob(content, name, mimeType = 'application/octet-stream') {
         return;
     }
 
+   if (url && (url.startsWith('blob:') || url.startsWith('data:') || url.startsWith('http:') || url.startsWith('https:'))) {
     const a = document.createElement('a');
     a.style.display = 'none';
     a.href = url;
     a.download = name || 'downloaded_file';
-
     document.body.appendChild(a);
     a.click();
+    document.body.removeChild(a);
+}
 
     setTimeout(() => {
         if (a.parentNode) {
