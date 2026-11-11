@@ -1,18 +1,13 @@
 /* =========================================================
-   DocuCraft AI - Advanced Autonomous Voice Assistant & Navigator
-   Developer: Indranil Ruidas
-   Full 75+ Tools, Working 'Clear' Button for Recently Used,
-   Filter Non-Tools, Live DOM Focusing & Zero-404 Navigation
+   DocuCraft AI - Complete 100% Tools Multilingual Assistant
    ========================================================= */
 
 let availableVoices = [];
 let isVoiceOutputEnabled = true;
 let globalRecognition = null;
 let isListening = false;
-let isAssistantSpeaking = false;
-
-// Selected Voice Gender ('female' by default)
-let selectedVoiceGender = localStorage.getItem('docucraft_voice_gender') || 'female';
+let currentUtterance = null;
+let autoRedirectTimer = null;
 
 // 1. System Voices Loader
 function loadSystemVoices() {
@@ -25,327 +20,775 @@ if ('speechSynthesis' in window) {
   loadSystemVoices();
 }
 
-// 2. Reliable Speech Synthesis with Callback & State Protection
-function speakText(text, langCode = 'en-US', onComplete = null) {
-  if (!isVoiceOutputEnabled || !('speechSynthesis' in window)) {
-    if (typeof onComplete === 'function') onComplete();
-    return;
+// 2. Center Floating AI Card UI (Mobile & Laptop)
+function showCenterAICard(userQuery, aiReply, toolName = '', targetUrl = '') {
+  let modal = document.getElementById('aiCenterModal');
+  if (!modal) {
+    modal = document.createElement('div');
+    modal.id = 'aiCenterModal';
+    modal.style.position = 'fixed';
+    modal.style.top = '50%';
+    modal.style.left = '50%';
+    modal.style.transform = 'translate(-50%, -50%) scale(0.9)';
+    modal.style.zIndex = '999999';
+    modal.style.background = 'rgba(15, 23, 42, 0.95)';
+    modal.style.backdropFilter = 'blur(16px)';
+    modal.style.border = '1.5px solid rgba(59, 130, 246, 0.4)';
+    modal.style.borderRadius = '24px';
+    modal.style.padding = '24px 28px';
+    modal.style.boxShadow = '0 25px 60px -15px rgba(0, 0, 0, 0.7), 0 0 35px rgba(59, 130, 246, 0.35)';
+    modal.style.width = '90%';
+    modal.style.maxWidth = '460px';
+    modal.style.textAlign = 'center';
+    modal.style.color = '#fff';
+    modal.style.fontFamily = 'system-ui, -apple-system, sans-serif';
+    modal.style.opacity = '0';
+    modal.style.transition = 'all 0.3s cubic-bezier(0.16, 1, 0.3, 1)';
+
+    modal.innerHTML = `
+      <div style="display: flex; justify-content: center; margin-bottom: 12px;">
+        <div id="aiOrb" style="width: 50px; height: 50px; border-radius: 50%; background: linear-gradient(135deg, #3b82f6, #8b5cf6, #ec4899); box-shadow: 0 0 20px rgba(59, 130, 246, 0.6); animation: aiPulse 1.8s infinite ease-in-out;"></div>
+      </div>
+      <div id="aiUserText" style="font-size: 13px; color: #94a3b8; margin-bottom: 6px; font-style: italic;"></div>
+      <div id="aiToolHeader" style="font-size: 18px; font-weight: 700; color: #38bdf8; margin-bottom: 8px;"></div>
+      <div id="aiReplyText" style="font-size: 14.5px; line-height: 1.5; color: #f1f5f9; margin-bottom: 14px;"></div>
+      <div id="aiActionBtnContainer"></div>
+    `;
+
+    const style = document.createElement('style');
+    style.innerHTML = `
+      @keyframes aiPulse {
+        0%, 100% { transform: scale(1); box-shadow: 0 0 20px rgba(59, 130, 246, 0.6); }
+        50% { transform: scale(1.1); box-shadow: 0 0 30px rgba(236, 72, 153, 0.8); }
+      }
+    `;
+    document.head.appendChild(style);
+    document.body.appendChild(modal);
   }
-  window.speechSynthesis.cancel();
 
-  const utterance = new SpeechSynthesisUtterance(text);
-  const voices = availableVoices.length > 0 ? availableVoices : window.speechSynthesis.getVoices();
-  const targetLang = (langCode || 'en').toLowerCase().split('-')[0];
+  const userElem = document.getElementById('aiUserText');
+  const toolElem = document.getElementById('aiToolHeader');
+  const replyElem = document.getElementById('aiReplyText');
+  const btnContainer = document.getElementById('aiActionBtnContainer');
 
-  const matchedVoices = voices.filter(v => 
-    v.lang.toLowerCase() === langCode.toLowerCase() || 
-    v.lang.toLowerCase().startsWith(targetLang)
-  );
+  if (userQuery) userElem.innerText = `“${userQuery}”`;
+  toolElem.innerText = toolName || "DocuCraft AI";
+  replyElem.innerText = aiReply;
 
-  if (matchedVoices.length > 0) {
-    if (selectedVoiceGender === 'female') {
-      utterance.voice = matchedVoices.find(v => 
-        /female|zira|samantha|victoria|karen|veena|lekha|priya|google.*female/i.test(v.name)
-      ) || matchedVoices[0];
-      utterance.pitch = 1.15;
-      utterance.rate = 0.96;
-    } else {
-      utterance.voice = matchedVoices.find(v => 
-        /male|david|george|rishi|neel|google.*male|guy/i.test(v.name)
-      ) || (matchedVoices.length > 1 ? matchedVoices[1] : matchedVoices[0]);
-      utterance.pitch = 0.88;
-      utterance.rate = 0.94;
-    }
+  if (targetUrl) {
+    btnContainer.innerHTML = `
+      <a href="${targetUrl}" style="display: inline-block; padding: 8px 18px; background: linear-gradient(135deg, #2563eb, #3b82f6); color: #fff; text-decoration: none; border-radius: 20px; font-size: 13px; font-weight: 600; box-shadow: 0 4px 12px rgba(37,99,235,0.4);">
+        এখনই খুলুন →
+      </a>
+    `;
   } else {
-    utterance.pitch = selectedVoiceGender === 'female' ? 1.2 : 0.85;
-    utterance.rate = 0.95;
+    btnContainer.innerHTML = '';
   }
 
-  utterance.lang = langCode;
-
-  utterance.onstart = () => {
-    isAssistantSpeaking = true;
-  };
-
-  utterance.onend = () => {
-    isAssistantSpeaking = false;
-    if (typeof onComplete === 'function') onComplete();
-  };
-
-  utterance.onerror = () => {
-    isAssistantSpeaking = false;
-    if (typeof onComplete === 'function') onComplete();
-  };
-
-  window.speechSynthesis.speak(utterance);
+  modal.style.opacity = '1';
+  modal.style.transform = 'translate(-50%, -50%) scale(1)';
 }
 
-// 3. Compact & Smart Welcome Greeting (One-time per session)
-function playSiteInitialGreeting() {
-  if (sessionStorage.getItem('docucraft_greeted')) return;
-  sessionStorage.setItem('docucraft_greeted', 'true');
-
-  const greetingText = "Hi, welcome to DocuCraft AI! What tool do you need today? Just say it, and I will open it for you.";
-  speakText(greetingText, 'en-US');
+function hideCenterAICard() {
+  const modal = document.getElementById('aiCenterModal');
+  if (modal) {
+    modal.style.opacity = '0';
+    modal.style.transform = 'translate(-50%, -50%) scale(0.9)';
+  }
 }
 
-document.addEventListener('click', () => playSiteInitialGreeting(), { once: true });
-document.addEventListener('touchstart', () => playSiteInitialGreeting(), { once: true });
+// 3. Reliable Multi-Device Speech Function
+function speakAndDisplay(userQuery, text, langCode = 'en-US', toolName = '', targetUrl = '') {
+  if (!isVoiceOutputEnabled || !('speechSynthesis' in window)) return;
+  
+  window.speechSynthesis.cancel();
+  if (autoRedirectTimer) clearTimeout(autoRedirectTimer);
 
-// 4. Microphone Assistant Welcome Prompt
-function playIndranilGreeting(onFinished) {
-  const greeting = "I am listening. Which tool do you want to open?";
-  speakText(greeting, 'en-US', onFinished);
+  showCenterAICard(userQuery, text, toolName, targetUrl);
+
+  currentUtterance = new SpeechSynthesisUtterance(text);
+  currentUtterance.rate = 0.95;
+  currentUtterance.pitch = 1.0;
+  currentUtterance.lang = langCode;
+
+  const voices = availableVoices.length > 0 ? availableVoices : window.speechSynthesis.getVoices();
+  if (voices.length > 0) {
+    const target = (langCode || 'en').toLowerCase().split('-')[0];
+    const matchedVoice = voices.find(v => 
+      v.lang.toLowerCase() === langCode.toLowerCase() ||
+      v.lang.toLowerCase().startsWith(target)
+    );
+    if (matchedVoice) {
+      currentUtterance.voice = matchedVoice;
+    }
+  }
+
+  // কথা বলা শেষ হলে কার্ড স্টপ হবে এবং স্বয়ংক্রিয়ভাবে টুলে নিয়ে যাবে
+  currentUtterance.onend = function() {
+    autoRedirectTimer = setTimeout(() => {
+      hideCenterAICard();
+      if (targetUrl) {
+        window.location.href = targetUrl;
+      }
+    }, 1200);
+  };
+
+  currentUtterance.onerror = function() {
+    hideCenterAICard();
+  };
+
+  window.speechSynthesis.speak(currentUtterance);
 }
 
+// 4. Language Detection
 function detectLanguage(text) {
   if (/[\u0980-\u09FF]/.test(text)) return 'bn-IN';
   if (/[\u0900-\u097F]/.test(text)) return 'hi-IN';
   return 'en-US';
 }
 
-// 5. Creator Biography & Knowledge
-const creatorBio = {
-  name: "Indranil Ruidas",
-  fullStory: "DocuCraft AI was developed and architected by Indranil Ruidas, a tech professional and frontend developer from Ajhapur, Purba Bardhaman, West Bengal[cite: 2]. Indranil holds a Diploma in Computer Science and Technology from Sylvan Polytechnic College with 80% marks, an ITI in Computer Science from Sathish Chandra ITI, and a Certificate in Communication and IT from Anudip Foundation[cite: 2]. He has over 3 years of hands-on experience across digital services, CCTV operations, customer assistance, and marketing with organizations like Jus Jumpin, Ezeepay Digital Services, Bharti AXA, and Bajaj Allianz[cite: 2]. He created DocuCraft AI as a free, powerful client-side utility hub for everyone."
-};
-
-const entertainingStories = [
-  "Did you know? The first computer bug was an actual moth stuck inside a Harvard Mark Two computer relay in 1947. Engineers had to literally debug the machine by removing the insect!",
-  "Technology makes everyday work effortless. DocuCraft AI handles all PDF manipulations and calculations securely inside your browser without uploading your files.",
-  "Here is an inspiring thought: In 1995, JavaScript was created in just 10 days! Small consistent efforts create great web solutions.",
-  "Here is a quick riddle: What has keys but cannot open locks? The answer is your keyboard!"
-];
-
-// 6. Complete 75+ Tool Knowledge Base
+// 5. Complete Tool Catalog (All 72+ Tools of DocuCraft AI)
 const siteKnowledgeBase = [
-  // Document & PDF Tools
-  { name: "Merge PDF", bn: "পিডিএফ জোড়া লাগানোর টুল", hi: "पीडीएफ मर्ज टूल", keywords: ["merge", "merger", "pdf jodo", "পিডিএফ জোড়া", "যুক্ত", "jodo"], url: "merge-pdf.html" },
-  { name: "Split PDF", bn: "পিডিএফ স্প্লিট টুল", hi: "पीडीएफ स्प्लिट टूल", keywords: ["split", "separate", "tukde", "ভাগ", "কাটা", "splitter"], url: "split-pdf.html" },
-  { name: "Compress PDF", bn: "পিডিএফ কম্প্রেস টুল", hi: "पीडीएफ कंप्रेस टूल", keywords: ["compress", "reduce size", "সাইজ কমানো", "কম্প্রেস", "chota karna"], url: "compress-pdf.html" },
-  { name: "PDF Scanner & Enhancer", bn: "পিডিএফ স্ক্যানার", hi: "पीडीएफ स्कैनर", keywords: ["scanner", "scan", "enhance", "স্ক্যানার"], url: "pdf-scanner.html" },
-  { name: "ZIP to PDF Converter", bn: "জিপ টু পিডিএফ কনভার্টার", hi: "ज़िप टू पीडीएफ", keywords: ["zip to pdf", "zip converter", "জিপ"], url: "zip-to-pdf.html" },
-  { name: "Repair PDF", bn: "পিডিএফ রিপেয়ার টুল", hi: "पीडीएफ रिपेयर", keywords: ["repair", "fix pdf", "repair pdf", "মেরামত", "corrupt"], url: "repair-pdf.html" },
-  { name: "Organize / Reorder Pages", bn: "পিডিএফ পেজ সাজানোর টুল", hi: "पेज रीऑर्डर टूल", keywords: ["organize", "reorder", "pages sequence", "সাজানো"], url: "organize-pdf.html" },
-  { name: "Rotate PDF", bn: "পিডিএফ ঘোরানোর টুল", hi: "पीडीएफ रोटेट टूल", keywords: ["rotate", "ghumaana", "ঘোরানো"], url: "rotate-pdf.html" },
-  { name: "Delete PDF Pages", bn: "পিডিএফ পেজ মুছে ফেলার টুল", hi: "पीडीएफ पेज हटाएं", keywords: ["delete pages", "remove pages", "বাদ দেওয়া", "মুছে ফেলা"], url: "delete-pdf.html" },
-  { name: "JPG / PNG to PDF", bn: "ছবি থেকে পিডিএফ কনভার্টার", hi: "फोटो से पीडीएफ", keywords: ["jpg to pdf", "png to pdf", "image to pdf", "photo to pdf", "ছবি থেকে পিডিএফ"], url: "jpg-to-pdf.html" },
-  { name: "Word to PDF", bn: "ওয়ার্ড টু পিডিএফ কনভার্টার", hi: "वर्ड टू पीडीएफ", keywords: ["word to pdf", "docx to pdf", "word converter"], url: "word-to-pdf.html" },
-  { name: "Excel to PDF", bn: "এক্সেল টু পিডিএফ কনভার্টার", hi: "एक्सेल टू पीडीएफ", keywords: ["excel to pdf", "xls to pdf", "xlsx to pdf"], url: "excel-to-pdf.html" },
-  { name: "PowerPoint to PDF", bn: "পাওয়ারপয়েন্ট টু পিডিএফ", hi: "पावरपॉइंट টু পিডিএফ", keywords: ["powerpoint to pdf", "ppt to pdf", "pptx to pdf", "slides"], url: "powerpoint-to-pdf.html" },
-  { name: "HTML to PDF Converter", bn: "এইচটিএমএল টু পিডিএফ", hi: "एचटीएमएल टू पीडीएफ", keywords: ["html to pdf", "web to pdf"], url: "html-to-pdf.html" },
-  { name: "PDF to JPG / PNG", bn: "পিডিএফ থেকে ছবি কনভার্টার", hi: "पीडीएफ টু फोटो", keywords: ["pdf to jpg", "pdf to image", "pdf to photo", "pdf to png"], url: "pdf-to-jpg.html" },
-  { name: "PDF to Word", bn: "পিডিএফ থেকে ওয়ার্ড কনভার্টার", hi: "पीडीएफ টু वर्ड", keywords: ["pdf to word", "pdf to docx"], url: "pdf-to-word.html" },
-  { name: "PDF to Excel", bn: "পিডিএফ থেকে এক্সেল কনভার্টার", hi: "पीडीएफ টু एक्सेल", keywords: ["pdf to excel", "pdf to xlsx"], url: "pdf-to-excel.html" },
-  { name: "PDF to Text (OCR Extractor)", bn: "পিডিএফ টেক্সট ও লেখার টুল", hi: "पीडीएफ टेक्स्ट एक्सट्रैक्टर", keywords: ["ocr", "pdf to text", "extract text", "লেখা বের করা"], url: "pdf-to-text.html" },
-  { name: "Edit PDF", bn: "পিডিএফ এডিটর", hi: "पीडीएफ एडिटर", keywords: ["edit pdf", "write on pdf", "এডিট"], url: "edit-pdf.html" },
-  { name: "Sign PDF", bn: "পিডিএফ সিগনেচার টুল", hi: "पीडीएफ साइन टूल", keywords: ["sign pdf", "signature on pdf", "হস্তাক্ষর", "সই"], url: "sign-pdf.html" },
-  { name: "Watermark PDF", bn: "পিডিএফ ওয়াটারমার্ক টুল", hi: "पीडीएफ वॉटरमार्क", keywords: ["watermark", "জলছাপ"], url: "watermark-pdf.html" },
-  { name: "Protect / Lock PDF", bn: "পিডিএফ লক টুল", hi: "पीडीएफ लॉक टूल", keywords: ["protect pdf", "lock pdf", "password", "পাসওয়ার্ড", "লক"], url: "protect-pdf.html" },
-  { name: "Unlock PDF", bn: "পিডিএফ আনলক টুল", hi: "पीडीएफ अनलॉक टूल", keywords: ["unlock pdf", "remove password", "আনলক"], url: "unlock-pdf.html" },
-  { name: "Add Page Numbers", bn: "পিডিএফ পেজ নম্বর টুল", hi: "पेज नंबर टूल", keywords: ["page numbers", "page number", "পেজ নম্বর"], url: "add-page-numbers.html" },
+  // --- Document & PDF Tools ---
+  { 
+    name: "Merge PDF", 
+    desc_bn: "এটি পিডিএফ মার্জার। এখানে একাধিক পিডিএফ ফাইল জোড়া দিয়ে একটি ফাইল করতে পারবেন।",
+    desc_hi: "यह पीडीएफ मर्ज टूल है। यहाँ कई पीडीएफ फाइलों को एक साथ जोड़ सकते हैं।",
+    desc_en: "This is Merge PDF. Combine multiple PDF documents into a single file.",
+    keywords: ["merge", "scanner", "merger", "pdf jodo", "পিডিএফ জোড়া", "যুক্ত", "jodo"], 
+    url: "merge-pdf.html" 
+  },
+  { 
+    name: "Split PDF", 
+    desc_bn: "এটি পিডিএফ স্প্লিট টুল। বড় পিডিএফ থেকে নির্দিষ্ট পেজ কেটে আলাদা করে নিতে পারেন।",
+    desc_hi: "यह पीडीएफ स्प्लिट टूल है। आप पीडीएफ फाइलों के पेजों को अलग कर सकते हैं।",
+    desc_en: "This is Split PDF. Extract and separate specific pages easily.",
+    keywords: ["split", "separate", "tukde", "katna", "ভাগ", "কাটা", "splitter"], 
+    url: "split-pdf.html" 
+  },
+  { 
+    name: "Compress PDF", 
+    desc_bn: "এটি পিডিএফ কম্প্রেসার। ফাইল কোয়ালিটি ঠিক রেখে সাইজ খুব সহজেই কমিয়ে নিতে পারবেন।",
+    desc_hi: "यह पीडीएफ कंप्रेस टूल है। क्वालिटी ठीक रखकर फाइल साइज छोटा करें।",
+    desc_en: "This is Compress PDF. Reduce file size while keeping visual quality intact.",
+    keywords: ["compress", "reduce size", "chota karna", "সাইজ কমানো", "কম্প্রেস"], 
+    url: "compress-pdf.html" 
+  },
+  { 
+    name: "PDF Scanner & Enhancer", 
+    desc_bn: "এটি পিডিএফ স্ক্যানার। ডকুমেন্টের ছবি তুলে পরিষ্কার ও স্পষ্ট পিডিএফে রূপান্তর করুন।",
+    desc_hi: "यह पीडीएफ स्कैनर है। दस्तावेज़ साफ़ और स्पष्ट स्कैन करें।",
+    desc_en: "This is PDF Scanner & Enhancer to scan and sharpen documents.",
+    keywords: ["scanner", "scan", "enhance", "स्कैनर", "স্ক্যানার"], 
+    url: "pdf-scanner.html" 
+  },
+  { 
+    name: "ZIP to PDF Converter", 
+    desc_bn: "এটি জিপ টু পিডিএফ কনভার্টার। জিপ ফাইলে থাকা সব ডকুমেন্ট পিডিএফে পরিণত হবে।",
+    desc_hi: "यह ज़िप टू पीडीएफ कनवर्टर है।",
+    desc_en: "Convert ZIP archives into consolidated PDF documents.",
+    keywords: ["zip to pdf", "zip converter", "জিপ"], 
+    url: "zip-to-pdf.html" 
+  },
+  { 
+    name: "Repair PDF", 
+    desc_bn: "এটি পিডিএফ রিপেয়ার টুল। নষ্ট বা ওপেন না হওয়া ড্যামেজ পিডিএফ ঠিক করতে সাহায্য করে।",
+    desc_hi: "यह पीडीएफ रिपेयर टूल है। खराब पीडीएफ फाइल को ठीक करें।",
+    desc_en: "Repair and restore damaged or corrupted PDF documents.",
+    keywords: ["repair", "fix", "theek karna", "মেরামত", "corrupt"], 
+    url: "repair-pdf.html" 
+  },
+  { 
+    name: "Organize / Reorder Pages", 
+    desc_bn: "এটি পেজ অর্গানাইজার। পিডিএফের পেজগুলোর সিরিয়াল বা সাজানো নিজের ইচ্ছামতো বদলাতে পারেন।",
+    desc_hi: "यह पेज रीऑर्डर टूल है। पीडीएफ पेजों का क्रम बदलें।",
+    desc_en: "Rearrange, reorder, or sort PDF pages easily.",
+    keywords: ["organize", "reorder", "pages sequence", "সাজানো"], 
+    url: "organize-pdf.html" 
+  },
+  { 
+    name: "Rotate PDF", 
+    desc_bn: "এটি রোটেট পিডিএফ। উল্টো থাকা যেকোনো পিডিএফ পেজ ঘুরিয়ে সোজা করতে পারবেন।",
+    desc_hi: "यह पीडीएफ रोटेट टूल है। उल्टे पेजों को घुमाकर सीधा करें।",
+    desc_en: "Rotate PDF pages clockwise or counterclockwise.",
+    keywords: ["rotate", "ghumaana", "ঘোরানো"], 
+    url: "rotate-pdf.html" 
+  },
+  { 
+    name: "Delete PDF Pages", 
+    desc_bn: "এটি ডিলিট পেজেস টুল। পিডিএফ থেকে অপ্রয়োজনীয় যেকোনো পেজ বাদ দিতে পারবেন।",
+    desc_hi: "यह पीडीएफ पेज रिमूवर है। गैर-जरूरी पेज हटाएं।",
+    desc_en: "Permanently delete unwanted pages from PDF files.",
+    keywords: ["delete", "remove pages", "hatao", "বাদ দেওয়া", "মুছে ফেলা"], 
+    url: "delete-pdf.html" 
+  },
+  { 
+    name: "JPG / PNG to PDF", 
+    desc_bn: "এটি ছবি থেকে পিডিএফ কনভার্টার। যেকোনো ছবি বা ফটো এক ক্লিকে পিডিএফে বদলে নিতে পারবেন।",
+    desc_hi: "यह फोटो से पीडीएफ कनवर्टर है। तस्वीरों को आसानी से पीडीएफ में बदलें।",
+    desc_en: "Convert JPG and PNG images into high quality PDFs.",
+    keywords: ["jpg to pdf", "png to pdf", "image to pdf", "photo to pdf", "फोटो से पीडीएफ", "ছবি থেকে পিডিএফ"], 
+    url: "jpg-to-pdf.html" 
+  },
+  { 
+    name: "Word to PDF", 
+    desc_bn: "এটি ওয়ার্ড টু পিডিএফ কনভার্টার। ডক ফাইল সরাসরি পিডিএফে কনভার্ট করতে পারেন।",
+    desc_hi: "यह वर्ड टू पीडीएफ कनवर्टर है। वर्ड फाइल को सीधे पीडीएफ में बदलें।",
+    desc_en: "Convert Word DOCX files directly into PDFs.",
+    keywords: ["word to pdf", "docx to pdf", "word converter"], 
+    url: "word-to-pdf.html" 
+  },
+  { 
+    name: "Excel to PDF", 
+    desc_bn: "এটি এক্সেল টু পিডিএফ। এক্সেল শিটকে সুরক্ষিত প্রিন্টেবল পিডিএফে পরিণত করুন।",
+    desc_hi: "यह एक्सेल टू पीडीएफ कनवर्टर है।",
+    desc_en: "Convert XLS and XLSX spreadsheet sheets to PDF.",
+    keywords: ["excel to pdf", "xls to pdf", "xlsx to pdf"], 
+    url: "excel-to-pdf.html" 
+  },
+  { 
+    name: "PowerPoint to PDF", 
+    desc_bn: "এটি পাওয়ারপয়েন্ট টু পিডিএফ। প্রেজেন্টেশন স্লাইড পিডিএফে সেভ করতে ব্যবহার করুন।",
+    desc_hi: "पावरपॉइंट स्लाइड्स को पीडीएफ में बदलें।",
+    desc_en: "Convert PPT and PPTX presentation slides to PDF.",
+    keywords: ["powerpoint to pdf", "ppt to pdf", "pptx to pdf", "slides"], 
+    url: "powerpoint-to-pdf.html" 
+  },
+  { 
+    name: "HTML to PDF Converter", 
+    desc_bn: "এটি এইচটিএমএল টু পিডিএফ। যেকোনো ওয়েব পেজ বা কোড পিডিএফে ডাউনলোড করুন।",
+    desc_hi: "वेबपेज को सीधे पीडीएफ में सेव करें।",
+    desc_en: "Convert HTML codes and web pages directly to PDF.",
+    keywords: ["html to pdf", "web to pdf"], 
+    url: "html-to-pdf.html" 
+  },
+  { 
+    name: "PDF to JPG / PNG", 
+    desc_bn: "এটি পিডিএফ টু ফটো কনভার্টার। পিডিএফের পেজগুলোকে হাই রেজোলিউশন ছবিতে রূপান্তর করুন।",
+    desc_hi: "पीडीएफ पेजों को हाई क्वालिटी फोटो में बदलें।",
+    desc_en: "Extract and convert PDF pages into JPG or PNG pictures.",
+    keywords: ["pdf to jpg", "pdf to image", "pdf to photo", "pdf to png"], 
+    url: "pdf-to-jpg.html" 
+  },
+  { 
+    name: "PDF to Word", 
+    desc_bn: "এটি পিডিএফ টু ওয়ার্ড। পিডিএফ ফাইল এডিট করার জন্য ডকে রূপান্তর করতে পারবেন।",
+    desc_hi: "पीडीएफ को एडिटेबल वर्ड फाइल में बदलें।",
+    desc_en: "Convert PDF documents into editable Microsoft Word format.",
+    keywords: ["pdf to word", "pdf to docx"], 
+    url: "pdf-to-word.html" 
+  },
+  { 
+    name: "PDF to Excel", 
+    desc_bn: "এটি পিডিএফ টু এক্সেল। পিডিএফ টেবিল সরাসরি স্প্রেডশিটে কনভার্ট করুন।",
+    desc_hi: "पीडीएफ टेबल को एक्सेल शीट में बदलें।",
+    desc_en: "Extract PDF tables into editable Excel spreadsheets.",
+    keywords: ["pdf to excel", "pdf to xlsx"], 
+    url: "pdf-to-excel.html" 
+  },
+  { 
+    name: "PDF to Text (OCR Extractor)", 
+    desc_bn: "এটি ওসিআর টেক্সট এক্সট্রাক্টর। যেকোনো ডকুমেন্টের ছবি বা পিডিএফ থেকে ভেতরের লেখা কপি করুন।",
+    desc_hi: "पीडीएफ या फोटो से सीधे लिखावट टेक्स्ट निकालें।",
+    desc_en: "Extract plain editable text from scanned PDFs and photos.",
+    keywords: ["ocr", "pdf to text", "extract text", "লেখা বের করা"], 
+    url: "pdf-to-text.html" 
+  },
+  { 
+    name: "Edit PDF", 
+    desc_bn: "এটি পিডিএফ এডিটর। ফাইলে নতুন লেখা যোগ করতে বা কোনো পরিবর্তন করতে এটি কাজে লাগবে।",
+    desc_hi: "पीडीएफ में नया टेक्स्ट लिखें और बदलाव करें।",
+    desc_en: "Edit, annotate, and write text on your PDF documents.",
+    keywords: ["edit pdf", "write on pdf", "এডিট"], 
+    url: "edit-pdf.html" 
+  },
+  { 
+    name: "Sign PDF", 
+    desc_bn: "এটি সাইন পিডিএফ টুল। ডকুমেন্টের ওপর ডিজিটাল সই বসিয়ে নেওয়ার জন্য এটি ব্যবহার করুন।",
+    desc_hi: "दस्तावेज़ों पर डिजिटल हस्ताक्षर लगाने के लिए।",
+    desc_en: "Add your personal electronic and digital signatures to PDFs.",
+    keywords: ["sign pdf", "signature on pdf", "হস্তাক্ষর", "সই"], 
+    url: "sign-pdf.html" 
+  },
+  { 
+    name: "Watermark PDF", 
+    desc_bn: "এটি ওয়াটারমার্ক টুল। ডকুমেন্টে আপনার নাম বা লোগোর জলছাপ যুক্ত করে সুরক্ষিত করুন।",
+    desc_hi: "पीडीएफ में अपना नाम या वॉटरमार्क जोड़ें।",
+    desc_en: "Add custom text or image watermarks to protect your files.",
+    keywords: ["watermark", "জলছাপ"], 
+    url: "watermark-pdf.html" 
+  },
+  { 
+    name: "Protect / Lock PDF", 
+    desc_bn: "এটি পিডিএফ লক টুল। ফাইলে পাসওয়ার্ড দিয়ে সুরক্ষিত রাখতে এটি ব্যবহার করুন।",
+    desc_hi: "पीडीएफ फाइल पर पासवर्ड लगाकर सुरक्षित करें।",
+    desc_en: "Encrypt and set strong passwords on your PDF documents.",
+    keywords: ["protect", "lock", "password", "পাসওয়ার্ড", "লক"], 
+    url: "protect-pdf.html" 
+  },
+  { 
+    name: "Unlock PDF", 
+    desc_bn: "এটি আনলক পিডিএফ। জানা পাসওয়ার্ড স্থায়ীভাবে সরিয়ে দিয়ে ফাইল মুক্ত করুন।",
+    desc_hi: "पीडीएफ से पासवर्ड हटाएं।",
+    desc_en: "Remove passwords and security restrictions from PDFs.",
+    keywords: ["unlock", "remove password", "আনলক"], 
+    url: "unlock-pdf.html" 
+  },
+  { 
+    name: "Add Page Numbers", 
+    desc_bn: "এটি পেজ নম্বর টুল। পিডিএফের প্রতিটি পেজে স্বয়ংক্রিয়ভাবে নম্বর যুক্ত করুন।",
+    desc_hi: "पीडीएफ पेजों पर क्रम से पेज नंबर जोड़ें।",
+    desc_en: "Add customized page numbering headers or footers to PDFs.",
+    keywords: ["page numbers", "page number", "पेज नंबर", "পেজ নম্বর"], 
+    url: "add-page-numbers.html" 
+  },
 
-  // Cyber, Photo & Design Tools
-  { name: "Photo & Sign KB / MB Resizer", bn: "ফটো এবং সিগনেচার রিসাইজার", hi: "फोटो और साइन रिसाइजर", keywords: ["resizer", "resize", "photo resizer", "sign resizer", "kb resizer", "mb resizer", "ছবি রিসাইজ"], url: "photo-resizer.html" },
-  { name: "Exam Photo & Signature Resizer", bn: "পরীক্ষার ফর্মের ফটো রিসাইজার", hi: "एग्जाम फोटो रिसाइजर", keywords: ["exam photo", "exam signature", "ssc photo", "upsc photo", "neet photo"], url: "exam-resizer.html" },
-  { name: "Passport Photo Sheet Maker", bn: "পাসপোর্ট ফটো শিট মেকার", hi: "पासपोर्ट फोटो शीट मेकर", keywords: ["passport photo", "passport sheet", "পাসপোর্ট ছবি"], url: "passport-photo.html" },
-  { name: "Digital Signature Maker (Sign Pad)", bn: "ডিজিটাল সিগনেচার মেকার", hi: "डिजिटल सिग्नेचर मेकर", keywords: ["digital signature", "sign pad", "draw sign", "ডিজিটাল সিগনেচার"], url: "signature-maker.html" },
-  { name: "QR Code & UPI Generator", bn: "কিউআর কোড এবং ইউপিআই জেনারেটর", hi: "क्यूआर कोड जनरेटर", keywords: ["qr code", "qr", "upi qr", "কিউআর কোড"], url: "qr-generator.html" },
-  { name: "Color Picker & HEX Extractor", bn: "কালার পিকার টুল", hi: "कलर पिकर टूल", keywords: ["color picker", "hex extractor", "color code", "কালার পিকার"], url: "color-picker.html" },
-  { name: "YouTube Thumbnail Downloader", bn: "ইউটিউব থাম্বনেইল ডাউনলোডার", hi: "यूट्यूब थंबनेल डाउनलोडर", keywords: ["thumbnail", "youtube thumbnail", "yt thumbnail", "থাম্বনেইল"], url: "youtube-thumbnail.html" },
-  { name: "Barcode Generator (Code 128)", bn: "বারকোড জেনারেটর", hi: "बारकोड जनरेटर", keywords: ["barcode generator", "barcode", "বারকোড"], url: "barcode-generator.html" },
-  { name: "Base64 Encoder & Decoder", bn: "বেস৬৪ এনকোডার", hi: "बेस 64 एनकोडर", keywords: ["base64", "base64 encoder", "base64 decoder"], url: "base64.html" },
+  // --- Cyber & Photo Tools ---
+  { 
+    name: "Photo & Sign KB / MB Resizer", 
+    desc_bn: "এটি ফটো ও সাইন রিসাইজার। সরকারি চাকরির ফর্মের জন্য নির্দিষ্ট কেবি বা এমবি সাইজ করতে পারেন।",
+    desc_hi: "तय केबी साइज के अनुसार फोटो और साइन रीसाइज करें।",
+    desc_en: "Compress and resize photo and signatures to exact KB file limits.",
+    keywords: ["resizer", "resize", "photo resizer", "sign resizer", "kb resizer", "mb resizer", "jb resizer", "फोटो रिसाइजर", "রিসাইজার", "ছবি রিসাইজ"], 
+    url: "photo-resizer.html" 
+  },
+  { 
+    name: "Exam Photo & Signature Resizer", 
+    desc_bn: "এটি এক্সাম ফর্ম রিসাইজার। এসএসসি, রেল, টেট ও চাকরির পরীক্ষার সাইজ অনুযায়ী ফটো বানান।",
+    desc_hi: "सरकारी परीक्षाओं के फॉर्म के लिए फोटो व साइन तैयार करें।",
+    desc_en: "Pre-set dimensions and KB limits for SSC, UPSC, and exam forms.",
+    keywords: ["exam photo", "exam signature", "ssc", "upsc", "neet", "exam form"], 
+    url: "exam-resizer.html" 
+  },
+  { 
+    name: "Passport Photo Sheet Maker", 
+    desc_bn: "এটি পাসপোর্ট ফটো মেকার। সাধারণ ছবি দিয়ে এক ক্লিকে প্রিন্ট করার পাসপোর্ট সাইজ শিট তৈরি হবে।",
+    desc_hi: "प्रिंट करने योग्य पासपोर्ट साइज फोटो शीट बनाएं।",
+    desc_en: "Generate printable multi-grid passport photos in standard dimensions.",
+    keywords: ["passport photo", "passport", "पासपोर्ट फोटो", "পাসপোর্ট ছবি"], 
+    url: "passport-photo.html" 
+  },
+  { 
+    name: "Digital Signature Maker (Sign Pad)", 
+    desc_bn: "এটি ডিজিটাল সিগনেচার প্যাড। স্ক্রিনে সই করে স্বচ্ছ ব্যাকগ্রাউন্ডে পিএনজি ডাউনলোড করুন।",
+    desc_hi: "स्क्रीन पर साइन बनाएं और पारदर्शी बैकग्राउंड में डाउनलोड करें।",
+    desc_en: "Draw and generate transparent background signature PNGs.",
+    keywords: ["digital signature", "sign pad", "draw sign", "ডিজিটাল সিগনেচার"], 
+    url: "signature-maker.html" 
+  },
+  { 
+    name: "QR Code & UPI Generator", 
+    desc_bn: "এটি কিউআর কোড জেনারেটর। পেমেন্টের জন্য বা যেকোনো ওয়েবসাইট লিঙ্কের কিউআর কোড বানাতে পারেন।",
+    desc_hi: "यूपीआई पेमेंट और वेबसाइट के लिए तुरंत क्यूआर कोड बनाएं।",
+    desc_en: "Generate custom QR codes for UPI payments, Wi-Fi, and URLs.",
+    keywords: ["qr code", "qr", "upi qr", "কিউআর কোড"], 
+    url: "qr-generator.html" 
+  },
+  { 
+    name: "Color Picker & HEX Extractor", 
+    desc_bn: "এটি কালার পিকার। যেকোনো ডিজাইনের হেক্স কালার কোড সহজে বের করে নিন।",
+    desc_hi: "किसी भी रंग का हेक्स कोड और आरजीबी कोड प्राप्त करें।",
+    desc_en: "Pick colors and extract precise HEX and RGB color values.",
+    keywords: ["color picker", "hex extractor", "color code", "কালার পিকার"], 
+    url: "color-picker.html" 
+  },
+  { 
+    name: "YouTube Thumbnail Downloader", 
+    desc_bn: "এটি থাম্বনেইল ডাউনলোডার। যেকোনো ইউটিউব ভিডিওর এইচডি থাম্বনেইল ডাউনলোড করতে পারেন।",
+    desc_hi: "यूट्यूब वीडियो से एचडी थंबनेल डाउनलोड करें।",
+    desc_en: "Download high definition thumbnails from YouTube video links.",
+    keywords: ["thumbnail", "youtube thumbnail", "yt thumbnail", "থাম্বনেইল"], 
+    url: "youtube-thumbnail.html" 
+  },
 
-  // Finance & Calculator Tools
-  { name: "Scientific Calculator", bn: "সায়েন্টিফিক ক্যালকুলেটর", hi: "वैज्ञानिक कैलकुलेटर", keywords: ["scientific calculator", "calculator", "math", "ক্যালকুলেটর", "hisab"], url: "calculator.html" },
-  { name: "Loan EMI Calculator", bn: "লোন ইএমআই ক্যালকুলেটর", hi: "लोन ईएमआई कैलकुलेटर", keywords: ["loan emi", "emi calculator", "loan", "লোন", "ইএমআই"], url: "loan-emi.html" },
-  { name: "Loan Prepayment & Interest Saver", bn: "লোন প্রিপেমেন্ট ক্যালকুলেটর", hi: "लोन प्रीपेमेंट टूल", keywords: ["prepayment", "interest saver", "loan prepayment"], url: "loan-prepayment.html" },
-  { name: "GST Calculator", bn: "জিএসটি ক্যালকুলেটর", hi: "जीएसटी कैलकुलेटर", keywords: ["gst calculator", "gst", "জিএসটি"], url: "gst-calculator.html" },
-  { name: "SIP Calculator", bn: "এসআইপি ক্যালকুলেটর", hi: "एसआईपी कैलकुलेटर", keywords: ["sip calculator", "sip", "mutual fund", "এসআইপি"], url: "sip-calculator.html" },
-  { name: "Simple & Compound Interest", bn: "সুদ ও ইন্টারেস্ট ক্যালকুলেটর", hi: "ब्याज कैलकुलेटर", keywords: ["simple interest", "compound interest", "interest calculator", "সুদ"], url: "interest-calculator.html" },
-  { name: "FD & RD Maturity Calculator", bn: "এফডি এবং আরডি ক্যালকুলেটর", hi: "एफडी आरडी कैलकुलेटर", keywords: ["fd calculator", "rd calculator", "fixed deposit", "এফডি"], url: "fd-rd-calculator.html" },
-  { name: "Gold & Jewellery Price Calculator", bn: "সোনার দাম ও গহনা ক্যালকুলেটর", hi: "सोने का कैलकुलेटर", keywords: ["gold calculator", "gold price", "jewellery", "সোনার দাম"], url: "gold-calculator.html" },
-  { name: "Inflation Calculator", bn: "মুদ্রাস্ফীতি ক্যালকুলেটর", hi: "मुद्रास्फीति कैलकुलेटर", keywords: ["inflation calculator", "inflation", "মুদ্রাস্ফীতি"], url: "inflation-calculator.html" },
-  { name: "PPF Calculator", bn: "পিপিএফ ক্যালকুলেটর", hi: "पीपीएफ कैलकुलेटर", keywords: ["ppf calculator", "ppf", "পিপিএফ"], url: "ppf-calculator.html" },
-  { name: "Electricity Bill & Power Calculator", bn: "বিদ্যুৎ বিল ক্যালকুলেটর", hi: "बिजली बिल कैलकुलेटर", keywords: ["electricity bill", "power calculator", "বিদ্যুৎ বিল"], url: "electricity-calculator.html" },
-  { name: "Fuel Cost & Trip Mileage Calculator", bn: "তেল খরচ ও মাইলেজ ক্যালকুলেটর", hi: "ईंधन लागत कैलकुलेटर", keywords: ["fuel cost", "mileage calculator", "petrol", "diesel", "তেল খরচ"], url: "fuel-calculator.html" },
-  { name: "Take-Home Salary & CTC Calculator", bn: "বেতন ও স্যালারি ক্যালকুলেটর", hi: "वेतन कैलकुलेटर", keywords: ["salary calculator", "ctc calculator", "in hand salary", "বেতন"], url: "salary-calculator.html" },
-  { name: "Friend Bill Split & Tip Calculator", bn: "বিল ভাগ ও স্প্লিট ক্যালকুলেটর", hi: "बिल स्प्लिट कैलकुलेटर", keywords: ["bill split", "split bill", "tip calculator", "বিল ভাগ"], url: "bill-split.html" },
-  { name: "Discount & Sale Calculator", bn: "ছাড় ও ডিসকাউন্ট ক্যালকুলেটর", hi: "छूट कैलकुलेटर", keywords: ["discount calculator", "sale calculator", "ছাড়"], url: "discount-calculator.html" },
-  { name: "Percentage Calculator", bn: "শতকরা ক্যালকুলেটর", hi: "प्रतिशत कैलकुलेटर", keywords: ["percentage calculator", "percentage", "শতকরা", "শতাংশ"], url: "percentage-calculator.html" },
-  { name: "Number to Words (Cheque Amount)", bn: "কথায় রূপান্তর করার টুল", hi: "नंबर से शब्द कनवर्टर", keywords: ["number to words", "cheque amount", "কথায় রূপান্তর"], url: "number-to-words.html" },
-  { name: "Land Area Converter", bn: "জমির পরিমাপ ও কাঠা ক্যালকুলেটর", hi: "जमीन मापक कैलकुलेटर", keywords: ["land area converter", "land converter", "bigha", "katha", "জমির মাপ", "বিঘা", "কাঠা"], url: "land-converter.html" },
+  // --- Finance & Calculator Tools ---
+  { 
+    name: "Scientific Calculator", 
+    desc_bn: "এটি সায়েন্টিফিক ক্যালকুলেটর। জটিল গাণিতিক ও বৈজ্ঞানিক হিসাব-নিকাশ করার জন্য এটি ব্যবহার করুন।",
+    desc_hi: "जटिल वैज्ञानिक और गणितीय गणनाओं के लिए।",
+    desc_en: "Full featured scientific calculator for advanced mathematics.",
+    keywords: ["scientific calculator", "calculator", "math", "हिसाब", "ক্যালকুলেটর"], 
+    url: "calculator.html" 
+  },
+  { 
+    name: "Loan EMI Calculator", 
+    desc_bn: "এটি লোন ইএমআই ক্যালকুলেটর। যেকোনো লোনের মাসিক কিস্তি ও মোট সুদের হিসাব জানতে পারবেন।",
+    desc_hi: "अपनी मासिक किस्त और कुल ब्याज का हिसाब लगाएं।",
+    desc_en: "Compute monthly EMI, total interest, and loan amortization.",
+    keywords: ["loan emi", "emi calculator", "loan", "किस्त", "লোন", "ইএমআই"], 
+    url: "loan-emi.html" 
+  },
+  { 
+    name: "Loan Prepayment & Interest Saver", 
+    desc_bn: "এটি লোন প্রিপেমেন্ট ক্যালকুলেটর। আগাম কিস্তি দিলে কত টাকা সুদ বাঁচবে তা হিসাব করুন।",
+    desc_hi: "लोन प्रीपेमेंट करके ब्याज बचाने की गणना करें।",
+    desc_en: "Calculate how much interest you save with loan prepayments.",
+    keywords: ["prepayment", "interest saver", "loan prepayment"], 
+    url: "loan-prepayment.html" 
+  },
+  { 
+    name: "GST Calculator", 
+    desc_bn: "এটি জিএসটি ক্যালকুলেটর। মূল্যের ওপর জিএসটি ট্যাক্স যোগ বা বাদ দিয়ে দাম বের করতে পারবেন।",
+    desc_hi: "मूल्य पर जीएसटी टैक्स जोड़ने या हटाने की गणना करें।",
+    desc_en: "Calculate inclusive and exclusive GST tax amounts instantly.",
+    keywords: ["gst calculator", "gst", "जीएसटी", "জিএসটি"], 
+    url: "gst-calculator.html" 
+  },
+  { 
+    name: "SIP Calculator", 
+    desc_bn: "এটি এসআইপি ক্যালকুলেটর। প্রতি মাসে মিউচুয়াল ফান্ডে বিনিয়োগ করলে ভবিষ্যতে কত রিটার্ন পাবেন তা দেখুন।",
+    desc_hi: "म्यूचुअल फंड एसआईपी निवेश पर मिलने वाले रिटर्न का हिसाब लगाएं।",
+    desc_en: "Calculate expected returns on monthly SIP mutual fund investments.",
+    keywords: ["sip calculator", "sip", "mutual fund", "এসআইপি"], 
+    url: "sip-calculator.html" 
+  },
+  { 
+    name: "Simple & Compound Interest", 
+    desc_bn: "এটি সরল ও চক্রবৃদ্ধি সুদ ক্যালকুলেটর। সুদের নিখুঁত লাভ জানতে এটি কাজে লাগবে।",
+    desc_hi: "साधारण और चक्रवृद्धि ब्याज की सही गणना करें।",
+    desc_en: "Calculate simple and compound interest over specific periods.",
+    keywords: ["simple interest", "compound interest", "interest calculator", "ब्याज", "সুদ"], 
+    url: "interest-calculator.html" 
+  },
+  { 
+    name: "FD & RD Maturity Calculator", 
+    desc_bn: "এটি এফডি ও আরডি ক্যালকুলেটর। ফিক্সড ডিপোজিটের ম্যাচিউরিটি ভ্যালু জানতে পারবেন।",
+    desc_hi: "फिक्स्ड डिपॉजिट और आरडी मैच्योरिटी राशि की गणना करें।",
+    desc_en: "Calculate maturity amount and interest earned on FD and RD.",
+    keywords: ["fd calculator", "rd calculator", "fixed deposit", "এফডি"], 
+    url: "fd-rd-calculator.html" 
+  },
+  { 
+    name: "Gold & Jewellery Price Calculator", 
+    desc_bn: "এটি সোনার গহনা ক্যালকুলেটর। মেকিং চার্জ ও জিএসটি সহ সোনার গহনার সঠিক দাম হিসাব করুন।",
+    desc_hi: "मेकिंग चार्ज और जीएसटी सहित सोने के आभूषणों का सही मूल्य निकालें।",
+    desc_en: "Calculate gold jewelry final price with making charges and taxes.",
+    keywords: ["gold calculator", "gold price", "jewellery", "সোনা", "সোনার দাম"], 
+    url: "gold-calculator.html" 
+  },
+  { 
+    name: "Inflation Calculator", 
+    desc_bn: "এটি মুদ্রাস্ফীতি ক্যালকুলেটর। ভবিষ্যৎ বা অতীতের টাকার ক্রয়ক্ষমতা যাচাই করুন।",
+    desc_hi: "महंगाई और पैसे की भविष्य की कीमत की गणना करें।",
+    desc_en: "Estimate purchasing power changes and future inflation values.",
+    keywords: ["inflation calculator", "inflation", "মহঙ্গাই", "মুদ্রাস্ফীতি"], 
+    url: "inflation-calculator.html" 
+  },
+  { 
+    name: "PPF Calculator", 
+    desc_bn: "এটি পিপিএফ ক্যালকুলেটর। পাবলিক প্রভিডেন্ট ফান্ডের ১৫ বছরের সঞ্চয় হিসাব করুন।",
+    desc_hi: "पीपीएफ निवेश पर 15 वर्षों का रिटर्न और ब्याज निकालें।",
+    desc_en: "Calculate Public Provident Fund maturity returns and yearly interest.",
+    keywords: ["ppf calculator", "ppf", "পিপিএফ"], 
+    url: "ppf-calculator.html" 
+  },
+  { 
+    name: "Electricity Bill & Power Calculator", 
+    desc_bn: "এটি বিদ্যুৎ বিল ক্যালকুলেটর। বৈদ্যুতিক সরঞ্জামগুলোর বিদ্যুৎ খরচ হিসাব করুন।",
+    desc_hi: "घर के बिजली बिल और यूनिट खपत की गणना करें।",
+    desc_en: "Calculate power consumption units and estimated electric bills.",
+    keywords: ["electricity bill", "power calculator", "electric bill", "बिजली बिल", "বিদ্যুৎ বিল"], 
+    url: "electricity-calculator.html" 
+  },
+  { 
+    name: "Fuel Cost & Trip Mileage Calculator", 
+    desc_bn: "এটি ফুয়েল ও ট্রিপ ক্যালকুলেটর। ভ্রমণের দূরত্ব অনুযায়ী পেট্রোল বা ডিজেল খরচ বের করুন।",
+    desc_hi: "यात्रा की दूरी के अनुसार पेट्रोल या डीजल खर्च का हिसाब निकालें।",
+    desc_en: "Calculate fuel trip cost and vehicle mileage per kilometer.",
+    keywords: ["fuel cost", "mileage calculator", "petrol", "diesel", "তেল খরচ"], 
+    url: "fuel-calculator.html" 
+  },
+  { 
+    name: "Take-Home Salary & CTC Calculator", 
+    desc_bn: "এটি স্যালারি ক্যালকুলেটর। পিএফ ও ট্যাক্স কাটার পর হাতে কত টাকা বেতন পাবেন তা হিসাব করুন।",
+    desc_hi: "सीटीसी से इन-हैंड नेट सैलरी की गणना करें।",
+    desc_en: "Compute in-hand monthly take-home salary after deductions.",
+    keywords: ["salary calculator", "ctc calculator", "in hand salary", "বেতন"], 
+    url: "salary-calculator.html" 
+  },
+  { 
+    name: "Friend Bill Split & Tip Calculator", 
+    desc_bn: "এটি ফ্রেন্ড বিল স্প্লিটার। বন্ধুদের সাথে রেস্তোরাঁর বিল সমান ভাগে ভাগ করুন।",
+    desc_hi: "दोस्तों के बीच होटल या रेस्टोरेंट बिल को आसानी से बांटें।",
+    desc_en: "Split dinner and trip bills evenly among friends with tip.",
+    keywords: ["bill split", "split bill", "tip calculator", "বিল ভাগ"], 
+    url: "bill-split.html" 
+  },
+  { 
+    name: "Discount & Sale Calculator", 
+    desc_bn: "এটি ডিসকাউন্ট ক্যালকুলেটর। কেনাকাটায় ছাড়ের পর আসল দাম কত হবে তা হিসাব করুন।",
+    desc_hi: "छूट के बाद सामान की अंतिम कीमत जानें।",
+    desc_en: "Find final sale price and savings after percentage discounts.",
+    keywords: ["discount calculator", "sale calculator", "छूट", "ছাড়"], 
+    url: "discount-calculator.html" 
+  },
+  { 
+    name: "Percentage Calculator", 
+    desc_bn: "এটি শতকরা ক্যালকুলেটর। যেকোনো সংখ্যার শতাংশ খুব সহজে হিসাব করতে পারবেন।",
+    desc_hi: "किसी भी संख्या का प्रतिशत तुरंत निकालें।",
+    desc_en: "Quick percentage, increase, decrease, and difference calculator.",
+    keywords: ["percentage calculator", "percentage", "प्रतिशत", "শতকরা", "শতাংশ"], 
+    url: "percentage-calculator.html" 
+  },
+  { 
+    name: "Number to Words (Cheque Amount)", 
+    desc_bn: "এটি নম্বর থেকে কথায় রূপান্তরকারী। ব্যাংকের চেক লেখার জন্য সংখ্যাকে কথায় বদলান।",
+    desc_hi: "बैंक चेक भरने के लिए संख्याओं को शब्दों में बदलें।",
+    desc_en: "Convert numbers and currency figures into written words.",
+    keywords: ["number to words", "cheque amount", "কথায় রূপান্তর"], 
+    url: "number-to-words.html" 
+  },
+  { 
+    name: "Land Area Converter", 
+    desc_bn: "এটি জমির পরিমাপ কনভার্টার। বিঘা, কাঠা, একর, শতক ও স্কয়ার ফিটের নিখুঁত হিসাব পাবেন।",
+    desc_hi: "बीघा, कट्ठा, एकड़ और डिसमिल का सही क्षेत्रफल निकालें।",
+    desc_en: "Convert land units like bigha, katha, acre, and sqft.",
+    keywords: ["land area converter", "land converter", "bigha", "katha", "জমির মাপ", "বিঘা", "কাঠা"], 
+    url: "land-converter.html" 
+  },
 
-  // Productivity & Utility Tools
-  { name: "DocuCraft AI Translator", bn: "ডকুক্ল্যাফট অনুবাদক", hi: "अनुवादक टूल", keywords: ["translator", "translate", "translation", "অনুবাদ", "dokocraft translator"], url: "translator.html" },
-  { name: "Pitch to Text (Voice Typing)", bn: "ভয়েস টাইপিং টুল", hi: "बोलकर लिखने का टूल", keywords: ["pitch to text", "voice typing", "speech to text", "ভয়েস টাইপিং"], url: "voice-typing.html" },
-  { name: "Text-to-Speech Converter", bn: "টেক্সট টু স্পিচ অডিও টুল", hi: "টেক্সট টু স্পিচ টুল", keywords: ["text to speech", "tts", "speak text", "টেক্সট টু স্পিচ"], url: "text-to-speech.html" },
-  { name: "Unlimited Text Notepad", bn: "আনলিমিটেড নোটপ্যাড", hi: "টেক্সট নোটপ্যাড", keywords: ["notepad", "notebook", "text notepad", "নোটপ্যাড"], url: "notepad.html" },
-  { name: "Govt Job Alerts & Results", bn: "সরকারি চাকরির খবর", hi: "सरकारी नौकरी अलर्ट", keywords: ["govt job", "job alert", "sarkari result", "চাকরি"], url: "job-alerts.html" },
-  { name: "Age Calculator (Exam DOB)", bn: "বয়স ক্যালকুলেটর", hi: "उम्र कैलकुलेटर", keywords: ["age calculator", "calculate age", "বয়স ক্যালকুলেটর", "বয়স"], url: "age-calculator.html" },
-  { name: "Exam Age Eligibility Checker", bn: "পরীক্ষার বয়স যোগ্যতা যাচাই", hi: "एग्जाम आयु पात्रता", keywords: ["age eligibility", "eligibility checker", "যোগ্যতা"], url: "exam-eligibility.html" },
-  { name: "1-Minute Typing Speed Test", bn: "টাইপিং স্পিড টেস্ট", hi: "टाइपिंग स्पीड टेस्ट", keywords: ["typing speed test", "typing test", "speed test", "টাইপিং টেস্ট"], url: "typing-test.html" },
-  { name: "Daily Calorie & BMR Calculator", bn: "ক্যালোরি ক্যালকুলেটর", hi: "कैलोरी कैलकुलेटर", keywords: ["calorie calculator", "bmr calculator", "ক্যালোরি"], url: "calorie-calculator.html" },
-  { name: "Daily Water Intake Goal", bn: "জল খাওয়ার লক্ষ্য ট্র্যাকার", hi: "पानी का लक्ष्य ट्रैकर", keywords: ["water intake", "water goal", "জল"], url: "water-intake.html" },
-  { name: "Sleep Calculator", bn: "ঘুমের হিসাব ক্যালকুলেটর", hi: "नींद कैलकुलेटर", keywords: ["sleep calculator", "sleep cycle", "ঘুমের হিসাব", "ঘুম"], url: "sleep-calculator.html" },
-  { name: "Random Password & PIN Generator", bn: "পাসওয়ার্ড ও পিন জেনারেটর", hi: "पासवर्ड जनरेटर", keywords: ["password generator", "pin generator", "random password", "পাসওয়ার্ড জেনারেটর"], url: "password-generator.html" },
-  { name: "Universal Unit Converter", bn: "ইউনিট কনভার্টার", hi: "यूनिट कनवर्टर", keywords: ["unit converter", "universal converter", "একক রূপান্তর"], url: "unit-converter.html" },
-  { name: "Duplicate Line Remover", bn: "ডুপ্লিকেট লাইন রিমুভার", hi: "डुप्लिकेट लाइन रिमूवर", keywords: ["duplicate line remover", "remove duplicates"], url: "duplicate-remover.html" },
-  { name: "Text Reverse & Flip Tool", bn: "টেক্সট উল্টানোর টুল", hi: "টেক্সট রিভার্স টুল", keywords: ["text reverse", "flip text", "লেখা উল্টানো"], url: "text-reverse.html" },
-  { name: "Marks to Percentage & CGPA", bn: "নম্বর থেকে শতাংশ ও সিজিপিএ", hi: "मार्क्स टू प्रतिशत", keywords: ["marks to percentage", "cgpa calculator", "cgpa"], url: "marks-calculator.html" },
-  { name: "Average & Grade Calculator", bn: "গ্রেড ক্যালকুলেটর", hi: "ग्रेड कैलकुलेटर", keywords: ["average calculator", "grade calculator"], url: "grade-calculator.html" },
-  { name: "Invoice / Bill Generator", bn: "বিল ও ইনভয়েস জেনারেটর", hi: "বিল जनरेटर", keywords: ["invoice generator", "bill generator", "বিল মেকার"], url: "invoice-generator.html" },
-  { name: "Resume / CV Maker to PDF", bn: "রিজিউমে ও সিভি মেকার", hi: "बायोडाटा मेकर", keywords: ["resume maker", "cv maker", "biodata", "রিজিউমে", "সিভি"], url: "resume-maker.html" },
-  { name: "Prescription / Memo Maker", bn: "প্রেসক্রিপশন মেকার", hi: "प्रिस्क्रिप्शन मेकर", keywords: ["prescription maker", "memo maker", "প্রেসক্রিপশন"], url: "prescription-maker.html" },
-  { name: "Contact & Support Desk", bn: "যোগাযোগ ও হেল্প ডেস্ক", hi: "संपर्क और सहायता", keywords: ["contact us", "support desk", "helpline", "যোগাযোগ করো"], url: "contact.html" }
+  // --- Utilities & Productivity Tools ---
+  { 
+    name: "DocuCraft AI Translator", 
+    desc_bn: "এটি এআই ট্রান্সলেটর। যেকোনো ভাষার লেখাকে অন্য ভাষায় অনুবাদ করার জন্য এটি ব্যবহার করুন।",
+    desc_hi: "किसी भी भाषा का अन्य भाषाओं में सटीक अनुवाद करें।",
+    desc_en: "Translate paragraphs and phrases across multiple global languages.",
+    keywords: ["translator", "translate", "translation", "অনুবাদ", "अनुवाद", "dokocraft translator", "docucraft translator"], 
+    url: "translator.html" 
+  },
+  { 
+    name: "Pitch to Text (Voice Typing)", 
+    desc_bn: "এটি ভয়েস টাইপিং টুল। মুখে যা বলবেন তা স্বয়ংক্রিয়ভাবে স্ক্রিনে টাইপ হয়ে যাবে।",
+    desc_hi: "बोलकर आसानी से स्क्रीन पर टाइप करें।",
+    desc_en: "Convert spoken speech into accurate real-time text.",
+    keywords: ["pitch to text", "voice typing", "speech to text", "बोलकर लिखना", "ভয়েস টাইপিং"], 
+    url: "voice-typing.html" 
+  },
+  { 
+    name: "Text-to-Speech Converter", 
+    desc_bn: "এটি টেক্সট টু স্পিচ টুল। যেকোনো লেখাকে স্পষ্ট অডিও ভয়েসে রূপান্তর করুন।",
+    desc_hi: "लिखे हुए टेक्स्ट को ऑडियो आवाज में बदलें।",
+    desc_en: "Synthesize written text into clear spoken voice audio.",
+    keywords: ["text to speech", "tts", "speak text", "টেক্সট টু স্পিচ"], 
+    url: "text-to-speech.html" 
+  },
+  { 
+    name: "Unlimited Text Notepad", 
+    desc_bn: "এটি আনলিমিটেড নোটপ্যাড। যেকোনো গুরুত্বপূর্ণ তথ্য লিখে সেভ করে রাখার জন্য ব্যবহার করুন।",
+    desc_hi: "अपने जरूरी नोट्स लिखने और कॉपी करने के लिए नोटपैड।",
+    desc_en: "Simple, fast, and unlimited browser notepad for your notes.",
+    keywords: ["notepad", "notebook", "text notepad", "unlimited notepad", "नोटपैड", "নোটপ্যাড", "নোটবুক"], 
+    url: "notepad.html" 
+  },
+  { 
+    name: "Govt Job Alerts & Results", 
+    desc_bn: "এটি চাকরির খবর পোর্টাল। সরকারি চাকরি ও পরীক্ষার রেজাল্টের আপডেট পান।",
+    desc_hi: "सरकारी नौकरियों और परीक्षाओं के ताज़ा परिणाम देखें।",
+    desc_en: "Find latest government recruitment alerts, exams, and results.",
+    keywords: ["govt job", "job alert", "sarkari result", "सरकारी नौकरी", "চাকরি"], 
+    url: "job-alerts.html" 
+  },
+  { 
+    name: "Age Calculator (Exam DOB)", 
+    desc_bn: "এটি বয়স ক্যালকুলেটর। জন্মতারিখ দিলে আজকের দিনে কত বছর, মাস ও দিন বয়স হলো তা দেখতে পারবেন।",
+    desc_hi: "जन्म तिथि से अपनी सटीक उम्र, महीने और दिन जानें।",
+    desc_en: "Calculate exact age in years, months, and days from date of birth.",
+    keywords: ["age calculator", "calculate age", "उम्र", "বয়স ক্যালকুলেটর", "বয়স"], 
+    url: "age-calculator.html" 
+  },
+  { 
+    name: "Exam Age Eligibility Checker", 
+    desc_bn: "এটি বয়স যোগ্যতা যাচাইকারী। সরকারি চাকরির পরীক্ষায় বসার বয়স আছে কিনা তা মিলিয়ে নিন।",
+    desc_hi: "सरकारी परीक्षाओं के लिए अपनी आयु सीमा पात्रता जांचें।",
+    desc_en: "Check if you satisfy official age eligibility criteria for jobs.",
+    keywords: ["age eligibility", "eligibility checker", "যোগ্যতা"], 
+    url: "exam-eligibility.html" 
+  },
+  { 
+    name: "1-Minute Typing Speed Test", 
+    desc_bn: "এটি টাইপিং স্পিড টেস্ট। ১ মিনিটে কতগুলো শব্দ নির্ভুল টাইপ করতে পারেন তা পরীক্ষা করুন।",
+    desc_hi: "1 मिनट में अपनी टाइपिंग स्पीड और सटीकता की जांच करें।",
+    desc_en: "Test words per minute speed and accuracy in a 60-second test.",
+    keywords: ["typing speed test", "typing test", "speed test", "টাইপিং টেস্ট"], 
+    url: "typing-test.html" 
+  },
+  { 
+    name: "Daily Calorie & BMR Calculator", 
+    desc_bn: "এটি ক্যালোরি ক্যালকুলেটর। ফিট থাকার জন্য প্রতিদিন কত ক্যালোরি খাবার প্রয়োজন তা জানুন।",
+    desc_hi: "दैनिक कैलोरी की जरूरत और बीएमआर का हिसाब लगाएं।",
+    desc_en: "Compute daily caloric needs and Basal Metabolic Rate.",
+    keywords: ["calorie calculator", "bmr calculator", "daily calorie", "ক্যালোরি"], 
+    url: "calorie-calculator.html" 
+  },
+  { 
+    name: "Daily Water Intake Goal", 
+    desc_bn: "এটি জল ট্র্যাকার। স্বাস্থ্য ভালো রাখতে সারাদিনে কত লিটার জল খাওয়া উচিত তা নির্ধারণ করুন।",
+    desc_hi: "वजन के अनुसार प्रतिदिन पानी पीने का सही लक्ष्य जानें।",
+    desc_en: "Determine your optimal daily water hydration requirements.",
+    keywords: ["water intake", "water goal", "পানি খাওয়ার লক্ষ্য", "জল"], 
+    url: "water-intake.html" 
+  },
+  { 
+    name: "Sleep Calculator", 
+    desc_bn: "এটি ঘুমের হিসাব ক্যালকুলেটর। সতেজ ঘুম থেকে ওঠার জন্য কখন ঘুমাতে যাওয়া উচিত তা হিসাব করুন।",
+    desc_hi: "सही समय पर जागने और सोने के चक्र की गणना करें।",
+    desc_en: "Optimize your sleep cycles and wake up refreshed.",
+    keywords: ["sleep calculator", "sleep cycle", "ঘুমের হিসাব", "ঘুম"], 
+    url: "sleep-calculator.html" 
+  },
+  { 
+    name: "Barcode Generator (Code 128)", 
+    desc_bn: "এটি বারকোড জেনারেটর। পণ্যের জন্য যেকোনো কোডের বারকোড বানিয়ে ডাউনলোড করুন।",
+    desc_hi: "उत्पादों और बिलिंग के लिए कस्टम बारकोड बनाएं।",
+    desc_en: "Generate standard Code 128 barcodes for inventory and products.",
+    keywords: ["barcode generator", "barcode", "বারকোড"], 
+    url: "barcode-generator.html" 
+  },
+  { 
+    name: "Base64 Encoder & Decoder", 
+    desc_bn: "এটি বেস৬৪ এনকোডার ও ডিকোডার। যেকোনো টেক্সট বা ছবিকে বেস৬৪ কোডে রূপান্তর করুন।",
+    desc_hi: "टेक्स्ट और फाइलों को बेस64 में एनकोड और डिकोड करें।",
+    desc_en: "Encode and decode raw strings and binary assets into Base64.",
+    keywords: ["base64", "base64 encoder", "base64 decoder"], 
+    url: "base64.html" 
+  },
+  { 
+    name: "Random Password & PIN Generator", 
+    desc_bn: "এটি পাসওয়ার্ড ও পিন জেনারেটর। সুরক্ষিত ও শক্তিশালী পাসওয়ার্ড স্বয়ংক্রিয়ভাবে তৈরি করুন।",
+    desc_hi: "सुरक्षित और मजबूत पासवर्ड व पिन बनाएं।",
+    desc_en: "Generate secure, random, cryptographically strong passwords.",
+    keywords: ["password generator", "pin generator", "random password", "পাসওয়ার্ড জেনারেটর"], 
+    url: "password-generator.html" 
+  },
+  { 
+    name: "Universal Unit Converter", 
+    desc_bn: "এটি ইউনিট কনভার্টার। দৈর্ঘ্য, ওজন, তাপমাত্রা ও পরিমাপের একক রূপান্তর করুন।",
+    desc_hi: "लंबाई, वजन, तापमान और विभिन्न इकाइयों का रूपांतरण करें।",
+    desc_en: "Convert measurement units across length, weight, area, and volume.",
+    keywords: ["unit converter", "universal converter", "একক রূপান্তর"], 
+    url: "unit-converter.html" 
+  },
+  { 
+    name: "Duplicate Line Remover", 
+    desc_bn: "এটি ডুপ্লিকেট লাইন রিমুভার। টেক্সটের তালিকা থেকে একই রকম ডুপ্লিকেট লাইনগুলো মুছে দিন।",
+    desc_hi: "टेक्स्ट लिस्ट से डुप्लिकेट पंक्तियाँ हटाएं।",
+    desc_en: "Remove repeated and duplicate lines from raw text blocks.",
+    keywords: ["duplicate line remover", "remove duplicates"], 
+    url: "duplicate-remover.html" 
+  },
+  { 
+    name: "Text Reverse & Flip Tool", 
+    desc_bn: "এটি টেক্সট রিভার্সার। যেকোনো লেখাকে উল্টো বা মিরর টেক্সটে রূপান্তর করুন।",
+    desc_hi: "लिखे हुए शब्दों को उल्टा और मिरर टेक्स्ट में बदलें।",
+    desc_en: "Reverse characters, words, and flip text upside down.",
+    keywords: ["text reverse", "flip text", "লেখা উল্টানো"], 
+    url: "text-reverse.html" 
+  },
+  { 
+    name: "Marks to Percentage & CGPA", 
+    desc_bn: "এটি নম্বর থেকে শতাংশ ও সিজিপিএ ক্যালকুলেটর। পরীক্ষার গ্রেড ও পার্সেন্টেজ হিসাব করুন।",
+    desc_hi: "परीक्षा अंकों से प्रतिशत और सीजीपीए निकालें।",
+    desc_en: "Convert academic marks into exact percentages and CGPA grades.",
+    keywords: ["marks to percentage", "cgpa calculator", "cgpa"], 
+    url: "marks-calculator.html" 
+  },
+  { 
+    name: "Average & Grade Calculator", 
+    desc_bn: "এটি গড় ও গ্রেড ক্যালকুলেটর। নম্বরের গড় ও লেটার গ্রেড বের করুন।",
+    desc_hi: "अंकों का औसत और ग्रेड तय करें।",
+    desc_en: "Calculate statistical weighted averages and final letter grades.",
+    keywords: ["average calculator", "grade calculator"], 
+    url: "grade-calculator.html" 
+  },
+  { 
+    name: "Invoice / Bill Generator", 
+    desc_bn: "এটি ইনভয়েস ও বিল জেনারেটর। ব্যবসার জন্য প্রফেশনাল ক্যাশ মেমো বা জিএসটি বিল তৈরি করুন।",
+    desc_hi: "दुकान और व्यापार के लिए पेशेवर बिल या इनवॉइस बनाएं।",
+    desc_en: "Generate printable invoices and billing receipts with auto tax.",
+    keywords: ["invoice generator", "bill generator", "बिल जनरेटर", "বিল মেকার"], 
+    url: "invoice-generator.html" 
+  },
+  { 
+    name: "Resume / CV Maker to PDF", 
+    desc_bn: "এটি রিজিউমে মেকার। চাকরির জন্য প্রফেশনাল বায়োডাটা তৈরি করে পিডিএফে ডাউনলোড করুন।",
+    desc_hi: "नौकरी के लिए शानदार रिज्यूमे और बायोडाटा तैयार करें।",
+    desc_en: "Build modern professional resumes and download directly in PDF.",
+    keywords: ["resume maker", "cv maker", "biodata", "बायोडाटा", "রিজিউমে", "সিভি"], 
+    url: "resume-maker.html" 
+  },
+  { 
+    name: "Prescription / Memo Maker", 
+    desc_bn: "এটি প্রেসক্রিপশন ও মেমো মেকার। ডাক্তার ও ফার্মেসির জন্য প্রেসক্রিপশন স্লিপ বানান।",
+    desc_hi: "क्लिनिक और डॉक्टर के लिए डिजिटल प्रिस्क्रिप्शन पर्ची बनाएं।",
+    desc_en: "Create clinical doctor prescriptions and medical memos cleanly.",
+    keywords: ["prescription maker", "memo maker", "প্রেসক্রিপশন"], 
+    url: "prescription-maker.html" 
+  },
+  { 
+    name: "Contact & Support Desk", 
+    desc_bn: "এটি কন্ট্যাক্ট ও সাপোর্ট ডেস্ক। যেকোনো সাহায্য বা যোগাযোগের জন্য এখানে যেতে পারেন।",
+    desc_hi: "सहायता और संपर्क करने के लिए सपोर्ट डेस्क पर जाएं।",
+    desc_en: "Reach our official support desk for inquiries and help.",
+    keywords: ["contact", "support", "help", "সাহায্য", "যোগাযোগ"], 
+    url: "contact.html" 
+  }
 ];
 
-// 7. Conversational AI Handler
-function handleSpecialAIQueries(query) {
-  const q = query.toLowerCase().trim();
-
-  // Creator Resume & Info
-  if (q.includes("who made") || q.includes("developer") || q.includes("creator") || q.includes("who is indranil") || q.includes("indranil ruidas") || q.includes("ইন্দ্রনীল")) {
-    speakText(creatorBio.fullStory, 'en-US');
-    return true;
-  }
-
-  // Story & Timepass
-  if (q.includes("story") || q.includes("bored") || q.includes("time pass") || q.includes("joke") || q.includes("গল্প বলো")) {
-    const randomIndex = Math.floor(Math.random() * entertainingStories.length);
-    speakText(entertainingStories[randomIndex], 'en-US');
-    return true;
-  }
-
-  // 75+ Tools Overview
-  if (q.includes("how many tools") || q.includes("75") || q.includes("what can you do") || q.includes("features") || q.includes("কাজ")) {
-    speakText("DocuCraft AI provides over 75 tools for PDF operations, image compression, financial calculations, unit conversions, and everyday office utilities.", 'en-US');
-    return true;
-  }
-
-  // Math Evaluation
-  const mathRegex = /^(what is|calculate|solve|হিসাব করো|কত)?\s*([0-9\.\s\+\-\*/\(\)\^%]+)$/i;
-  const match = q.match(mathRegex);
-  if (match && match[2] && match[2].length > 1) {
-    try {
-      const sanitized = match[2].replace(/\^/g, '**');
-      const result = Function('"use strict";return (' + sanitized + ')')();
-      if (!isNaN(result)) {
-        speakText(`The answer is ${result}`, 'en-US');
-        return true;
-      }
-    } catch (e) {}
-  }
-
-  return false;
-}
-
-// 8. Intent Resolver & Live Target Navigation (Highlights Card on Screen & Opens Real URL)
-function scrollToMatchedTool(query) {
+// 6. Matching & Responding when User Speaks
+function handleUserQuery(query) {
   if (!query) return;
 
   const raw = query.toLowerCase().trim();
   const lang = detectLanguage(raw);
 
-  if (handleSpecialAIQueries(raw)) return;
-
-  if (raw.includes("how can i help") || raw.includes("i am indranil") || raw.includes("which tool")) {
-    return;
-  }
-
   const cleanQuery = raw
-    .replace(/^(open|show|find|go to|launch|cholo|dekhao|kholo|please|tool|khol|chalu karo|চালু করো|খুলুন|খোল|দেখাও|খোলো|দিখাও|আমি|আমার|দরকার|লাগে|খুলতে চাই|kholna hai|dikhaye)\s+/i, '')
-    .replace(/\s+(open|kholo|khol|খুলুন|খোল|দেখাও|চাই|দাও|dikhaye)$/i, '')
+    .replace(/^(open|show|find|go to|launch|cholo|dekhao|kholo|please|tool|khol|kholo ji|chalu karo|চালু করো|খুলুন|খোল|দেখাও|খুলবে|খোলো|দাও|আমাকে|হিসাব)\s+/i, '')
     .trim();
 
-  if (cleanQuery.length < 2) return;
+  let bestMatchedItem = null;
+  let maxScore = 0;
 
-  const allCards = Array.from(document.querySelectorAll('.tool-card, .popular-card, [data-tool], .grid-item, a[href*=".html"]'));
-  
-  let bestCard = null;
-  let bestKnowledgeItem = null;
-  let highestScore = 0;
-
-  // Search KnowledgeBase
   siteKnowledgeBase.forEach(item => {
     let score = 0;
     const nameLower = item.name.toLowerCase();
 
-    if (cleanQuery === nameLower) score += 150;
-    else if (nameLower.includes(cleanQuery)) score += 90;
+    if (cleanQuery === nameLower) score += 120;
+    else if (nameLower.includes(cleanQuery)) score += 80;
     else if (cleanQuery.includes(nameLower)) score += 60;
 
     item.keywords.forEach(kw => {
       const kwLower = kw.toLowerCase();
-      if (cleanQuery === kwLower) score += 140;
-      else if (cleanQuery.includes(kwLower)) score += 100;
+      if (cleanQuery === kwLower) score += 100;
+      else if (cleanQuery.includes(kwLower)) score += 70;
       else if (kwLower.includes(cleanQuery)) score += 50;
     });
 
-    if (score > highestScore) {
-      highestScore = score;
-      bestKnowledgeItem = item;
+    if (score > maxScore) {
+      maxScore = score;
+      bestMatchedItem = item;
     }
   });
 
-  // Verify against actual visible cards in DOM
-  allCards.forEach(card => {
-    const titleElem = card.querySelector('h3, h4, .tool-title, strong, b');
-    const cardText = (titleElem ? (titleElem.innerText || titleElem.textContent) : (card.innerText || '')).toLowerCase();
-    const cardHref = (card.getAttribute('href') || card.querySelector('a')?.getAttribute('href') || '').toLowerCase();
-
-    if (bestKnowledgeItem) {
-      const targetSlug = bestKnowledgeItem.url.toLowerCase().replace('.html', '');
-      if (cardHref.includes(targetSlug) || cardText.includes(bestKnowledgeItem.name.toLowerCase())) {
-        bestCard = card;
-      }
+  if (bestMatchedItem && maxScore >= 40) {
+    let message = bestMatchedItem.desc_en;
+    if (lang === 'bn-IN' && bestMatchedItem.desc_bn) {
+      message = bestMatchedItem.desc_bn;
+    } else if (lang === 'hi-IN' && bestMatchedItem.desc_hi) {
+      message = bestMatchedItem.desc_hi;
     }
-
-    if (!bestCard && cardText.includes(cleanQuery)) {
-      bestCard = card;
-    }
-  });
-
-  // Execute Action: Bring directly in front of mobile screen & Navigate safely
-  if (bestCard || (bestKnowledgeItem && highestScore >= 50)) {
-    const finalToolName = bestKnowledgeItem ? bestKnowledgeItem.name : (bestCard.querySelector('h3, h4')?.innerText || "Tool");
-    
-    let speakMessage = `Opening ${finalToolName}`;
+    speakAndDisplay(raw, message, lang, bestMatchedItem.name, bestMatchedItem.url);
+  } else {
+    let notFoundMsg = "Sorry, I couldn't find that specific tool. Please tell me what you need.";
     if (lang === 'bn-IN') {
-      speakMessage = `${bestKnowledgeItem?.bn || finalToolName} খোলা হচ্ছে...`;
+      notFoundMsg = "দুঃখিত, এই টুলটি বুঝতে পারিনি। আপনার কী ধরনের কাজ দরকার তা আরেকবার বলুন।";
     } else if (lang === 'hi-IN') {
-      speakMessage = `${bestKnowledgeItem?.hi || finalToolName} खोला जा रहा है...`;
+      notFoundMsg = "माफ़ कीजिए, यह टूल नहीं मिला। आपको किस काम के लिए टूल चाहिए कृपया दोबारा बोलें।";
     }
-    speakText(speakMessage, lang);
-
-    if (bestCard) {
-      bestCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      bestCard.style.transition = 'transform 0.3s ease, box-shadow 0.3s ease, border 0.3s ease';
-      bestCard.style.boxShadow = '0 0 25px rgba(56, 189, 248, 0.9)';
-      bestCard.style.transform = 'scale(1.04)';
-      bestCard.style.border = '2px solid #38bdf8';
-
-      setTimeout(() => {
-        const linkTag = bestCard.tagName === 'A' ? bestCard : bestCard.querySelector('a');
-        const exactHref = linkTag?.getAttribute('href') || bestCard.getAttribute('href');
-
-        if (exactHref && exactHref !== '#' && !exactHref.startsWith('javascript:')) {
-          window.location.href = exactHref;
-        } else if (bestKnowledgeItem && bestKnowledgeItem.url) {
-          window.location.href = bestKnowledgeItem.url;
-        } else {
-          bestCard.click();
-        }
-      }, 750);
-    } else if (bestKnowledgeItem && bestKnowledgeItem.url) {
-      setTimeout(() => {
-        window.location.href = bestKnowledgeItem.url;
-      }, 750);
-    }
+    speakAndDisplay(raw, notFoundMsg, lang, "DocuCraft AI", "");
   }
 }
 
-// 9. Speech Recognition Controller (Anti-Echo Loop Protection)
+// 7. Microphone Input Handler (Starts ONLY when user clicks and speaks)
 function toggleVoiceInput(inputElementId = 'toolSearchInput') {
   const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
   if (!SpeechRecognition) {
@@ -353,23 +796,30 @@ function toggleVoiceInput(inputElementId = 'toolSearchInput') {
     return;
   }
 
-  const micBtn = document.getElementById('voiceSearchBtn') || document.querySelector('.search-bar svg, .search-box svg');
+  const micBtn = document.getElementById('voiceSearchBtn');
   const statusElem = document.getElementById('voice-status');
 
   if (isListening && globalRecognition) {
-    shouldRestart = false;
     globalRecognition.stop();
     isListening = false;
     if (micBtn) micBtn.classList.remove('listening');
     if (statusElem) statusElem.innerText = "";
-    window.speechSynthesis.cancel();
+    if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+    if (autoRedirectTimer) clearTimeout(autoRedirectTimer);
+    hideCenterAICard();
     return;
   }
+
+  if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+  if (autoRedirectTimer) clearTimeout(autoRedirectTimer);
+  hideCenterAICard();
 
   globalRecognition = new SpeechRecognition();
   globalRecognition.continuous = false;
   globalRecognition.interimResults = false;
-  globalRecognition.lang = navigator.language || 'en-US';
+
+  const userPreferredLang = navigator.language || 'en-US';
+  globalRecognition.lang = userPreferredLang;
 
   globalRecognition.onstart = function() {
     isListening = true;
@@ -378,20 +828,14 @@ function toggleVoiceInput(inputElementId = 'toolSearchInput') {
   };
 
   globalRecognition.onresult = function(event) {
-    if (isAssistantSpeaking) return;
-
-    let transcript = '';
-    for (let i = event.resultIndex; i < event.results.length; ++i) {
-      if (event.results[i].isFinal) {
-        transcript += event.results[i][0].transcript;
-      }
-    }
-
-    const cleanTranscript = transcript.trim();
-    if (cleanTranscript) {
+    const transcript = event.results[0][0].transcript;
+    if (transcript) {
+      const cleanTranscript = transcript.trim();
       const inputField = document.getElementById(inputElementId);
-      if (inputField) inputField.value = cleanTranscript;
-      scrollToMatchedTool(cleanTranscript);
+      if (inputField) {
+        inputField.value = cleanTranscript;
+      }
+      handleUserQuery(cleanTranscript);
     }
   };
 
@@ -407,227 +851,37 @@ function toggleVoiceInput(inputElementId = 'toolSearchInput') {
     if (statusElem) statusElem.innerText = "";
   };
 
-  // Assistant prompt completes first, then mic captures user speech
-  playIndranilGreeting(() => {
-    try {
-      setTimeout(() => {
-        globalRecognition.start();
-      }, 350);
-    } catch (err) {
-      console.warn("Recognition delay:", err);
-    }
-  });
-}
-
-// 10. Voice Gender Switcher & UI Injection (Clean Alignment)
-function injectVoiceGenderSwitcher() {
-  const micElement = document.getElementById('voiceSearchBtn') || document.querySelector('.search-bar svg, .search-box svg');
-  if (!micElement) return;
-
-  const parent = micElement.parentElement;
-  if (!parent) return;
-
-  if (getComputedStyle(parent).position === 'static') {
-    parent.style.position = 'relative';
-  }
-
-  const oldBadge = parent.querySelector('.ai-voice-badge');
-  if (oldBadge) oldBadge.remove();
-
-  const badge = document.createElement('span');
-  badge.className = 'ai-voice-badge';
-  badge.innerText = 'AI';
-  badge.style.position = 'absolute';
-  badge.style.bottom = '-4px';
-  badge.style.right = '-2px';
-  badge.style.fontSize = '9px';
-  badge.style.fontWeight = 'bold';
-  badge.style.color = '#38bdf8';
-  badge.style.pointerEvents = 'none';
-  parent.appendChild(badge);
-
-  const oldSwitcher = parent.querySelector('.voice-switch-btn');
-  if (oldSwitcher) oldSwitcher.remove();
-
-  const switcher = document.createElement('button');
-  switcher.className = 'voice-switch-btn';
-  switcher.type = 'button';
-  switcher.title = 'Switch Voice (Female / Male)';
-  switcher.innerText = selectedVoiceGender === 'female' ? '👩 Female' : '👨 Male';
-  switcher.style.position = 'absolute';
-  switcher.style.top = '-26px';
-  switcher.style.right = '0';
-  switcher.style.background = 'rgba(15, 23, 42, 0.9)';
-  switcher.style.color = '#38bdf8';
-  switcher.style.border = '1px solid rgba(56, 189, 248, 0.4)';
-  switcher.style.borderRadius = '12px';
-  switcher.style.padding = '2px 8px';
-  switcher.style.fontSize = '10px';
-  switcher.style.fontWeight = '600';
-  switcher.style.cursor = 'pointer';
-  switcher.style.zIndex = '10';
-
-  switcher.addEventListener('click', (e) => {
-    e.stopPropagation();
-    selectedVoiceGender = selectedVoiceGender === 'female' ? 'male' : 'female';
-    localStorage.setItem('docucraft_voice_gender', selectedVoiceGender);
-    switcher.innerText = selectedVoiceGender === 'female' ? '👩 Female' : '👨 Male';
-    speakText(selectedVoiceGender === 'female' ? "Female voice selected." : "Male voice selected.", 'en-US');
-  });
-
-  parent.appendChild(switcher);
-
-  micElement.style.cursor = 'pointer';
-  micElement.onclick = (e) => {
-    e.preventDefault();
-    toggleVoiceInput('toolSearchInput');
-  };
-}
-
-// 11. Strict Safe URL Resolver
-function getCleanSafeHref(rawUrl) {
-  if (!rawUrl || typeof rawUrl !== 'string') return null;
-  const trimmed = rawUrl.trim();
   try {
-    const parsed = new URL(trimmed, window.location.origin);
-    if (parsed.protocol === 'http:' || parsed.protocol === 'https:') {
-      return parsed.href;
-    }
-  } catch (e) {
-    return null;
+    globalRecognition.start();
+  } catch (err) {
+    console.error("Start error:", err);
   }
-  return null;
 }
-
-// 12. Robust Recently Used Tracker & Instant Working Clear Feature
-function trackToolUsage(toolName, toolUrl) {
-  if (!toolName || typeof toolName !== 'string') return;
-  const cleanName = toolName.replace(/^⚡\s*/, '').replace(/\s*⚡$/, '').trim();
-  
-  // Ignore empty titles, lightning symbols, or static policy pages
-  if (cleanName.length < 2 || cleanName === '⚡' || cleanName === '⚡ ⚡') return;
-  
-  const ignoredWords = ['privacy policy', 'terms', 'disclaimer', 'contact us', 'about us', 'about', 'clear'];
-  if (ignoredWords.includes(cleanName.toLowerCase())) return;
-
-  const safeUrl = getCleanSafeHref(toolUrl);
-  if (!safeUrl) return;
-
-  let recent = [];
-  try {
-    recent = JSON.parse(localStorage.getItem('docucraft_recent_tools') || '[]');
-  } catch (e) {
-    recent = [];
+function handleCardClick(element) {
+  const title = element.querySelector('h3, h4, .tool-title')?.innerText || element.innerText.split('\n')[0];
+  const url = element.getAttribute('href');
+  const match = siteKnowledgeBase.find(item => item.name.toLowerCase() === title.toLowerCase().trim());
+  if (match) {
+    const lang = detectLanguage(navigator.language);
+    let desc = match.desc_en;
+    if (lang === 'bn-IN' && match.desc_bn) desc = match.desc_bn;
+    else if (lang === 'hi-IN' && match.desc_hi) desc = match.desc_hi;
+    speakAndDisplay(title, desc, lang, match.name, url);
+  } else {
+    speakAndDisplay(title, `Opening ${title}`, 'en-US', title, url);
   }
-
-  // Filter out any previous corrupt or matching entries
-  recent = recent.filter(t => t && t.name && t.name.trim() !== cleanName && !t.name.includes('Privacy Policy'));
-  recent.unshift({ name: cleanName.slice(0, 60), url: safeUrl });
-  
-  if (recent.length > 4) recent.pop();
-  localStorage.setItem('docucraft_recent_tools', JSON.stringify(recent));
-  renderRecentTools();
 }
-
-function clearRecentTools() {
-  localStorage.removeItem('docucraft_recent_tools');
-  const container = document.getElementById('recentToolsSection') || document.querySelector('.recently-used, [data-section="recent"]');
-  const grid = document.getElementById('recentToolsGrid') || document.querySelector('.recently-used-grid, .recent-tools-grid');
-  
-  if (grid) grid.innerHTML = '';
-  if (container) container.style.display = 'none';
+function startVoice() {
+  toggleVoiceInput('toolSearchInput');
 }
-
-function renderRecentTools() {
-  const container = document.getElementById('recentToolsSection') || document.querySelector('.recently-used, [data-section="recent"]');
-  const grid = document.getElementById('recentToolsGrid') || document.querySelector('.recently-used-grid, .recent-tools-grid');
-  
-  // Attach Clear Button Listener explicitly (Touch & Click Support)
-  const clearBtn = document.getElementById('clearRecentBtn') || document.querySelector('.recently-used .clear, .recent-clear, [data-clear-recent]');
-  if (clearBtn) {
-    clearBtn.style.cursor = 'pointer';
-    clearBtn.onclick = (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      clearRecentTools();
-    };
-  }
-
-  if (!container || !grid) return;
-
-  let recent = [];
-  try {
-    recent = JSON.parse(localStorage.getItem('docucraft_recent_tools') || '[]');
-  } catch (e) {
-    recent = [];
-  }
-
-  // Clean up any corrupt entries stored earlier
-  recent = recent.filter(t => t && t.name && t.name.trim().length >= 2 && !t.name.includes('⚡ ⚡') && !t.name.toLowerCase().includes('privacy policy'));
-
-  if (!Array.isArray(recent) || recent.length === 0) {
-    container.style.display = 'none';
-    return;
-  }
-
-  container.style.display = 'block';
-  grid.innerHTML = '';
-
-  recent.forEach(tool => {
-    const safeHref = getCleanSafeHref(tool.url);
-    if (!safeHref) return;
-
-    const link = document.createElement('a');
-    link.setAttribute('href', safeHref);
-    link.className = 'recent-chip';
-    link.style.display = 'inline-flex';
-    link.style.alignItems = 'center';
-    link.style.gap = '8px';
-    link.style.padding = '8px 14px';
-    link.style.background = 'rgba(255,255,255,0.06)';
-    link.style.border = '1px solid rgba(255,255,255,0.12)';
-    link.style.borderRadius = '12px';
-    link.style.textDecoration = 'none';
-    link.style.color = '#fff';
-    link.style.fontSize = '13px';
-    link.style.margin = '4px';
-
-    const cleanTitle = tool.name.replace(/^⚡\s*/, '').trim();
-    link.innerHTML = `<span>⚡</span><span>${cleanTitle}</span>`;
-
-    grid.appendChild(link);
-  });
-}
-
-// 13. DOM Initializer & Safe Tracking Filters
+// Global event listener for all tool and popular cards
 document.addEventListener('DOMContentLoaded', () => {
-  injectVoiceGenderSwitcher();
-  renderRecentTools();
-
-  // Global delegation for 'Clear' button tap on mobile
-  document.addEventListener('click', (e) => {
-    if (e.target && (e.target.matches('#clearRecentBtn, .recent-clear, [data-clear-recent]') || e.target.innerText?.trim().toLowerCase() === 'clear')) {
-      const isInsideRecent = e.target.closest('#recentToolsSection, .recently-used');
-      if (isInsideRecent) {
-        e.preventDefault();
-        clearRecentTools();
-      }
-    }
-  });
-
-  // Track only tool cards, ignore footer or policy links
-  document.querySelectorAll('a[href*=".html"], .tool-card, .popular-card').forEach(link => {
-    link.addEventListener('click', function() {
-      // Ignore footer, privacy policy, contact, and header links
-      if (this.closest('footer, .footer, nav, .navbar, .legal-links')) return;
-      
-      const titleEl = this.querySelector('h3, h4, .tool-title, strong, b');
-      const toolName = (titleEl ? titleEl.innerText : this.innerText.split('\n')[0] || '').trim();
-      const rawUrl = this.getAttribute('href') || (this.querySelector('a') ? this.querySelector('a').getAttribute('href') : null);
-      
-      const safeUrl = getCleanSafeHref(rawUrl);
-      if (toolName && safeUrl) {
-        trackToolUsage(toolName, safeUrl);
+  const cards = document.querySelectorAll('.popular-card, .tool-card');
+  
+  cards.forEach(card => {
+    card.addEventListener('click', function(e) {
+      if (typeof handleCardClick === 'function') {
+        handleCardClick(this);
       }
     });
   });
