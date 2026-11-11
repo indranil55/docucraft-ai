@@ -1155,17 +1155,26 @@ function downloadBlob(content, name, mimeType = 'application/octet-stream') {
    if (url && (url.startsWith('blob:') || url.startsWith('data:') || url.startsWith('http:') || url.startsWith('https:'))) {
     const a = document.createElement('a');
     a.style.display = 'none';
-    a.href = url;
-    a.download = name || 'downloaded_file';
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-}
+    function downloadBlob(content, name, mimeType = 'application/octet-stream') {
+    if (!content) return;
 
-    setTimeout(() => {
-        if (a.parentNode) {
-            a.parentNode.removeChild(a);
-        }
-        window.URL.revokeObjectURL(url);
-    }, 100);
+    const blob = content instanceof Blob ? content : new Blob([content], { type: mimeType });
+    const url = window.URL.createObjectURL(blob);
+
+    if (url && url.startsWith('blob:')) {
+        const a = document.createElement('a');
+        a.style.display = 'none';
+        a.href = url;
+        a.download = name || 'downloaded_file';
+
+        document.body.appendChild(a);
+        a.click();
+
+        setTimeout(() => {
+            if (a.parentNode) {
+                a.parentNode.removeChild(a);
+            }
+            window.URL.revokeObjectURL(url);
+        }, 100);
+    }
 }
