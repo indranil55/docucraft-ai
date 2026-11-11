@@ -3,7 +3,7 @@
 let isSignUpMode = false;
 let isResetMode = false;
 
-const GOOGLE_SHEET_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbw7ypSy3VkabsXyc0aiDStAC7xCsEW5Xks-OPGa9SUmpDIlgaXidHT7jC56cQlw-LpXsw/exec";
+const GOOGLE_SHEET_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwBYgZTU89Q4oZUyoCFanq_n2bTB85o6QHdjKKtFDsZOCdQP83FZeMUtYIm_PQTAoTuMw/exec";
 
 window.addEventListener('DOMContentLoaded', () => {
   if (typeof pdfjsLib !== 'undefined') {
