@@ -562,28 +562,28 @@
 <section class="popular-section">
   <h3 class="section-title"><i class="fa-solid fa-fire" style="color: #e5322d;"></i> Most Popular Tools</h3>
   <div class="popular-grid">
-    <div class="popular-card" onclick="handleCardClick(this); launchTool('merge');">
+    <div class="popular-card" onclick="launchTool('merge');">
       <div class="popular-icon" style="background:#fee2e2; color:#e5322d;"><i class="fa-solid fa-object-group"></i></div>
       <div class="popular-info">
         <h4>Merge PDF</h4>
         <span>Combine files</span>
       </div>
     </div>
-    <div class="popular-card" onclick="handleCardClick(this); launchTool('kbResizer');">
+    <div class="popular-card" onclick="launchTool('kbResizer');">
       <div class="popular-icon" style="background:#dbeafe; color:#2563eb;"><i class="fa-solid fa-compress"></i></div>
       <div class="popular-info">
         <h4>Photo & Sign KB / MB Resizer</h4>
         <span>Compress image size</span>
       </div>
     </div>
-    <div class="popular-card" onclick="handleCardClick(this); launchTool('compress');">
+    <div class="popular-card" onclick="launchTool('compress');">
       <div class="popular-icon" style="background:#ecfdf5; color:#059669;"><i class="fa-solid fa-file-zipper"></i></div>
       <div class="popular-info">
         <h4>Compress PDF</h4>
         <span>Reduce file size</span>
       </div>
     </div>
-    <div class="popular-card" onclick="handleCardClick(this); openGovtJobModal();">
+    <div class="popular-card" onclick="openGovtJobModal();">
       <div class="popular-icon" style="background:#fee2e2; color:#dc2626;"><i class="fa-solid fa-bullhorn"></i></div>
       <div class="popular-info">
         <h4>Govt Job Alerts</h4>
@@ -591,8 +591,18 @@
       </div>
     </div>
   </div>
-</section> 
+</section>
+<script>
+window.addEventListener('appinstalled', () => {
+  console.log('PWA installed successfully');
+  if (installBtn) installBtn.style.display = 'none';
+});
+</script>
 
+<div id="networkStatusBanner" style="display: none; position: fixed; top: 0; left: 0; width: 100%; text-align: center; padding: 10px; font-size: 14px; font-weight: 600; z-index: 99999; transition: all 0.3s ease;"></div>
+
+<script>
+const banner = document.getElementById('networkStatusBanner');
   <!-- Category Tabs -->
   <div class="filter-wrapper">
     <div class="filter-tabs" id="tools">
