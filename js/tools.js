@@ -1141,30 +1141,29 @@ function parseRange(str, total) {
   return Array.from(indices).sort((a, b) => a - b);
 }
 
-function readFileAsDataURL(file) {
-  return new Promise((res, rej) => {
-    const r = new FileReader();
-    r.onload = () => res(r.result);
-    r.onerror = rej;
-    r.readAsDataURL(file);
-  });
-}
-
-// 100% Direct Force Downloader
 function downloadBlob(content, name, mimeType = 'application/octet-stream') {
-  if (!content) return;
-  const blob = content instanceof Blob ? content : new Blob([content], { type: mimeType });
+    if (!content) return;
 
-  const url = window.URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.style.display = 'none';
-  a.href = url;
-  a.download = name || 'downloaded_file';
-  document.body.appendChild(a);
-  a.click();
+    const blob = content instanceof Blob ? content : new Blob([content], { type: mimeType });
+    const url = window.URL.createObjectURL(blob);
 
-  setTimeout(() => {
-    if (a.parentNode) a.parentNode.removeChild(a);
-    window.URL.revokeObjectURL(url);
-  }, 1200);
+    // Validate that the URL is a safe blob URI
+    if (!url || !url.startsWith('blob:')) {
+        return;
+    }
+
+    const a = document.createElement('a');
+    a.style.display = 'none';
+    a.href = url;
+    a.download = name || 'downloaded_file';
+
+    document.body.appendChild(a);
+    a.click();
+
+    setTimeout(() => {
+        if (a.parentNode) {
+            a.parentNode.removeChild(a);
+        }
+        window.URL.revokeObjectURL(url);
+    }, 100);
 }
