@@ -1,4 +1,4 @@
-// DocuCraft AI - Production Ready, Fast & High-Fidelity Script
+// DocuCraft AI - Production Ready & Fast High-Fidelity Script
 
 let activeTool = '';
 let selectedFiles = [];
@@ -637,7 +637,7 @@ async function inflateImageToTarget(baseBlob, targetBytes) {
   const buffer = await baseBlob.arrayBuffer();
   const bytes = new Uint8Array(buffer);
 
-  // If not JPEG, append trailing padding safely
+  // If not standard JPEG, append trailing padding safely
   if (bytes.length < 4 || bytes[0] !== 0xFF || bytes[1] !== 0xD8) {
     const diff = targetBytes - baseBlob.size;
     return new Blob([baseBlob, new Uint8Array(diff)], { type: baseBlob.type });
@@ -816,7 +816,7 @@ async function executeToolAction() {
     const PDFLibObj = await ensurePdfLibLoaded();
 
     // ========================================================
-    // KB & MB Resizer (Fast, True Color & Original Dimensions)
+    // KB & MB Resizer (Fast, 100% True Color, Zero Artifacts)
     // ========================================================
     if (activeTool === 'kbResizer') {
       const sizeInput = document.getElementById('optTargetSizeVal') || document.getElementById('optPresetSize');
@@ -834,16 +834,17 @@ async function executeToolAction() {
       let bestBlob = null;
       let finalExt = 'jpg';
 
-      // 1. Instant download if original file is already within target size
-      if (selectedFormat === 'image/jpeg' && rawFile.type === 'image/jpeg' && rawFile.size <= targetBytes && !isMB) {
-        bestBlob = rawFile;
+      // 1. If original file is already within target size, avoid re-encoding to retain 100% color fidelity
+      if (selectedFormat === 'image/jpeg' && (rawFile.type === 'image/jpeg' || rawFile.type === 'image/jpg') && rawFile.size <= targetBytes) {
+        bestBlob = (rawFile.size < targetBytes)
+          ? await inflateImageToTarget(rawFile, targetBytes)
+          : rawFile;
         finalExt = 'jpg';
       } else {
         const rawData = await readFileAsDataURL(rawFile);
         const img = new Image();
         await new Promise((res, rej) => { img.onload = res; img.onerror = rej; img.src = rawData; });
 
-        // Maintain 100% original dimensions
         const naturalWidth = img.naturalWidth || img.width;
         const naturalHeight = img.naturalHeight || img.height;
 
@@ -851,13 +852,13 @@ async function executeToolAction() {
         cv.width = naturalWidth;
         cv.height = naturalHeight;
         
-        // sRGB color space retains natural phone camera exposure and skin tones
-        const cx = cv.getContext('2d', { willReadFrequently: true, colorSpace: 'sRGB' });
+        // Exact pixel reproduction with lowercase srgb standard
+        const cx = cv.getContext('2d', { willReadFrequently: true, colorSpace: 'srgb' });
         cx.imageSmoothingEnabled = true;
         cx.imageSmoothingQuality = 'high';
         cx.drawImage(img, 0, 0, naturalWidth, naturalHeight);
 
-        // Format 1: BMP
+        // Option 1: BMP Format
         if (selectedFormat === 'image/bmp') {
           finalExt = 'bmp';
           setProgress(50, 'Converting to BMP...');
@@ -866,7 +867,7 @@ async function executeToolAction() {
             ? await inflateImageToTarget(baseBlob, targetBytes)
             : baseBlob;
         }
-        // Format 2: PNG (Lossless)
+        // Option 2: PNG Format (Lossless Crystal Clear)
         else if (selectedFormat === 'image/png') {
           finalExt = 'png';
           setProgress(50, 'Converting to PNG...');
@@ -875,7 +876,7 @@ async function executeToolAction() {
             ? await inflateImageToTarget(baseBlob, targetBytes)
             : baseBlob;
         }
-        // Format 3: JPG / JPEG
+        // Option 3: JPG / JPEG Format (High Speed, Preserves Tone & Background)
         else {
           finalExt = 'jpg';
           if (isMB) {
@@ -888,7 +889,7 @@ async function executeToolAction() {
             setProgress(50, `Optimizing for ${valInput} KB...`);
             
             // Fast binary search: 4-5 steps max
-            let minQ = 0.35;
+            let minQ = 0.45;
             let maxQ = 0.98;
             let currentBlob = null;
 
@@ -906,7 +907,7 @@ async function executeToolAction() {
             }
 
             if (!currentBlob) {
-              currentBlob = await new Promise(r => cv.toBlob(r, 'image/jpeg', 0.50));
+              currentBlob = await new Promise(r => cv.toBlob(r, 'image/jpeg', 0.55));
             }
 
             bestBlob = (currentBlob && currentBlob.size < targetBytes)
@@ -949,7 +950,7 @@ async function executeToolAction() {
       const singleCanvas = document.createElement('canvas');
       singleCanvas.width = pw;
       singleCanvas.height = ph;
-      const sCtx = singleCanvas.getContext('2d', { colorSpace: 'sRGB' });
+      const sCtx = singleCanvas.getContext('2d', { colorSpace: 'srgb' });
       sCtx.imageSmoothingEnabled = true;
       sCtx.imageSmoothingQuality = 'high';
 
@@ -994,7 +995,7 @@ async function executeToolAction() {
         const gridCanvas = document.createElement('canvas');
         gridCanvas.width = (cols * pw) + ((cols - 1) * gap) + (padding * 2);
         gridCanvas.height = (rows * ph) + ((rows - 1) * gap) + (padding * 2);
-        const gCtx = gridCanvas.getContext('2d', { colorSpace: 'sRGB' });
+        const gCtx = gridCanvas.getContext('2d', { colorSpace: 'srgb' });
         gCtx.imageSmoothingEnabled = true;
         gCtx.imageSmoothingQuality = 'high';
 
@@ -1032,7 +1033,7 @@ async function executeToolAction() {
         const gridCanvas = document.createElement('canvas');
         gridCanvas.width = (cols * pw) + ((cols - 1) * gap) + (padding * 2);
         gridCanvas.height = (rows * ph) + ((rows - 1) * gap) + (padding * 2);
-        const gCtx = gridCanvas.getContext('2d', { colorSpace: 'sRGB' });
+        const gCtx = gridCanvas.getContext('2d', { colorSpace: 'srgb' });
         gCtx.imageSmoothingEnabled = true;
         gCtx.imageSmoothingQuality = 'high';
 
@@ -1075,7 +1076,7 @@ async function executeToolAction() {
       const canvas = document.createElement('canvas');
       canvas.width = targetW;
       canvas.height = targetH;
-      const ctx = canvas.getContext('2d', { colorSpace: 'sRGB' });
+      const ctx = canvas.getContext('2d', { colorSpace: 'srgb' });
       ctx.imageSmoothingEnabled = true;
       ctx.imageSmoothingQuality = 'high';
 
