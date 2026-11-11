@@ -1270,9 +1270,8 @@ function downloadBlob(content, name, mimeType = 'application/octet-stream') {
   if (!content) return;
   const blob = content instanceof Blob ? content : new Blob([content], { type: mimeType });
 
-  // CodeQL XSS Fix: Strip HTML meta-characters and sanitize filename
+  // Completely sanitize the filename to pass GitHub CodeQL security scanning
   const safeName = String(name || 'downloaded_file')
-    .replace(/[<>&"'`]/g, '')
     .replace(/[^a-zA-Z0-9._-]/g, '_')
     .substring(0, 255);
 
