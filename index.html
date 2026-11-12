@@ -4558,17 +4558,23 @@ function shareWebsite() {
     const allTools = document.querySelectorAll(".tools-grid a, .tool-card"); 
 
     if (track && allTools.length > 0) {
-      let pillsHTML = "";
-      allTools.forEach(tool => {
-        const href = tool.getAttribute("href");
-        const titleEl = tool.querySelector("h3, h4, .tool-title") || tool;
-        const name = titleEl.textContent.trim();
-        if (href && name) {
-          pillsHTML += `<a href="${href}" class="quick-pin-pill">${name}</a>`;
-        }
-      });
-      // Inject twice for seamless infinite scrolling
-      track.innerHTML = pillsHTML + pillsHTML;
+  // Run the loop twice for seamless infinite scrolling
+  for (let i = 0; i < 2; i++) {
+    allTools.forEach(tool => {
+      const href = tool.getAttribute('href');
+      const titleEl = tool.querySelector('h3, h4, .tool-title') || tool;
+      const name = titleEl.textContent.trim();
+
+      if (href && name) {
+        const a = document.createElement('a');
+        a.href = href;
+        a.className = 'quick-pin-pill';
+        a.textContent = name;
+        track.appendChild(a);
+      }
+    });
+  }
+}
     }
   });
 </script>
