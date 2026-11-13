@@ -88,8 +88,31 @@ function openCustomModal(modalId) {
   } catch (e) {}
 }
 
-function launchTool(toolKey) {
-  if (toolKey === 'rot') toolKey = 'rotate';
+function launchTool(rawToolKey) {
+  // Smart Normalizer to fix HTML toolKey names and missing "to"
+  let toolKey = rawToolKey;
+  if (typeof toolKey === 'string') {
+    const tk = toolKey.toLowerCase().replace(/[^a-z0-9]/g, '');
+    const keyMap = {
+      'rot': 'rotate',
+      'jpgpdf': 'jpgToPdf', 'jpgtopdf': 'jpgToPdf',
+      'pngpdf': 'pngToPdf', 'pngtopdf': 'pngToPdf',
+      'webppdf': 'webpToPdf', 'webptopdf': 'webpToPdf',
+      'wordpdf': 'wordToPdf', 'wordtopdf': 'wordToPdf', 'docpdf': 'wordToPdf', 'docxpdf': 'wordToPdf',
+      'excelpdf': 'excelToPdf', 'exceltopdf': 'excelToPdf', 'xlspdf': 'excelToPdf',
+      'pptpdf': 'pptToPdf', 'ppttopdf': 'pptToPdf',
+      'htmlpdf': 'htmlToPdf', 'htmltopdf': 'htmlToPdf',
+      'textpdf': 'textToPdf', 'texttopdf': 'textToPdf', 'txtpdf': 'textToPdf',
+      'zippdf': 'zipToPdf', 'ziptopdf': 'zipToPdf',
+      'pdfword': 'pdfToWord', 'pdftoword': 'pdfToWord',
+      'pdfexcel': 'pdfToExcel', 'pdftoexcel': 'pdfToExcel',
+      'pdfppt': 'pdfToPpt', 'pdftoppt': 'pdfToPpt',
+      'pdfjpg': 'pdfToJpg', 'pdftojpg': 'pdfToJpg',
+      'pdfpng': 'pdfToPng', 'pdftopng': 'pdfToPng',
+      'pdftext': 'pdfToText', 'pdftotext': 'pdfToText'
+    };
+    if (keyMap[tk]) toolKey = keyMap[tk];
+  }
 
   if (typeof checkUserAccess === 'function' && !checkUserAccess(toolKey)) {
     return;
@@ -118,7 +141,7 @@ function launchTool(toolKey) {
 
   if (fileInput) {
     fileInput.value = '';
-    if (['merge', 'split', 'compress', 'organize', 'rotate', 'removePages', 'watermark', 'protect', 'unlock', 'addPageNumbers', 'pdfToJpg', 'pdfToWord', 'pdfToExcel', 'editPdf'].includes(toolKey)) {
+    if (['merge', 'split', 'compress', 'organize', 'rotate', 'removePages', 'watermark', 'protect', 'unlock', 'addPageNumbers', 'pdfToJpg', 'pdfToPng', 'pdfToWord', 'pdfToExcel', 'pdfToPpt', 'pdfToText', 'editPdf'].includes(toolKey)) {
       fileInput.accept = '.pdf,application/pdf';
     } else if (['jpgToPdf', 'pngToPdf', 'webpToPdf', 'kbResizer', 'examResizer', 'ocr', 'passportGrid'].includes(toolKey)) {
       fileInput.accept = '.jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp';
@@ -130,6 +153,10 @@ function launchTool(toolKey) {
       fileInput.accept = '.ppt,.pptx,application/vnd.ms-powerpoint,application/vnd.openxmlformats-officedocument.presentationml.presentation';
     } else if (toolKey === 'htmlToPdf') {
       fileInput.accept = '.html,.htm,text/html';
+    } else if (toolKey === 'textToPdf') {
+      fileInput.accept = '.txt,text/plain';
+    } else if (toolKey === 'zipToPdf') {
+      fileInput.accept = '.zip,application/zip';
     } else {
       fileInput.accept = '*/*';
     }
@@ -158,6 +185,15 @@ function launchTool(toolKey) {
       history.pushState({ modalOpen: true }, '', window.location.href);
     }
   }
+
+  // Predefined beautiful titles
+  const titleMap = {
+    'jpgToPdf': 'JPG to PDF', 'pngToPdf': 'PNG to PDF', 'webpToPdf': 'WebP to PDF',
+    'wordToPdf': 'Word to PDF', 'excelToPdf': 'Excel to PDF', 'pptToPdf': 'PowerPoint to PDF',
+    'htmlToPdf': 'HTML to PDF', 'textToPdf': 'Text to PDF', 'zipToPdf': 'ZIP to PDF',
+    'pdfToWord': 'PDF to Word', 'pdfToExcel': 'PDF to Excel', 'pdfToPpt': 'PDF to PowerPoint',
+    'pdfToJpg': 'PDF to JPG', 'pdfToPng': 'PDF to PNG', 'pdfToText': 'PDF to Text'
+  };
 
   if (toolKey === 'sigPad') {
     if (title) title.innerText = 'Digital Signature Maker';
@@ -407,9 +443,9 @@ function launchTool(toolKey) {
           <input type="text" id="optDeleteRange" class="form-control" placeholder="e.g., 2, 4" style="width:100%; padding:10px; border:1px solid #d1d5db; border-radius:8px;">
         </div>`;
     }
-  } else if (toolKey === 'jpgToPdf' || toolKey === 'pngToPdf' || toolKey === 'webpToPdf') {
-    if (title) title.innerText = 'Image to PDF Converter';
-    if (desc) desc.innerText = 'Convert JPG, PNG, or WebP images into a clean PDF with proper sizing.';
+  } else if (['jpgToPdf', 'pngToPdf', 'webpToPdf'].includes(toolKey)) {
+    if (title) title.innerText = titleMap[toolKey] || 'Image to PDF';
+    if (desc) desc.innerText = 'Convert images into a clean PDF with proper sizing.';
     if (dropText) dropText.innerText = 'Tap to select image file(s)';
     if (customUI) {
       customUI.innerHTML = `
@@ -441,24 +477,28 @@ function launchTool(toolKey) {
           <input type="text" id="optWatermark" class="form-control" value="CONFIDENTIAL" style="width:100%; padding:10px; border:1px solid #d1d5db; border-radius:8px;">
         </div>`;
     }
+  } else if (toolKey === 'zipToPdf') {
+    if (title) title.innerText = titleMap[toolKey];
+    if (desc) desc.innerText = 'Extract images from a ZIP file and convert them into a single PDF.';
+    if (dropText) dropText.innerText = 'Tap to select ZIP archive';
+  } else if (toolKey === 'textToPdf') {
+    if (title) title.innerText = titleMap[toolKey];
+    if (desc) desc.innerText = 'Create clean PDF documents from plain text files.';
+    if (dropText) dropText.innerText = 'Tap to select TXT file';
+  } else if (toolKey === 'htmlToPdf') {
+    if (title) title.innerText = titleMap[toolKey];
+    if (desc) desc.innerText = 'Convert HTML text content or web markup directly into PDF.';
+    if (dropText) dropText.innerText = 'Tap to select HTML file';
+  } else if (['pdfToJpg', 'pdfToPng'].includes(toolKey)) {
+    if (title) title.innerText = titleMap[toolKey];
+    if (desc) desc.innerText = 'Extract pages from your PDF document as high-quality image files.';
+    if (dropText) dropText.innerText = 'Tap to select a PDF';
+  } else if (toolKey === 'pdfToText') {
+    if (title) title.innerText = titleMap[toolKey];
+    if (desc) desc.innerText = 'Extract text contents from your PDF document into a text file.';
+    if (dropText) dropText.innerText = 'Tap to select a PDF';
   } else {
-    let formattedTitle = toolKey;
-    const lowerKey = toolKey.toLowerCase();
-    if (lowerKey === 'pdfexcel') formattedTitle = 'PDF to Excel';
-    else if (lowerKey === 'pdftext') formattedTitle = 'PDF to Text';
-    else if (lowerKey === 'pdfword') formattedTitle = 'PDF to Word';
-    else if (lowerKey === 'pdfjpg') formattedTitle = 'PDF to JPG';
-    else if (lowerKey === 'pdfpng') formattedTitle = 'PDF to PNG';
-    else if (lowerKey === 'wordtopdf') formattedTitle = 'Word to PDF';
-    else if (lowerKey === 'exceltopdf') formattedTitle = 'Excel to PDF';
-    else if (lowerKey === 'ppttopdf') formattedTitle = 'PowerPoint to PDF';
-    else if (lowerKey === 'htmltopdf') formattedTitle = 'HTML to PDF';
-    else if (lowerKey === 'texttopdf') formattedTitle = 'Text to PDF';
-    else {
-      formattedTitle = toolKey.replace(/([A-Z])/g, ' $1').toUpperCase();
-    }
-
-    if (title) title.innerText = formattedTitle;
+    if (title) title.innerText = titleMap[toolKey] || toolKey.replace(/([A-Z])/g, ' $1').trim().replace(/^./, str => str.toUpperCase());
     if (desc) desc.innerText = 'Process your document instantly.';
     if (dropText) dropText.innerText = 'Tap to select file(s)';
   }
@@ -851,7 +891,8 @@ async function executeToolAction() {
     return;
   }
 
-  const fileNeeded = ['kbResizer', 'examResizer', 'passportGrid', 'merge', 'split', 'compress', 'organize', 'rotate', 'removePages', 'jpgToPdf', 'pngToPdf', 'webpToPdf', 'watermark', 'unlock', 'addPageNumbers'];
+  const fileNeeded = ['kbResizer', 'examResizer', 'passportGrid', 'merge', 'split', 'compress', 'organize', 'rotate', 'removePages', 'jpgToPdf', 'pngToPdf', 'webpToPdf', 'watermark', 'unlock', 'addPageNumbers', 'textToPdf', 'htmlToPdf', 'zipToPdf', 'wordToPdf', 'excelToPdf', 'pptToPdf', 'pdfToJpg', 'pdfToPng', 'pdfToText', 'pdfToWord', 'pdfToExcel', 'pdfToPpt'];
+  
   if (fileNeeded.includes(activeTool) && selectedFiles.length === 0) {
     alert('Please tap to select the required file(s) first.');
     return;
@@ -1265,6 +1306,139 @@ async function executeToolAction() {
       downloadBlob(await doc.save(), 'Watermarked_Document.pdf', 'application/pdf');
       showSuccessPopup('Watermark Added Successfully!');
 
+    } else if (activeTool === 'textToPdf') {
+      setProgress(30, 'Reading text file...');
+      const text = await selectedFiles[0].text();
+      const jsPdfLib = await ensureJsPdfLoaded();
+      const { jsPDF } = jsPdfLib || window.jspdf;
+      const pdf = new jsPDF();
+      const splitText = pdf.splitTextToSize(text, 180);
+      pdf.text(splitText, 15, 15);
+      downloadBlob(pdf.output('blob'), 'Converted_Text.pdf', 'application/pdf');
+      showSuccessPopup('Text Converted to PDF Successfully!');
+
+    } else if (activeTool === 'htmlToPdf') {
+      setProgress(30, 'Reading HTML file...');
+      const htmlText = await selectedFiles[0].text();
+      const jsPdfLib = await ensureJsPdfLoaded();
+      const { jsPDF } = jsPdfLib || window.jspdf;
+      const pdf = new jsPDF();
+      const tempDiv = document.createElement('div');
+      tempDiv.innerHTML = htmlText;
+      const plainText = tempDiv.innerText || tempDiv.textContent; 
+      const splitText = pdf.splitTextToSize(plainText, 180);
+      pdf.text(splitText, 15, 15);
+      downloadBlob(pdf.output('blob'), 'Converted_HTML.pdf', 'application/pdf');
+      showSuccessPopup('HTML Converted to PDF Successfully!');
+
+    } else if (activeTool === 'zipToPdf') {
+      setProgress(30, 'Loading ZIP extractor...');
+      let JSZip = window.JSZip;
+      if (!JSZip) {
+        await loadScript('https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js');
+        JSZip = window.JSZip;
+      }
+      setProgress(50, 'Extracting images from ZIP...');
+      const zip = new JSZip();
+      const loadedZip = await zip.loadAsync(selectedFiles[0]);
+      const jsPdfLib = await ensureJsPdfLoaded();
+      const { jsPDF } = jsPdfLib || window.jspdf;
+      const pdf = new jsPDF();
+      let pageAdded = false;
+
+      for (const [filename, fileData] of Object.entries(loadedZip.files)) {
+        if (!fileData.dir && filename.match(/\.(jpg|jpeg|png|webp)$/i)) {
+          const blob = await fileData.async('blob');
+          const imgData = await readFileAsDataURL(blob);
+          if (pageAdded) pdf.addPage();
+          pdf.addImage(imgData, 'JPEG', 10, 10, 190, 277);
+          pageAdded = true;
+        }
+      }
+      if (!pageAdded) { alert('No valid images found in the ZIP archive!'); return; }
+      setProgress(90, 'Generating PDF...');
+      downloadBlob(pdf.output('blob'), 'ZIP_to_PDF.pdf', 'application/pdf');
+      showSuccessPopup('ZIP Images Converted to PDF!');
+
+    } else if (activeTool === 'pdfToJpg' || activeTool === 'pdfToPng') {
+      setProgress(20, 'Loading PDF Document...');
+      const pdfjs = await ensurePdfJsLoaded();
+      if (!pdfjs) throw new Error('PDF library failed to load.');
+
+      const fileBuffer = await selectedFiles[0].arrayBuffer();
+      const pdfDoc = await pdfjs.getDocument({ data: fileBuffer }).promise;
+      const totalPages = pdfDoc.numPages;
+      const ext = activeTool === 'pdfToJpg' ? 'jpg' : 'png';
+      const mime = activeTool === 'pdfToJpg' ? 'image/jpeg' : 'image/png';
+
+      if (totalPages === 1) {
+        setProgress(60, 'Converting Page 1...');
+        const page = await pdfDoc.getPage(1);
+        const viewport = page.getViewport({ scale: 2.0 });
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d', { alpha: false });
+        canvas.height = viewport.height;
+        canvas.width = viewport.width;
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        await page.render({ canvasContext: ctx, viewport: viewport }).promise;
+
+        const blob = await canvasToBlobFast(canvas, 0.95);
+        downloadBlob(blob, `Converted_Page_1.${ext}`, mime);
+      } else {
+        setProgress(40, 'Preparing ZIP for multiple pages...');
+        let JSZip = window.JSZip;
+        if (!JSZip) {
+          await loadScript('https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js');
+          JSZip = window.JSZip;
+        }
+        const zip = new JSZip();
+
+        for (let i = 1; i <= totalPages; i++) {
+          setProgress(40 + Math.floor((i / totalPages) * 50), `Converting Page ${i}...`);
+          const page = await pdfDoc.getPage(i);
+          const viewport = page.getViewport({ scale: 2.0 });
+          const canvas = document.createElement('canvas');
+          const ctx = canvas.getContext('2d', { alpha: false });
+          canvas.height = viewport.height;
+          canvas.width = viewport.width;
+          ctx.fillStyle = '#ffffff';
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
+          await page.render({ canvasContext: ctx, viewport: viewport }).promise;
+
+          const dataUrl = canvas.toDataURL(mime, 0.95);
+          const base64Data = dataUrl.split(',')[1];
+          zip.file(`Page_${i}.${ext}`, base64Data, { base64: true });
+        }
+        setProgress(95, 'Zipping images...');
+        const zipBlob = await zip.generateAsync({ type: 'blob' });
+        downloadBlob(zipBlob, `Converted_Images.zip`, 'application/zip');
+      }
+      showSuccessPopup('PDF Converted to Images Successfully!');
+
+    } else if (activeTool === 'pdfToText') {
+      setProgress(30, 'Reading PDF content...');
+      const pdfjs = await ensurePdfJsLoaded();
+      if (!pdfjs) throw new Error('PDF library failed to load.');
+      const fileBuffer = await selectedFiles[0].arrayBuffer();
+      const pdfDoc = await pdfjs.getDocument({ data: fileBuffer }).promise;
+      let fullText = '';
+      
+      for (let i = 1; i <= pdfDoc.numPages; i++) {
+         setProgress(30 + Math.floor((i / pdfDoc.numPages) * 60), `Extracting Text from Page ${i}...`);
+         const page = await pdfDoc.getPage(i);
+         const textContent = await page.getTextContent();
+         const pageText = textContent.items.map(item => item.str).join(' ');
+         fullText += `--- Page ${i} ---\n\n${pageText}\n\n`;
+      }
+      
+      const blob = new Blob([fullText], { type: 'text/plain;charset=utf-8' });
+      downloadBlob(blob, 'Extracted_Text.txt', 'text/plain');
+      showSuccessPopup('Text Extracted Successfully!');
+
+    } else if (['wordToPdf', 'excelToPdf', 'pptToPdf', 'pdfToWord', 'pdfToExcel', 'pdfToPpt'].includes(activeTool)) {
+      alert('Note: Pure offline conversion for Word/Excel/PPT requires premium server-side APIs to maintain formatting. This feature is coming in the next update!');
+      
     } else if (activeTool === 'jpgToPdf' || activeTool === 'pngToPdf' || activeTool === 'webpToPdf') {
       const jsPdfLib = await ensureJsPdfLoaded();
       const { jsPDF } = jsPdfLib || window.jspdf;
@@ -1378,6 +1552,7 @@ function downloadBlob(content, name, mimeType = 'application/octet-stream') {
     window.URL.revokeObjectURL(url);
   }, 60000);
 }
+
 function updatePrivacyStatus() {
   const statusTag = document.getElementById('network-status');
   if (!statusTag) return;
