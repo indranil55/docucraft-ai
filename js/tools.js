@@ -118,10 +118,9 @@ function launchTool(toolKey) {
 
   if (fileInput) {
     fileInput.value = '';
-    if (['merge', 'split', 'compress', 'organize', 'rotate', 'removePages', 'watermark', 'protect', 'unlock', 'pdfToJpg', 'pdfToWord', 'pdfToExcel', 'editPdf'].includes(toolKey)) {
+    if (['merge', 'split', 'compress', 'organize', 'rotate', 'removePages', 'watermark', 'protect', 'unlock', 'addPageNumbers', 'pdfToJpg', 'pdfToWord', 'pdfToExcel', 'editPdf'].includes(toolKey)) {
       fileInput.accept = '.pdf,application/pdf';
-    } else if (['jpgToPdf', 'pngToPdf', 'kbResizer', 'examResizer', 'ocr', 'passportGrid'].includes(toolKey)) {
-      // Bypass slow Android Google Photos cloud picker for instant (<0.2s) local file selection
+    } else if (['jpgToPdf', 'pngToPdf', 'webpToPdf', 'kbResizer', 'examResizer', 'ocr', 'passportGrid'].includes(toolKey)) {
       fileInput.accept = '.jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp';
     } else if (toolKey === 'wordToPdf') {
       fileInput.accept = '.doc,.docx,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document';
@@ -135,7 +134,7 @@ function launchTool(toolKey) {
       fileInput.accept = '*/*';
     }
 
-    if (['merge', 'jpgToPdf', 'pngToPdf', 'wordToPdf', 'excelToPdf', 'pptToPdf', 'htmlToPdf'].includes(toolKey)) {
+    if (['merge', 'jpgToPdf', 'pngToPdf', 'webpToPdf', 'wordToPdf', 'excelToPdf', 'pptToPdf', 'htmlToPdf'].includes(toolKey)) {
       fileInput.setAttribute('multiple', 'true');
     } else {
       fileInput.removeAttribute('multiple');
@@ -303,6 +302,37 @@ function launchTool(toolKey) {
           </div>
         </div>`;
     }
+  } else if (toolKey === 'unlock') {
+    if (title) title.innerText = 'Unlock PDF';
+    if (desc) desc.innerText = 'Remove owner passwords and editing restrictions securely from your PDF.';
+    if (dropText) dropText.innerText = 'Tap to select locked PDF';
+    if (customUI) {
+      customUI.innerHTML = `
+        <div class="form-group" style="margin-top:10px;">
+          <label style="font-weight:600; font-size:13px; display:block; margin-bottom:6px;">Save File Name:</label>
+          <input type="text" id="optUnlockFileName" class="form-control" value="Unlocked_Document" style="width:100%; padding:10px; border:1px solid #d1d5db; border-radius:8px;">
+        </div>`;
+    }
+  } else if (toolKey === 'addPageNumbers') {
+    if (title) title.innerText = 'Add Page Numbers';
+    if (desc) desc.innerText = 'Automatically insert page numbers into your PDF file.';
+    if (dropText) dropText.innerText = 'Tap to select PDF';
+    if (customUI) {
+      customUI.innerHTML = `
+        <div class="form-group">
+          <label style="font-weight:600; font-size:13px; display:block; margin-bottom:6px;">Number Position:</label>
+          <select id="optPageNumPos" class="form-control" style="width:100%; padding:10px; border:1px solid #d1d5db; border-radius:8px;">
+            <option value="bottom-center" selected>Bottom Center</option>
+            <option value="bottom-right">Bottom Right</option>
+            <option value="top-center">Top Center</option>
+            <option value="top-right">Top Right</option>
+          </select>
+        </div>
+        <div class="form-group" style="margin-top:10px;">
+          <label style="font-weight:600; font-size:13px; display:block; margin-bottom:6px;">Save File Name:</label>
+          <input type="text" id="optPageNumFileName" class="form-control" value="Numbered_Document" style="width:100%; padding:10px; border:1px solid #d1d5db; border-radius:8px;">
+        </div>`;
+    }
   } else if (toolKey === 'merge') {
     if (title) title.innerText = 'Merge PDF';
     if (desc) desc.innerText = 'Select multiple PDF files to combine. Order can be rearranged.';
@@ -326,11 +356,15 @@ function launchTool(toolKey) {
         </div>`;
     }
   } else if (toolKey === 'compress') {
-    if (title) title.innerText = 'Optimize / Compact PDF';
-    if (desc) desc.innerText = 'Streamline document data and remove redundant streams.';
+    if (title) title.innerText = 'Compress / Reduce PDF Size';
+    if (desc) desc.innerText = 'Reduce PDF file size by selecting the desired quality percentage.';
     if (dropText) dropText.innerText = 'Tap to select PDF';
     if (customUI) {
       customUI.innerHTML = `
+        <div class="form-group">
+          <label style="font-weight:600; font-size:13px; display:block; margin-bottom:6px;">Compression Quality: <span id="qualityValue">50%</span></label>
+          <input type="range" id="optCompressQuality" min="10" max="100" value="50" step="5" style="width:100%; cursor:pointer;" oninput="document.getElementById('qualityValue').innerText = this.value + '%'">
+        </div>
         <div class="form-group" style="margin-top:10px;">
           <label style="font-weight:600; font-size:13px; display:block; margin-bottom:6px;">Save File Name:</label>
           <input type="text" id="optCompressFileName" class="form-control" value="Compressed_Document" style="width:100%; padding:10px; border:1px solid #d1d5db; border-radius:8px;">
@@ -373,9 +407,9 @@ function launchTool(toolKey) {
           <input type="text" id="optDeleteRange" class="form-control" placeholder="e.g., 2, 4" style="width:100%; padding:10px; border:1px solid #d1d5db; border-radius:8px;">
         </div>`;
     }
-  } else if (toolKey === 'jpgToPdf' || toolKey === 'pngToPdf') {
+  } else if (toolKey === 'jpgToPdf' || toolKey === 'pngToPdf' || toolKey === 'webpToPdf') {
     if (title) title.innerText = 'Image to PDF Converter';
-    if (desc) desc.innerText = 'Convert your image files into a clean PDF with proper sizing.';
+    if (desc) desc.innerText = 'Convert JPG, PNG, or WebP images into a clean PDF with proper sizing.';
     if (dropText) dropText.innerText = 'Tap to select image file(s)';
     if (customUI) {
       customUI.innerHTML = `
@@ -817,7 +851,7 @@ async function executeToolAction() {
     return;
   }
 
-  const fileNeeded = ['kbResizer', 'examResizer', 'passportGrid', 'merge', 'split', 'compress', 'organize', 'rotate', 'removePages', 'jpgToPdf', 'pngToPdf', 'watermark'];
+  const fileNeeded = ['kbResizer', 'examResizer', 'passportGrid', 'merge', 'split', 'compress', 'organize', 'rotate', 'removePages', 'jpgToPdf', 'pngToPdf', 'webpToPdf', 'watermark', 'unlock', 'addPageNumbers'];
   if (fileNeeded.includes(activeTool) && selectedFiles.length === 0) {
     alert('Please tap to select the required file(s) first.');
     return;
@@ -1080,6 +1114,41 @@ async function executeToolAction() {
       downloadBlob(bestBlob, `${fileName}.jpg`, 'image/jpeg');
       showSuccessPopup('Exam Document Resized Successfully!');
 
+    } else if (activeTool === 'unlock' && PDFLibObj) {
+      setProgress(40, 'Removing PDF restrictions...');
+      const customName = document.getElementById('optUnlockFileName')?.value?.trim() || 'Unlocked_Document';
+      const fileBuffer = await selectedFiles[0].arrayBuffer();
+      const doc = await PDFLibObj.PDFDocument.load(fileBuffer, { ignoreEncryption: true });
+      const unlockedBytes = await doc.save();
+      downloadBlob(unlockedBytes, `${customName}.pdf`, 'application/pdf');
+      showSuccessPopup('PDF Unlocked Successfully!');
+
+    } else if (activeTool === 'addPageNumbers' && PDFLibObj) {
+      setProgress(40, 'Adding Page Numbers...');
+      const customName = document.getElementById('optPageNumFileName')?.value?.trim() || 'Numbered_Document';
+      const pos = document.getElementById('optPageNumPos')?.value || 'bottom-center';
+      const fileBuffer = await selectedFiles[0].arrayBuffer();
+      const doc = await PDFLibObj.PDFDocument.load(fileBuffer, { ignoreEncryption: true });
+      
+      const pages = doc.getPages();
+      pages.forEach((page, idx) => {
+        const { width, height } = page.getSize();
+        const text = String(idx + 1);
+        const size = 12;
+        let x = width / 2;
+        let y = 20;
+        
+        if (pos === 'bottom-right') { x = width - 30; }
+        else if (pos === 'top-center') { y = height - 30; }
+        else if (pos === 'top-right') { x = width - 30; y = height - 30; }
+        
+        page.drawText(text, { x, y, size, color: PDFLibObj.rgb(0, 0, 0) });
+      });
+      
+      const numberedBytes = await doc.save();
+      downloadBlob(numberedBytes, `${customName}.pdf`, 'application/pdf');
+      showSuccessPopup('Page Numbers Added Successfully!');
+
     } else if (activeTool === 'merge' && PDFLibObj) {
       setProgress(20, 'Combining PDF files...');
       const customName = document.getElementById('optMergeFileName')?.value?.trim() || 'Merged_Document';
@@ -1087,7 +1156,7 @@ async function executeToolAction() {
 
       for (let i = 0; i < selectedFiles.length; i++) {
         const fileBuffer = await selectedFiles[i].arrayBuffer();
-        const doc = await PDFLibObj.PDFDocument.load(fileBuffer);
+        const doc = await PDFLibObj.PDFDocument.load(fileBuffer, { ignoreEncryption: true });
         const copiedPages = await mergedPdf.copyPages(doc, doc.getPageIndices());
         copiedPages.forEach((page) => mergedPdf.addPage(page));
       }
@@ -1096,14 +1165,55 @@ async function executeToolAction() {
       downloadBlob(mergedPdfBytes, `${customName}.pdf`, 'application/pdf');
       showSuccessPopup('PDFs Merged Successfully!');
 
-    } else if (activeTool === 'compress' && PDFLibObj) {
-      setProgress(30, 'Optimizing PDF streams...');
+    } else if (activeTool === 'compress') {
+      setProgress(10, 'Loading PDF for compression...');
       const customName = document.getElementById('optCompressFileName')?.value?.trim() || 'Compressed_Document';
+      const qualityPercentage = parseInt(document.getElementById('optCompressQuality')?.value) || 50;
+      const qualityDecimal = qualityPercentage / 100;
+      
+      const pdfjs = await ensurePdfJsLoaded();
+      const jsPdfLib = await ensureJsPdfLoaded();
+      
+      if (!pdfjs || !jsPdfLib) {
+         throw new Error('Failed to load required PDF libraries.');
+      }
+      
+      const { jsPDF } = jsPdfLib || window.jspdf;
       const fileBuffer = await selectedFiles[0].arrayBuffer();
-      const doc = await PDFLibObj.PDFDocument.load(fileBuffer);
-      const compressedBytes = await doc.save({ useObjectStreams: true });
-      downloadBlob(compressedBytes, `${customName}.pdf`, 'application/pdf');
-      showSuccessPopup('PDF Optimized Successfully!');
+      
+      const loadingTask = pdfjs.getDocument({ data: fileBuffer });
+      const pdfDoc = await loadingTask.promise;
+      const totalPages = pdfDoc.numPages;
+      
+      const newPdf = new jsPDF({ unit: 'pt', orientation: 'portrait' });
+      newPdf.deletePage(1); 
+      
+      for (let pageNum = 1; pageNum <= totalPages; pageNum++) {
+          setProgress(20 + Math.floor((pageNum / totalPages) * 70), `Compressing page ${pageNum} of ${totalPages}...`);
+          const page = await pdfDoc.getPage(pageNum);
+          const viewport = page.getViewport({ scale: 1.5 }); 
+          
+          const canvas = document.createElement('canvas');
+          const ctx = canvas.getContext('2d', { alpha: false });
+          canvas.height = viewport.height;
+          canvas.width = viewport.width;
+          
+          ctx.fillStyle = '#ffffff';
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
+          
+          await page.render({ canvasContext: ctx, viewport: viewport }).promise;
+          
+          const imgData = canvas.toDataURL('image/jpeg', qualityDecimal);
+          
+          const orientation = viewport.width > viewport.height ? 'landscape' : 'portrait';
+          newPdf.addPage([viewport.width, viewport.height], orientation);
+          newPdf.addImage(imgData, 'JPEG', 0, 0, viewport.width, viewport.height);
+      }
+      
+      setProgress(95, 'Finalizing compressed PDF...');
+      const compressedBlob = newPdf.output('blob');
+      downloadBlob(compressedBlob, `${customName}.pdf`, 'application/pdf');
+      showSuccessPopup('PDF Compressed Successfully!');
 
     } else if (activeTool === 'split' && PDFLibObj) {
       const range = document.getElementById('optRange')?.value.trim();
@@ -1155,7 +1265,7 @@ async function executeToolAction() {
       downloadBlob(await doc.save(), 'Watermarked_Document.pdf', 'application/pdf');
       showSuccessPopup('Watermark Added Successfully!');
 
-    } else if (activeTool === 'jpgToPdf' || activeTool === 'pngToPdf') {
+    } else if (activeTool === 'jpgToPdf' || activeTool === 'pngToPdf' || activeTool === 'webpToPdf') {
       const jsPdfLib = await ensureJsPdfLoaded();
       const { jsPDF } = jsPdfLib || window.jspdf;
 
@@ -1268,3 +1378,11 @@ function downloadBlob(content, name, mimeType = 'application/octet-stream') {
     window.URL.revokeObjectURL(url);
   }, 60000);
 }
+function updatePrivacyStatus() {
+  const statusTag = document.getElementById('network-status');
+  if (!statusTag) return;
+  statusTag.textContent = navigator.onLine ? 'Device-Only Mode' : 'Offline Mode Active ✓';
+}
+window.addEventListener('online', updatePrivacyStatus);
+window.addEventListener('offline', updatePrivacyStatus);
+updatePrivacyStatus();
