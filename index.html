@@ -4767,7 +4767,7 @@ function shareWebsite() {
       actionBar.className = 'tool-actions';
       actionBar.style.cssText = 'display:flex; justify-content:flex-end; gap:12px; margin-top:10px; padding-top:8px; border-top:1px solid rgba(255,255,255,0.08);';
 
-      actionBar.innerHTML = `
+      actionbar.innerHTML = `<button class="action-btn like-btn" data-tool="${toolId}" onclick="event.preventDefault(); event.stopPropagation(); toggleLike('${toolId}', this)"><i class="fas fa-heart"></i> <span class="like-count">0</span></button> <button class="action-btn comment-btn" data-title="${toolTitle.replace(/"/g, '&quot;')}" onclick="event.preventDefault(); event.stopPropagation(); openComments('${toolId}', this.dataset.title)"><i class="fas fa-comment"></i> <span class="comment-count">0</span></button>`;
         <button class="action-btn like-btn" data-tool="${toolId}" onclick="event.preventDefault(); event.stopPropagation(); toggleLike('${toolId}', this)">
           ❤️ <span class="like-count">0</span>
         </button>
