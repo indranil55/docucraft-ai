@@ -141,7 +141,7 @@ function launchTool(rawToolKey) {
 
   if (fileInput) {
     fileInput.value = '';
-    if (['merge', 'split', 'compress', 'organize', 'rotate', 'removePages', 'watermark', 'protect', 'unlock', 'addPageNumbers', 'pdfToJpg', 'pdfToPng', 'pdfToWord', 'pdfToExcel', 'pdfToPpt', 'pdfToText', 'editPdf'].includes(toolKey)) {
+    if (['merge', 'split', 'compress', 'organize', 'rotate', 'removePages', 'watermark', 'protect', 'unlock', 'addPageNumbers', 'pdfToJpg', 'pdfToPng', 'pdfToWord', 'pdfToExcel', 'pdfToPpt', 'pdfToText', 'editPdf', 'repairPdf'].includes(toolKey)) {
       fileInput.accept = '.pdf,application/pdf';
     } else if (['jpgToPdf', 'pngToPdf', 'webpToPdf', 'kbResizer', 'examResizer', 'ocr', 'passportGrid'].includes(toolKey)) {
       fileInput.accept = '.jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp';
@@ -172,7 +172,7 @@ function launchTool(rawToolKey) {
     dropzone.style.display = 'block';
     dropzone.onclick = () => {
       fileInput.click();
-    };
+    }
   }
 
   if (overlay) {
@@ -186,13 +186,14 @@ function launchTool(rawToolKey) {
     }
   }
 
-  // Predefined beautiful titles
+  // FIXED: Added editPdf and repairPdf to predefined beautiful titles
   const titleMap = {
     'jpgToPdf': 'JPG to PDF', 'pngToPdf': 'PNG to PDF', 'webpToPdf': 'WebP to PDF',
     'wordToPdf': 'Word to PDF', 'excelToPdf': 'Excel to PDF', 'pptToPdf': 'PowerPoint to PDF',
     'htmlToPdf': 'HTML to PDF', 'textToPdf': 'Text to PDF', 'zipToPdf': 'ZIP to PDF',
     'pdfToWord': 'PDF to Word', 'pdfToExcel': 'PDF to Excel', 'pdfToPpt': 'PDF to PowerPoint',
-    'pdfToJpg': 'PDF to JPG', 'pdfToPng': 'PDF to PNG', 'pdfToText': 'PDF to Text'
+    'pdfToJpg': 'PDF to JPG', 'pdfToPng': 'PDF to PNG', 'pdfToText': 'PDF to Text',
+    'editPdf': 'Edit PDF', 'repairPdf': 'Repair PDF'
   };
 
   if (toolKey === 'sigPad') {
@@ -844,8 +845,9 @@ async function padJpegSafely(blob, targetBytes) {
   return new Blob(parts.slice(0, idx + 1), { type: 'image/jpeg' });
 }
 
-function canvasToBlobFast(canvas, quality) {
-  return new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', quality));
+// FIXED: Added mimeType parameter to maintain format (e.g. transparent PNGs)
+function canvasToBlobFast(canvas, quality, mimeType = 'image/jpeg') {
+  return new Promise(resolve => canvas.toBlob(resolve, mimeType, quality));
 }
 
 async function executeToolAction() {
@@ -902,6 +904,7 @@ async function executeToolAction() {
   setProgress(10, 'Processing...');
 
   try {
+    // FIXED: Updated kbResizer logic for better quality and transparency support
     if (activeTool === 'kbResizer') {
       const valInput = parseFloat(document.getElementById('optPresetSize')?.value) || 50;
       const unit = document.getElementById('optTargetUnit')?.value || 'KB';
@@ -912,21 +915,29 @@ async function executeToolAction() {
         ? Math.floor(valInput * 1000 * 1000 * 0.98)
         : Math.floor(valInput * 1000 * 0.98);
 
-      const img = await loadImageFast(selectedFiles[0]);
+      const origFile = selectedFiles[0];
+      // Preserve original format (PNG/WebP) to maintain transparency, fallback to JPEG
+      let outMime = (origFile.type === 'image/png' || origFile.type === 'image/webp') ? origFile.type : 'image/jpeg';
+      const isTransparent = outMime !== 'image/jpeg';
+
+      const img = await loadImageFast(origFile);
       const origW = img.naturalWidth || img.width;
       const origH = img.naturalHeight || img.height;
       const aspect = origW / origH;
 
       function renderHD(w, h) {
         const cv = document.createElement('canvas');
-        cv.width = w;
-        cv.height = h;
-        const cx = cv.getContext('2d', { alpha: false });
+        cv.width = Math.max(1, w);
+        cv.height = Math.max(1, h);
+        const cx = cv.getContext('2d', { alpha: isTransparent });
         cx.imageSmoothingEnabled = true;
         cx.imageSmoothingQuality = 'high';
-        cx.fillStyle = '#ffffff';
-        cx.fillRect(0, 0, w, h);
-        cx.drawImage(img, 0, 0, w, h);
+        
+        if (!isTransparent) {
+          cx.fillStyle = '#ffffff';
+          cx.fillRect(0, 0, cv.width, cv.height);
+        }
+        cx.drawImage(img, 0, 0, cv.width, cv.height);
         return cv;
       }
 
@@ -942,44 +953,53 @@ async function executeToolAction() {
           renderH = Math.round(origH * scale);
         }
         const cv = renderHD(renderW, renderH);
-        const baseBlob = await canvasToBlobFast(cv, 0.96);
-        bestBlob = await padJpegSafely(baseBlob, maxAllowedBytes);
+        const baseBlob = await canvasToBlobFast(cv, 0.96, outMime);
+        bestBlob = (outMime === 'image/jpeg') ? await padJpegSafely(baseBlob, maxAllowedBytes) : baseBlob;
       } else {
-        const targetPixels = maxAllowedBytes * 4.2;
+        const targetPixels = maxAllowedBytes * 5.0; // Higher multiplier for better clarity
         const origPixels = origW * origH;
         let scale = 1;
         if (origPixels > targetPixels) {
-          scale = Math.max(0.25, Math.sqrt(targetPixels / origPixels));
+          scale = Math.sqrt(targetPixels / origPixels);
         }
 
-        let targetW = Math.max(240, Math.round(origW * scale));
-        let targetH = Math.max(240, Math.round(targetW / aspect));
+        let targetW = Math.round(origW * scale);
+        let targetH = Math.round(targetW / aspect);
+        
+        // Prevent upscaling small images
         if (targetW > origW) {
           targetW = origW;
           targetH = origH;
         }
 
         let cv = renderHD(targetW, targetH);
-        let probeBlob = await canvasToBlobFast(cv, 0.85);
+        let probeBlob = await canvasToBlobFast(cv, 0.85, outMime);
 
         if (probeBlob.size <= maxAllowedBytes) {
-          const hqBlob = await canvasToBlobFast(cv, 0.95);
-          bestBlob = hqBlob.size <= maxAllowedBytes
-            ? await padJpegSafely(hqBlob, maxAllowedBytes)
-            : probeBlob;
-        } else {
-          const ratio = maxAllowedBytes / probeBlob.size;
-          const estQ = Math.max(0.45, Math.min(0.84, Number((0.85 * Math.pow(ratio, 0.85)).toFixed(2))));
-          let secondBlob = await canvasToBlobFast(cv, estQ);
-
-          if (secondBlob.size <= maxAllowedBytes) {
-            bestBlob = secondBlob;
+          const hqBlob = await canvasToBlobFast(cv, 0.95, outMime);
+          if (hqBlob.size <= maxAllowedBytes) {
+              bestBlob = (outMime === 'image/jpeg') ? await padJpegSafely(hqBlob, maxAllowedBytes) : hqBlob;
           } else {
-            const downScale = Math.sqrt(maxAllowedBytes / secondBlob.size) * 0.92;
-            const fbW = Math.max(180, Math.round(targetW * downScale));
-            const fbH = Math.max(180, Math.round(fbW / aspect));
-            const fbCv = renderHD(fbW, fbH);
-            bestBlob = await canvasToBlobFast(fbCv, 0.65);
+              bestBlob = probeBlob;
+          }
+        } else {
+          // Smooth quality degradation before resolution drop
+          let found = false;
+          for(let q = 0.80; q >= 0.30; q -= 0.10) {
+             const tBlob = await canvasToBlobFast(cv, q, outMime);
+             if (tBlob.size <= maxAllowedBytes) {
+                bestBlob = tBlob;
+                found = true;
+                break;
+             }
+          }
+          
+          if (!found) {
+             const downScale = Math.sqrt(maxAllowedBytes / probeBlob.size) * 0.95;
+             const fbW = Math.max(10, Math.round(targetW * downScale));
+             const fbH = Math.max(10, Math.round(fbW / aspect));
+             const fbCv = renderHD(fbW, fbH);
+             bestBlob = await canvasToBlobFast(fbCv, 0.75, outMime);
           }
         }
       }
@@ -987,8 +1007,9 @@ async function executeToolAction() {
       if (typeof img.close === 'function') img.close();
 
       setProgress(100, 'Done');
-      const finalFileName = `${customName}_${valInput}${unit}.jpg`;
-      downloadBlob(bestBlob, finalFileName, 'image/jpeg');
+      const ext = outMime === 'image/png' ? 'png' : (outMime === 'image/webp' ? 'webp' : 'jpg');
+      const finalFileName = `${customName}_${valInput}${unit}.${ext}`;
+      downloadBlob(bestBlob, finalFileName, outMime);
 
       const sizeDisplay = isMB
         ? (bestBlob.size / (1000 * 1000)).toFixed(1) + ' MB'
