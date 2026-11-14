@@ -1,22 +1,5 @@
 // DocuCraft AI - Authentication & Gate Security Logic (Unlimited Access - 3 Use Limit Removed)
-import { getAuth, onAuthStateChanged } from "firebase/auth";
 
-const auth = getAuth();
-
-// This code will run as soon as the page loads
-onAuthStateChanged(auth, (user) => {
-  if (user) {
-    // The user is already logged in
-    // Hide the login pop-up or form from the screen
-    document.getElementById('login-modal').style.display = 'none';
-    
-    // (You can show your main website dashboard or content here if needed)
-  } else {
-    // The user is not logged in or has logged out
-    // Show the login pop-up or form on the screen
-    document.getElementById('login-modal').style.display = 'block'; /* Can be 'flex' or 'block' depending on your design */
-  }
-});
 let isSignUpMode = false;
 let isResetMode = false;
 
@@ -244,10 +227,6 @@ function updateHeaderAuthUI() {
   let navActions = document.querySelector('.nav-actions');
   if (!navActions) {
     const navContainer = document.querySelector('.nav-container');
-    <!-- For example: -->
-<div id="login-modal">
-    <!-- Your email, password inputs, and login button go here -->
-</div>
     if (navContainer) {
       navActions = document.createElement('div');
       navActions.className = 'nav-actions';
