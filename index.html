@@ -4764,17 +4764,32 @@ function shareWebsite() {
 
       // Adds the like and comment buttons at the bottom of each card
       const actionBar = document.createElement('div');
-      actionBar.className = 'tool-actions';
-      actionBar.style.cssText = 'display:flex; justify-content:flex-end; gap:12px; margin-top:10px; padding-top:8px; border-top:1px solid rgba(255,255,255,0.08);';
+      // Create the Like button
+    const likeBtn = document.createElement('button');
+    likeBtn.className = 'action-btn like-btn';
+    likeBtn.setAttribute('data-tool', toolId);
+    likeBtn.innerHTML = '<i class="fas fa-heart"></i> <span class="like-count">0</span>';
+    likeBtn.onclick = function(event) {
+        event.preventDefault();
+        event.stopPropagation();
+        toggleLike(toolId, this);
+    };
 
-      card.appendChild(actionbar);
-        <button class="action-btn like-btn" data-tool="${toolId}" onclick="event.preventDefault(); event.stopPropagation(); toggleLike('${toolId}', this)">
-          ❤️ <span class="like-count">0</span>
-        </button>
-        <button class="action-btn" onclick="event.preventDefault(); event.stopPropagation(); openComments('${toolId}', '${toolName.replace(/'/g, "\\'")}')">
-          💬 <span class="comment-count">0</span>
-        </button>
-      `;
+    // Create the Comment button
+    const commentBtn = document.createElement('button');
+    commentBtn.className = 'action-btn comment-btn';
+    commentBtn.setAttribute('data-title', toolTitle);
+    commentBtn.innerHTML = '<i class="fas fa-comment"></i> <span class="comment-count">0</span>';
+    commentBtn.onclick = function(event) {
+        event.preventDefault();
+        event.stopPropagation();
+        openComments(toolId, toolTitle);
+    };
+
+    // Append buttons to the actionbar and actionbar to the card
+    actionbar.appendChild(likeBtn);
+    actionbar.appendChild(commentBtn);
+    card.appendChild(actionbar);
 
       card.appendChild(actionBar);
 
