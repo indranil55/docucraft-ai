@@ -1324,7 +1324,7 @@ async function executeToolAction() {
       const { jsPDF } = jsPdfLib || window.jspdf;
       const pdf = new jsPDF();
       const tempDiv = document.createElement('div');
-      tempDiv.innerHTML = htmlText;
+      tempDiv.textContent = htmlText;
       const plainText = tempDiv.innerText || tempDiv.textContent; 
       const splitText = pdf.splitTextToSize(plainText, 180);
       pdf.text(splitText, 15, 15);
