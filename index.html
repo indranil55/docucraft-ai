@@ -4620,7 +4620,7 @@ function shareWebsite() {
   <i class="fa-solid fa-share-nodes" style="font-size: 20px; pointer-events: none;"></i>
 </button>
 
-<script>
+ <script>
 (function() {
   const btn = document.getElementById('floatingShareBtn');
   let isDragging = false;
@@ -4752,70 +4752,50 @@ function shareWebsite() {
   const db = getDatabase(app);
   let currentActiveTool = '';
 
-  const iconStyles = [
-    { bg: '#fecdd3', color: '#e11d48', icon: '📄' },
-    { bg: '#dbeafe', color: '#2563eb', icon: '🖼️' },
-    { bg: '#dcfce7', color: '#16a34a', icon: '🗜️' },
-    { bg: '#fef3c7', color: '#d97706', icon: '⚡' },
-    { bg: '#f3e8ff', color: '#9333ea', icon: '🛠️' }
-  ];
+  // Finds all existing tool cards on your page after it loads
+  window.addEventListener('DOMContentLoaded', () => {
+    const existingCards = document.querySelectorAll('.tool-card');
 
-  // 1. Automatically generate tool cards from siteKnowledgeBase
-  const container = document.getElementById('autoToolsContainer');
-  if (container && typeof siteKnowledgeBase !== 'undefined') {
-    siteKnowledgeBase.forEach((tool, index) => {
-      // Generate a unique ID from the tool name (e.g., "Merge PDF" -> "merge-pdf")
-      const toolId = tool.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
-      const style = iconStyles[index % iconStyles.length];
-      const shortDesc = tool.desc_en ? tool.desc_en.split('.')[0] : 'Fast & Free Online Tool';
+    existingCards.forEach((card, index) => {
+      // Generates a unique ID from the card's title
+      const titleEl = card.querySelector('h3, h4, .tool-title, strong');
+      const toolName = titleEl ? titleEl.innerText.trim() : `Tool ${index + 1}`;
+      const toolId = toolName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
 
-      const card = document.createElement('div');
-      card.className = 'tool-card-item';
-      card.onclick = () => window.location.href = tool.url;
+      // Adds the like and comment buttons at the bottom of each card
+      const actionBar = document.createElement('div');
+      actionBar.className = 'tool-actions';
+      actionBar.style.cssText = 'display:flex; justify-content:flex-end; gap:12px; margin-top:10px; padding-top:8px; border-top:1px solid rgba(255,255,255,0.08);';
 
-      card.innerHTML = `
-        <div class="tool-info-left">
-          <div class="tool-icon-box" style="background: ${style.bg}; color: ${style.color};">${style.icon}</div>
-          <div class="tool-text">
-            <h3>${tool.name}</h3>
-            <p>${shortDesc}</p>
-          </div>
-        </div>
-        <div class="tool-actions">
-          <button class="action-btn like-btn" data-tool="${toolId}" onclick="event.stopPropagation(); toggleLike('${toolId}', this)">
-            ❤️ <span class="like-count">0</span>
-          </button>
-          <button class="action-btn" onclick="event.stopPropagation(); openComments('${toolId}', '${tool.name.replace(/'/g, "\\'")}')">
-            💬 <span class="comment-count">0</span>
-          </button>
-        </div>
+      actionBar.innerHTML = `
+        <button class="action-btn like-btn" data-tool="${toolId}" onclick="event.preventDefault(); event.stopPropagation(); toggleLike('${toolId}', this)">
+          ❤️ <span class="like-count">0</span>
+        </button>
+        <button class="action-btn" onclick="event.preventDefault(); event.stopPropagation(); openComments('${toolId}', '${toolName.replace(/'/g, "\\'")}')">
+          💬 <span class="comment-count">0</span>
+        </button>
       `;
-      container.appendChild(card);
+
+      card.appendChild(actionBar);
+
+      // Syncs live like and comment counts from Firebase
+      const likeBtn = actionBar.querySelector('.like-btn');
+      const likeCountEl = actionBar.querySelector('.like-count');
+      const commentCountEl = actionBar.querySelector('.comment-count');
+
+      onValue(ref(db, `tools/${toolId}/likes`), (snapshot) => {
+        likeCountEl.innerText = formatNumber(snapshot.val() || 0);
+      });
+
+      onValue(ref(db, `tools/${toolId}/comments`), (snapshot) => {
+        const count = snapshot.exists() ? Object.keys(snapshot.val()).length : 0;
+        commentCountEl.innerText = formatNumber(count);
+      });
+
+      if (localStorage.getItem(`liked_${toolId}`)) {
+        likeBtn.classList.add('liked');
+      }
     });
-  }
-
-  // 2. Sync Firebase likes and comments for all generated cards
-  document.querySelectorAll('.like-btn').forEach(btn => {
-    const toolId = btn.getAttribute('data-tool');
-    if (!toolId) return;
-
-    const parentBox = btn.closest('.tool-actions');
-    const likeCountEl = parentBox.querySelector('.like-count');
-    const commentCountEl = parentBox.querySelector('.comment-count');
-
-    onValue(ref(db, `tools/${toolId}/likes`), (snapshot) => {
-      const count = snapshot.val() || 0;
-      if (likeCountEl) likeCountEl.innerText = formatNumber(count);
-    });
-
-    onValue(ref(db, `tools/${toolId}/comments`), (snapshot) => {
-      const count = snapshot.exists() ? Object.keys(snapshot.val()).length : 0;
-      if (commentCountEl) commentCountEl.innerText = formatNumber(count);
-    });
-
-    if (localStorage.getItem(`liked_${toolId}`)) {
-      btn.classList.add('liked');
-    }
   });
 
   function formatNumber(num) {
