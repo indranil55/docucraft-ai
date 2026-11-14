@@ -1324,7 +1324,7 @@ async function executeToolAction() {
       const { jsPDF } = jsPdfLib || window.jspdf;
       const pdf = new jsPDF();
       const tempDiv = document.createElement('div');
-       tempDiv.textContent = htmlText;
+      tempDiv.innerHTML = htmlText;
       const plainText = tempDiv.innerText || tempDiv.textContent; 
       const splitText = pdf.splitTextToSize(plainText, 180);
       pdf.text(splitText, 15, 15);
@@ -1529,28 +1529,35 @@ function readFileAsDataURL(file) {
   });
 }
 
-// Instant Cross-Device Downloader (Mobile & Desktop Safe)
+// Ultimate Cross-Device Downloader (iPhone, All Androids & Desktop Safe)
 function downloadBlob(content, name, mimeType = 'application/octet-stream') {
   if (!content) return;
-  const blob = content instanceof Blob ? content : new Blob([content], { type: mimeType });
 
-  const url = window.URL.createObjectURL(blob);
+  const originalBlob = content instanceof Blob ? content : new Blob([content], { type: mimeType });
+  const forceDownloadBlob = new Blob([originalBlob], { type: 'application/octet-stream' });
+
+  const url = window.URL.createObjectURL(forceDownloadBlob);
   const a = document.createElement('a');
+  
   a.style.display = 'none';
   a.href = url;
   a.download = name || 'downloaded_file';
-  document.body.appendChild(a);
   
-  a.dispatchEvent(new MouseEvent('click', {
-    bubbles: true,
-    cancelable: true,
-    view: window
-  }));
+  document.body.appendChild(a);
 
   setTimeout(() => {
-    if (a.parentNode) a.parentNode.removeChild(a);
-    window.URL.revokeObjectURL(url);
-  }, 60000);
+    try {
+      a.click();
+    } catch (e) {
+      const ev = new MouseEvent('click', { bubbles: true, cancelable: true, view: window });
+      a.dispatchEvent(ev);
+    }
+    
+    setTimeout(() => {
+      if (a.parentNode) a.parentNode.removeChild(a);
+      window.URL.revokeObjectURL(url);
+    }, 30000);
+  }, 50);
 }
 
 function updatePrivacyStatus() {
