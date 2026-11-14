@@ -4850,14 +4850,12 @@ function shareWebsite() {
         return;
       }
       snapshot.forEach((child) => {
-        const data = child.val();
-        const div = document.createElement('div');
-        div.className = 'single-comment';
-        div.innerHTML = `<strong>${escapeHTML(data.name)}</strong><span>${escapeHTML(data.text)}</span>`;
-        listEl.appendChild(div);
-      });
-    });
-  };
+  const data = child.val();
+  const div = document.createElement('div');
+  div.className = 'single-comment';
+  div.innerHTML = `<strong>${escapeHTML(data.name)}</strong><span>${escapeHTML(data.text)}</span>`;
+  listEl.appendChild(div);
+});
 
   window.closeComments = function() {
     document.getElementById('commentModal').style.display = 'none';
