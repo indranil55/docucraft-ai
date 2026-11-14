@@ -4768,7 +4768,7 @@ function shareWebsite() {
         <button class="action-btn like-btn" data-tool="${toolId}" onclick="event.preventDefault(); event.stopPropagation(); toggleLike('${toolId}', this)">
           ❤️ <span class="like-count">0</span>
         </button>
-        <button class="action-btn" onclick="event.preventDefault(); event.stopPropagation(); openComments('${toolId}', '${toolName.replace(/'/g, "\\'")}')">
+        <button class="action-btn" onclick="event.preventDefault(); event.stopPropagation(); openComments('${toolId}', ${toolName.replace(/"/g, '&quot;')}')">
           💬 <span class="comment-count">0</span>
         </button>
       `;
