@@ -920,3 +920,9 @@ footer {
     height: 36px;
     flex-shrink: 0;
   }
+.header-buttons-container {
+    display: flex;
+    justify-content: flex-end; /* or space-between */
+    align-items: center;
+    gap: 10px; /* to keep a specific gap between the buttons */
+}
