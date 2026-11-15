@@ -89,7 +89,6 @@ function openCustomModal(modalId) {
 }
 
 function launchTool(rawToolKey) {
-  // Smart Normalizer to fix HTML toolKey names and missing "to"
   let toolKey = rawToolKey;
   if (typeof toolKey === 'string') {
     const tk = toolKey.toLowerCase().replace(/[^a-z0-9]/g, '');
@@ -186,7 +185,6 @@ function launchTool(rawToolKey) {
     }
   }
 
-  // FIXED: Added editPdf and repairPdf to predefined beautiful titles
   const titleMap = {
     'jpgToPdf': 'JPG to PDF', 'pngToPdf': 'PNG to PDF', 'webpToPdf': 'WebP to PDF',
     'wordToPdf': 'Word to PDF', 'excelToPdf': 'Excel to PDF', 'pptToPdf': 'PowerPoint to PDF',
@@ -845,7 +843,6 @@ async function padJpegSafely(blob, targetBytes) {
   return new Blob(parts.slice(0, idx + 1), { type: 'image/jpeg' });
 }
 
-// FIXED: Added mimeType parameter to maintain format (e.g. transparent PNGs)
 function canvasToBlobFast(canvas, quality, mimeType = 'image/jpeg') {
   return new Promise(resolve => canvas.toBlob(resolve, mimeType, quality));
 }
@@ -874,6 +871,7 @@ async function executeToolAction() {
       downloadBlob(blob, `Digital_Signature.${ext}`, format);
       showSuccessPopup('Digital Signature Downloaded Successfully!');
       closeWorkspace();
+      exportCanvas.width = 0; exportCanvas.height = 0; // Memory cleanup
     }, format, 0.95);
     return;
   }
@@ -902,9 +900,11 @@ async function executeToolAction() {
 
   if (btn) { btn.innerText = 'Processing...'; btn.disabled = true; }
   setProgress(10, 'Processing...');
+  
+  // Instant yield (0ms delay) to keep UI smooth but start process instantly
+  await new Promise(r => setTimeout(r, 0)); 
 
   try {
-    // FIXED: Updated kbResizer logic for better quality and transparency support
     if (activeTool === 'kbResizer') {
       const valInput = parseFloat(document.getElementById('optPresetSize')?.value) || 50;
       const unit = document.getElementById('optTargetUnit')?.value || 'KB';
@@ -916,7 +916,6 @@ async function executeToolAction() {
         : Math.floor(valInput * 1000 * 0.98);
 
       const origFile = selectedFiles[0];
-      // Preserve original format (PNG/WebP) to maintain transparency, fallback to JPEG
       let outMime = (origFile.type === 'image/png' || origFile.type === 'image/webp') ? origFile.type : 'image/jpeg';
       const isTransparent = outMime !== 'image/jpeg';
 
@@ -953,10 +952,12 @@ async function executeToolAction() {
           renderH = Math.round(origH * scale);
         }
         const cv = renderHD(renderW, renderH);
+        await new Promise(r => setTimeout(r, 0)); // Instant yield
         const baseBlob = await canvasToBlobFast(cv, 0.96, outMime);
         bestBlob = (outMime === 'image/jpeg') ? await padJpegSafely(baseBlob, maxAllowedBytes) : baseBlob;
+        cv.width = 0; cv.height = 0; 
       } else {
-        const targetPixels = maxAllowedBytes * 5.0; // Higher multiplier for better clarity
+        const targetPixels = maxAllowedBytes * 5.0; 
         const origPixels = origW * origH;
         let scale = 1;
         if (origPixels > targetPixels) {
@@ -966,13 +967,13 @@ async function executeToolAction() {
         let targetW = Math.round(origW * scale);
         let targetH = Math.round(targetW / aspect);
         
-        // Prevent upscaling small images
         if (targetW > origW) {
           targetW = origW;
           targetH = origH;
         }
 
         let cv = renderHD(targetW, targetH);
+        await new Promise(r => setTimeout(r, 0)); // Instant yield
         let probeBlob = await canvasToBlobFast(cv, 0.85, outMime);
 
         if (probeBlob.size <= maxAllowedBytes) {
@@ -983,7 +984,6 @@ async function executeToolAction() {
               bestBlob = probeBlob;
           }
         } else {
-          // Smooth quality degradation before resolution drop
           let found = false;
           for(let q = 0.80; q >= 0.30; q -= 0.10) {
              const tBlob = await canvasToBlobFast(cv, q, outMime);
@@ -999,9 +999,12 @@ async function executeToolAction() {
              const fbW = Math.max(10, Math.round(targetW * downScale));
              const fbH = Math.max(10, Math.round(fbW / aspect));
              const fbCv = renderHD(fbW, fbH);
+             await new Promise(r => setTimeout(r, 0)); // Instant yield
              bestBlob = await canvasToBlobFast(fbCv, 0.75, outMime);
+             fbCv.width = 0; fbCv.height = 0; 
           }
         }
+        cv.width = 0; cv.height = 0; 
       }
 
       if (typeof img.close === 'function') img.close();
@@ -1018,7 +1021,7 @@ async function executeToolAction() {
       closeWorkspace();
       setTimeout(() => {
         showSuccessPopup(`Photo Resized Successfully (${sizeDisplay})!`);
-      }, 150);
+      }, 50);
       return;
     }
 
@@ -1026,6 +1029,8 @@ async function executeToolAction() {
 
     if (activeTool === 'passportGrid') {
       setProgress(35, 'Processing Passport Photo...');
+      await new Promise(r => setTimeout(r, 0)); // Instant yield
+
       const downloadType = document.getElementById('optPassportType')?.value || 'grid';
       const copies = parseInt(document.getElementById('optPassportCopies')?.value) || 8;
       const borderType = document.getElementById('optPassportBorder')?.value || 'thin';
@@ -1100,14 +1105,15 @@ async function executeToolAction() {
             placed++;
           }
         }
-
+        await new Promise(r => setTimeout(r, 0)); // Instant yield
         const gBlob = await canvasToBlobFast(gridCanvas, 0.95);
         downloadBlob(gBlob, `${fileName}_${copies}_Copies_Grid.jpg`, 'image/jpeg');
+        gridCanvas.width = 0; gridCanvas.height = 0; 
       } else if (downloadType === 'both') {
         const sBlob = await canvasToBlobFast(singleCanvas, 0.95);
         downloadBlob(sBlob, `${fileName}_Single_3.5x4.5cm.jpg`, 'image/jpeg');
 
-        await new Promise(r => setTimeout(r, 350));
+        await new Promise(r => setTimeout(r, 100)); // Small delay to separate two downloads smoothly
 
         let cols = 3;
         if (copies === 2 || copies === 4) cols = 2;
@@ -1135,11 +1141,13 @@ async function executeToolAction() {
             placed++;
           }
         }
-
+        await new Promise(r => setTimeout(r, 0)); // Instant yield
         const gBlob = await canvasToBlobFast(gridCanvas, 0.95);
         downloadBlob(gBlob, `${fileName}_${copies}_Copies_Grid.jpg`, 'image/jpeg');
+        gridCanvas.width = 0; gridCanvas.height = 0; 
       }
 
+      singleCanvas.width = 0; singleCanvas.height = 0; 
       setProgress(100, 'Done');
       showSuccessPopup('Passport Photo Processed Successfully!');
       closeWorkspace();
@@ -1167,12 +1175,14 @@ async function executeToolAction() {
       ctx.drawImage(img, 0, 0, targetW, targetH);
       if (typeof img.close === 'function') img.close();
 
+      await new Promise(r => setTimeout(r, 0)); // Instant yield
       let bestBlob = await canvasToBlobFast(canvas, 0.88);
       if (bestBlob.size > targetMaxBytes) {
         const estQ = Math.max(0.35, Number((0.88 * (targetMaxBytes / bestBlob.size)).toFixed(2)));
         bestBlob = await canvasToBlobFast(canvas, estQ);
       }
 
+      canvas.width = 0; canvas.height = 0; 
       downloadBlob(bestBlob, `${fileName}.jpg`, 'image/jpeg');
       showSuccessPopup('Exam Document Resized Successfully!');
 
@@ -1252,6 +1262,8 @@ async function executeToolAction() {
       
       for (let pageNum = 1; pageNum <= totalPages; pageNum++) {
           setProgress(20 + Math.floor((pageNum / totalPages) * 70), `Compressing page ${pageNum} of ${totalPages}...`);
+          await new Promise(r => setTimeout(r, 0)); // Instant Yield
+          
           const page = await pdfDoc.getPage(pageNum);
           const viewport = page.getViewport({ scale: 1.5 }); 
           
@@ -1266,6 +1278,7 @@ async function executeToolAction() {
           await page.render({ canvasContext: ctx, viewport: viewport }).promise;
           
           const imgData = canvas.toDataURL('image/jpeg', qualityDecimal);
+          canvas.width = 0; canvas.height = 0; 
           
           const orientation = viewport.width > viewport.height ? 'landscape' : 'portrait';
           newPdf.addPage([viewport.width, viewport.height], orientation);
@@ -1394,6 +1407,8 @@ async function executeToolAction() {
 
       if (totalPages === 1) {
         setProgress(60, 'Converting Page 1...');
+        await new Promise(r => setTimeout(r, 0)); // Instant Yield
+        
         const page = await pdfDoc.getPage(1);
         const viewport = page.getViewport({ scale: 2.0 });
         const canvas = document.createElement('canvas');
@@ -1406,6 +1421,7 @@ async function executeToolAction() {
 
         const blob = await canvasToBlobFast(canvas, 0.95);
         downloadBlob(blob, `Converted_Page_1.${ext}`, mime);
+        canvas.width = 0; canvas.height = 0; 
       } else {
         setProgress(40, 'Preparing ZIP for multiple pages...');
         let JSZip = window.JSZip;
@@ -1417,6 +1433,8 @@ async function executeToolAction() {
 
         for (let i = 1; i <= totalPages; i++) {
           setProgress(40 + Math.floor((i / totalPages) * 50), `Converting Page ${i}...`);
+          await new Promise(r => setTimeout(r, 0)); // Instant Yield
+          
           const page = await pdfDoc.getPage(i);
           const viewport = page.getViewport({ scale: 2.0 });
           const canvas = document.createElement('canvas');
@@ -1430,6 +1448,7 @@ async function executeToolAction() {
           const dataUrl = canvas.toDataURL(mime, 0.95);
           const base64Data = dataUrl.split(',')[1];
           zip.file(`Page_${i}.${ext}`, base64Data, { base64: true });
+          canvas.width = 0; canvas.height = 0; 
         }
         setProgress(95, 'Zipping images...');
         const zipBlob = await zip.generateAsync({ type: 'blob' });
@@ -1447,6 +1466,7 @@ async function executeToolAction() {
       
       for (let i = 1; i <= pdfDoc.numPages; i++) {
          setProgress(30 + Math.floor((i / pdfDoc.numPages) * 60), `Extracting Text from Page ${i}...`);
+         await new Promise(r => setTimeout(r, 0)); // Instant Yield
          const page = await pdfDoc.getPage(i);
          const textContent = await page.getTextContent();
          const pageText = textContent.items.map(item => item.str).join(' ');
@@ -1478,6 +1498,7 @@ async function executeToolAction() {
       const margin = 10;
 
       for (let i = 0; i < selectedFiles.length; i++) {
+        await new Promise(r => setTimeout(r, 0)); // Instant Yield
         const rawData = await readFileAsDataURL(selectedFiles[i]);
         const img = new Image();
         await new Promise((res, rej) => { img.onload = res; img.onerror = rej; img.src = rawData; });
@@ -1550,7 +1571,7 @@ function readFileAsDataURL(file) {
   });
 }
 
-// Ultimate Cross-Device Downloader (iPhone, All Androids & Desktop Safe)
+// Instant Cross-Device Downloader without delay
 function downloadBlob(content, name, mimeType = 'application/octet-stream') {
   if (!content) return;
 
@@ -1566,7 +1587,8 @@ function downloadBlob(content, name, mimeType = 'application/octet-stream') {
   
   document.body.appendChild(a);
 
-  setTimeout(() => {
+  // requestAnimationFrame ensures it executes immediately after DOM update
+  requestAnimationFrame(() => {
     try {
       a.click();
     } catch (e) {
@@ -1577,8 +1599,8 @@ function downloadBlob(content, name, mimeType = 'application/octet-stream') {
     setTimeout(() => {
       if (a.parentNode) a.parentNode.removeChild(a);
       window.URL.revokeObjectURL(url);
-    }, 30000);
-  }, 50);
+    }, 10000);
+  });
 }
 
 function updatePrivacyStatus() {
