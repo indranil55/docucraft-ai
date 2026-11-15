@@ -11,6 +11,7 @@
   --shadow-lg: 0 15px 30px -5px rgba(229, 50, 45, 0.3);
 }
 
+/* Fixed: Replaced hyphen (-) with asterisk (*) for the universal selector */
 * {
   box-sizing: border-box;
   margin: 0;
@@ -20,6 +21,7 @@
 }
 
 body {
+  margin: 0; /* Fixed: Added margin 0 to override browser defaults */
   background: #0f172a;
   color: #f1f5f9;
   min-height: 100vh;
@@ -58,7 +60,7 @@ header {
   justify-content: space-between;
 }
 
-/* লোগো টেক্সট সাদা ও স্পষ্ট করার জন্য */
+/* To make the logo text white and clear */
 .brand-logo-svg text[fill="#0F172A"] {
   fill: #ffffff !important;
 }
@@ -148,7 +150,7 @@ header {
   padding: 0 8px;
 }
 
-/* পপুলার টুলস সেকশন স্টাইল */
+/* Popular tools section style */
 .popular-section {
   width: 100%;
   max-width: 1320px;
@@ -336,7 +338,7 @@ header {
   gap: 10px;
 }
 
-/* ব্যাকগ্রাউন্ড হেভি ব্লার এবং ডার্ক ওভারলে ফিক্স (ফাঁকা জায়গায় ক্লিক বা স্ক্রল করলে পপআপ যাতে না কাটে) */
+/* Heavy background blur and dark overlay fix (to prevent the popup from closing when clicking or scrolling on empty space) */
 .workspace-overlay {
   position: fixed !important;
   inset: 0 !important;
@@ -402,7 +404,7 @@ header {
   color: var(--primary);
 }
 
-/* ড্র্যাগ অ্যান্ড ড্রপ গ্রিন চেকমার্ক অ্যানিমেশন ও স্টাইল */
+/* Drag and drop green checkmark animation and style */
 .dropzone {
   border: 2px dashed rgba(255, 255, 255, 0.2);
   border-radius: 16px;
