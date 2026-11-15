@@ -60,6 +60,16 @@
  <link rel="stylesheet" href="style.css?v=3">
   
   <style>
+   /* Fix header buttons for mobile screens */
+@media screen and (max-width: 768px) {
+    header button {
+        font-size: 11px !important;
+        padding: 5px 8px !important;
+    }
+    header div[style*="gap"] {
+        gap: 4px !important;
+    }
+}
   .tools-list-container {
     display: flex;
     flex-direction: column;
