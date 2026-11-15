@@ -248,33 +248,57 @@ function launchTool(rawToolKey) {
     if (title) title.innerText = 'Photo & Sign KB / MB Resizer';
     if (desc) desc.innerText = 'Compress or expand image precisely to target KB or MB in <1s without losing clarity.';
     if (dropText) dropText.innerText = 'Tap to select photo/signature';
+    
     if (customUI) {
-      customUI.innerHTML = `
+        customUI.innerHTML = `
         <div class="form-group">
-          <label style="font-weight:600; font-size:13px; display:block; margin-bottom:6px;">Select Target Size & Unit:</label>
-          <div style="display: flex; gap: 8px;">
-            <select id="optPresetSize" class="form-control" style="flex: 2; padding:10px; border:1px solid #d1d5db; border-radius:8px;">
-              <option value="10">10 KB</option>
-              <option value="20">20 KB</option>
-              <option value="30">30 KB</option>
-              <option value="40">40 KB</option>
-              <option value="50" selected>50 KB</option>
-              <option value="100">100 KB</option>
-              <option value="200">200 KB</option>
-              <option value="300">300 KB</option>
-              <option value="400">400 KB</option>
-              <option value="500">500 KB</option>
-            </select>
-            <select id="optTargetUnit" class="form-control" style="flex: 1; padding:10px; border:1px solid #d1d5db; border-radius:8px;" onchange="updateResizerOptions()">
-              <option value="KB" selected>KB</option>
-              <option value="MB">MB</option>
-            </select>
-          </div>
+            <label style="font-weight:600; font-size:13px; display:block; margin-bottom:6px;">Select Target Size & Unit:</label>
+            <div style="display: flex; gap: 8px;">
+                <select id="optPresetSize" class="form-control" style="flex: 2; padding:10px; border:1px solid #d1d5db; border-radius:8px;">
+                    <!-- Default KB options -->
+                    <option value="5">5</option>
+                    <option value="10">10</option>
+                    <option value="20">20</option>
+                    <option value="30">30</option>
+                    <option value="40">40</option>
+                    <option value="50" selected>50</option>
+                    <option value="100">100</option>
+                    <option value="200">200</option>
+                    <option value="300">300</option>
+                    <option value="400">400</option>
+                    <option value="500">500</option>
+                </select>
+                <select id="optTargetUnit" class="form-control" style="flex: 1; padding:10px; border:1px solid #d1d5db; border-radius:8px;" onchange="updateResizerDropdowns()">
+                    <option value="KB" selected>KB</option>
+                    <option value="MB">MB</option>
+                </select>
+            </div>
         </div>
         <div class="form-group" style="margin-top:10px;">
-          <label style="font-weight:600; font-size:13px; display:block; margin-bottom:6px;">Save File Name:</label>
-          <input type="text" id="optCustomFileName" class="form-control" value="Resized_Photo" style="width:100%; padding:10px; border:1px solid #d1d5db; border-radius:8px;">
-        </div>`;
+            <label style="font-weight:600; font-size:13px; display:block; margin-bottom:6px;">Save File Name:</label>
+            <input type="text" id="optCustomFileName" class="form-control" value="Resized_Photo" style="width:100%; padding:10px; border:1px solid #d1d5db; border-radius:8px;">
+        </div>
+        
+        <!-- Script to handle KB/MB change dynamically -->
+        <script>
+            function updateResizerDropdowns() {
+                const unit = document.getElementById('optTargetUnit').value;
+                const sizeDropdown = document.getElementById('optPresetSize');
+                sizeDropdown.innerHTML = ''; 
+                
+                if (unit === 'KB') {
+                    const kbValues = [5, 10, 20, 30, 40, 50, 100, 200, 300, 400, 500];
+                    kbValues.forEach(val => {
+                        sizeDropdown.innerHTML += \`<option value="\${val}" \${val === 50 ? 'selected' : ''}>\${val}</option>\`;
+                    });
+                } else if (unit === 'MB') {
+                    const mbValues = [1, 2, 5, 10, 20, 50, 100];
+                    mbValues.forEach(val => {
+                        sizeDropdown.innerHTML += \`<option value="\${val}" \${val === 1 ? 'selected' : ''}>\${val}</option>\`;
+                    });
+                }
+            }
+        </script>`;
     }
   } else if (toolKey === 'examResizer') {
     if (title) title.innerText = 'Exam Photo & Signature Resizer';
@@ -678,28 +702,92 @@ function renderFileList() {
   const listContainer = document.getElementById('wsFileList');
   if (!listContainer) return;
 
-  if (selectedFiles.length === 0) {
-    listContainer.innerHTML = '';
-    return;
-  }
+  listContainer.replaceChildren();
 
-  let html = `<div style="background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px; padding: 10px; margin-top: 10px; max-height: 150px; overflow-y: auto;">
-    <div style="font-size: 12px; font-weight: 700; color: #1e293b; margin-bottom: 8px; display: flex; align-items: center; justify-content: space-between;">
-      <span><i class="fa-solid fa-list-check" style="color: #2563eb;"></i> Selected File(s) (${selectedFiles.length}):</span>
-      <button type="button" onclick="clearAllSelectedFiles()" style="background: #fee2e2; color: #991b1b; border: none; padding: 2px 8px; border-radius: 4px; font-size: 10px; cursor: pointer;">Clear All</button>
-    </div>`;
+  if (selectedFiles.length === 0) return;
+
+  const wrapper = document.createElement('div');
+  wrapper.style.cssText = "background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px; padding: 10px; margin-top: 10px; max-height: 250px; overflow-y: auto;";
+
+  const header = document.createElement('div');
+  header.style.cssText = "font-size: 12px; font-weight: 700; color: #1e293b; margin-bottom: 8px; display: flex; align-items: center; justify-content: space-between;";
+  
+  const span = document.createElement('span');
+  
+  const icon = document.createElement('i');
+  icon.className = "fa-solid fa-list-check";
+  icon.style.color = "#2563eb";
+  icon.style.marginRight = "5px";
+  
+  span.appendChild(icon);
+  span.appendChild(document.createTextNode(` Selected File(s) (${selectedFiles.length}):`));
+  
+  header.appendChild(span);
+
+  const clearBtn = document.createElement('button');
+  clearBtn.type = "button";
+  clearBtn.textContent = "Clear All";
+  clearBtn.style.cssText = "background: #fee2e2; color: #991b1b; border: none; padding: 2px 8px; border-radius: 4px; font-size: 10px; cursor: pointer;";
+  clearBtn.onclick = clearAllSelectedFiles;
+  header.appendChild(clearBtn);
+  
+  wrapper.appendChild(header);
 
   selectedFiles.forEach((file, index) => {
-    const fileSize = (file.size / 1024).toFixed(1) + ' KB';
-    const safeFileName = escapeHtml(file.name);
+    const itemRow = document.createElement('div');
+    itemRow.style.cssText = "display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #e2e8f0; font-size: 12px;";
 
-    html += `<div style="display: flex; justify-content: space-between; align-items: center; padding: 6px 0; border-bottom: 1px solid #e2e8f0; font-size: 12px;">
-      <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 170px; color: #334155;">${index + 1}. ${safeFileName} (${fileSize})</span>
-      <button type="button" onclick="removeSelectedFile(${index})" style="background: #fee2e2; color: #991b1b; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 10px;">×</button>
-    </div>`;
+    const infoDiv = document.createElement('div');
+    infoDiv.style.cssText = "display: flex; align-items: center; overflow: hidden;";
+
+    if (file.type.startsWith('image/')) {
+      const img = document.createElement('img');
+      
+      const setImgSrc = (element, url) => {
+        element.src = url;
+      };
+      
+      const imageUrl = URL.createObjectURL(file);
+      setImgSrc(img, imageUrl);
+      
+      img.onload = function() { URL.revokeObjectURL(imageUrl); };
+      img.style.cssText = "width: 45px; height: 45px; object-fit: cover; border-radius: 6px; margin-right: 10px; border: 1px solid #cbd5e1; box-shadow: 0 1px 2px rgba(0,0,0,0.1);";
+      
+      infoDiv.appendChild(img);
+    } else {
+      const docIcon = document.createElement('div');
+      docIcon.textContent = "DOC";
+      docIcon.style.cssText = "width: 45px; height: 45px; background: #e2e8f0; border-radius: 6px; margin-right: 10px; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: bold; color: #64748b; border: 1px solid #cbd5e1;";
+      infoDiv.appendChild(docIcon);
+    }
+
+    const textContainer = document.createElement('div');
+    textContainer.style.cssText = "display: flex; flex-direction: column; justify-content: center;";
+
+    const nameSpan = document.createElement('span');
+    nameSpan.style.cssText = "overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 150px; color: #334155; font-weight: 600;";
+    nameSpan.textContent = `${index + 1}. ${file.name}`;
+    textContainer.appendChild(nameSpan);
+
+    const sizeSpan = document.createElement('span');
+    sizeSpan.style.cssText = "color: #64748b; font-size: 11px;";
+    sizeSpan.textContent = (file.size / 1024).toFixed(1) + ' KB';
+    textContainer.appendChild(sizeSpan);
+
+    infoDiv.appendChild(textContainer);
+    itemRow.appendChild(infoDiv);
+
+    const delBtn = document.createElement('button');
+    delBtn.type = "button";
+    delBtn.textContent = "×";
+    delBtn.style.cssText = "background: #fee2e2; color: #991b1b; border: none; padding: 6px 10px; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: bold; display: flex; align-items: center; justify-content: center;";
+    delBtn.onclick = () => removeSelectedFile(index);
+    itemRow.appendChild(delBtn);
+
+    wrapper.appendChild(itemRow);
   });
-  html += `</div>`;
-  listContainer.innerHTML = html;
+
+  listContainer.appendChild(wrapper);
 }
 
 function removeSelectedFile(index) {
@@ -738,7 +826,6 @@ function setProgress(percent, text) {
   if (pct) pct.textContent = Math.round(safe) + '%';
 }
 
-// Ultra-Fast Hardware-Accelerated Image Decoder (<50ms)
 async function loadImageFast(file) {
   if (typeof createImageBitmap === 'function') {
     try {
@@ -760,7 +847,6 @@ async function loadImageFast(file) {
   });
 }
 
-// Zero-Copy Instant JPEG Inflator (<10ms even for 100MB)
 async function padJpegSafely(blob, targetBytes) {
   if (blob.size >= targetBytes) return blob;
   const buffer = await blob.arrayBuffer();
@@ -871,7 +957,7 @@ async function executeToolAction() {
       downloadBlob(blob, `Digital_Signature.${ext}`, format);
       showSuccessPopup('Digital Signature Downloaded Successfully!');
       closeWorkspace();
-      exportCanvas.width = 0; exportCanvas.height = 0; // Memory cleanup
+      exportCanvas.width = 0; exportCanvas.height = 0; 
     }, format, 0.95);
     return;
   }
@@ -901,7 +987,6 @@ async function executeToolAction() {
   if (btn) { btn.innerText = 'Processing...'; btn.disabled = true; }
   setProgress(10, 'Processing...');
   
-  // Instant yield (0ms delay) to keep UI smooth but start process instantly
   await new Promise(r => setTimeout(r, 0)); 
 
   try {
@@ -952,7 +1037,7 @@ async function executeToolAction() {
           renderH = Math.round(origH * scale);
         }
         const cv = renderHD(renderW, renderH);
-        await new Promise(r => setTimeout(r, 0)); // Instant yield
+        await new Promise(r => setTimeout(r, 0)); 
         const baseBlob = await canvasToBlobFast(cv, 0.96, outMime);
         bestBlob = (outMime === 'image/jpeg') ? await padJpegSafely(baseBlob, maxAllowedBytes) : baseBlob;
         cv.width = 0; cv.height = 0; 
@@ -973,7 +1058,7 @@ async function executeToolAction() {
         }
 
         let cv = renderHD(targetW, targetH);
-        await new Promise(r => setTimeout(r, 0)); // Instant yield
+        await new Promise(r => setTimeout(r, 0)); 
         let probeBlob = await canvasToBlobFast(cv, 0.85, outMime);
 
         if (probeBlob.size <= maxAllowedBytes) {
@@ -999,7 +1084,7 @@ async function executeToolAction() {
              const fbW = Math.max(10, Math.round(targetW * downScale));
              const fbH = Math.max(10, Math.round(fbW / aspect));
              const fbCv = renderHD(fbW, fbH);
-             await new Promise(r => setTimeout(r, 0)); // Instant yield
+             await new Promise(r => setTimeout(r, 0)); 
              bestBlob = await canvasToBlobFast(fbCv, 0.75, outMime);
              fbCv.width = 0; fbCv.height = 0; 
           }
@@ -1029,7 +1114,7 @@ async function executeToolAction() {
 
     if (activeTool === 'passportGrid') {
       setProgress(35, 'Processing Passport Photo...');
-      await new Promise(r => setTimeout(r, 0)); // Instant yield
+      await new Promise(r => setTimeout(r, 0)); 
 
       const downloadType = document.getElementById('optPassportType')?.value || 'grid';
       const copies = parseInt(document.getElementById('optPassportCopies')?.value) || 8;
@@ -1105,7 +1190,7 @@ async function executeToolAction() {
             placed++;
           }
         }
-        await new Promise(r => setTimeout(r, 0)); // Instant yield
+        await new Promise(r => setTimeout(r, 0)); 
         const gBlob = await canvasToBlobFast(gridCanvas, 0.95);
         downloadBlob(gBlob, `${fileName}_${copies}_Copies_Grid.jpg`, 'image/jpeg');
         gridCanvas.width = 0; gridCanvas.height = 0; 
@@ -1113,7 +1198,7 @@ async function executeToolAction() {
         const sBlob = await canvasToBlobFast(singleCanvas, 0.95);
         downloadBlob(sBlob, `${fileName}_Single_3.5x4.5cm.jpg`, 'image/jpeg');
 
-        await new Promise(r => setTimeout(r, 100)); // Small delay to separate two downloads smoothly
+        await new Promise(r => setTimeout(r, 100)); 
 
         let cols = 3;
         if (copies === 2 || copies === 4) cols = 2;
@@ -1141,7 +1226,7 @@ async function executeToolAction() {
             placed++;
           }
         }
-        await new Promise(r => setTimeout(r, 0)); // Instant yield
+        await new Promise(r => setTimeout(r, 0)); 
         const gBlob = await canvasToBlobFast(gridCanvas, 0.95);
         downloadBlob(gBlob, `${fileName}_${copies}_Copies_Grid.jpg`, 'image/jpeg');
         gridCanvas.width = 0; gridCanvas.height = 0; 
@@ -1175,7 +1260,7 @@ async function executeToolAction() {
       ctx.drawImage(img, 0, 0, targetW, targetH);
       if (typeof img.close === 'function') img.close();
 
-      await new Promise(r => setTimeout(r, 0)); // Instant yield
+      await new Promise(r => setTimeout(r, 0)); 
       let bestBlob = await canvasToBlobFast(canvas, 0.88);
       if (bestBlob.size > targetMaxBytes) {
         const estQ = Math.max(0.35, Number((0.88 * (targetMaxBytes / bestBlob.size)).toFixed(2)));
@@ -1262,7 +1347,7 @@ async function executeToolAction() {
       
       for (let pageNum = 1; pageNum <= totalPages; pageNum++) {
           setProgress(20 + Math.floor((pageNum / totalPages) * 70), `Compressing page ${pageNum} of ${totalPages}...`);
-          await new Promise(r => setTimeout(r, 0)); // Instant Yield
+          await new Promise(r => setTimeout(r, 0)); 
           
           const page = await pdfDoc.getPage(pageNum);
           const viewport = page.getViewport({ scale: 1.5 }); 
@@ -1407,7 +1492,7 @@ async function executeToolAction() {
 
       if (totalPages === 1) {
         setProgress(60, 'Converting Page 1...');
-        await new Promise(r => setTimeout(r, 0)); // Instant Yield
+        await new Promise(r => setTimeout(r, 0)); 
         
         const page = await pdfDoc.getPage(1);
         const viewport = page.getViewport({ scale: 2.0 });
@@ -1433,7 +1518,7 @@ async function executeToolAction() {
 
         for (let i = 1; i <= totalPages; i++) {
           setProgress(40 + Math.floor((i / totalPages) * 50), `Converting Page ${i}...`);
-          await new Promise(r => setTimeout(r, 0)); // Instant Yield
+          await new Promise(r => setTimeout(r, 0)); 
           
           const page = await pdfDoc.getPage(i);
           const viewport = page.getViewport({ scale: 2.0 });
@@ -1466,7 +1551,7 @@ async function executeToolAction() {
       
       for (let i = 1; i <= pdfDoc.numPages; i++) {
          setProgress(30 + Math.floor((i / pdfDoc.numPages) * 60), `Extracting Text from Page ${i}...`);
-         await new Promise(r => setTimeout(r, 0)); // Instant Yield
+         await new Promise(r => setTimeout(r, 0)); 
          const page = await pdfDoc.getPage(i);
          const textContent = await page.getTextContent();
          const pageText = textContent.items.map(item => item.str).join(' ');
@@ -1498,7 +1583,7 @@ async function executeToolAction() {
       const margin = 10;
 
       for (let i = 0; i < selectedFiles.length; i++) {
-        await new Promise(r => setTimeout(r, 0)); // Instant Yield
+        await new Promise(r => setTimeout(r, 0)); 
         const rawData = await readFileAsDataURL(selectedFiles[i]);
         const img = new Image();
         await new Promise((res, rej) => { img.onload = res; img.onerror = rej; img.src = rawData; });
@@ -1571,7 +1656,6 @@ function readFileAsDataURL(file) {
   });
 }
 
-// Instant Cross-Device Downloader without delay
 function downloadBlob(content, name, mimeType = 'application/octet-stream') {
   if (!content) return;
 
@@ -1587,7 +1671,6 @@ function downloadBlob(content, name, mimeType = 'application/octet-stream') {
   
   document.body.appendChild(a);
 
-  // requestAnimationFrame ensures it executes immediately after DOM update
   requestAnimationFrame(() => {
     try {
       a.click();
