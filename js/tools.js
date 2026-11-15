@@ -244,37 +244,61 @@ function launchTool(rawToolKey) {
           <input type="text" id="optQrText" class="form-control" value="https://docucraftai.website" style="width:100%; padding:10px; border:1px solid #d1d5db; border-radius:8px;">
         </div>`;
     }
-  } else if (toolKey === 'kbResizer') {
+ } else if (toolKey === 'kbResizer') {
     if (title) title.innerText = 'Photo & Sign KB / MB Resizer';
     if (desc) desc.innerText = 'Compress or expand image precisely to target KB or MB in <1s without losing clarity.';
     if (dropText) dropText.innerText = 'Tap to select photo/signature';
+    
     if (customUI) {
-      customUI.innerHTML = `
+        customUI.innerHTML = `
         <div class="form-group">
-          <label style="font-weight:600; font-size:13px; display:block; margin-bottom:6px;">Select Target Size & Unit:</label>
-          <div style="display: flex; gap: 8px;">
-            <select id="optPresetSize" class="form-control" style="flex: 2; padding:10px; border:1px solid #d1d5db; border-radius:8px;">
-              <option value="10">10 KB</option>
-              <option value="20">20 KB</option>
-              <option value="30">30 KB</option>
-              <option value="40">40 KB</option>
-              <option value="50" selected>50 KB</option>
-              <option value="100">100 KB</option>
-              <option value="200">200 KB</option>
-              <option value="300">300 KB</option>
-              <option value="400">400 KB</option>
-              <option value="500">500 KB</option>
-            </select>
-            <select id="optTargetUnit" class="form-control" style="flex: 1; padding:10px; border:1px solid #d1d5db; border-radius:8px;" onchange="updateResizerOptions()">
-              <option value="KB" selected>KB</option>
-              <option value="MB">MB</option>
-            </select>
-          </div>
+            <label style="font-weight:600; font-size:13px; display:block; margin-bottom:6px;">Select Target Size & Unit:</label>
+            <div style="display: flex; gap: 8px;">
+                <select id="optPresetSize" class="form-control" style="flex: 2; padding:10px; border:1px solid #d1d5db; border-radius:8px;">
+                    <!-- Default KB options -->
+                    <option value="5">5</option>
+                    <option value="10">10</option>
+                    <option value="20">20</option>
+                    <option value="30">30</option>
+                    <option value="40">40</option>
+                    <option value="50" selected>50</option>
+                    <option value="100">100</option>
+                    <option value="200">200</option>
+                    <option value="300">300</option>
+                    <option value="400">400</option>
+                    <option value="500">500</option>
+                </select>
+                <select id="optTargetUnit" class="form-control" style="flex: 1; padding:10px; border:1px solid #d1d5db; border-radius:8px;" onchange="updateResizerDropdowns()">
+                    <option value="KB" selected>KB</option>
+                    <option value="MB">MB</option>
+                </select>
+            </div>
         </div>
         <div class="form-group" style="margin-top:10px;">
-          <label style="font-weight:600; font-size:13px; display:block; margin-bottom:6px;">Save File Name:</label>
-          <input type="text" id="optCustomFileName" class="form-control" value="Resized_Photo" style="width:100%; padding:10px; border:1px solid #d1d5db; border-radius:8px;">
-        </div>`;
+            <label style="font-weight:600; font-size:13px; display:block; margin-bottom:6px;">Save File Name:</label>
+            <input type="text" id="optCustomFileName" class="form-control" value="Resized_Photo" style="width:100%; padding:10px; border:1px solid #d1d5db; border-radius:8px;">
+        </div>
+        
+        <!-- Script to handle KB/MB change dynamically -->
+        <script>
+            function updateResizerDropdowns() {
+                const unit = document.getElementById('optTargetUnit').value;
+                const sizeDropdown = document.getElementById('optPresetSize');
+                sizeDropdown.innerHTML = ''; 
+                
+                if (unit === 'KB') {
+                    const kbValues = [5, 10, 20, 30, 40, 50, 100, 200, 300, 400, 500];
+                    kbValues.forEach(val => {
+                        sizeDropdown.innerHTML += \`<option value="\${val}" \${val === 50 ? 'selected' : ''}>\${val}</option>\`;
+                    });
+                } else if (unit === 'MB') {
+                    const mbValues = [1, 2, 5, 10, 20, 50, 100];
+                    mbValues.forEach(val => {
+                        sizeDropdown.innerHTML += \`<option value="\${val}" \${val === 1 ? 'selected' : ''}>\${val}</option>\`;
+                    });
+                }
+            }
+        </script>`;
     }
   } else if (toolKey === 'examResizer') {
     if (title) title.innerText = 'Exam Photo & Signature Resizer';
