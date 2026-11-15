@@ -737,9 +737,9 @@ function renderFileList() {
     </div>`;
   });
   
-  html += `</div>`;
-  listContainer.replaceChildren();
-listContainer.insertAdjacentHTML('beforeend', html);
+ const parser = new DOMParser();
+const doc = parser.parseFromString(html, 'text/html');
+listContainer.replaceChildren(...doc.body.childNodes);
 }
 
 function removeSelectedFile(index) {
