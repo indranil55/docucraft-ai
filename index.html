@@ -240,36 +240,42 @@
   }
 </style>
   <style>
-   /* Main container */
-.action-dropdown {
-  position: relative;
-  display: inline-block;
-}
-
-/* Inner Install App button (hidden by default) */
-.dropdown-content {
-  display: none;
-  position: absolute;
-  right: 0; /* Align to the right so it doesn't overflow the screen */
-  top: 100%;
-  margin-top: 8px;
-  min-width: 120px;
-  z-index: 999; /* Display above other elements */
-}
-
-/* Show Install App on hover or focus */
-.action-dropdown:hover .dropdown-content,
-.action-dropdown:focus-within .dropdown-content {
-  display: flex;
-  flex-direction: column;
-}
-
-/* Responsive sizing for mobile screens */
-@media (max-width: 768px) {
-  .love-india-btn {
-    padding: 6px 12px;
-    font-size: 14px; /* Slightly smaller font for mobile */
-  }
+   @media screen and (max-width: 768px) {
+    header div[style*="gap"] {
+        display: grid !important;
+        grid-template-columns: 1fr max-content !important;
+        row-gap: 4px !important;
+        column-gap: 8px !important;
+        align-items: center !important;
+        justify-content: end !important;
+    }
+    
+    /* Install App - Top position */
+    header div[style*="gap"] > :nth-child(1) {
+        grid-column: 1 !important;
+        grid-row: 1 !important;
+    }
+    
+    /* Love India - Bottom position (under Install App) */
+    header div[style*="gap"] > :nth-child(2) {
+        grid-column: 1 !important;
+        grid-row: 2 !important;
+    }
+    
+    /* Login/Profile Icon - Positioned on the right side spanning both rows */
+    header div[style*="gap"] > :nth-child(3) {
+        grid-column: 2 !important;
+        grid-row: 1 / span 2 !important;
+    }
+    
+    /* Button sizing to fit perfectly inside the header */
+    header div[style*="gap"] button, 
+    header div[style*="gap"] a {
+        font-size: 11px !important;
+        padding: 5px 8px !important;
+        margin: 0 !important;
+        width: 100% !important;
+    }
 }
     /* Universal Apple iOS/Safari & Touch Optimization */
     * {
@@ -651,12 +657,17 @@
         </svg>
       </a>
 
-   <div class="action-dropdown">
-  <button class="love-india-btn">🤍 Love India</button>
-  <div class="dropdown-content">
-    <!-- Place your existing Install App button code or link here -->
-    <button class="install-app-btn">⬇️ Install App</button>
-  </div>
+ <div class="nav-actions" style="display: flex; gap: 8px; align-items: center; flex-wrap: nowrap;">
+  <button id="pwaInstallBtn" style="display: none; background: #2563eb; color: #ffffff; border: none; padding: 8px 16px; border-radius: 8px; font-weight: 600; cursor: pointer; align-items: center; gap: 8px; white-space: nowrap;">
+    <i class="fa-solid fa-download"></i> Install App
+  </button>
+  <button onclick="openDonateModal()" style="background: linear-gradient(135deg, #3b82f6, #ec4899); color: #fff; border: none; padding: 6px 14px; border-radius: 20px; font-weight: 700; font-size: 12px; cursor: pointer; display: flex; align-items: center; gap: 6px; box-shadow: 0 3px 8px rgba(59, 130, 246, 0.4);">
+    <i class="fa-solid fa-heart" style="color: #ffffff;"></i> Love India
+  </button>
+  <button class="auth-icon-btn" id="authNavBtn" onclick="openAuthModal()" title="Login / Sign Up">
+    <i class="fas fa-user"></i>
+  </button>
+</div>
 </div>
 </header>
 
