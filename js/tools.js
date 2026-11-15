@@ -244,7 +244,7 @@ function launchTool(rawToolKey) {
           <input type="text" id="optQrText" class="form-control" value="https://docucraftai.website" style="width:100%; padding:10px; border:1px solid #d1d5db; border-radius:8px;">
         </div>`;
     }
-  } else if (toolKey === 'kbResizer') {
+ } else if (toolKey === 'kbResizer') {
     if (title) title.innerText = 'Photo & Sign KB / MB Resizer';
     if (desc) desc.innerText = 'Compress or expand image precisely to target KB or MB in <1s without losing clarity.';
     if (dropText) dropText.innerText = 'Tap to select photo/signature';
