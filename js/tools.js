@@ -737,9 +737,90 @@ function renderFileList() {
     </div>`;
   });
   
- const parser = new DOMParser();
-const doc = parser.parseFromString(html, 'text/html');
-listContainer.replaceChildren(...doc.body.childNodes);
+ function renderFileList() {
+  const listContainer = document.getElementById('wsFileList');
+  if (!listContainer) return;
+
+  listContainer.replaceChildren();
+
+  if (selectedFiles.length === 0) return;
+
+  const wrapper = document.createElement('div');
+  wrapper.style.cssText = "background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px; padding: 10px; margin-top: 10px; max-height: 250px; overflow-y: auto;";
+
+  const header = document.createElement('div');
+  header.style.cssText = "font-size: 12px; font-weight: 700; color: #1e293b; margin-bottom: 8px; display: flex; align-items: center; justify-content: space-between;";
+  
+  const span = document.createElement('span');
+  
+  // Icon add korar jonno
+  const icon = document.createElement('i');
+  icon.className = "fa-solid fa-list-check";
+  icon.style.color = "#2563eb";
+  icon.style.marginRight = "5px";
+  
+  span.appendChild(icon);
+  span.appendChild(document.createTextNode(` Selected File(s) (${selectedFiles.length}):`));
+  
+  header.appendChild(span);
+
+  const clearBtn = document.createElement('button');
+  clearBtn.type = "button";
+  clearBtn.textContent = "Clear All";
+  clearBtn.style.cssText = "background: #fee2e2; color: #991b1b; border: none; padding: 2px 8px; border-radius: 4px; font-size: 10px; cursor: pointer;";
+  clearBtn.onclick = clearAllSelectedFiles;
+  header.appendChild(clearBtn);
+  
+  wrapper.appendChild(header);
+
+  selectedFiles.forEach((file, index) => {
+    const itemRow = document.createElement('div');
+    itemRow.style.cssText = "display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #e2e8f0; font-size: 12px;";
+
+    const infoDiv = document.createElement('div');
+    infoDiv.style.cssText = "display: flex; align-items: center; overflow: hidden;";
+
+    if (file.type.startsWith('image/')) {
+      const img = document.createElement('img');
+      img.src = URL.createObjectURL(file);
+      img.onload = function() { URL.revokeObjectURL(this.src); };
+      img.style.cssText = "width: 45px; height: 45px; object-fit: cover; border-radius: 6px; margin-right: 10px; border: 1px solid #cbd5e1; box-shadow: 0 1px 2px rgba(0,0,0,0.1);";
+      infoDiv.appendChild(img);
+    } else {
+      const docIcon = document.createElement('div');
+      docIcon.textContent = "DOC";
+      docIcon.style.cssText = "width: 45px; height: 45px; background: #e2e8f0; border-radius: 6px; margin-right: 10px; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: bold; color: #64748b; border: 1px solid #cbd5e1;";
+      infoDiv.appendChild(docIcon);
+    }
+
+    const textContainer = document.createElement('div');
+    textContainer.style.cssText = "display: flex; flex-direction: column; justify-content: center;";
+
+    const nameSpan = document.createElement('span');
+    nameSpan.style.cssText = "overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 150px; color: #334155; font-weight: 600;";
+    nameSpan.textContent = `${index + 1}. ${file.name}`;
+    textContainer.appendChild(nameSpan);
+
+    const sizeSpan = document.createElement('span');
+    sizeSpan.style.cssText = "color: #64748b; font-size: 11px;";
+    sizeSpan.textContent = (file.size / 1024).toFixed(1) + ' KB';
+    textContainer.appendChild(sizeSpan);
+
+    infoDiv.appendChild(textContainer);
+    itemRow.appendChild(infoDiv);
+
+    const delBtn = document.createElement('button');
+    delBtn.type = "button";
+    delBtn.textContent = "×";
+    delBtn.style.cssText = "background: #fee2e2; color: #991b1b; border: none; padding: 6px 10px; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: bold; display: flex; align-items: center; justify-content: center;";
+    delBtn.onclick = () => removeSelectedFile(index);
+    itemRow.appendChild(delBtn);
+
+    wrapper.appendChild(itemRow);
+  });
+
+  listContainer.appendChild(wrapper);
+}
 }
 
 function removeSelectedFile(index) {
