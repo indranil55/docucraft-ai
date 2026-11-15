@@ -782,10 +782,14 @@ function renderFileList() {
 
     if (file.type.startsWith('image/')) {
       const img = document.createElement('img');
-      img.src = URL.createObjectURL(file);
-      img.onload = function() { URL.revokeObjectURL(this.src); };
+      const imageUrl = URL.createObjectURL(file);
+      
+      img.setAttribute('src', imageUrl);
+      img.onload = function() { URL.revokeObjectURL(imageUrl); };
       img.style.cssText = "width: 45px; height: 45px; object-fit: cover; border-radius: 6px; margin-right: 10px; border: 1px solid #cbd5e1; box-shadow: 0 1px 2px rgba(0,0,0,0.1);";
+      
       infoDiv.appendChild(img);
+    }
     } else {
       const docIcon = document.createElement('div');
       docIcon.textContent = "DOC";
