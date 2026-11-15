@@ -60,14 +60,23 @@
  <link rel="stylesheet" href="style.css?v=3">
   
   <style>
-   /* Fix header buttons for mobile screens */
-@media screen and (max-width: 768px) {
-    header button {
-        font-size: 11px !important;
-        padding: 5px 8px !important;
-    }
+   @media screen and (max-width: 768px) {
+    /* Stack the header buttons vertically (top-to-bottom) */
     header div[style*="gap"] {
-        gap: 4px !important;
+        display: flex !important;
+        flex-direction: column !important; 
+        align-items: flex-end !important; /* Keep them aligned to the right */
+        gap: 6px !important;
+    }
+    
+    /* Resize only the header buttons (leaves the login form buttons intact) */
+    header div[style*="gap"] button, 
+    header div[style*="gap"] a {
+        font-size: 11px !important;
+        padding: 6px 10px !important;
+        margin: 0 !important;
+        width: 100% !important; /* Makes both buttons the same width */
+        text-align: center !important;
     }
 }
   .tools-list-container {
