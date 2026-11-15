@@ -240,6 +240,37 @@
   }
 </style>
   <style>
+   /* Main container */
+.action-dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+/* Inner Install App button (hidden by default) */
+.dropdown-content {
+  display: none;
+  position: absolute;
+  right: 0; /* Align to the right so it doesn't overflow the screen */
+  top: 100%;
+  margin-top: 8px;
+  min-width: 120px;
+  z-index: 999; /* Display above other elements */
+}
+
+/* Show Install App on hover or focus */
+.action-dropdown:hover .dropdown-content,
+.action-dropdown:focus-within .dropdown-content {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Responsive sizing for mobile screens */
+@media (max-width: 768px) {
+  .love-india-btn {
+    padding: 6px 12px;
+    font-size: 14px; /* Slightly smaller font for mobile */
+  }
+}
     /* Universal Apple iOS/Safari & Touch Optimization */
     * {
       -webkit-tap-highlight-color: transparent;
@@ -620,17 +651,12 @@
         </svg>
       </a>
 
-   <div class="nav-actions" style="display: flex; gap: 8px; align-items: center; flex-wrap: nowrap;">
-  <button id="pwaInstallBtn" style="display: none; background: #2563eb; color: #ffffff; border: none; padding: 8px 16px; border-radius: 8px; font-weight: 600; cursor: pointer; align-items: center; gap: 8px; white-space: nowrap;">
-    <i class="fa-solid fa-download"></i> Install App
-  </button>
-  <button onclick="openDonateModal()" style="background: linear-gradient(135deg, #3b82f6, #ec4899); color: #fff; border: none; padding: 6px 14px; border-radius: 20px; font-weight: 700; font-size: 12px; cursor: pointer; display: flex; align-items: center; gap: 6px; box-shadow: 0 3px 8px rgba(59, 130, 246, 0.4);">
-    <i class="fa-solid fa-heart" style="color: #ffffff;"></i> Love India
-  </button>
-  <button class="auth-icon-btn" id="authNavBtn" onclick="openAuthModal()" title="Login / Sign Up">
-    <i class="fas fa-user"></i>
-  </button>
-</div>
+   <div class="action-dropdown">
+  <button class="love-india-btn">🤍 Love India</button>
+  <div class="dropdown-content">
+    <!-- Place your existing Install App button code or link here -->
+    <button class="install-app-btn">⬇️ Install App</button>
+  </div>
 </div>
 </header>
 
