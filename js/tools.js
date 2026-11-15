@@ -740,12 +740,18 @@ function renderFileList() {
     const infoDiv = document.createElement('div');
     infoDiv.style.cssText = "display: flex; align-items: center; overflow: hidden;";
 
+    const imageUrl = URL.createObjectURL(file);
+      img.setAttribute('src', imageUrl);
+    
     if (file.type.startsWith('image/')) {
       const img = document.createElement('img');
+      const imageUrl = URL.createObjectURL(file);
+      img.setAttribute('src', imageUrl);
       
-      const setImgSrc = (element, url) => {
-        element.src = url;
-      };
+      img.onload = function() { URL.revokeObjectURL(imageUrl); };
+      // ... rest of the code ...
+      
+    
       
       const imageUrl = URL.createObjectURL(file);
       setImgSrc(img, imageUrl);
