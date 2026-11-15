@@ -738,7 +738,8 @@ function renderFileList() {
   });
   
   html += `</div>`;
-  listContainer.innerHTML = html;
+  listContainer.replaceChildren();
+listContainer.insertAdjacentHTML('beforeend', html);
 }
 
 function removeSelectedFile(index) {
