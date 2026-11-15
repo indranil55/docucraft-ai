@@ -61,13 +61,42 @@
   
   <style>
    @media screen and (max-width: 768px) {
-    /* Stack the header buttons vertically (top-to-bottom) */
     header div[style*="gap"] {
-        display: flex !important;
-        flex-direction: column !important; 
-        align-items: flex-end !important; /* Keep them aligned to the right */
-        gap: 6px !important;
+        display: grid !important;
+        grid-template-columns: max-content max-content !important;
+        row-gap: 4px !important;
+        column-gap: 8px !important;
+        align-items: center !important;
+        justify-content: end !important;
     }
+    
+    /* Install App - Top position */
+    header div[style*="gap"] > :nth-child(1) {
+        grid-column: 1 !important;
+        grid-row: 1 !important;
+    }
+    
+    /* Love India - Bottom position (under Install App) */
+    header div[style*="gap"] > :nth-child(2) {
+        grid-column: 1 !important;
+        grid-row: 2 !important;
+    }
+    
+    /* Login/Profile Icon - Positioned on the right side spanning both rows */
+    header div[style*="gap"] > :nth-child(3) {
+        grid-column: 2 !important;
+        grid-row: 1 / span 2 !important;
+    }
+    
+    /* Button sizing to fit perfectly inside the header */
+    header div[style*="gap"] button, 
+    header div[style*="gap"] a {
+        font-size: 11px !important;
+        padding: 5px 8px !important;
+        margin: 0 !important;
+        width: 100% !important;
+    }
+}
     
     /* Resize only the header buttons (leaves the login form buttons intact) */
     header div[style*="gap"] button, 
