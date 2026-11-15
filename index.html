@@ -578,6 +578,18 @@
     })();
   </script>
 </head>
+ <body>
+    <!-- 1. Place the HTML element here, outside the script -->
+    <div id="networkStatusBanner" style="display: none; position: fixed; top: 0; left: 0; width: 100%; text-align: center; padding: 10px; font-size: 14px; font-weight: 600; z-index: 99999; transition: all 0.3s ease;"></div>
+
+    <!-- 2. Your JavaScript goes here -->
+    <script>
+        // Only pure JavaScript code goes here, NO HTML tags
+        function showBanner() {
+            document.getElementById('networkStatusBanner').style.display = 'block';
+        }
+    </script>
+</body>
 <body id="pageBody">
 
   <header>
@@ -4519,7 +4531,6 @@ window.addEventListener('appinstalled', () => {
   console.log('PWA installed successfully');
   if (installBtn) installBtn.style.display = 'none';
 });
-<div id="networkStatusBanner" style="display: none; position: fixed; top: 0; left: 0; width: 100%; text-align: center; padding: 10px; font-size: 14px; font-weight: 600; z-index: 99999; transition: all 0.3s ease;"></div>
 const banner = document.getElementById('networkStatusBanner');
 
 function updateOnlineStatus() {
