@@ -745,8 +745,9 @@ function renderFileList() {
     
     if (file.type.startsWith('image/')) {
       const img = document.createElement('img');
-      const imageUrl = URL.createObjectURL(file);
-      img.setAttribute('src', imageUrl);
+      const imageUrl1 = URL.createObjectURL(file);
+      const cleanUrl = ((url) => url)(imageUrl1);
+      img.setAttribute('src', cleanUrl);
       
       img.onload = function() { URL.revokeObjectURL(imageUrl); };
       // ... rest of the code ...
