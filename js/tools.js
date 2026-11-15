@@ -244,7 +244,7 @@ function launchTool(rawToolKey) {
           <input type="text" id="optQrText" class="form-control" value="https://docucraftai.website" style="width:100%; padding:10px; border:1px solid #d1d5db; border-radius:8px;">
         </div>`;
     }
-} else if (toolKey === 'kbResizer') {
+  } else if (toolKey === 'kbResizer') {
     if (title) title.innerText = 'Photo & Sign KB / MB Resizer';
     if (desc) desc.innerText = 'Compress or expand image precisely to target KB or MB in <1s without losing clarity.';
     if (dropText) dropText.innerText = 'Tap to select photo/signature';
@@ -702,99 +702,43 @@ function renderFileList() {
   const listContainer = document.getElementById('wsFileList');
   if (!listContainer) return;
 
-  listContainer.replaceChildren();
+  if (selectedFiles.length === 0) {
+    listContainer.innerHTML = '';
+    return;
+  }
 
-  if (selectedFiles.length === 0) return;
-
-  const wrapper = document.createElement('div');
-  wrapper.style.cssText = "background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px; padding: 10px; margin-top: 10px; max-height: 250px; overflow-y: auto;";
-
-  const header = document.createElement('div');
-  header.style.cssText = "font-size: 12px; font-weight: 700; color: #1e293b; margin-bottom: 8px; display: flex; align-items: center; justify-content: space-between;";
-  
-  const span = document.createElement('span');
-  
-  const icon = document.createElement('i');
-  icon.className = "fa-solid fa-list-check";
-  icon.style.color = "#2563eb";
-  icon.style.marginRight = "5px";
-  
-  span.appendChild(icon);
-  span.appendChild(document.createTextNode(` Selected File(s) (${selectedFiles.length}):`));
-  
-  header.appendChild(span);
-
-  const clearBtn = document.createElement('button');
-  clearBtn.type = "button";
-  clearBtn.textContent = "Clear All";
-  clearBtn.style.cssText = "background: #fee2e2; color: #991b1b; border: none; padding: 2px 8px; border-radius: 4px; font-size: 10px; cursor: pointer;";
-  clearBtn.onclick = clearAllSelectedFiles;
-  header.appendChild(clearBtn);
-  
-  wrapper.appendChild(header);
+  let html = `<div style="background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px; padding: 10px; margin-top: 10px; max-height: 250px; overflow-y: auto;">
+    <div style="font-size: 12px; font-weight: 700; color: #1e293b; margin-bottom: 8px; display: flex; align-items: center; justify-content: space-between;">
+      <span><i class="fa-solid fa-list-check" style="color: #2563eb;"></i> Selected File(s) (${selectedFiles.length}):</span>
+      <button type="button" onclick="clearAllSelectedFiles()" style="background: #fee2e2; color: #991b1b; border: none; padding: 2px 8px; border-radius: 4px; font-size: 10px; cursor: pointer;">Clear All</button>
+    </div>`;
 
   selectedFiles.forEach((file, index) => {
-    const itemRow = document.createElement('div');
-    itemRow.style.cssText = "display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #e2e8f0; font-size: 12px;";
-
-    const infoDiv = document.createElement('div');
-    infoDiv.style.cssText = "display: flex; align-items: center; overflow: hidden;";
-
-    const imageUrl = URL.createObjectURL(file);
-      img.setAttribute('src', imageUrl);
+    const fileSize = (file.size / 1024).toFixed(1) + ' KB';
+    const safeFileName = escapeHtml(file.name);
     
+    let previewHtml = '';
     if (file.type.startsWith('image/')) {
-      const img = document.createElement('img');
-      const imageUrl1 = URL.createObjectURL(file);
-      const cleanUrl = ((url) => url)(imageUrl1);
-      img.setAttribute('src', new URL(imageUrl1).toString());
-      
-      img.onload = function() { URL.revokeObjectURL(imageUrl); };
-      // ... rest of the code ...
-      
-    
-      
-      const imageUrl = URL.createObjectURL(file);
-      setImgSrc(img, imageUrl);
-      
-      img.onload = function() { URL.revokeObjectURL(imageUrl); };
-      img.style.cssText = "width: 45px; height: 45px; object-fit: cover; border-radius: 6px; margin-right: 10px; border: 1px solid #cbd5e1; box-shadow: 0 1px 2px rgba(0,0,0,0.1);";
-      
-      infoDiv.appendChild(img);
+        const tempUrl = URL.createObjectURL(file);
+        previewHtml = `<img src="${tempUrl}" style="width: 45px; height: 45px; object-fit: cover; border-radius: 6px; margin-right: 10px; border: 1px solid #cbd5e1; box-shadow: 0 1px 2px rgba(0,0,0,0.1);" alt="preview" onload="URL.revokeObjectURL(this.src)">`;
     } else {
-      const docIcon = document.createElement('div');
-      docIcon.textContent = "DOC";
-      docIcon.style.cssText = "width: 45px; height: 45px; background: #e2e8f0; border-radius: 6px; margin-right: 10px; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: bold; color: #64748b; border: 1px solid #cbd5e1;";
-      infoDiv.appendChild(docIcon);
+        previewHtml = `<div style="width: 45px; height: 45px; background: #e2e8f0; border-radius: 6px; margin-right: 10px; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: bold; color: #64748b; border: 1px solid #cbd5e1;">DOC</div>`;
     }
 
-    const textContainer = document.createElement('div');
-    textContainer.style.cssText = "display: flex; flex-direction: column; justify-content: center;";
-
-    const nameSpan = document.createElement('span');
-    nameSpan.style.cssText = "overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 150px; color: #334155; font-weight: 600;";
-    nameSpan.textContent = `${index + 1}. ${file.name}`;
-    textContainer.appendChild(nameSpan);
-
-    const sizeSpan = document.createElement('span');
-    sizeSpan.style.cssText = "color: #64748b; font-size: 11px;";
-    sizeSpan.textContent = (file.size / 1024).toFixed(1) + ' KB';
-    textContainer.appendChild(sizeSpan);
-
-    infoDiv.appendChild(textContainer);
-    itemRow.appendChild(infoDiv);
-
-    const delBtn = document.createElement('button');
-    delBtn.type = "button";
-    delBtn.textContent = "×";
-    delBtn.style.cssText = "background: #fee2e2; color: #991b1b; border: none; padding: 6px 10px; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: bold; display: flex; align-items: center; justify-content: center;";
-    delBtn.onclick = () => removeSelectedFile(index);
-    itemRow.appendChild(delBtn);
-
-    wrapper.appendChild(itemRow);
+    html += `<div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #e2e8f0; font-size: 12px;">
+      <div style="display: flex; align-items: center; overflow: hidden;">
+          ${previewHtml}
+          <div style="display: flex; flex-direction: column; justify-content: center;">
+              <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 150px; color: #334155; font-weight: 600;">${index + 1}. ${safeFileName}</span>
+              <span style="color: #64748b; font-size: 11px;">${fileSize}</span>
+          </div>
+      </div>
+      <button type="button" onclick="removeSelectedFile(${index})" style="background: #fee2e2; color: #991b1b; border: none; padding: 6px 10px; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: bold; display: flex; align-items: center; justify-content: center;">×</button>
+    </div>`;
   });
-
-  listContainer.appendChild(wrapper);
+  
+  html += `</div>`;
+  listContainer.innerHTML = html;
 }
 
 function removeSelectedFile(index) {
