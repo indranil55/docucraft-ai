@@ -926,14 +926,3 @@ footer {
     align-items: center;
     gap: 10px; /* to keep a specific gap between the buttons */
 }
-/* Add this to your main CSS file (e.g., style.css) */
-.modal-content-container {
-    /* dvh adjusts height automatically when the mobile keyboard opens */
-    max-height: 75dvh; 
-    
-    /* Allows vertical scrolling inside the modal */
-    overflow-y: auto;  
-    
-    /* Smooth scrolling for mobile devices */
-    -webkit-overflow-scrolling: touch; 
-}
