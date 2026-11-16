@@ -611,6 +611,11 @@
       box-shadow: 0 0 0 2px #2563eb;
       transform: scale(1.15);
     }
+   .modal-content-container {
+    max-height: 75dvh; 
+    overflow-y: auto;  
+    -webkit-overflow-scrolling: touch; 
+}
   </style>
   
   <script>
@@ -624,6 +629,15 @@
       }
     })();
   </script>
+ <style>
+    /* Your other existing CSS code... */
+
+    .modal-content-container {
+        max-height: 75dvh; 
+        overflow-y: auto;  
+        -webkit-overflow-scrolling: touch; 
+    }
+</style>
 </head>
  <body>
     <!-- 1. Place the HTML element here, outside the script -->
