@@ -57,34 +57,6 @@
  <link rel="stylesheet" href="style.css?v=3">
   
   <style>
-   /* Replace .custom-modal with the actual class name of your popup box */
-.custom-modal { 
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 90%;
-    max-width: 400px; /* Adjust based on your design */
-    
-    /* Prevents the box from going off-screen when the keyboard opens: */
-    max-height: 80vh; /* Box will not take more than 80% of the screen height */
-    overflow-y: auto; /* Adds a scrollbar automatically if the content is too long */
-    
-    background: #ffffff;
-    border-radius: 12px;
-    z-index: 9999; /* Ensures it stays on top of everything else */
-    
-    /* Smooth transition effect */
-    transition: top 0.3s ease, transform 0.3s ease;
-}
-
-/* When the keyboard opens (screen height becomes smaller), shift the box slightly up */
-@media screen and (max-height: 600px) {
-    .custom-modal {
-        top: 45%; /* Shifts the box slightly upwards */
-        max-height: 85vh;
-    }
-}
     /* Resize only the header buttons (leaves the login form buttons intact) */
     header div[style*="gap"] button, 
     header div[style*="gap"] a {
