@@ -94,6 +94,9 @@ function launchTool(rawToolKey) {
     const tk = toolKey.toLowerCase().replace(/[^a-z0-9]/g, '');
     const keyMap = {
       'rot': 'rotate',
+      'repair': 'repairPdf', 'repairpdf': 'repairPdf',
+      'edit': 'editPdf', 'editpdf': 'editPdf',
+      'protect': 'protectPdf', 'protectpdf': 'protectPdf', 'lock': 'protectPdf',
       'jpgpdf': 'jpgToPdf', 'jpgtopdf': 'jpgToPdf',
       'pngpdf': 'pngToPdf', 'pngtopdf': 'pngToPdf',
       'webppdf': 'webpToPdf', 'webptopdf': 'webpToPdf',
@@ -140,7 +143,7 @@ function launchTool(rawToolKey) {
 
   if (fileInput) {
     fileInput.value = '';
-    if (['merge', 'split', 'compress', 'organize', 'rotate', 'removePages', 'watermark', 'protect', 'protectPdf', 'unlock', 'addPageNumbers', 'pdfToJpg', 'pdfToPng', 'pdfToWord', 'pdfToExcel', 'pdfToPpt', 'pdfToText', 'editPdf', 'repairPdf'].includes(toolKey)) {
+    if (['merge', 'split', 'compress', 'organize', 'rotate', 'removePages', 'watermark', 'protect', 'protectPdf', 'unlock', 'addPageNumbers', 'pdfToJpg', 'pdfToPng', 'pdfToWord', 'pdfToExcel', 'pdfToPpt', 'pdfToText', 'editPdf', 'edit', 'repairPdf', 'repair'].includes(toolKey)) {
       fileInput.accept = '.pdf,application/pdf';
     } else if (['jpgToPdf', 'pngToPdf', 'webpToPdf', 'kbResizer', 'examResizer', 'ocr', 'passportGrid'].includes(toolKey)) {
       fileInput.accept = '.jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp';
@@ -191,7 +194,7 @@ function launchTool(rawToolKey) {
     'htmlToPdf': 'HTML to PDF', 'textToPdf': 'Text to PDF', 'zipToPdf': 'ZIP to PDF',
     'pdfToWord': 'PDF to Word', 'pdfToExcel': 'PDF to Excel', 'pdfToPpt': 'PDF to PowerPoint',
     'pdfToJpg': 'PDF to JPG', 'pdfToPng': 'PDF to PNG', 'pdfToText': 'PDF to Text',
-    'editPdf': 'Edit PDF', 'repairPdf': 'Repair PDF'
+    'editPdf': 'Edit PDF', 'repairPdf': 'Repair PDF', 'edit': 'Edit PDF', 'repair': 'Repair PDF', 'protect': 'Protect PDF'
   };
 
   if (toolKey === 'sigPad') {
@@ -387,11 +390,11 @@ function launchTool(rawToolKey) {
           <input type="text" id="optProtectFileName" class="form-control" value="Protected_Document" style="width:100%; padding:10px; border:1px solid #d1d5db; border-radius:8px;">
         </div>`;
     }
-  } else if (toolKey === 'repairPdf') {
+  } else if (toolKey === 'repairPdf' || toolKey === 'repair') {
     if (title) title.innerText = 'Repair PDF';
     if (desc) desc.innerText = 'Fix corrupted or broken PDF files offline.';
     if (dropText) dropText.innerText = 'Tap to select broken PDF';
-  } else if (toolKey === 'editPdf') {
+  } else if (toolKey === 'editPdf' || toolKey === 'edit') {
     if (title) title.innerText = 'Edit PDF';
     if (desc) desc.innerText = 'Visual interactive PDF editor.';
     if (dropText) dropText.innerText = 'Tap to select PDF to edit';
@@ -939,7 +942,7 @@ async function executeToolAction() {
   }
 
   // Update: Added repairPdf, editPdf, protect, protectPdf in fileNeeded Array
-  const fileNeeded = ['kbResizer', 'examResizer', 'passportGrid', 'merge', 'split', 'compress', 'organize', 'rotate', 'removePages', 'jpgToPdf', 'pngToPdf', 'webpToPdf', 'watermark', 'unlock', 'addPageNumbers', 'textToPdf', 'htmlToPdf', 'zipToPdf', 'wordToPdf', 'excelToPdf', 'pptToPdf', 'pdfToJpg', 'pdfToPng', 'pdfToText', 'pdfToWord', 'pdfToExcel', 'pdfToPpt', 'repairPdf', 'editPdf', 'protect', 'protectPdf'];
+  const fileNeeded = ['kbResizer', 'examResizer', 'passportGrid', 'merge', 'split', 'compress', 'organize', 'rotate', 'removePages', 'jpgToPdf', 'pngToPdf', 'webpToPdf', 'watermark', 'unlock', 'addPageNumbers', 'textToPdf', 'htmlToPdf', 'zipToPdf', 'wordToPdf', 'excelToPdf', 'pptToPdf', 'pdfToJpg', 'pdfToPng', 'pdfToText', 'pdfToWord', 'pdfToExcel', 'pdfToPpt', 'repairPdf', 'repair', 'editPdf', 'edit', 'protect', 'protectPdf'];
   
   if (fileNeeded.includes(activeTool) && selectedFiles.length === 0) {
     alert('Please tap to select the required file(s) first.');
@@ -1246,7 +1249,7 @@ async function executeToolAction() {
     // ==========================================
     // Added Repair, Protect & Edit PDF Logic Block
     // ==========================================
-    } else if (activeTool === 'repairPdf') {
+    } else if (activeTool === 'repairPdf' || activeTool === 'repair') {
       setProgress(40, 'Analyzing and repairing PDF structure...');
       if (!PDFLibObj) throw new Error('PDF library failed to load.');
       const fileBuffer = await selectedFiles[0].arrayBuffer();
@@ -1270,7 +1273,7 @@ async function executeToolAction() {
       await new Promise(r => setTimeout(r, 800)); // Simulate processing delay
       alert('Note: Strong 256-bit PDF encryption requires the Premium Crypto Module to execute securely offline. This feature is coming in the next update!');
 
-    } else if (activeTool === 'editPdf') {
+    } else if (activeTool === 'editPdf' || activeTool === 'edit') {
       setProgress(30, 'Loading Interactive Editor...');
       await new Promise(r => setTimeout(r, 500)); // Simulate processing delay
       alert('Note: Advanced visual PDF editing requires the Premium Interactive Editor UI module. This feature is coming in the next update!');
