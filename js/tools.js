@@ -1748,7 +1748,7 @@ async function generateResumeDownload() {
         }
     });
     
-    resumeDiv.innerHTML = content;
+    resumeDiv.textContent = content;
     
     const opt = {
       margin:       15,
