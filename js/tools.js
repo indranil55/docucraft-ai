@@ -1712,6 +1712,69 @@ function updatePrivacyStatus() {
   if (!statusTag) return;
   statusTag.textContent = navigator.onLine ? 'Device-Only Mode' : 'Offline Mode Active ✓';
 }
+
+// Resume Download Function
+async function generateResumeDownload() {
+  const btn = event ? event.target : null;
+  const originalText = btn ? btn.innerText : 'Download Resume (HTML/Text)';
+  if (btn) { btn.innerText = "Generating PDF..."; btn.disabled = true; }
+  
+  try {
+    // Load html2pdf library dynamically using your existing loadScript function
+    await loadScript('https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js');
+    
+    const modal = document.getElementById('resumeMakerModal');
+    if (!modal) throw new Error("Resume modal not found");
+    
+    const inputs = modal.querySelectorAll('input, textarea');
+    
+    // Create a clean resume layout dynamically
+    const resumeDiv = document.createElement('div');
+    resumeDiv.style.padding = '40px';
+    resumeDiv.style.fontFamily = 'Arial, sans-serif';
+    resumeDiv.style.color = '#1e293b';
+    
+    let content = `<h1 style="text-align:center; color:#2563eb; margin-bottom:10px;">Professional Resume</h1><hr style="margin-bottom:20px; border: 1px solid #cbd5e1;"/>`;
+    
+    inputs.forEach(input => {
+        const val = input.value.trim();
+        if (val) {
+            // Use placeholder as label if available
+            const label = input.placeholder || 'Details';
+            content += `<div style="margin-bottom: 20px;">
+                <h3 style="margin: 0 0 5px 0; font-size: 14px; color: #64748b; text-transform: uppercase;">${label}</h3>
+                <p style="margin: 0; font-size: 16px; white-space: pre-wrap; line-height: 1.5;">${val}</p>
+            </div>`;
+        }
+    });
+    
+    resumeDiv.innerHTML = content;
+    
+    const opt = {
+      margin:       15,
+      filename:     'Professional_Resume.pdf',
+      image:        { type: 'jpeg', quality: 0.98 },
+      html2canvas:  { scale: 2, useCORS: true },
+      jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+    };
+    
+    // Generate and download PDF
+    await html2pdf().set(opt).from(resumeDiv).save();
+    
+    // Show success message using your existing popup function
+    if (typeof showSuccessPopup === 'function') {
+        showSuccessPopup('Resume Downloaded Successfully!');
+    } else {
+        alert('Resume Downloaded Successfully!');
+    }
+  } catch (err) {
+    console.error(err);
+    alert('Error generating resume: ' + err.message);
+  } finally {
+    if (btn) { btn.innerText = originalText; btn.disabled = false; }
+  }
+}
+
 window.addEventListener('online', updatePrivacyStatus);
 window.addEventListener('offline', updatePrivacyStatus);
 updatePrivacyStatus();
