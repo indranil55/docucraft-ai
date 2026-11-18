@@ -855,19 +855,24 @@
         <span class="tool-meta">Open Calculator &rarr;</span>
       </div>
 
-      <div class="tool-card" data-cat="document" onclick="openPdfScannerModal()">
-        <div class="tool-icon" style="background:#e0f2fe; color:#0284c7;"><i class="fa-solid fa-scanner"></i></div>
-        <h3>PDF Scanner & Enhancer <span class="badge-new">NEW</span></h3>
-        <p>Scan documents using camera or upload photos to enhance and convert into clear PDF.</p>
-        <span class="tool-meta">Open Scanner &rarr;</span>
-      </div>
+     <div class="tool-card" data-cat="document" onclick="openPdfScannerModal()" style="cursor: pointer;">
+  <div class="tool-icon" style="background:#e0f2fe; color:#0284c7;">
+    <!-- It is safer to use 'fa-camera' or 'fa-barcode' instead of 'fa-scanner' as it might not be available in the free FontAwesome version -->
+    <i class="fa-solid fa-camera"></i>
+  </div>
+  <h3>PDF Scanner & Enhancer <span class="badge-new">NEW</span></h3>
+  <p>Scan documents using camera or upload photos to enhance and convert into clear PDF.</p>
+  <span class="tool-meta">Open Scanner &rarr;</span>
+</div>
 
-      <div class="tool-card" data-cat="toPdf" onclick="openZipToPdfModal()">
-        <div class="tool-icon" style="background:#fef3c7; color:#d97706;"><i class="fa-solid fa-file-zipper"></i></div>
-        <h3>ZIP to PDF Converter <span class="badge-new">NEW</span></h3>
-        <p>Upload a ZIP archive containing images or docs and convert them into a single PDF.</p>
-        <span class="tool-meta">Open ZIP to PDF &rarr;</span>
-      </div>
+<div class="tool-card" data-cat="toPdf" onclick="openZipToPdfModal()" style="cursor: pointer;">
+  <div class="tool-icon" style="background:#fef3c7; color:#d97706;">
+    <i class="fa-solid fa-file-zipper"></i>
+  </div>
+  <h3>ZIP to PDF Converter <span class="badge-new">NEW</span></h3>
+  <p>Upload a ZIP archive containing images or docs and convert them into a single PDF.</p>
+  <span class="tool-meta">Open ZIP to PDF &rarr;</span>
+</div>
 
       <div class="tool-card" data-cat="utility" onclick="openDocTranslatorModal()">
         <div class="tool-icon" style="background:#f3e8ff; color:#9333ea;"><i class="fa-solid fa-language"></i></div>
