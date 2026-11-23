@@ -47,10 +47,10 @@
   <meta name="twitter:image" content="https://docucraftai.website/banner.png">
   <meta name="google-site-verification" content="g-Ww17Sxt42ftp8mYJX1dtanefwYJK691JhChb_47Rw" />
   <meta name="google-adsense-account" content="ca-pub-4392363279740727">
-  <meta name="description" content="DocuCraft AI - Free Online PDF, Photo, Financial & Productivity Utilities. Resize Photo, Docx to PDF, Govt Job Alerts, Barcode, Gold Price, Notepad and more.">
-  <meta name="keywords" content="PDF editor, KB resizer, docx to pdf, govt jobs, sarkari result, barcode generator, color picker, typing speed test, notepad">
+  <meta name="description" content="DocuCraft AI - Free Online PDF, Photo, Financial & Productivity Utilities. Resize Photo, Docx to PDF, Barcode, Gold Price, Notepad and more.">
+  <meta name="keywords" content="PDF editor, KB resizer, docx to pdf, barcode generator, color picker, typing speed test, notepad">
   <meta property="og:title" content="DocuCraft AI ⚡ Fast PDF Tools & Daily Utilities">
-  <meta property="og:description" content="Merge, Compress, Resize KB, Docx to PDF, Govt Job Alerts, Barcode, Gold Price, BMR, PPF, EMI, Notepad, GST free in browser.">
+  <meta property="og:description" content="Merge, Compress, Resize KB, Docx to PDF, Barcode, Gold Price, BMR, PPF, EMI, Notepad, GST free in browser.">
   <meta property="og:type" content="website">
   
   <link rel="sitemap" type="application/xml" title="Sitemap" href="/sitemap.xml">
@@ -690,7 +690,7 @@
     <!-- Search Bar Inner Box -->
     <div class="search-box-inner">
         <i class="fa-solid fa-magnifying-glass search-icon"></i>
-        <input type="text" id="toolSearchInput" class="search-input" placeholder="Search any tool (e.g. Merge PDF, KB Resizer, Govt Jobs)...">
+        <input type="text" id="toolSearchInput" class="search-input" placeholder="Search any tool (e.g. Merge PDF, KB Resizer,)...">
         
         <div class="voice-assistant-container">
             <button type="button" id="voiceSearchBtn" class="voice-btn" onclick="startVoice()" title="Search by voice">
@@ -1350,19 +1350,7 @@
     </div>
   </div>
 
-  <!-- Free Job Alert Modal -->
-  <div class="calc-modal" id="freeJobAlertModal" onclick="if(event.target === this) closeFreeJobAlertModal()">
-    <div class="calc-box" style="max-width: 520px;">
-      <button class="calc-close" onclick="closeFreeJobAlertModal()">&times;</button>
-      <h3><i class="fa-solid fa-bell" style="color: #2563eb;"></i> Free Job Alert Portal</h3>
-      <p style="font-size: 13.5px; color: #475569; margin-bottom: 14px;">Select the official Free Job Alert portal to browse live notifications, admit cards, and recruitment results:</p>
-      <div style="display: flex; flex-direction: column; gap: 10px;">
-        <a href="https://www.freejobalert.com" target="_blank" class="calc-btn" style="text-decoration: none; text-align: center; background: #2563eb;"><i class="fa-solid fa-globe"></i> Visit Free Job Alert (Official) &rarr;</a>
-      </div>
-    </div>
-  </div>
-
-  <!-- Scientific Calculator Modal with Algebra / Alphabet Tab Added -->
+  <!--Calculator -->
   <div class="calc-modal" id="scientificCalcModal" onclick="if(event.target === this) closeScientificCalcModal()">
     <div class="calc-box" style="max-width: 440px;">
       <button class="calc-close" onclick="closeScientificCalcModal()">&times;</button>
@@ -1372,9 +1360,6 @@
         <!-- Horizontal Scrollable Tabs on Mobile & Apple devices -->
         <div class="calc-mode-tabs">
           <button class="calc-tab-btn active" onclick="switchSciTab('sciBasic', event)">Basic</button>
-          <button class="calc-tab-btn" onclick="switchSciTab('sciTrig', event)">Trigonometry</button>
-          <button class="calc-tab-btn" onclick="switchSciTab('sciCalc', event)">Calculus</button>
-          <button class="calc-tab-btn" onclick="switchSciTab('sciAlgebra', event)">Algebra</button>
         </div>
 
         <div class="calc-screen-display">
@@ -1408,112 +1393,7 @@
           <button onclick="appendSciValue('.')">.</button>
           <button class="btn-sci-ac" onclick="sciBackspace()">⌫</button>
           <button class="btn-sci-eq" onclick="calculateSciResult()">=</button>
-        </div>
-
-        <!-- Trigonometry Panel -->
-        <div id="sciTrig" class="calc-buttons-grid-box calc-panel-sec">
-          <button class="btn-sci-op" onclick="appendSciFunc('Math.sin(')">sin</button>
-          <button class="btn-sci-op" onclick="appendSciFunc('Math.cos(')">cos</button>
-          <button class="btn-sci-op" onclick="appendSciFunc('Math.tan(')">tan</button>
-          <button class="btn-sci-ac" onclick="clearSciScreen()">AC</button>
-
-          <button class="btn-sci-op" onclick="appendSciFunc('Math.asin(')">arcsin</button>
-          <button class="btn-sci-op" onclick="appendSciFunc('Math.acos(')">arccos</button>
-          <button class="btn-sci-op" onclick="appendSciFunc('Math.atan(')">arctan</button>
-          <button class="btn-sci-op" onclick="appendSciValue('Math.PI')">π</button>
-
-          <button onclick="appendSciValue('7')">7</button>
-          <button onclick="appendSciValue('8')">8</button>
-          <button onclick="appendSciValue('9')">9</button>
-          <button class="btn-sci-op" onclick="appendSciValue('/')">÷</button>
-
-          <button onclick="appendSciValue('4')">4</button>
-          <button onclick="appendSciValue('5')">5</button>
-          <button onclick="appendSciValue('6')">6</button>
-          <button class="btn-sci-op" onclick="appendSciValue('*')">×</button>
-
-          <button onclick="appendSciValue('1')">1</button>
-          <button onclick="appendSciValue('2')">2</button>
-          <button onclick="appendSciValue('3')">3</button>
-          <button class="btn-sci-op" onclick="appendSciValue('-')">-</button>
-
-          <button onclick="appendSciValue('0')">0</button>
-          <button onclick="appendSciValue('.')">.</button>
-          <button class="btn-sci-ac" onclick="sciBackspace()">⌫</button>
-          <button class="btn-sci-eq" onclick="calculateSciResult()">=</button>
-        </div>
-
-        <!-- Calculus Panel -->
-        <div id="sciCalc" class="calc-buttons-grid-box calc-panel-sec">
-          <button class="btn-sci-op" onclick="appendSciFunc('Math.log(')">ln</button>
-          <button class="btn-sci-op" onclick="appendSciFunc('Math.log10(')">log</button>
-          <button class="btn-sci-op" onclick="appendSciValue('Math.E')">e</button>
-          <button class="btn-sci-ac" onclick="clearSciScreen()">AC</button>
-
-          <button class="btn-sci-op" onclick="appendSciFunc('Math.sqrt(')">√</button>
-          <button class="btn-sci-op" onclick="appendSciValue('**2')">x²</button>
-          <button class="btn-sci-op" onclick="appendSciValue('**')">x^y</button>
-          <button class="btn-sci-op" onclick="appendSciValue('%')">%</button>
-
-          <button onclick="appendSciValue('7')">7</button>
-          <button onclick="appendSciValue('8')">8</button>
-          <button onclick="appendSciValue('9')">9</button>
-          <button class="btn-sci-op" onclick="appendSciValue('/')">÷</button>
-
-          <button onclick="appendSciValue('4')">4</button>
-          <button onclick="appendSciValue('5')">5</button>
-          <button onclick="appendSciValue('6')">6</button>
-          <button class="btn-sci-op" onclick="appendSciValue('*')">×</button>
-
-          <button onclick="appendSciValue('1')">1</button>
-          <button onclick="appendSciValue('2')">2</button>
-          <button onclick="appendSciValue('3')">3</button>
-          <button class="btn-sci-op" onclick="appendSciValue('-')">-</button>
-
-          <button onclick="appendSciValue('0')">0</button>
-          <button onclick="appendSciValue('.')">.</button>
-          <button class="btn-sci-ac" onclick="sciBackspace()">⌫</button>
-          <button class="btn-sci-eq" onclick="calculateSciResult()">=</button>
-        </div>
-
-        <!-- Algebra (Alphabet / Variables) Panel Added -->
-        <div id="sciAlgebra" class="calc-buttons-grid-box calc-panel-sec">
-          <button class="btn-sci-var" onclick="appendSciValue('x')">x</button>
-          <button class="btn-sci-var" onclick="appendSciValue('y')">y</button>
-          <button class="btn-sci-var" onclick="appendSciValue('z')">z</button>
-          <button class="btn-sci-ac" onclick="clearSciScreen()">AC</button>
-
-          <button class="btn-sci-var" onclick="appendSciValue('a')">a</button>
-          <button class="btn-sci-var" onclick="appendSciValue('b')">b</button>
-          <button class="btn-sci-var" onclick="appendSciValue('c')">c</button>
-          <button class="btn-sci-op" onclick="appendSciValue('**2')">²</button>
-
-          <button class="btn-sci-op" onclick="appendSciValue('(')">(</button>
-          <button class="btn-sci-op" onclick="appendSciValue(')')">)</button>
-          <button class="btn-sci-op" onclick="appendSciValue('**')">^</button>
-          <button class="btn-sci-op" onclick="appendSciValue('/')">÷</button>
-
-          <button onclick="appendSciValue('7')">7</button>
-          <button onclick="appendSciValue('8')">8</button>
-          <button onclick="appendSciValue('9')">9</button>
-          <button class="btn-sci-op" onclick="appendSciValue('*')">×</button>
-
-          <button onclick="appendSciValue('4')">4</button>
-          <button onclick="appendSciValue('5')">5</button>
-          <button onclick="appendSciValue('6')">6</button>
-          <button class="btn-sci-op" onclick="appendSciValue('-')">-</button>
-
-          <button onclick="appendSciValue('1')">1</button>
-          <button onclick="appendSciValue('2')">2</button>
-          <button onclick="appendSciValue('3')">3</button>
-          <button class="btn-sci-op" onclick="appendSciValue('+')">+</button>
-
-          <button onclick="appendSciValue('0')">0</button>
-          <button onclick="appendSciValue('.')">.</button>
-          <button class="btn-sci-ac" onclick="sciBackspace()">⌫</button>
-          <button class="btn-sci-eq" onclick="calculateSciResult()">=</button>
-        </div>
-      </div>
+        </div>     
     </div>
   </div>
 
