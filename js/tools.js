@@ -1828,7 +1828,7 @@ function updatePrivacyStatus() {
         }, 400);
       }
     }
-    });
+    
     
     resumeDiv.textContent = content;
     
