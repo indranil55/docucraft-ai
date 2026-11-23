@@ -679,7 +679,7 @@
  <!-- Hero Section -->
   <section class="hero">
     <h1>Next-Gen Document & Productivity Toolbox for Everyday Tasks</h1>
-    <p>Advanced Photo KB Resizer, Unlimited Notepad, Docx to PDF, Govt Job Alerts & Utilities.</p>
+    <p>Advanced Photo KB Resizer, Unlimited Notepad, Docx to PDF,</p>
   </section>
 
 <!-- Search & Filter Section -->
@@ -4446,10 +4446,7 @@ function executeVoiceCommand(cmd) {
   else if (cmd.includes("calculator") || cmd.includes("calc")) {
     speakResponse("Opening Calculator");
     if (typeof openScientificCalc === "function") openScientificCalc();
-  }
-  else if (cmd.includes("job") || cmd.includes("alert")) {
-    speakResponse("Opening Job Alerts");
-    if (typeof openGovtJobModal === "function") openGovtJobModal();
+  
   }
   else if (cmd.includes("translate") || cmd.includes("translator")) {
     speakResponse("Opening Translator");
