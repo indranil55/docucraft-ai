@@ -1713,39 +1713,121 @@ function updatePrivacyStatus() {
   statusTag.textContent = navigator.onLine ? 'Device-Only Mode' : 'Offline Mode Active ✓';
 }
 
-// Resume Download Function
-async function generateResumeDownload() {
-  const btn = event ? event.target : null;
-  const originalText = btn ? btn.innerText : 'Download Resume (HTML/Text)';
-  if (btn) { btn.innerText = "Generating PDF..."; btn.disabled = true; }
-  
-  try {
-    // Load html2pdf library dynamically using your existing loadScript function
-    await loadScript('https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js');
-    
-    const modal = document.getElementById('resumeMakerModal');
-    if (!modal) throw new Error("Resume modal not found");
-    
-    const inputs = modal.querySelectorAll('input, textarea');
-    
-    // Create a clean resume layout dynamically
-    const resumeDiv = document.createElement('div');
-    resumeDiv.style.padding = '40px';
-    resumeDiv.style.fontFamily = 'Arial, sans-serif';
-    resumeDiv.style.color = '#1e293b';
-    
-    let content = `<h1 style="text-align:center; color:#2563eb; margin-bottom:10px;">Professional Resume</h1><hr style="margin-bottom:20px; border: 1px solid #cbd5e1;"/>`;
-    
-    inputs.forEach(input => {
-        const val = input.value.trim();
-        if (val) {
-            // Use placeholder as label if available
-            const label = input.placeholder || 'Details';
-            content += `<div style="margin-bottom: 20px;">
-                <h3 style="margin: 0 0 5px 0; font-size: 14px; color: #64748b; text-transform: uppercase;">${label}</h3>
-                <p style="margin: 0; font-size: 16px; white-space: pre-wrap; line-height: 1.5;">${val}</p>
-            </div>`;
+// Professional A4 Resume Maker (Supports A4 Print/PDF & MS Word .doc)
+    function openResumeMakerModal() { showModal('resumeMakerModal'); }
+    function closeResumeMakerModal() { hideModal('resumeMakerModal'); }
+    function generateResumeA4(format) {
+      const name = document.getElementById('resumeName').value.trim() || 'Your Name';
+      const email = document.getElementById('resumeEmail').value.trim() || 'email@example.com';
+      const phone = document.getElementById('resumePhone').value.trim() || '+91 0000000000';
+      const address = document.getElementById('resumeAddress').value.trim() || '';
+      const summary = (document.getElementById('resumeSummary').value.trim() || 'Add your professional summary and work experience here.').replace(/\n/g, '<br>');
+      const skills = (document.getElementById('resumeSkills').value.trim() || 'Add your educational qualifications and technical skills here.').replace(/\n/g, '<br>');
+
+      const a4HtmlContent = `
+        <!DOCTYPE html>
+        <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
+        <head>
+          <meta charset="utf-8">
+          <title>${name} - Resume</title>
+          <style>
+            @page {
+              size: A4;
+              margin: 20mm;
+            }
+            body {
+              font-family: 'Segoe UI', Arial, sans-serif;
+              color: #1e293b;
+              line-height: 1.6;
+              margin: 0;
+              padding: 0;
+              background: #ffffff;
+            }
+            .a4-container {
+              width: 100%;
+              max-width: 210mm;
+              margin: 0 auto;
+              padding: 10px;
+              box-sizing: border-box;
+            }
+            .header {
+              border-bottom: 2.5px solid #1d4ed8;
+              padding-bottom: 14px;
+              margin-bottom: 20px;
+            }
+            .header h1 {
+              margin: 0 0 6px 0;
+              font-size: 26pt;
+              color: #0f172a;
+              text-transform: uppercase;
+              letter-spacing: 0.5px;
+            }
+            .contact-info {
+              font-size: 10.5pt;
+              color: #475569;
+            }
+            .section {
+              margin-bottom: 20px;
+            }
+            .section-title {
+              font-size: 13pt;
+              font-weight: bold;
+              color: #1d4ed8;
+              text-transform: uppercase;
+              border-bottom: 1px solid #cbd5e1;
+              padding-bottom: 4px;
+              margin-bottom: 10px;
+            }
+            .section-content {
+              font-size: 11pt;
+              color: #334155;
+            }
+          </style>
+        </head>
+        <body>
+          <div class="a4-container">
+            <div class="header">
+              <h1>${name}</h1>
+              <div class="contact-info">
+                <strong>Email:</strong> ${email} &nbsp;|&nbsp; <strong>Phone:</strong> ${phone}
+                ${address ? `<br><strong>Address:</strong> ${address}` : ''}
+              </div>
+            </div>
+
+            <div class="section">
+              <div class="section-title">Professional Summary &amp; Experience</div>
+              <div class="section-content">${summary}</div>
+            </div>
+
+            <div class="section">
+              <div class="section-title">Education &amp; Skills</div>
+              <div class="section-content">${skills}</div>
+            </div>
+          </div>
+        </body>
+        </html>
+      `;
+
+      if (format === 'word') {
+        const blob = new Blob(['\ufeff', a4HtmlContent], {
+          type: 'application/msword;charset=utf-8'
+        });
+        triggerDownload(URL.createObjectURL(blob), `${name.replace(/\s+/g, '_')}_Resume_A4.doc`);
+      } else {
+        const printWindow = window.open('', '_blank', 'width=850,height=950');
+        if (!printWindow) {
+          alert("Please allow pop-ups in your browser to save or print the A4 PDF.");
+          return;
         }
+        printWindow.document.open();
+        printWindow.document.write(a4HtmlContent);
+        printWindow.document.close();
+        printWindow.focus();
+        setTimeout(() => {
+          printWindow.print();
+        }, 400);
+      }
+    }
     });
     
     resumeDiv.textContent = content;
