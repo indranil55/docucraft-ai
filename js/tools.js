@@ -1726,6 +1726,7 @@ async function generateResumeDownload(e) {
     const name = (document.getElementById('resumeName')?.value || 'Your Name').trim();
     const email = (document.getElementById('resumeEmail')?.value || '').trim();
     const phone = (document.getElementById('resumePhone')?.value || '').trim();
+    const address = (document.getElementById('resumeAddress')?.value || '').trim();
     const summary = (document.getElementById('resumeSummary')?.value || '').trim();
     const skills = (document.getElementById('resumeSkills')?.value || '').trim();
 
@@ -1745,6 +1746,7 @@ async function generateResumeDownload(e) {
       <div style="border-bottom: 3px solid #1d4ed8; padding-bottom: 14px; margin-bottom: 22px;">
         <h1 style="margin: 0 0 8px 0; font-size: 26pt; color: #0f172a; text-transform: uppercase; letter-spacing: 0.5px;">${escapeHtml(name)}</h1>
         <div style="font-size: 11pt; color: #475569;">${contactParts.join(' &nbsp;|&nbsp; ') || 'Professional Curriculum Vitae'}</div>
+        ${address ? `<div style="font-size: 10.5pt; color: #475569; margin-top: 4px;"><strong>Address:</strong> ${escapeHtml(address)}</div>` : ''}
       </div>
 
       ${summary ? `
@@ -1784,6 +1786,88 @@ async function generateResumeDownload(e) {
   }
 }
 window.generateResumeDownload = generateResumeDownload;
+
+// A4 PDF & Word (.doc) Download Function for Resume Maker
+async function generateResumeA4(format, e) {
+  const evt = e || window.event;
+  const btn = evt && evt.target ? evt.target.closest('button') : null;
+  const originalHtml = btn ? btn.innerHTML : '';
+
+  const name = (document.getElementById('resumeName')?.value || 'Your Name').trim();
+  const email = (document.getElementById('resumeEmail')?.value || '').trim();
+  const phone = (document.getElementById('resumePhone')?.value || '').trim();
+  const address = (document.getElementById('resumeAddress')?.value || '').trim();
+  const summary = (document.getElementById('resumeSummary')?.value || '').trim();
+  const skills = (document.getElementById('resumeSkills')?.value || '').trim();
+  const safeFileName = name.replace(/[^a-zA-Z0-9_-]+/g, '_') || 'Professional_Resume';
+
+  const contactParts = [];
+  if (email) contactParts.push(`<strong>Email:</strong> ${escapeHtml(email)}`);
+  if (phone) contactParts.push(`<strong>Phone:</strong> ${escapeHtml(phone)}`);
+
+  const innerResumeHtml = `
+    <div style="border-bottom: 3px solid #1d4ed8; padding-bottom: 14px; margin-bottom: 22px;">
+      <h1 style="margin: 0 0 8px 0; font-size: 26pt; color: #0f172a; text-transform: uppercase; letter-spacing: 0.5px;">${escapeHtml(name)}</h1>
+      <div style="font-size: 11pt; color: #475569;">${contactParts.join(' &nbsp;|&nbsp; ') || 'Professional Curriculum Vitae'}</div>
+      ${address ? `<div style="font-size: 10.5pt; color: #475569; margin-top: 4px;"><strong>Address:</strong> ${escapeHtml(address)}</div>` : ''}
+    </div>
+
+    ${summary ? `
+    <div style="margin-bottom: 22px;">
+      <h2 style="margin: 0 0 8px 0; font-size: 13pt; color: #1d4ed8; text-transform: uppercase; border-bottom: 1px solid #cbd5e1; padding-bottom: 4px;">Professional Summary &amp; Experience</h2>
+      <p style="margin: 0; font-size: 11pt; line-height: 1.65; white-space: pre-wrap; color: #334155;">${escapeHtml(summary)}</p>
+    </div>` : ''}
+
+    ${skills ? `
+    <div style="margin-bottom: 22px;">
+      <h2 style="margin: 0 0 8px 0; font-size: 13pt; color: #1d4ed8; text-transform: uppercase; border-bottom: 1px solid #cbd5e1; padding-bottom: 4px;">Education &amp; Skills</h2>
+      <p style="margin: 0; font-size: 11pt; line-height: 1.65; white-space: pre-wrap; color: #334155;">${escapeHtml(skills)}</p>
+    </div>` : ''}
+  `;
+
+  if (format === 'word') {
+    const wordDocHtml = `<!DOCTYPE html>
+<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
+<head><meta charset="utf-8"><title>${escapeHtml(name)} - Resume</title>
+<style>@page { size: A4; margin: 20mm; } body { font-family: 'Segoe UI', Arial, sans-serif; color: #1e293b; }</style>
+</head><body>${innerResumeHtml}</body></html>`;
+    const blob = new Blob(['\ufeff', wordDocHtml], { type: 'application/msword;charset=utf-8' });
+    downloadBlob(blob, `${safeFileName}_Resume_A4.doc`, 'application/msword');
+    showSuccessPopup('A4 Word Resume (.doc) Downloaded Successfully!');
+    return;
+  }
+
+  // Direct A4 PDF Download
+  if (btn) { btn.innerText = 'Generating A4 PDF...'; btn.disabled = true; }
+  try {
+    await loadScript('https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js');
+    const resumeDiv = document.createElement('div');
+    resumeDiv.style.width = '180mm';
+    resumeDiv.style.padding = '10mm';
+    resumeDiv.style.fontFamily = "'Segoe UI', Arial, sans-serif";
+    resumeDiv.style.color = '#1e293b';
+    resumeDiv.style.background = '#ffffff';
+    resumeDiv.style.boxSizing = 'border-box';
+    resumeDiv.innerHTML = innerResumeHtml;
+
+    const opt = {
+      margin:       15,
+      filename:     `${safeFileName}_Resume_A4.pdf`,
+      image:        { type: 'jpeg', quality: 0.98 },
+      html2canvas:  { scale: 2, useCORS: true, backgroundColor: '#ffffff' },
+      jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+    };
+
+    await html2pdf().set(opt).from(resumeDiv).save();
+    showSuccessPopup('A4 Resume PDF Downloaded Successfully!');
+  } catch (err) {
+    console.error(err);
+    alert('Error generating A4 PDF: ' + err.message);
+  } finally {
+    if (btn) { btn.innerHTML = originalHtml; btn.disabled = false; }
+  }
+}
+window.generateResumeA4 = generateResumeA4;
 
 window.addEventListener('online', updatePrivacyStatus);
 window.addEventListener('offline', updatePrivacyStatus);
