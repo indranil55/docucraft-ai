@@ -1663,11 +1663,11 @@
     </div>
   </div>
 
-  <!-- Resume Maker Modal Added -->
+ <!-- Resume Maker Modal Updated for A4 PDF & Word -->
   <div class="calc-modal" id="resumeMakerModal" onclick="if(event.target === this) closeResumeMakerModal()">
     <div class="calc-box" style="max-width: 600px;">
       <button class="calc-close" onclick="closeResumeMakerModal()">&times;</button>
-      <h3><i class="fa-solid fa-file-lines" style="color: #1d4ed8;"></i> Professional Resume Maker</h3>
+      <h3><i class="fa-solid fa-file-lines" style="color: #1d4ed8;"></i> Professional Resume Maker (A4)</h3>
       <div class="calc-group">
         <label>Full Name:</label>
         <input type="text" id="resumeName" placeholder="e.g. Indranil Ruidas">
@@ -1683,17 +1683,27 @@
         </div>
       </div>
       <div class="calc-group">
+        <label>Address / Location:</label>
+        <input type="text" id="resumeAddress" placeholder="e.g. Purba Bardhaman, West Bengal, India">
+      </div>
+      <div class="calc-group">
         <label>Professional Summary & Experience:</label>
-        <textarea id="resumeSummary" rows="3" placeholder="Write a brief professional summary or work experience..."></textarea>
+        <textarea id="resumeSummary" rows="4" placeholder="Write a brief professional summary or work experience..."></textarea>
       </div>
       <div class="calc-group">
         <label>Education & Skills:</label>
-        <textarea id="resumeSkills" rows="3" placeholder="Mention degrees, technical skills, certifications..."></textarea>
+        <textarea id="resumeSkills" rows="4" placeholder="Mention degrees, technical skills, certifications..."></textarea>
       </div>
-      <button class="calc-btn" onclick="generateResumeDownload()">Download Resume (HTML/Text)</button>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 8px;">
+        <button class="calc-btn" onclick="generateResumeA4('pdf')" style="background: #dc2626; margin-top: 0;">
+          <i class="fa-solid fa-file-pdf"></i> Save as A4 PDF
+        </button>
+        <button class="calc-btn" onclick="generateResumeA4('word')" style="background: #1d4ed8; margin-top: 0;">
+          <i class="fa-solid fa-file-word"></i> Download Word (.doc)
+        </button>
+      </div>
     </div>
   </div>
-
   <!-- Prescription Maker Modal Added -->
   <div class="calc-modal" id="prescriptionMakerModal" onclick="if(event.target === this) closePrescriptionMakerModal()">
     <div class="calc-box" style="max-width: 600px;">
